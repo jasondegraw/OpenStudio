@@ -81,6 +81,9 @@ OPTION( BUILD_SDD "Build with SDD support" ON )
 # Build CONTAM
 OPTION( BUILD_CONTAM "Build with CONTAM support" OFF )
 
+# Build AFN
+OPTION( BUILD_AFN "Build with AFN support" OFF )
+
 # Build with Dakota support
 OPTION( BUILD_WITH_DAKOTA "Build with Dakota algorithm library support" OFF )
 
@@ -153,6 +156,10 @@ ENDIF( BUILD_SDD )
 IF( BUILD_CONTAM )
   LIST(APPEND project_directories contam)
 ENDIF( BUILD_CONTAM ) 
+
+IF( BUILD_AFN )
+  LIST(APPEND project_directories afn)
+ENDIF( BUILD_AFN ) 
 
 ###############################################################################
 
@@ -780,6 +787,11 @@ ELSE( BUILD_CONTAM )
   SET(OPENSTUDIO_CONTAM "")
 ENDIF( BUILD_CONTAM )
 
+IF( BUILD_AFN )
+  SET(OPENSTUDIO_AFN "openstudio_afn")
+ELSE( BUILD_AFN )
+  SET(OPENSTUDIO_AFN "")
+ENDIF( BUILD_AFN )
 
 export(TARGETS openstudio_runmanager 
                openstudio_project
@@ -797,6 +809,7 @@ export(TARGETS openstudio_runmanager
                openstudio_plugin
                openstudio_sdd
                ${OPENSTUDIO_CONTAM}
+	       ${OPENSTUDIO_AFN}
                ${LIBSSH_EXPORT}
                ${QTWINMIGRATE_EXPORT}
                zkexpat
