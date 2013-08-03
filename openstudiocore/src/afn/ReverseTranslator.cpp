@@ -51,24 +51,27 @@
 #include <utilities/units/QuantityConverter.hpp>
 #include <utilities/plot/ProgressBar.hpp>
 
+#include <energyplus/ForwardTranslator.hpp>
+
 #include <QFile>
 #include <QSharedPointer>
 
 namespace openstudio {
   namespace afn {
 
-    ReverseTranslator::ReverseTranslator()
+    ForwardTranslator::ForwardTranslator()
     {
       m_progressBar = 0;
     }
 
-    ReverseTranslator::~ReverseTranslator()
+    ForwardTranslator::~ForwardTranslator()
     {
     }
 
-    boost::optional<openstudio::Workspace> ReverseTranslator::translate(openstudio::model::Model model, ProgressBar* progressBar)
+    boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstudio::model::Model & model, ProgressBar* progressBar)
     {
-      openstudio::Workspace workspace;
+      energyplus::ForwardTranslator translator;
+      openstudio::Workspace workspace = translator.translateModel(model,progressBar);
       QStringList idfStrings;
       // Create a simulation control object
       idfStrings << "AirflowNetwork:SimulationControl"
@@ -168,7 +171,19 @@ namespace openstudio {
             LOG(Error, "Surface '" << surface.handle() << "' has no name, translation aborted");
             return false;
           }
-          // Now for the type specific info
+          boost::optional<openstudio::model::Space> space = surface.space();
+          if(!space)
+          {
+            LOG(Error, "Unattached surface '" << *name << "', translation aborted");
+            return false;
+          }
+          boost::optional<openstudio::model::ThermalZone> thermalZone = space->thermalZone();
+          if(!thermalZone)
+          {
+            LOG(Error, "Unattached space '" << space->handle() << "', translation aborted");
+            return false;
+          }
+          // Now for the type specific work
           QString idfString;
           if(bc == "Outdoors")
           {
@@ -180,16 +195,31 @@ namespace openstudio {
           }
           else if (bc == "Surface")
           {
-            // Make an interior surface
-            if(type == "RoofCeiling")
-              idfString = interior.arg(openstudio::toQString(*name)).arg("");
-            else
-              idfString = interior.arg(openstudio::toQString(*name)).arg("");
-            boost::optional<openstudio::model::Surface> adjacentSurface = surface.adjacentSurface();
+             boost::optional<openstudio::model::Surface> adjacentSurface = surface.adjacentSurface();
             if(!adjacentSurface)
             {
-              LOG(Error, "Unable to find adjacent surface for surface '" << *name << "'");
+              LOG(Error, "Unable to find adjacent surface for surface '" << name << "', translation aborted");
               return false;
+            }
+            boost::optional<openstudio::model::Space> adjacentSpace = adjacentSurface->space();
+            if(!adjacentSpace)
+            {
+              LOG(Error, "Unattached adjacent surface '" << adjacentSurface->handle() << "', translation aborted");
+              return false;
+            }
+            boost::optional<openstudio::model::ThermalZone> adjacentZone = adjacentSpace->thermalZone();
+            if(!adjacentZone)
+            {
+              LOG(Error, "Unattached adjacent space '" << adjacentSpace->handle() << "', translation aborted");
+              return false;
+            }
+            if(adjacentZone.get() != thermalZone.get()) // I don't really like doing this
+            {
+              // Make an interior surface
+              if(type == "RoofCeiling")
+                idfString = interior.arg(openstudio::toQString(*name)).arg("");
+              else
+                idfString = interior.arg(openstudio::toQString(*name)).arg("");
             }
             used << adjacentSurface->handle();
           }

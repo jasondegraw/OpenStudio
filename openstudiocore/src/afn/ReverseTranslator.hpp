@@ -18,8 +18,8 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#ifndef AFN_REVERSETRANSLATOR_HPP
-#define AFN_REVERSETRANSLATOR_HPP
+#ifndef AFN_FORWARDTRANSLATOR_HPP
+#define AFN_FORWARDTRANSLATOR_HPP
 
 #include "AfnAPI.hpp"
 
@@ -42,31 +42,31 @@ namespace openstudio {
 
   namespace afn {
 
-    class AFN_API ReverseTranslator
+    class AFN_API ForwardTranslator
     {
     public:
 
-      ReverseTranslator();
+      ForwardTranslator();
 
-      virtual ~ReverseTranslator();
+      virtual ~ForwardTranslator();
 
-      boost::optional<openstudio::Workspace> translate(openstudio::model::Model model, ProgressBar* progressBar = NULL);
+      boost::optional<openstudio::Workspace> translateModel(openstudio::model::Model & model, ProgressBar* progressBar = NULL);
 
     private:
       //void translateLevels(openstudio::model::Model &model, const prj::Data &data);
       //bool translateZones(openstudio::model::Model &model, const prj::Data &data);
       //bool translateSimpleAHS(openstudio::model::Model &model, const prj::Data &data);
 
-      ProgressBar* m_progressBar;
+      //ProgressBar* m_progressBar;
       //QMap<int,Handle> m_levelMap;
       //QMap<int,Handle> m_zoneMap;
       //QMap<int,Handle> m_ahsMap;
       //QMap<int,int> m_connections;
 
-      REGISTER_LOGGER("openstudio.afn.ReverseTranslator");
+      REGISTER_LOGGER("openstudio.afn.ForwardTranslator");
     };
 
   } // afn
 } // openstudio
 
-#endif // AFN_REVERSETRANSLATOR_HPP
+#endif // AFN_FORWARDTRANSLATOR_HPP
