@@ -2,8 +2,8 @@ SET( target_name openstudio_afn )
 
 SET( ${target_name}_src
   AfnAPI.hpp
-  ReverseTranslator.hpp
-  ReverseTranslator.cpp
+  ForwardTranslator.hpp
+  ForwardTranslator.cpp
 )
 
 # resource files
@@ -29,6 +29,7 @@ SET( ${target_name}_depends
   ${QT_LIBS}
   openstudio_utilities
   openstudio_model
+  openstudio_energyplus
   zkexpat
   boost_log
 )
@@ -65,6 +66,7 @@ TARGET_LINK_LIBRARIES( AddAfnToOsm
   ${${target_name}_depends}
   openstudio_osversion
   openstudio_afn
+  openstudio_energyplus
 )
 
 #INSTALL(TARGETS gbXMLToIdf

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <afn/ReverseTranslator.hpp>
+#include <afn/ForwardTranslator.hpp>
 
 #include <model/Model.hpp>
 #include <model/ModelObject.hpp>
@@ -61,7 +61,7 @@ namespace openstudio {
 
     ForwardTranslator::ForwardTranslator()
     {
-      m_progressBar = 0;
+      // m_progressBar = 0;
     }
 
     ForwardTranslator::~ForwardTranslator()
