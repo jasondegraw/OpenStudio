@@ -53,7 +53,9 @@ namespace openstudio {
       boost::optional<openstudio::Workspace> translateModel(openstudio::model::Model & model, ProgressBar* progressBar = NULL);
 
     private:
-      //void translateLevels(openstudio::model::Model &model, const prj::Data &data);
+      std::vector<openstudio::model::Surface> getInteriorZoneSurfaces(openstudio::model::Model & model);
+      std::vector<openstudio::model::Surface> getExteriorZoneSurfaces(openstudio::model::Model & model);
+      std::map<std::string,double> largestSurfaceAreas(openstudio::model::Model &model);
       //bool translateZones(openstudio::model::Model &model, const prj::Data &data);
       //bool translateSimpleAHS(openstudio::model::Model &model, const prj::Data &data);
 

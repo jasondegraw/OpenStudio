@@ -18,7 +18,7 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-//#include <contam/ReverseTranslator.hpp>
+#include <afn/ForwardTranslator.hpp>
 //#include <contam/PrjData.hpp>
 #include <model/Model.hpp>
 #include <osversion/VersionTranslator.hpp>
@@ -32,14 +32,13 @@
 
 void usage( boost::program_options::options_description desc)
 {
-  std::cout << "Usage: PrjToOsm --inputPath=./path/to/input.prj" << std::endl;
-  std::cout << "   or: PrjToOsm input.prj" << std::endl;
+  std::cout << "Usage: AddAfnToOsm --inputPath=./path/to/input.osm" << std::endl;
+  std::cout << "   or: AddAfnToOsm input.prj" << std::endl;
   std::cout << desc << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
-  /*
   std::string inputPathString;
 
   boost::program_options::options_description desc("Allowed options");
@@ -70,24 +69,42 @@ int main(int argc, char *argv[])
     usage(desc);
     return EXIT_SUCCESS;
   }
-  if (vm.count("inputPath"))
+  if(!vm.count("inputPath"))
   {
-    openstudio::path inputPath = openstudio::toPath(inputPathString);
-    if (boost::filesystem::exists(inputPath))
-    {
-      openstudio::contam::ReverseTranslator translator;
-      openstudio::contam::prj::Data data(openstudio::toQString(inputPath),true);
-      if(data.valid)
-      {
-        boost::optional<openstudio::model::Model> model = translator.translate(data);
-        if(model)
-        {
-          openstudio::path outPath = inputPath.replace_extension(openstudio::toPath("osm").string());
-          if(!model->save(outPath,true))
-          {
-            std::cout << "Failed to write OSM file." << std::endl;
-            return EXIT_FAILURE;
-          }
+    std::cout << "No input path given." << std::endl << std::endl;
+    usage(desc);
+    return EXIT_FAILURE;
+  }
+
+  openstudio::path inputPath = openstudio::toPath(inputPathString);
+
+  if(!boost::filesystem::exists(inputPath))
+  {
+    std::cout << "Input path does not exist." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  openstudio::osversion::VersionTranslator vt;
+  boost::optional<openstudio::model::Model> model = vt.loadModel(inputPath);
+
+  if(!model)
+  {
+    std::cout << "Unable to load file '"<< inputPathString << "' as an OpenStudio model." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  openstudio::afn::ForwardTranslator translator;
+
+  boost::optional<openstudio::Workspace> workspace = translator.translateModel(*model);
+
+  openstudio::path outPath = inputPath.replace_extension(openstudio::toPath("idf").string());
+
+  if(!workspace->save(outPath,true))
+  {
+    std::cout << "Failed to write IDF file." << std::endl;
+    return EXIT_FAILURE;
+  }
+  /*
         }
         else
         {
@@ -106,12 +123,6 @@ int main(int argc, char *argv[])
       std::cout << "Input path does not exist." << std::endl;
       return EXIT_FAILURE;
     }
-  }
-  else
-  { 
-    std::cout << "No input path given." << std::endl << std::endl;
-    usage(desc);
-    return EXIT_FAILURE;
   }
   */
   return EXIT_SUCCESS;

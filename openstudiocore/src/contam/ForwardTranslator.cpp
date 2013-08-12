@@ -89,7 +89,7 @@ namespace contam
         return keys[0];
       }
     }
-    LOG(Warn, "Unable to revers look up " << nr << " in " << name);
+    LOG(Warn, "Unable to reverse look up " << nr << " in " << name);
     return std::string();
   }
 
@@ -107,7 +107,7 @@ namespace contam
         return keys[0];
       }
     }
-    LOG(Warn, "Unable to revers look up " << nr << " in " << name);
+    LOG(Warn, "Unable to reverse look up " << nr << " in " << name);
     return Handle();
   }
 
