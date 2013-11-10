@@ -2050,6 +2050,7 @@ namespace detail {
 
   void Space_Impl::matchSurfaces(Space& other)
   {
+    double tol = 0.01;
 
     if (this->handle() == other.handle()){
       return;
@@ -2084,7 +2085,7 @@ namespace detail {
 
         std::reverse(otherVertices.begin(), otherVertices.end());
 
-        if (circularEqual(vertices, otherVertices, 0.001)){
+        if (circularEqual(vertices, otherVertices, tol)){
 
           // TODO: check constructions?
           surface.setAdjacentSurface(otherSurface);
@@ -2100,7 +2101,7 @@ namespace detail {
               otherVertices = transformation*otherSubSurface.vertices();
               std::reverse(otherVertices.begin(), otherVertices.end());
 
-              if (circularEqual(vertices, otherVertices, 0.001)){
+              if (circularEqual(vertices, otherVertices, tol)){
 
                 // TODO: check constructions?
                 subSurface.setAdjacentSubSurface(otherSubSurface);
@@ -2111,6 +2112,81 @@ namespace detail {
         }
       }
     }
+  }
+
+  void Space_Impl::intersectSurfaces(Space& other)
+  {
+    if (this->handle() == other.handle()){
+      return;
+    }
+
+    std::vector<Surface> surfaces = this->surfaces();
+    std::vector<Surface> otherSurfaces = other.surfaces();
+    
+    std::map<std::string, bool> hasSubSurfaceMap;
+    std::map<std::string, bool> hasAdjacentSurfaceMap;
+    std::set<std::string> completedIntersections;
+
+    bool anyNewSurfaces = true;
+    while(anyNewSurfaces){
+
+      anyNewSurfaces = false;
+      std::vector<Surface> newSurfaces;
+      std::vector<Surface> newOtherSurfaces;
+
+      BOOST_FOREACH(Surface surface, surfaces){
+        std::string surfaceHandle = toString(surface.handle());
+        if (hasSubSurfaceMap.find(surfaceHandle) == hasSubSurfaceMap.end()){
+          hasSubSurfaceMap[surfaceHandle] = !surface.subSurfaces().empty();
+          hasAdjacentSurfaceMap[surfaceHandle] = surface.adjacentSurface();
+        } 
+
+        if (hasSubSurfaceMap[surfaceHandle] || hasAdjacentSurfaceMap[surfaceHandle]){
+          continue;
+        }
+
+        BOOST_FOREACH(Surface otherSurface, otherSurfaces){
+          std::string otherSurfaceHandle = toString(otherSurface.handle());
+          if (hasSubSurfaceMap.find(otherSurfaceHandle) == hasSubSurfaceMap.end()){
+            hasSubSurfaceMap[otherSurfaceHandle] = !otherSurface.subSurfaces().empty();
+            hasAdjacentSurfaceMap[otherSurfaceHandle] = otherSurface.adjacentSurface();
+          } 
+
+          if (hasSubSurfaceMap[otherSurfaceHandle] || hasAdjacentSurfaceMap[otherSurfaceHandle]){
+            continue;
+          }
+
+          // see if we have already tested these for intersection, 
+          // surfaces that previously did not intersect will not intersect if vertices change
+          // surfaces that previously did intersect will intersect exactly
+          std::string intersectionKey = surfaceHandle + otherSurfaceHandle;
+          if (completedIntersections.find(intersectionKey) != completedIntersections.end()){
+            continue;
+          }
+          completedIntersections.insert(intersectionKey);
+
+          // number of surfaces in each space will only increase in intersect
+          boost::optional<SurfaceIntersection> intersection = surface.computeIntersection(otherSurface);
+          if (intersection){
+            std::vector<Surface> newSurfaces1 = intersection->newSurfaces1();
+            newSurfaces.insert(newSurfaces.end(), newSurfaces1.begin(), newSurfaces1.end());
+
+            std::vector<Surface> newSurfaces2 = intersection->newSurfaces2();
+            newOtherSurfaces.insert(newOtherSurfaces.end(), newSurfaces2.begin(), newSurfaces2.end());
+          }
+        }
+      }
+
+      if (!newSurfaces.empty()){
+        surfaces.insert(surfaces.end(), newSurfaces.begin(), newSurfaces.end());
+        anyNewSurfaces = true;
+      }
+      if (!newOtherSurfaces.empty()){
+        otherSurfaces.insert(otherSurfaces.end(), newOtherSurfaces.begin(), newOtherSurfaces.end());
+        anyNewSurfaces = true;
+      }
+    }
+
   }
 
   std::vector<Surface> Space_Impl::findSurfaces(boost::optional<double> minDegreesFromNorth,
@@ -2456,22 +2532,6 @@ namespace detail {
     OS_ASSERT(count == 1);
   }
 
-  // helper function to get a boost polygon point from a Point3d
-  boost::tuple<double, double> point3dToTuple(const Point3d& point3d, std::vector<Point3d>& allPoints, double tol)
-  {
-    // simple method
-    //return boost::make_tuple(point3d.x(), point3d.y());
-
-    // detailed method, try to combine points within tolerance
-    BOOST_FOREACH(const Point3d& otherPoint, allPoints){
-      if (std::sqrt(std::pow(point3d.x()-otherPoint.x(), 2) + std::pow(point3d.y()-otherPoint.y(), 2)) < tol){
-        return boost::make_tuple(otherPoint.x(), otherPoint.y());
-      }
-    }
-    allPoints.push_back(point3d);
-    return boost::make_tuple(point3d.x(), point3d.y());
-  }
-
   std::vector<Point3d> Space_Impl::floorPrint() const
   {
     double tol = 0.01; // 1 cm tolerance
@@ -2612,6 +2672,23 @@ namespace detail {
     result = removeColinear(result);
 
     return result;
+  }
+
+  
+  // helper function to get a boost polygon point from a Point3d
+  boost::tuple<double, double> Space_Impl::point3dToTuple(const Point3d& point3d, std::vector<Point3d>& allPoints, double tol) const
+  {
+    // simple method
+    //return boost::make_tuple(point3d.x(), point3d.y());
+
+    // detailed method, try to combine points within tolerance
+    BOOST_FOREACH(const Point3d& otherPoint, allPoints){
+      if (std::sqrt(std::pow(point3d.x()-otherPoint.x(), 2) + std::pow(point3d.y()-otherPoint.y(), 2)) < tol){
+        return boost::make_tuple(otherPoint.x(), otherPoint.y());
+      }
+    }
+    allPoints.push_back(point3d);
+    return boost::make_tuple(point3d.x(), point3d.y());
   }
 
 } // detail
@@ -3087,6 +3164,10 @@ void Space::unmatchSurfaces() {
 
 void Space::matchSurfaces(Space& space) {
   getImpl<detail::Space_Impl>()->matchSurfaces(space);
+}
+
+void Space::intersectSurfaces(Space& space) {
+  getImpl<detail::Space_Impl>()->intersectSurfaces(space);
 }
 
 std::vector <Surface> Space::findSurfaces(boost::optional<double> minDegreesFromNorth,

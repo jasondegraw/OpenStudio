@@ -37,6 +37,8 @@
 #include <model/AirLoopHVACZoneSplitter_Impl.hpp>
 #include <model/AirLoopHVACZoneMixer.hpp>
 #include <model/AirLoopHVACZoneMixer_Impl.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeCooledBeam.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeCooledBeam_Impl.hpp>
 #include <model/AirTerminalSingleDuctUncontrolled.hpp>
 #include <model/AirTerminalSingleDuctUncontrolled_Impl.hpp>
 #include <model/AirTerminalSingleDuctVAVReheat.hpp>
@@ -719,6 +721,13 @@ namespace detail {
     return addBranchForZone(thermalZone,comp);
   }
 
+  bool AirLoopHVAC_Impl::addBranchForZone(ThermalZone & thermalZone, StraightComponent & airTerminal)
+  {
+    boost::optional<StraightComponent> comp = airTerminal;
+
+    return addBranchForZone(thermalZone, comp);
+  }
+
   bool AirLoopHVAC_Impl::addBranchForHVACComponent(HVACComponent airTerminal)
   {
     Model _model = this->model();
@@ -1129,6 +1138,11 @@ IddObjectType AirLoopHVAC::iddObjectType() {
 bool AirLoopHVAC::addBranchForZone(openstudio::model::ThermalZone & thermalZone)
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->addBranchForZone(thermalZone);
+}
+
+bool AirLoopHVAC::addBranchForZone(ThermalZone & thermalZone, StraightComponent & airTerminal)
+{
+  return getImpl<detail::AirLoopHVAC_Impl>()->addBranchForZone(thermalZone, airTerminal);
 }
 
 bool AirLoopHVAC::addBranchForHVACComponent(HVACComponent airTerminal)

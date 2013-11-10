@@ -113,7 +113,7 @@ void DesignAlternativesTabController::updateButtonStatusBasedOnSelectionNow()
 
     bool measuresSelected = false;
     for( std::vector<QPointer<OSListItem> >::const_iterator it = items.begin(); it != items.end(); it++ ) {
-      if( measuretab::MeasureItem * measureItem = qobject_cast<measuretab::MeasureItem *>(*it) ){
+      if( qobject_cast<measuretab::MeasureItem *>(*it) ){
         measuresSelected = true;
         break;
       }
@@ -330,7 +330,7 @@ std::string DesignAltListController::suggestDesignAltName(const boost::optional<
 
   std::set<std::string> allNames;
   if( boost::optional<analysisdriver::SimpleProject> project = PatApp::instance()->project() ){
-    BOOST_FOREACH(const analysis::DataPoint& dataPoint, project->analysis().dataPoints()){
+    Q_FOREACH(const analysis::DataPoint& dataPoint, project->analysis().dataPoints()){
       allNames.insert(dataPoint.name());
       allNames.insert(dataPoint.displayName());
     }

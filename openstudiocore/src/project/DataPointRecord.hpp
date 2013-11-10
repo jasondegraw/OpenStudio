@@ -25,10 +25,12 @@
 
 namespace openstudio {
 
+class Attribute;
 class FileReference;
 
 namespace analysis {
   class DataPoint;
+  class DataPointRunType;
 } // analysis
 namespace project {
 
@@ -36,6 +38,7 @@ class AnalysisRecord;
 class AttributeRecord;
 class ProblemRecord;
 class FileReferenceRecord;
+class MeasureRecord;
 class TagRecord;
 class DataPointValueRecord;
 
@@ -84,6 +87,7 @@ OPENSTUDIO_ENUM(DataPointRecordColumns,
   ((dakotaParametersFiles)(TEXT)(18))
   ((idfInputDataRecordId)(INTEGER)(19))
   ((selected)(BOOLEAN)(20))
+  ((runType)(INTEGER)(21))
 );
 
 /** DataPointRecord is a ObjectRecord*/
@@ -144,8 +148,18 @@ class PROJECT_API DataPointRecord : public ObjectRecord {
 
   bool selected() const;
 
+  analysis::DataPointRunType runType() const;
+
   openstudio::path directory() const;
 
+  std::vector<QVariant> variableValues() const;
+
+  /** Returns the measures associated with this DataPoint via MeasureGroup selection. Returns them
+   *  in ProblemRecord::inputVariableRecords order. */
+  std::vector<MeasureRecord> measureRecords() const;
+
+  /** Returns the continuous variable values associated with this DataPoint. Returns them in 
+   *  ProblemRecord::inputVariableRecords order. */
   std::vector<DataPointValueRecord> continuousVariableValueRecords() const;
 
   std::vector<DataPointValueRecord> responseValueRecords() const;
@@ -218,9 +232,10 @@ class PROJECT_API DataPointRecord : public ObjectRecord {
       ProjectDatabase& database,
       bool isNew);
 
-  std::vector<FileReferenceRecord> saveChildFileReferences(
-      const std::vector<FileReference>& childFileReferences,
+  std::vector<FileReferenceRecord> saveChildXmlFileReferences(
+      std::vector<FileReference> childFileReferences,
       std::vector<FileReferenceRecord> oldFileReferenceRecords,
+      std::vector<Attribute> outputAttributes,
       DataPointRecord& copyOfThis,
       ProjectDatabase& database,
       bool isNew);

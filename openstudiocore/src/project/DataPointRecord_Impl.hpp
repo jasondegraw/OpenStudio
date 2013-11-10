@@ -25,21 +25,20 @@
 
 #include <project/DataPointRecord.hpp>
 
+#include <analysis/DataPoint.hpp>
+
 namespace openstudio {
-namespace analysis {
-  class DataPoint;
-} // analysis
 namespace project {
 
 class AnalysisRecord;
 class FileReferenceRecord;
 class DataPointValueRecord;
+class MeasureRecord;
 
 namespace detail {
 
   /** DataPointRecord_Impl is a ObjectRecord_Impl that is the implementation class for DataPointRecord.*/
   class PROJECT_API DataPointRecord_Impl : public ObjectRecord_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -104,8 +103,18 @@ namespace detail {
 
     bool selected() const;
 
+    analysis::DataPointRunType runType() const;
+
     openstudio::path directory() const;
 
+    std::vector<QVariant> variableValues() const;
+
+    /** Returns the measures associated with this DataPoint via MeasureGroup selection. Returns them
+     *  in ProblemRecord::inputVariableRecords order. */
+    std::vector<MeasureRecord> measureRecords() const;
+
+    /** Returns the continuous variable values associated with this DataPoint. Returns them in 
+     *  ProblemRecord::inputVariableRecords order. */
     std::vector<DataPointValueRecord> continuousVariableValueRecords() const;
 
     std::vector<DataPointValueRecord> responseValueRecords() const;
@@ -185,6 +194,7 @@ namespace detail {
     bool m_complete;
     bool m_failed;
     bool m_selected;
+    analysis::DataPointRunType m_runType;
     openstudio::path m_directory;
     boost::optional<int> m_osmInputDataRecordId;
     boost::optional<int> m_idfInputDataRecordId;
@@ -198,6 +208,7 @@ namespace detail {
     bool m_lastComplete;
     bool m_lastFailed;
     bool m_lastSelected;
+    analysis::DataPointRunType m_lastRunType;
     openstudio::path m_lastDirectory;
     boost::optional<int> m_lastOsmInputDataRecordId;
     boost::optional<int> m_lastIdfInputDataRecordId;

@@ -40,13 +40,18 @@
 #include <utilities/idf/ValidityReport.hpp>
 #include <utilities/idf/Workspace.hpp>
 
+#include <model/EvaporativeFluidCoolerSingleSpeed.hpp>
 #include <model/AirLoopHVACOutdoorAirSystem.hpp>
 #include <model/AirLoopHVACUnitaryHeatPumpAirToAir.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeCooledBeam.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeReheat.hpp>
 #include <model/AirTerminalSingleDuctParallelPIUReheat.hpp>
 #include <model/AirTerminalSingleDuctUncontrolled.hpp>
 #include <model/AirTerminalSingleDuctVAVReheat.hpp>
+#include <model/AirTerminalSingleDuctVAVNoReheat.hpp>
 #include <model/AvailabilityManagerScheduled.hpp>
 #include <model/BuildingStory.hpp>
+#include <model/CoilCoolingCooledBeam.hpp>
 #include <model/CoilCoolingDXSingleSpeed.hpp>
 #include <model/CoilCoolingDXTwoSpeed.hpp>
 #include <model/CoilCoolingWaterToAirHeatPumpEquationFit.hpp>
@@ -761,9 +766,11 @@ bool OpenStudioApp::notify(QObject* receiver, QEvent* event)
   return QApplication::notify(receiver, event);
 }
 
-void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& translator, bool successful, const QString& fileName, 
-    const openstudio::path &tempModelDir) {
-  
+void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& translator, 
+                                            bool successful, 
+                                            const QString& fileName, 
+                                            const openstudio::path &tempModelDir) 
+{  
   QMessageBox messageBox; 
 
   QString log;

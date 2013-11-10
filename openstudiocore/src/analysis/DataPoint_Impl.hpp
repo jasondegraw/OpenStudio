@@ -23,6 +23,7 @@
 #include <analysis/AnalysisAPI.hpp>
 #include <analysis/AnalysisObject_Impl.hpp>
 
+#include <analysis/DataPoint.hpp>
 #include <analysis/Problem.hpp>
 
 #include <model/Model.hpp>
@@ -46,14 +47,10 @@ namespace runmanager {
 
 namespace analysis {
 
-class DataPoint;
-class DataPointSerializationOptions;
-
 namespace detail {
 
   /** DataPoint_Impl is a AnalysisObject_Impl that is the implementation class for DataPoint.*/
   class ANALYSIS_API DataPoint_Impl : public AnalysisObject_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -73,6 +70,7 @@ namespace detail {
                    bool complete,
                    bool failed,
                    bool selected,
+                   DataPointRunType runType,
                    const std::vector<QVariant>& variableValues,
                    const std::vector<double>& responseValues,
                    const openstudio::path& directory,
@@ -96,6 +94,7 @@ namespace detail {
                    bool complete,
                    bool failed,
                    bool selected,
+                   DataPointRunType runType,
                    const std::vector<QVariant>& variableValues,
                    const std::vector<double>& responseValues,
                    const openstudio::path& directory,
@@ -144,6 +143,8 @@ namespace detail {
 
     /** Returns true if the DataPoint is selected (to be simulated in the next batch). */
     bool selected() const;
+
+    DataPointRunType runType() const;
 
     /** Returns the variableValues to be applied in simulating this DataPoint. (That is, inputData
      *  will be the result of applying variableValues to the Analysis seed file.) */
@@ -194,6 +195,8 @@ namespace detail {
 
     void setSelected(bool selected);
 
+    void setRunType(const DataPointRunType& runType);
+
     void setDirectory(const openstudio::path& directory);
 
     void setTopLevelJob(const runmanager::Job& topLevelJob);
@@ -207,6 +210,15 @@ namespace detail {
     //@}
     /** @name Actions */
     //@{
+
+    /** Update high level results from json. */
+    bool updateFromJSON(const std::string& json, boost::optional<runmanager::RunManager>& runManager);
+
+    virtual bool updateFromJSON(const AnalysisJSONLoadResult& loadResult, boost::optional<runmanager::RunManager>& runManager);
+
+    /** Whoever downloaded the zip file should have setDirectory(), and had the file placed in
+     *  directory() / toPath("dataPoint.zip"). */
+    bool updateDetails(boost::optional<runmanager::RunManager>& runManager);
 
     /** Clear model, workspace, and sqlFile from cache. */
     void clearFileDataFromCache() const;
@@ -260,8 +272,6 @@ namespace detail {
 
     static DataPoint fromVariant(const QVariant& variant, const VersionString& version);
 
-    virtual QVariant toServerDataPointsVariant() const;
-
     //@}
    protected:
     // relationship state
@@ -278,6 +288,7 @@ namespace detail {
                                             // set to true by Problem update if point is unusable
     bool m_selected;                        // true after construction
                                             // used by Analysis to determine which points to run
+    DataPointRunType m_runType;
     std::vector<QVariant> m_variableValues; // variable values for this run
     std::vector<double> m_responseValues;   // response function values for this run
     openstudio::path m_directory;           // directory containing results
