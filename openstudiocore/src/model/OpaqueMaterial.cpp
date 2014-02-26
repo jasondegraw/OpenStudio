@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <model/OpaqueMaterial.hpp>
 #include <model/OpaqueMaterial_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace model {
@@ -58,7 +60,7 @@ namespace detail {
 OpaqueMaterial::OpaqueMaterial(IddObjectType type,const Model& model)
   : Material(type,model) 
 {
-  BOOST_ASSERT(getImpl<detail::OpaqueMaterial_Impl>());
+  OS_ASSERT(getImpl<detail::OpaqueMaterial_Impl>());
 }
 
 double OpaqueMaterial::thermalConductivity() const {

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -67,7 +67,7 @@ IddObjectType ModelObjectTypeListView::currentIddObjectType() const
 {
   OSCollapsibleItem* selectedCollapsibleItem = this->selectedCollapsibleItem();
   ModelObjectTypeItem* modelObjectTypeItem = qobject_cast<ModelObjectTypeItem*>(selectedCollapsibleItem);
-  BOOST_ASSERT(modelObjectTypeItem);
+  OS_ASSERT(modelObjectTypeItem);
   return modelObjectTypeItem->iddObjectType();
 }
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -36,6 +36,10 @@ GenericUncertaintyDescription::GenericUncertaintyDescription(const UncertaintyDe
 
 UncertaintyDescriptionType GenericUncertaintyDescription::type() {
   return UncertaintyDescriptionType(UncertaintyDescriptionType::Generic);
+}
+
+UncertaintyDescriptionType GenericUncertaintyDescription::actualType() const {
+  return impl()->type();
 }
 
 std::vector<Attribute> GenericUncertaintyDescription::attributes() const {

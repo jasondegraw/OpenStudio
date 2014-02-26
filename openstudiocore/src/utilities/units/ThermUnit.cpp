@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <utilities/units/ThermUnit.hpp>
 #include <utilities/units/ThermUnit_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace detail {
@@ -60,7 +62,7 @@ namespace detail {
   }
 
   Unit ThermUnit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::Therm);
+    OS_ASSERT(system() == UnitSystem::Therm);
     boost::shared_ptr<ThermUnit_Impl> impl(new ThermUnit_Impl(*this));
     return ThermUnit(impl).cast<Unit>();
   }

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -21,6 +21,7 @@
 #define UTILITIES_CORE_ASSERT_HPP
 
 /****************************************************************************
+!!! THIS FILE MUST BE INCLUDED BY ANY SOURCE FILE THAT USES OPENSTUDIO_ASSERT!!!
 !!! THIS FILE MUST BE INCLUDED BY ANY SOURCE FILE THAT USES BOOST_ASSERT!!!
 *****************************************************************************/
 
@@ -28,6 +29,8 @@
 #include <utilities/core/Logger.hpp>
 
 #include <sstream>
+
+#define OS_ASSERT(expr) BOOST_ASSERT(expr)
 
 #ifdef NDEBUG
   //#define BOOST_DISABLE_ASSERTS

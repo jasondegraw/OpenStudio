@@ -4,19 +4,23 @@ SET( ${target_name}_src
   ContamAPI.hpp
   ForwardTranslator.hpp
   ForwardTranslator.cpp
-  ReverseTranslator.hpp
-  ReverseTranslator.cpp
   PrjReader.hpp
   PrjReader.cpp
-  PrjWriter.hpp
-  PrjWriter.cpp
-  PrjObjects.hpp
-  PrjObjects.cpp
-  PrjDefs.hpp
-  PrjData.hpp
-  PrjData.cpp
-  SimTxt.hpp
-  SimTxt.cpp
+  SimFile.hpp
+  SimFile.cpp
+  WindPressure.hpp
+  WindPressure.cpp
+  PrjDefines.hpp
+  PrjModel.hpp
+  PrjModel.cpp
+  PrjPublic.hpp
+  PrjPublic.cpp
+  PrjPrivate.hpp
+  PrjPrivate.cpp
+  PrjSubobjects.hpp
+  PrjSubobjects.cpp
+  PrjSubobjectsPrivate.hpp
+  PrjSubobjectsPrivate.cpp
 )
 
 # resource files
@@ -34,14 +38,17 @@ SET( ${target_name}_test_src
 )
 
 SET( ${target_name}_swig_src
+  Contam.i
 )
 
+# Someone should make sure these are all really needed
 SET( ${target_name}_depends
   ${Boost_LIBRARIES}
   ${CMAKE_THREAD_LIBS}
   ${QT_LIBS}
   openstudio_utilities
   openstudio_model
+  openstudio_osversion
   zkexpat
   boost_log
 )
@@ -67,36 +74,9 @@ CREATE_SRC_GROUPS( "${${target_name}_swig_src}" )
 
 CREATE_TEST_TARGETS( ${target_name} "${${target_name}_test_src}" "${${target_name}_depends}")
 IF(BUILD_TESTING)
-  ADD_DEPENDENCIES(${target_name}_tests openstudio_contam_resources)
+  ADD_DEPENDENCIES(${target_name}_tests 
+    openstudio_contam_resources)
 ENDIF()
 
-#MAKE_SWIG_TARGET( OpenStudioContam Contam "${CMAKE_CURRENT_SOURCE_DIR}/Contam.i" "${${target_name}_swig_src}" ${target_name} "${target_name}" )
+MAKE_SWIG_TARGET( OpenStudioContam Contam "${CMAKE_CURRENT_SOURCE_DIR}/Contam.i" "${${target_name}_swig_src}" ${target_name} OpenStudioEnergyPlus)
 
-add_executable(OsmToPrj OsmToPrj.cpp)
-
-TARGET_LINK_LIBRARIES( OsmToPrj
-  ${${target_name}_depends}
-  openstudio_osversion
-  openstudio_contam
-)
-
-add_executable(PrjToOsm PrjToOsm.cpp)
-
-TARGET_LINK_LIBRARIES( PrjToOsm
-  ${${target_name}_depends}
-  openstudio_osversion
-  openstudio_contam
-)
-
-add_executable(FitInfiltration FitInfiltration.cpp)
-
-TARGET_LINK_LIBRARIES( FitInfiltration
-  ${${target_name}_depends}
-  openstudio_osversion
-  openstudio_contam
-)
-
-#INSTALL(TARGETS gbXMLToIdf
-#    BUNDLE DESTINATION . 
-#    RUNTIME DESTINATION bin 
-#    )

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -19,10 +19,14 @@
 
 #include "OSListView.hpp"
 #include "OSListController.hpp"
+
+#include <utilities/core/Assert.hpp>
+
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QStyleOption>
 #include <QPainter>
+#include <QGraphicsObject>
 
 namespace openstudio {
 
@@ -145,7 +149,7 @@ void OSListView::refreshAllViews()
   {
       QWidget * widget = child->widget();
 
-      Q_ASSERT(widget);
+      OS_ASSERT(widget);
 
       delete widget;
 
@@ -154,7 +158,7 @@ void OSListView::refreshAllViews()
 
   if( m_listController )
   {
-    for( int i = 0; i < m_listController->count(); i++ )
+    for( int i = 0, n = m_listController->count(); i < n; i++ )
     {
       insertItemView(i);
     }
@@ -163,11 +167,11 @@ void OSListView::refreshAllViews()
 
 void OSListView::insertItemView(int i)
 {
-  Q_ASSERT(m_listController);
+  OS_ASSERT(m_listController);
 
   QSharedPointer<OSListItem> itemData = m_listController->itemAt(i);
 
-  Q_ASSERT(itemData);
+  OS_ASSERT(itemData);
 
   QWidget * itemView = m_delegate->view(itemData);
 
@@ -179,18 +183,18 @@ void OSListView::insertItemView(int i)
 
   bool bingo = connect(itemView,SIGNAL(destroyed(QObject *)),this,SLOT(removePair(QObject *)));
 
-  Q_ASSERT(bingo);
+  OS_ASSERT(bingo);
 }
 
 void OSListView::removeItemView(int i)
 {
   QLayoutItem * item = m_mainVLayout->takeAt(i);
 
-  Q_ASSERT(item);
+  OS_ASSERT(item);
 
   QWidget * widget = item->widget();
 
-  Q_ASSERT(widget);
+  OS_ASSERT(widget);
 
   delete widget;
 
@@ -204,14 +208,14 @@ void OSListView::removePair(QObject * object)
 
 void OSListView::refreshItemView(int i)
 {
-  removeItemView(i);
+  if (i < int(m_widgetItemPairs.size())) {
+    removeItemView(i);
+  }
+  else {
+    LOG(Trace,"Not calling removeItemView(" << i << "), because the list is not that long.");
+  }
 
   insertItemView(i);
-}
-
-QWidget * OSItemDelegate::view(QSharedPointer<OSListItem> dataSource) 
-{ 
-  return new QWidget();
 }
 
 } // openstudio

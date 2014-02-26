@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -64,6 +64,8 @@ class SubTabController : public OSQObjectController
 
     virtual void onInspectItem(OSItem* item) = 0;
 
+    SubTabView* m_subTabView;
+
 signals:
 
     void openBclDlgClicked();
@@ -97,8 +99,6 @@ signals:
     boost::optional<openstudio::model::ModelObject> selectedModelObject() const;
 
     openstudio::IddObjectType currentIddObjectType() const;
-
-    SubTabView* m_subTabView;
 
     openstudio::model::Model m_model;
 };

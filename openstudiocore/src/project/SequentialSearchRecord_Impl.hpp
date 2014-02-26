@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -34,7 +34,6 @@ namespace detail {
   /** SequentialSearchRecord_Impl is an OpenStudioAlgorithmRecord_Impl that is the implementation 
    *  class for SequentialSearchRecord.*/
   class PROJECT_API SequentialSearchRecord_Impl : public OpenStudioAlgorithmRecord_Impl {
-    Q_OBJECT;
    public:
 
     /** @name Constructors and Destructors */

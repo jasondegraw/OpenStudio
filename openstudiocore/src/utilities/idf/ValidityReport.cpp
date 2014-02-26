@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -103,8 +103,8 @@ std::ostream& operator<<(std::ostream& os,const ValidityReport& report) {
     }
   }
   else {
-    BOOST_ASSERT(report.scope() == Scope::Object);
-    BOOST_ASSERT(report.objectType());
+    OS_ASSERT(report.scope() == Scope::Object);
+    OS_ASSERT(report.objectType());
     if (report.numErrors() == 0) { 
       os << "The object of type '" << report.objectType()->valueDescription() << "', named '";
       os << report.objectName() << "', is VALID at strictness level '";

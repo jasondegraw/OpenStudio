@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ namespace detail {
   CurveExponentialSkewNormal_Impl::CurveExponentialSkewNormal_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : Curve_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == CurveExponentialSkewNormal::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == CurveExponentialSkewNormal::iddObjectType());
   }
 
   CurveExponentialSkewNormal_Impl::CurveExponentialSkewNormal_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -46,7 +46,7 @@ namespace detail {
                                                                    bool keepHandle)
     : Curve_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == CurveExponentialSkewNormal::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == CurveExponentialSkewNormal::iddObjectType());
   }
 
   CurveExponentialSkewNormal_Impl::CurveExponentialSkewNormal_Impl(const CurveExponentialSkewNormal_Impl& other,
@@ -72,7 +72,7 @@ namespace detail {
   }
 
   double CurveExponentialSkewNormal_Impl::evaluate(const std::vector<double>& x) const {
-    BOOST_ASSERT(x.size() == 1u);
+    OS_ASSERT(x.size() == 1u);
     double z1 = (x[0] - coefficient1C1()) / coefficient2C2();
     double z2 = (exp(coefficient3C3() * x[0]) * coefficient4C4() * x[0] - coefficient1C1()) / 
                 coefficient2C2();
@@ -86,37 +86,37 @@ namespace detail {
 
   double CurveExponentialSkewNormal_Impl::coefficient1C1() const {
     boost::optional<double> value = getDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient1C1,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double CurveExponentialSkewNormal_Impl::coefficient2C2() const {
     boost::optional<double> value = getDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient2C2,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double CurveExponentialSkewNormal_Impl::coefficient3C3() const {
     boost::optional<double> value = getDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient3C3,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double CurveExponentialSkewNormal_Impl::coefficient4C4() const {
     boost::optional<double> value = getDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient4C4,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double CurveExponentialSkewNormal_Impl::minimumValueofx() const {
     boost::optional<double> value = getDouble(OS_Curve_ExponentialSkewNormalFields::MinimumValueofx,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double CurveExponentialSkewNormal_Impl::maximumValueofx() const {
     boost::optional<double> value = getDouble(OS_Curve_ExponentialSkewNormalFields::MaximumValueofx,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -130,7 +130,7 @@ namespace detail {
 
   std::string CurveExponentialSkewNormal_Impl::inputUnitTypeforx() const {
     boost::optional<std::string> value = getString(OS_Curve_ExponentialSkewNormalFields::InputUnitTypeforx,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -140,7 +140,7 @@ namespace detail {
 
   std::string CurveExponentialSkewNormal_Impl::outputUnitType() const {
     boost::optional<std::string> value = getString(OS_Curve_ExponentialSkewNormalFields::OutputUnitType,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -149,39 +149,33 @@ namespace detail {
   }
 
   void CurveExponentialSkewNormal_Impl::setCoefficient1C1(double coefficient1C1) {
-    bool result = false;
-    result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient1C1, coefficient1C1);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient1C1, coefficient1C1);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setCoefficient2C2(double coefficient2C2) {
-    bool result = false;
-    result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient2C2, coefficient2C2);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient2C2, coefficient2C2);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setCoefficient3C3(double coefficient3C3) {
-    bool result = false;
-    result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient3C3, coefficient3C3);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient3C3, coefficient3C3);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setCoefficient4C4(double coefficient4C4) {
-    bool result = false;
-    result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient4C4, coefficient4C4);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient4C4, coefficient4C4);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setMinimumValueofx(double minimumValueofx) {
-    bool result = false;
-    result = setDouble(OS_Curve_ExponentialSkewNormalFields::MinimumValueofx, minimumValueofx);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Curve_ExponentialSkewNormalFields::MinimumValueofx, minimumValueofx);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setMaximumValueofx(double maximumValueofx) {
-    bool result = false;
-    result = setDouble(OS_Curve_ExponentialSkewNormalFields::MaximumValueofx, maximumValueofx);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Curve_ExponentialSkewNormalFields::MaximumValueofx, maximumValueofx);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setMinimumCurveOutput(boost::optional<double> minimumCurveOutput) {
@@ -191,12 +185,12 @@ namespace detail {
     } else {
       result = setString(OS_Curve_ExponentialSkewNormalFields::MinimumCurveOutput, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::resetMinimumCurveOutput() {
     bool result = setString(OS_Curve_ExponentialSkewNormalFields::MinimumCurveOutput, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::setMaximumCurveOutput(boost::optional<double> maximumCurveOutput) {
@@ -206,34 +200,32 @@ namespace detail {
     } else {
       result = setString(OS_Curve_ExponentialSkewNormalFields::MaximumCurveOutput, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CurveExponentialSkewNormal_Impl::resetMaximumCurveOutput() {
     bool result = setString(OS_Curve_ExponentialSkewNormalFields::MaximumCurveOutput, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CurveExponentialSkewNormal_Impl::setInputUnitTypeforx(std::string inputUnitTypeforx) {
-    bool result = false;
-    result = setString(OS_Curve_ExponentialSkewNormalFields::InputUnitTypeforx, inputUnitTypeforx);
+    bool result = setString(OS_Curve_ExponentialSkewNormalFields::InputUnitTypeforx, inputUnitTypeforx);
     return result;
   }
 
   void CurveExponentialSkewNormal_Impl::resetInputUnitTypeforx() {
     bool result = setString(OS_Curve_ExponentialSkewNormalFields::InputUnitTypeforx, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CurveExponentialSkewNormal_Impl::setOutputUnitType(std::string outputUnitType) {
-    bool result = false;
-    result = setString(OS_Curve_ExponentialSkewNormalFields::OutputUnitType, outputUnitType);
+    bool result = setString(OS_Curve_ExponentialSkewNormalFields::OutputUnitType, outputUnitType);
     return result;
   }
 
   void CurveExponentialSkewNormal_Impl::resetOutputUnitType() {
     bool result = setString(OS_Curve_ExponentialSkewNormalFields::OutputUnitType, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
 } // detail
@@ -241,7 +233,7 @@ namespace detail {
 CurveExponentialSkewNormal::CurveExponentialSkewNormal(const Model& model)
   : Curve(CurveExponentialSkewNormal::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::CurveExponentialSkewNormal_Impl>());
+  OS_ASSERT(getImpl<detail::CurveExponentialSkewNormal_Impl>());
   setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient1C1,1.0);
   setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient2C2,1.0);
   setDouble(OS_Curve_ExponentialSkewNormalFields::Coefficient3C3,-1.0);

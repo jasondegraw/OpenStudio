@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -73,7 +73,11 @@ class ENERGYPLUS_API ReverseTranslator {
 
   boost::optional<model::ModelObject> translateAirLoopHVACOutdoorAirSystem(const WorkspaceObject& workspaceObject);
 
+  boost::optional<model::ModelObject> translateAirTerminalSingleDuctConstantVolumeReheat(const WorkspaceObject& workspaceObject);
+
   boost::optional<model::ModelObject> translateAirTerminalSingleDuctUncontrolled(const WorkspaceObject& workspaceObject);
+
+  boost::optional<model::ModelObject> translateAirTerminalSingleDuctVAVNoReheat(const WorkspaceObject& workspaceObject);
 
   boost::optional<model::ModelObject> translateAirTerminalSingleDuctVAVReheat(const WorkspaceObject& workspaceObject);
 
@@ -135,6 +139,8 @@ class ENERGYPLUS_API ReverseTranslator {
   
   boost::optional<model::ModelObject> translateEvaporativeCoolerDirectResearchSpecial(const WorkspaceObject & workspaceObject);
 
+  boost::optional<model::ModelObject> translateEvaporativeFluidCoolerSingleSpeed(const WorkspaceObject & workspaceObject);
+
   boost::optional<model::ModelObject> translateExteriorLights(const WorkspaceObject& workspaceObject);
 
   boost::optional<model::ModelObject> translateFanConstantVolume(const WorkspaceObject & workspaceObject);
@@ -142,6 +148,8 @@ class ENERGYPLUS_API ReverseTranslator {
   boost::optional<model::ModelObject> translateFenestrationSurfaceDetailed(const WorkspaceObject & workspaceObject);
 
   boost::optional<model::ModelObject> translateGasEquipment(const WorkspaceObject & workspaceObject);
+
+  boost::optional<model::ModelObject> translateGroundHeatExchangerVertical(const WorkspaceObject & workspaceObject);
 
   boost::optional<model::ModelObject> translateHeatBalanceAlgorithm(const WorkspaceObject& workspaceObject);
 
@@ -174,6 +182,10 @@ class ENERGYPLUS_API ReverseTranslator {
   boost::optional<model::ModelObject> translatePeople(const WorkspaceObject & workspaceObject);
 
   boost::optional<model::ModelObject> translateSizingPeriodDesignDay(const WorkspaceObject & workspaceObject);
+
+  boost::optional<model::ModelObject> translateRefrigerationCase(const WorkspaceObject & workspaceObject);
+
+  boost::optional<model::ModelObject> translateRefrigerationCompressor(const WorkspaceObject & workspaceObject);
 
   boost::optional<model::ModelObject> translateRunPeriod(const WorkspaceObject & workspaceObject);
 

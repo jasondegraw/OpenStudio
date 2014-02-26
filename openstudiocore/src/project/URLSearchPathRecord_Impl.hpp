@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -38,11 +38,7 @@ namespace project {
 
 namespace detail {
 
-  class PROJECT_API URLSearchPathRecord_Impl : public ObjectRecord_Impl
-  {
-
-    Q_OBJECT;
-
+  class PROJECT_API URLSearchPathRecord_Impl : public ObjectRecord_Impl {
     public:
 
     /// constructors

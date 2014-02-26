@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -34,7 +34,6 @@ namespace detail {
 
   /** OptimizationProblem_Impl is a Problem_Impl that is the implementation class for OptimizationProblem.*/
   class ANALYSIS_API OptimizationProblem_Impl : public Problem_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -132,6 +131,18 @@ namespace detail {
 
     /** Clear all objective functions. */
     void clearObjectiveFunctions();
+
+    //@}
+    /** @name Protected in or Absent from Public Class */
+    //@{
+
+    virtual QVariant toVariant() const;
+
+    static OptimizationProblem fromVariant(const QVariant& variant, const VersionString& version);
+
+    /// Relocate path data from originalBase to newBase.
+    virtual void updateInputPathData(const openstudio::path& originalBase,
+                                     const openstudio::path& newBase);
 
     //@}
    protected:

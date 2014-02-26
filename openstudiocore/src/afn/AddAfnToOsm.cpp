@@ -1,6 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2010, Alliance for Sustainable Energy.
-*  Copyright (c) 2013, The Pennsylvania State University.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -19,7 +18,6 @@
 **********************************************************************/
 
 #include <afn/ForwardTranslator.hpp>
-//#include <contam/PrjData.hpp>
 #include <model/Model.hpp>
 #include <osversion/VersionTranslator.hpp>
 #include <utilities/core/CommandLine.hpp>
@@ -52,25 +50,21 @@ int main(int argc, char *argv[])
   // The following try/catch block is necessary to avoid uncaught
   // exceptions when the program is executed with more than one
   // "positional" argument - there's got to be a better way.
-  try
-  {
+  try {
     boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(pos).run(),
       vm);
     boost::program_options::notify(vm);
   }
-  catch(std::exception&)
-  {
+  catch(std::exception&) {
     std::cout << "Execution failed: check arguments and retry."<< std::endl << std::endl;
     usage(desc);
     return EXIT_FAILURE;
   }
-  if (vm.count("help"))
-  {
+  if (vm.count("help")) {
     usage(desc);
     return EXIT_SUCCESS;
   }
-  if(!vm.count("inputPath"))
-  {
+  if(!vm.count("inputPath")) {
     std::cout << "No input path given." << std::endl << std::endl;
     usage(desc);
     return EXIT_FAILURE;
@@ -78,8 +72,7 @@ int main(int argc, char *argv[])
 
   openstudio::path inputPath = openstudio::toPath(inputPathString);
 
-  if(!boost::filesystem::exists(inputPath))
-  {
+  if(!boost::filesystem::exists(inputPath)) {
     std::cout << "Input path does not exist." << std::endl;
     return EXIT_FAILURE;
   }
@@ -87,8 +80,7 @@ int main(int argc, char *argv[])
   openstudio::osversion::VersionTranslator vt;
   boost::optional<openstudio::model::Model> model = vt.loadModel(inputPath);
 
-  if(!model)
-  {
+  if(!model) {
     std::cout << "Unable to load file '"<< inputPathString << "' as an OpenStudio model." << std::endl;
     return EXIT_FAILURE;
   }
@@ -99,32 +91,11 @@ int main(int argc, char *argv[])
 
   openstudio::path outPath = inputPath.replace_extension(openstudio::toPath("idf").string());
 
-  if(!workspace->save(outPath,true))
-  {
+  if(!workspace->save(outPath,true)) {
     std::cout << "Failed to write IDF file." << std::endl;
     return EXIT_FAILURE;
   }
-  /*
-        }
-        else
-        {
-          std::cout << "Failed to translate PRJ file." << std::endl;
-          return EXIT_FAILURE;
-        }
-      }
-      else
-      {
-        std::cout << "Failed to read PRJ file." << std::endl;
-        return EXIT_FAILURE;
-      }
-    }
-    else
-    {
-      std::cout << "Input path does not exist." << std::endl;
-      return EXIT_FAILURE;
-    }
-  }
-  */
+  
   return EXIT_SUCCESS;
 }
 

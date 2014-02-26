@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ boost::optional<IdfObject> ForwardTranslator::translateCurveDoubleExponentialDec
   OptionalString s;
   OptionalDouble d;
 
-  if (s = modelObject.name()) {
+  if ((s = modelObject.name())) {
     idfObject.setName(*s);
   }
 
@@ -53,10 +53,10 @@ boost::optional<IdfObject> ForwardTranslator::translateCurveDoubleExponentialDec
   idfObject.setDouble(Curve_DoubleExponentialDecayFields::Coefficient3C5,modelObject.coefficient3C5());
   idfObject.setDouble(Curve_DoubleExponentialDecayFields::MinimumValueofx,modelObject.minimumValueofx());
   idfObject.setDouble(Curve_DoubleExponentialDecayFields::MaximumValueofx,modelObject.maximumValueofx());
-  if (d = modelObject.minimumCurveOutput()) {
+  if ((d = modelObject.minimumCurveOutput())) {
     idfObject.setDouble(Curve_DoubleExponentialDecayFields::MinimumCurveOutput,*d);
   }
-  if (d = modelObject.maximumCurveOutput()) {
+  if ((d = modelObject.maximumCurveOutput())) {
     idfObject.setDouble(Curve_DoubleExponentialDecayFields::MaximumCurveOutput,*d);
   }
   if (!modelObject.isInputUnitTypeforxDefaulted()) {

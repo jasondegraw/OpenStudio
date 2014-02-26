@@ -1,17 +1,17 @@
 /**********************************************************************
-* Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
-*
+*  
 *  This library is free software; you can redistribute it and/or
 *  modify it under the terms of the GNU Lesser General Public
 *  License as published by the Free Software Foundation; either
 *  version 2.1 of the License, or (at your option) any later version.
-*
+*  
 *  This library is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 *  Lesser General Public License for more details.
-*
+*  
 *  You should have received a copy of the GNU Lesser General Public
 *  License along with this library; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -26,6 +26,7 @@
 #include <utilities/core/PathHelpers.hpp>
 #include <utilities/core/FileReference.hpp>
 #include <utilities/data/Attribute.hpp>
+#include <utilities/core/Assert.hpp>
 
 #include <OpenStudio.hxx>
 
@@ -38,13 +39,7 @@
 
 namespace openstudio{
 
-  BCLMeasure::BCLMeasure(const std::string& name, const std::string& className, const openstudio::path& dir,
-    const std::string& taxonomyTag, MeasureType measureType, MeasureFunction measureFunction,
-    bool requiresEnergyPlusResults, bool usesSketchUpAPI)
-    : m_directory(boost::filesystem::system_complete(dir)),
-      m_bclXML(BCLXMLType::MeasureXML)
-  {
-
+  void BCLMeasure::createDirectory(const openstudio::path& dir){
     if (exists(dir)){
       if (!isEmptyDirectory(dir)){
         LOG_AND_THROW("'" << toString(dir) << "' exists but is not an empty directory");
@@ -54,22 +49,29 @@ namespace openstudio{
         LOG_AND_THROW("'" << toString(dir) << "' cannot be created as an empty directory");
       }
     }
+  }
+
+  BCLMeasure::BCLMeasure(const std::string& name, const std::string& className, const openstudio::path& dir,
+    const std::string& taxonomyTag, MeasureType measureType, bool usesSketchUpAPI)
+    : m_directory(boost::filesystem::system_complete(dir)),
+      m_bclXML(BCLXMLType::MeasureXML)
+  {
 
     openstudio::path measureTestDir = dir / toPath("tests");
-    if (exists(measureTestDir)){
-      if (!isEmptyDirectory(measureTestDir)){
-        LOG_AND_THROW("'" << toString(measureTestDir) << "' exists but is not an empty directory");
-      }
-    }else{
-      if (!boost::filesystem::create_directories(measureTestDir)){
-        LOG_AND_THROW("'" << toString(measureTestDir) << "' cannot be created as an empty directory");
-      }
-    }
+
+    createDirectory(dir);
+    createDirectory(measureTestDir);
 
     // read in template files
     QString measureTemplate;
     QString testTemplate;
     QString templateName;
+    QString testOSM;
+    QString testEPW;
+    QString resourceFile;
+    openstudio::path testOSMPath;
+    openstudio::path testEPWPath;
+    openstudio::path resourceFilePath;
     if (measureType == MeasureType::ModelMeasure){
       measureTemplate = ":/templates/ModelMeasure/measure.rb";
       testTemplate = ":/templates/ModelMeasure/tests/ModelMeasure_Test.rb";
@@ -82,6 +84,21 @@ namespace openstudio{
       measureTemplate = ":/templates/UtilityMeasure/measure.rb";
       testTemplate = ":/templates/UtilityMeasure/tests/UtilityMeasure_Test.rb";
       templateName = "UtilityMeasure";
+    }else if (measureType == MeasureType::ReportingMeasure){
+      measureTemplate = ":/templates/ReportingMeasure/measure.rb";
+      testTemplate = ":/templates/ReportingMeasure/tests/ReportingMeasure_Test.rb";
+      templateName = "ReportingMeasure";
+
+      testOSM = ":/templates/ReportingMeasure/tests/ExampleModel.osm";
+      testEPW = ":/templates/ReportingMeasure/tests/ExampleModel/files/USA_CO_Golden-NREL.724666_TMY3.epw";
+      resourceFile = ":/templates/ReportingMeasure/resources/report.html.in";
+
+      createDirectory(dir / toPath("tests/ExampleModel/files"));
+      createDirectory(dir / toPath("resources"));
+
+      testOSMPath = dir / toPath("tests/ExampleModel.osm");
+      testEPWPath = dir / toPath("tests/ExampleModel/files/USA_CO_Golden-NREL.724666_TMY3.epw");
+      resourceFilePath = dir / toPath("resources/report.html.in");
     }
 
     QString measureString;
@@ -106,6 +123,36 @@ namespace openstudio{
       }
     }
 
+    QString testOSMString;
+    if (!testOSM.isEmpty()){
+      QFile file(testOSM);
+      if(file.open(QFile::ReadOnly)){
+        QTextStream docIn(&file);
+        testOSMString = docIn.readAll();
+        file.close();
+      }
+    }
+
+    QString testEPWString;
+    if (!testEPW.isEmpty()){
+      QFile file(testEPW);
+      if(file.open(QFile::ReadOnly)){
+        QTextStream docIn(&file);
+        testEPWString = docIn.readAll();
+        file.close();
+      }
+    }
+
+    QString resourceFileString;
+    if (!resourceFile.isEmpty()){
+      QFile file(resourceFile);
+      if(file.open(QFile::ReadOnly)){
+        QTextStream docIn(&file);
+        resourceFileString = docIn.readAll();
+        file.close();
+      }
+    }
+
     // write files
     openstudio::path measureXMLPath = dir / toPath("measure.xml");
     openstudio::path measureScriptPath = dir / toPath("measure.rb");
@@ -116,7 +163,7 @@ namespace openstudio{
       QFile file(toQString(measureScriptPath));
       bool opened = file.open(QIODevice::WriteOnly);
       if (!opened){
-        LOG_AND_THROW("Cannot write measure.rb to '" << toString(dir) << "'");
+        LOG_AND_THROW("Cannot write measure.rb to '" << toString(measureScriptPath) << "'");
       }
       QTextStream textStream(&file);
       textStream << measureString;
@@ -133,7 +180,7 @@ namespace openstudio{
       QFile file(toQString(measureTestPath));
       bool opened = file.open(QIODevice::WriteOnly);
       if (!opened){
-        LOG_AND_THROW("Cannot write test file to '" << toString(measureTestDir) << "'");
+        LOG_AND_THROW("Cannot write test file to '" << toString(measureTestPath) << "'");
       }
       QTextStream textStream(&file);
       textStream << testString;
@@ -144,12 +191,64 @@ namespace openstudio{
     measureTestFileReference.setUsageType("test");
     m_bclXML.addFile(measureTestFileReference);
 
+    // write test osm
+    { 
+      if (!testOSMString.isEmpty()){
+        QFile file(toQString(testOSMPath));
+        bool opened = file.open(QIODevice::WriteOnly);
+        if (!opened){
+          LOG_AND_THROW("Cannot write test osm file to '" << toString(testOSMPath) << "'");
+        }
+        QTextStream textStream(&file);
+        textStream << testOSMString;
+        file.close();
+      }
+    }
+
+    BCLFileReference measureTestOSMFileReference(testOSMPath, true);
+    measureTestOSMFileReference.setUsageType("test");
+    m_bclXML.addFile(measureTestOSMFileReference);
+
+    // write test epw
+    {
+      if (!testEPWString.isEmpty()){
+        QFile file(toQString(testEPWPath));
+        bool opened = file.open(QIODevice::WriteOnly);
+        if (!opened){
+          LOG_AND_THROW("Cannot write test epw file to '" << toString(testEPWPath) << "'");
+        }
+        QTextStream textStream(&file);
+        textStream << testEPWString;
+        file.close();
+      }
+    }
+
+    BCLFileReference measureTestEPWFileReference(testEPWPath, true);
+    measureTestEPWFileReference.setUsageType("test");
+    m_bclXML.addFile(measureTestEPWFileReference);
+
+    // write resource
+    {
+      if (!resourceFileString.isEmpty()){
+        QFile file(toQString(resourceFilePath));
+        bool opened = file.open(QIODevice::WriteOnly);
+        if (!opened){
+          LOG_AND_THROW("Cannot write resource file to '" << toString(resourceFilePath) << "'");
+        }
+        QTextStream textStream(&file);
+        textStream << resourceFileString;
+        file.close();
+      }
+    }
+
+    BCLFileReference resourceFileReference(resourceFilePath, true);
+    resourceFileReference.setUsageType("resource");
+    m_bclXML.addFile(resourceFileReference);
+
     // set rest of measure fields
     m_bclXML.setName(name);
     m_bclXML.addTag(taxonomyTag);
     this->setMeasureType(measureType);
-    this->setMeasureFunction(measureFunction);
-    this->setRequiresEnergyPlusResults(requiresEnergyPlusResults);
     this->setUsesSketchUpAPI(usesSketchUpAPI);
     m_bclXML.saveAs(measureXMLPath);
   }
@@ -167,49 +266,23 @@ namespace openstudio{
 
     m_bclXML = *bclXML;
 
-    // check for required attributes, and update old attributes
+    // check for required attributes
     boost::optional<Attribute> measureType = m_bclXML.getAttribute("Measure Type");
     if (!measureType){
-      measureType = m_bclXML.getAttribute("MeasureType");
-      if (measureType){
-        m_bclXML.addAttribute(Attribute("Measure Type", measureType->valueAsString()));
-        m_bclXML.removeAttribute("MeasureType");
-      }
-    }
-    boost::optional<Attribute> measureFunction = m_bclXML.getAttribute("Measure Function");
-    if (!measureFunction){
-      measureFunction = m_bclXML.getAttribute("MeasureFunction");
-      if (measureFunction){
-        m_bclXML.addAttribute(Attribute("Measure Function", measureFunction->valueAsString()));
-        m_bclXML.removeAttribute("MeasureFunction");
-      }
-    }
-    boost::optional<Attribute> requiresEnergyPlusResults = m_bclXML.getAttribute("Requires EnergyPlus Results");
-    if (!requiresEnergyPlusResults){
-      requiresEnergyPlusResults = m_bclXML.getAttribute("RequiresEnergyPlusResults");
-      if (requiresEnergyPlusResults){
-        m_bclXML.addAttribute(Attribute("Requires EnergyPlus Results", requiresEnergyPlusResults->valueAsBoolean()));
-        m_bclXML.removeAttribute("RequiresEnergyPlusResults");
-      }
-    }
-    boost::optional<Attribute> usesSketchUpAPI = m_bclXML.getAttribute("Uses SketchUp API");
-    if (!usesSketchUpAPI){
-      usesSketchUpAPI = m_bclXML.getAttribute("UsesSketchUpAPI");
-      if (usesSketchUpAPI){
-        m_bclXML.addAttribute(Attribute("Uses SketchUp API", usesSketchUpAPI->valueAsBoolean()));
-        m_bclXML.removeAttribute("UsesSketchUpAPI");
-      }
+      LOG_AND_THROW("'" << toString(dir) << "' is missing the required attribute \"Measure Type\"");
     }
 
-    if (!measureType || !measureFunction || !requiresEnergyPlusResults || !usesSketchUpAPI){
-      LOG_AND_THROW("'" << toString(dir) << "' is not a valid measure");
+    boost::optional<Attribute> usesSketchUpAPI = m_bclXML.getAttribute("Uses SketchUp API");
+    if (!usesSketchUpAPI){
+      LOG_AND_THROW("'" << toString(dir) << "' is missing the required attribute \"Uses SketchUp API\"");
     }
 
     // these may throw later, test here now
-    MeasureType(measureType->valueAsString());
-    MeasureFunction(measureFunction->valueAsString());
-    requiresEnergyPlusResults->valueAsBoolean();
     usesSketchUpAPI->valueAsBoolean();
+
+    if (m_bclXML.versionId() != bclXML->versionId()){
+      LOG_AND_THROW("Measure version_id is no longer valid");
+    }
   }
 
   BCLMeasure::~BCLMeasure()
@@ -393,28 +466,14 @@ namespace openstudio{
   MeasureType BCLMeasure::measureType() const
   {
     boost::optional<Attribute> measureType = m_bclXML.getAttribute("Measure Type");
-    Q_ASSERT(measureType);
+    OS_ASSERT(measureType);
     return MeasureType(measureType->valueAsString());
-  }
-
-  MeasureFunction BCLMeasure::measureFunction() const
-  {
-    boost::optional<Attribute> measureFunction = m_bclXML.getAttribute("Measure Function");
-    Q_ASSERT(measureFunction);
-    return MeasureFunction(measureFunction->valueAsString());
-  }
-
-  bool BCLMeasure::requiresEnergyPlusResults() const
-  {
-    boost::optional<Attribute> requiresEnergyPlusResults = m_bclXML.getAttribute("Requires EnergyPlus Results");
-    Q_ASSERT(requiresEnergyPlusResults);
-    return requiresEnergyPlusResults->valueAsBoolean();
   }
 
   bool BCLMeasure::usesSketchUpAPI() const
   {
     boost::optional<Attribute> usesSketchUpAPI = m_bclXML.getAttribute("Uses SketchUp API");
-    Q_ASSERT(usesSketchUpAPI);
+    OS_ASSERT(usesSketchUpAPI);
     return usesSketchUpAPI->valueAsBoolean();
   }
 
@@ -452,6 +511,9 @@ namespace openstudio{
       result = FileReferenceType::IDF;
     }else if (measureType == MeasureType::UtilityMeasure){
       // no-op
+    }else if (measureType == MeasureType::ReportingMeasure){
+      // DLM: is this right?
+      // no-op
     }
     return result;
   }
@@ -460,24 +522,14 @@ namespace openstudio{
   {
     FileReferenceType result = FileReferenceType::Unknown;
     MeasureType measureType = this->measureType();
-    MeasureFunction measureFunction = this->measureFunction();
     if (measureType == MeasureType::ModelMeasure){
-      if (measureFunction == MeasureFunction::Measure){
-        result = FileReferenceType::OSM;
-      }else if (measureFunction == MeasureFunction::Report){
-        result = FileReferenceType::XML;
-      }else if (measureFunction == MeasureFunction::Other){
-        // no-op
-      }
+      result = FileReferenceType::OSM;
     }else if (measureType == MeasureType::EnergyPlusMeasure){
-      if (measureFunction == MeasureFunction::Measure){
-        result = FileReferenceType::IDF;
-      }else if (measureFunction == MeasureFunction::Report){
-        result = FileReferenceType::XML;
-      }else if (measureFunction == MeasureFunction::Other){
-        // no-op
-      }
+      result = FileReferenceType::IDF;
     }else if (measureType == MeasureType::UtilityMeasure){
+      // no-op
+    }else if (measureType == MeasureType::ReportingMeasure){
+      // DLM: is this right?
       // no-op
     }
     return result;
@@ -522,18 +574,6 @@ namespace openstudio{
   void BCLMeasure::setMeasureType(const MeasureType& measureType)
   {
     Attribute attribute("Measure Type", measureType.valueName());
-    m_bclXML.addAttribute(attribute);
-  }
-
-  void BCLMeasure::setMeasureFunction(const MeasureFunction& measureFunction)
-  {
-    Attribute attribute("Measure Function", measureFunction.valueName());
-    m_bclXML.addAttribute(attribute);
-  }
-
-  void BCLMeasure::setRequiresEnergyPlusResults(bool requiresEnergyPlusResults)
-  {
-    Attribute attribute("Requires EnergyPlus Results", requiresEnergyPlusResults);
     m_bclXML.addAttribute(attribute);
   }
 

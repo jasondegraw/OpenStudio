@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -64,7 +64,7 @@ namespace detail {
     try {
       m_idf = files.getLastByExtension("idf");
       resetFiles(m_files, m_idf);
-    } catch (const std::exception &) {
+    } catch (const std::runtime_error &) {
     }
 
     m_description = buildDescription("idf");
@@ -119,7 +119,7 @@ namespace detail {
     try {
       m_idf = idfFile();
       resetFiles(m_files, m_idf); 
-    } catch (const std::exception &e) {
+    } catch (const std::runtime_error &e) {
       errors.result = ruleset::OSResultValue::Fail;
       errors.addError(ErrorType::Error, e.what());
     }
@@ -226,7 +226,9 @@ namespace detail {
           ofs << "    WaterSystems:Electricity,!- Variable or Meter 12 Name" << std::endl;
           ofs << "    SumOrAverage,            !- Aggregation Type for Variable or Meter 12" << std::endl;
           ofs << "    Cogeneration:Electricity,!- Variable or Meter 13 Name" << std::endl;
-          ofs << "    SumOrAverage;            !- Aggregation Type for Variable or Meter 13" << std::endl;
+          ofs << "    SumOrAverage,            !- Aggregation Type for Variable or Meter 13" << std::endl;
+          ofs << "    Refrigeration:Electricity,!- Variable or Meter 14 Name" << std::endl;
+          ofs << "    SumOrAverage;            !- Aggregation Type for Variable or Meter 14" << std::endl;
 
           ofs << "Output:Table:Monthly," << std::endl;
           ofs << "  Building Energy Performance - Natural Gas,  !- Name" << std::endl;

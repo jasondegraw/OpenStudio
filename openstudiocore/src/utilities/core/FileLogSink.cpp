@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -65,7 +65,7 @@ namespace openstudio{
   FileLogSink::FileLogSink(const openstudio::path& path)
     : LogSink(boost::shared_ptr<detail::FileLogSink_Impl>(new detail::FileLogSink_Impl(path)))
   {
-    BOOST_ASSERT(getImpl<detail::FileLogSink_Impl>());
+    OS_ASSERT(getImpl<detail::FileLogSink_Impl>());
   }
 
   openstudio::path FileLogSink::path() const

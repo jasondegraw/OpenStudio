@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -494,7 +494,7 @@ SpaceLoadInstanceMiniView::SpaceLoadInstanceMiniView(const model::SpaceLoadInsta
   hLayout->addWidget(m_removeButton);
   
   isConnected = connect(m_removeButton,SIGNAL(clicked()),this,SLOT(onRemoveClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   // inherited label
   label = new QLabel();
@@ -761,35 +761,35 @@ void SpaceLoadInstancesWidget::attach(const model::Space& space)
                         this,
                         SLOT(objectAdded(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_model->getImpl<openstudio::model::detail::Model_Impl>().get(), 
                         SIGNAL(removeWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         this,
                         SLOT(objectRemoved(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   model::Building building = m_model->getUniqueModelObject<model::Building>();
   isConnected = connect(building.getImpl<model::detail::ModelObject_Impl>().get(),
                         SIGNAL(onRelationshipChange(int, Handle, Handle)),
                         this, 
                         SLOT(onBuildingRelationshipChange(int, Handle, Handle)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   BOOST_FOREACH(model::SpaceType spaceType, m_model->getModelObjects<model::SpaceType>()){
     isConnected = connect(spaceType.getImpl<model::detail::ModelObject_Impl>().get(),
                           SIGNAL(onRelationshipChange(int, Handle, Handle)),
                           this, 
                           SLOT(onSpaceTypeRelationshipChange(int, Handle, Handle)));
-    BOOST_ASSERT(isConnected);
+    OS_ASSERT(isConnected);
   }
 
   isConnected = connect(m_space->getImpl<model::detail::ModelObject_Impl>().get(),
                         SIGNAL(onRelationshipChange(int, Handle, Handle)),
                         this, 
                         SLOT(onSpaceRelationshipChange(int, Handle, Handle)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   m_dirty = true;
   QTimer::singleShot(0, this, SLOT(refresh()));
@@ -808,28 +808,28 @@ void SpaceLoadInstancesWidget::attach(const model::SpaceType& spaceType)
                         this,
                         SLOT(objectAdded(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_model->getImpl<openstudio::model::detail::Model_Impl>().get(), 
                         SIGNAL(removeWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         this,
                         SLOT(objectRemoved(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   model::Building building = m_model->getUniqueModelObject<model::Building>();
   isConnected = connect(building.getImpl<model::detail::ModelObject_Impl>().get(),
                         SIGNAL(onRelationshipChange(int, Handle, Handle)),
                         this, 
                         SLOT(onBuildingRelationshipChange(int, Handle, Handle)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   BOOST_FOREACH(model::SpaceType spaceType, m_model->getModelObjects<model::SpaceType>()){
     isConnected = connect(spaceType.getImpl<model::detail::ModelObject_Impl>().get(),
                           SIGNAL(onRelationshipChange(int, Handle, Handle)),
                           this, 
                           SLOT(onSpaceTypeRelationshipChange(int, Handle, Handle)));
-    BOOST_ASSERT(isConnected);
+    OS_ASSERT(isConnected);
   }
 
   m_dirty = true;
@@ -847,7 +847,7 @@ void SpaceLoadInstancesWidget::onBuildingRelationshipChange(int index, Handle ne
     return;
   }
 
-  if ((index == OS_BuildingFields::SpaceTypeName)){
+  if (index == OS_BuildingFields::SpaceTypeName){
     m_dirty = true;
     QTimer::singleShot(0, this, SLOT(refresh()));
   }
@@ -866,7 +866,7 @@ void SpaceLoadInstancesWidget::onSpaceRelationshipChange(int index, Handle newHa
     return;
   }
 
-  if ((index == OS_SpaceFields::SpaceTypeName)){
+  if (index == OS_SpaceFields::SpaceTypeName){
     m_dirty = true;
     QTimer::singleShot(0, this, SLOT(refresh()));
   }
@@ -875,12 +875,11 @@ void SpaceLoadInstancesWidget::onSpaceRelationshipChange(int index, Handle newHa
 void SpaceLoadInstancesWidget::objectAdded(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl> impl, const openstudio::IddObjectType& iddObjectType, const openstudio::UUID& handle)
 {
   if (iddObjectType == IddObjectType::OS_SpaceType){
-    bool isConnected = false;
-    isConnected = connect(impl.get(),
-                          SIGNAL(onRelationshipChange(int, Handle, Handle)),
-                          this, 
-                          SLOT(onSpaceTypeRelationshipChange(int, Handle, Handle)));
-    BOOST_ASSERT(isConnected);
+    bool isConnected = connect(impl.get(),
+                               SIGNAL(onRelationshipChange(int, Handle, Handle)),
+                               this, 
+                               SLOT(onSpaceTypeRelationshipChange(int, Handle, Handle)));
+    OS_ASSERT(isConnected);
     return;
   }
 
@@ -1100,10 +1099,9 @@ void SpaceLoadInstancesWidget::addSpaceLoadInstance(const model::SpaceLoadInstan
 {
   SpaceLoadInstanceMiniView* spaceLoadInstanceMiniView = new SpaceLoadInstanceMiniView(spaceLoadInstance, isDefault);
 
-  bool isConnected = false;
-  isConnected = connect(spaceLoadInstanceMiniView, SIGNAL(removeClicked(SpaceLoadInstanceMiniView*)),
-                        this, SLOT(remove(SpaceLoadInstanceMiniView*)));
-  BOOST_ASSERT(isConnected);
+  bool isConnected = connect(spaceLoadInstanceMiniView, SIGNAL(removeClicked(SpaceLoadInstanceMiniView*)),
+                             this, SLOT(remove(SpaceLoadInstanceMiniView*)));
+  OS_ASSERT(isConnected);
 
   m_mainVLayout->addWidget(spaceLoadInstanceMiniView);
 }

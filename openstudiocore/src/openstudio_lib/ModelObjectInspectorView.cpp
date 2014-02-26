@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ ModelObjectInspectorView::ModelObjectInspectorView(const openstudio::model::Mode
                              SIGNAL(toggleUnitsClicked(bool)),
                              this, 
                              SLOT(toggleUnits(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 void ModelObjectInspectorView::selectModelObject(const openstudio::model::ModelObject& modelObject)
@@ -65,12 +65,11 @@ void ModelObjectInspectorView::selectModelObject(const openstudio::model::ModelO
 
   m_modelObject = modelObject;
 
-  bool isConnected = false;
-  isConnected = connect(m_modelObject->getImpl<openstudio::model::detail::ModelObject_Impl>().get(),
-                        SIGNAL(onChange()),
-                        this,
-                        SLOT(update()));
-  BOOST_ASSERT(isConnected);
+  bool isConnected = connect(m_modelObject->getImpl<openstudio::model::detail::ModelObject_Impl>().get(),
+                             SIGNAL(onChange()),
+                             this,
+                             SLOT(update()));
+  OS_ASSERT(isConnected);
 
   onSelectModelObject(*m_modelObject);
 }
@@ -87,7 +86,7 @@ void ModelObjectInspectorView::onClearSelection()
 void ModelObjectInspectorView::onSelectItem(OSItem *item)
 {
   ModelObjectItem* modelObjectItem = qobject_cast<ModelObjectItem*>(item);
-  BOOST_ASSERT(modelObjectItem);
+  OS_ASSERT(modelObjectItem);
   selectModelObject(modelObjectItem->modelObject());
 }
 
@@ -156,7 +155,7 @@ void DefaultInspectorView::onSelectModelObject(const openstudio::model::ModelObj
 void DefaultInspectorView::onUpdate()
 {
   boost::optional<openstudio::model::ModelObject> modelObject = this->modelObject();
-  BOOST_ASSERT(modelObject);
+  OS_ASSERT(modelObject);
 
   std::stringstream ss;
   ss << *modelObject;

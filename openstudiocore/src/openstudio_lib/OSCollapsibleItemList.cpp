@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -142,7 +142,7 @@ void OSCollapsibleItemList::setShowFilterLayout(const bool showFilterLayout)
 
 void OSCollapsibleItemList::addCollapsibleItem(OSCollapsibleItem * collapsibleItem)
 {
-  BOOST_ASSERT(collapsibleItem);
+  OS_ASSERT(collapsibleItem);
 
   collapsibleItem->setItemsDraggable(m_itemsDraggable);
 
@@ -167,31 +167,31 @@ void OSCollapsibleItemList::addCollapsibleItem(OSCollapsibleItem * collapsibleIt
 
   isConnected = connect(collapsibleItem, SIGNAL(collapsableItemSelected(OSCollapsibleItem *)),
                         this, SLOT(onCollapsableItemSelected(OSCollapsibleItem *)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(collapsibleItem, SIGNAL(itemSelected(OSItem*)),
                         this, SLOT(onItemSelected(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(collapsibleItem, SIGNAL(itemSelected(OSItem*)),
                         this, SIGNAL(itemSelected(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(collapsibleItem, SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)),
                         this, SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(collapsibleItem, SIGNAL(itemRemoveClicked(OSItem*)),
                         this, SIGNAL(itemRemoveClicked(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(collapsibleItem, SIGNAL(selectionCleared()),
                         this, SIGNAL(selectionCleared()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(collapsibleItem,SIGNAL(openLibDlgClicked()),
                         this,SIGNAL(openLibDlgClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   if (!selectedItem()){
     collapsibleItem->itemList()->selectItem(collapsibleItem->itemList()->firstItem());
@@ -203,14 +203,13 @@ void OSCollapsibleItemList::addCollapsibleItem(OSCollapsibleItem * collapsibleIt
 void OSCollapsibleItemList::onCollapsableItemSelected(OSCollapsibleItem* selectedItem)
 {
   QLayoutItem * layoutItem = NULL;
-  QWidget * widget = NULL;
   OSCollapsibleItem* collapsibleItem = NULL;
   OSItem* newSelectedItem = NULL;
 
   for (int i = 0; i < m_vLayout->count(); ++i){
 
     layoutItem = m_vLayout->itemAt(i);
-    widget = layoutItem->widget();
+    QWidget * widget = layoutItem->widget();
 
     collapsibleItem = qobject_cast<OSCollapsibleItem*>(widget);
     if (collapsibleItem){
@@ -237,13 +236,12 @@ void OSCollapsibleItemList::onCollapsableItemSelected(OSCollapsibleItem* selecte
 void OSCollapsibleItemList::onItemSelected(OSItem* item)
 {
   QLayoutItem * layoutItem = NULL;
-  QWidget * widget = NULL;
   OSCollapsibleItem* collapsibleItem = NULL;
 
   for (int i = 0; i < m_vLayout->count(); ++i){
 
     layoutItem = m_vLayout->itemAt(i);
-    widget = layoutItem->widget();
+    QWidget * widget = layoutItem->widget();
 
     collapsibleItem = qobject_cast<OSCollapsibleItem*>(widget);
     if (collapsibleItem){

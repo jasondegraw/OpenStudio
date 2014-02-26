@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@
 #include <model/Site.hpp>
 #include <model/Site_Impl.hpp>
 
+#include <utilities/idd/OS_SizingPeriod_WeatherFileDays_FieldEnums.hxx>
+
 #include <utilities/core/Assert.hpp>
 
 namespace openstudio {
@@ -32,7 +34,7 @@ namespace detail {
   WeatherFileDays_Impl::WeatherFileDays_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : SizingPeriod_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == WeatherFileDays::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == WeatherFileDays::iddObjectType());
   }
 
   WeatherFileDays_Impl::WeatherFileDays_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -40,7 +42,7 @@ namespace detail {
                                              bool keepHandle)
     : SizingPeriod_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == WeatherFileDays::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == WeatherFileDays::iddObjectType());
   }
 
   WeatherFileDays_Impl::WeatherFileDays_Impl(const WeatherFileDays_Impl& other,
@@ -63,13 +65,35 @@ namespace detail {
     return WeatherFileDays::iddObjectType();
   }
 
+  void WeatherFileDays_Impl::ensureNoLeapDays()
+  {
+    boost::optional<int> month;
+    boost::optional<int> day;
+
+    month = getInt(OS_SizingPeriod_WeatherFileDaysFields::BeginMonth);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_SizingPeriod_WeatherFileDaysFields::BeginDayofMonth);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_SizingPeriod_WeatherFileDaysFields::BeginDayofMonth, 28);
+      }
+    }
+
+    month = getInt(OS_SizingPeriod_WeatherFileDaysFields::EndMonth);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_SizingPeriod_WeatherFileDaysFields::EndDayofMonth);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_SizingPeriod_WeatherFileDaysFields::EndDayofMonth, 28);
+      }
+    }
+  }
+
 } // detail
 
 /// constructor
 WeatherFileDays::WeatherFileDays(const Model& model)
   : SizingPeriod(WeatherFileDays::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::WeatherFileDays_Impl>());
+  OS_ASSERT(getImpl<detail::WeatherFileDays_Impl>());
 }
 
 // constructor

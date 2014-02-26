@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -48,14 +48,14 @@ class EditNullView : public QWidget
   void paintEvent(QPaintEvent *);
 };
 
-class EditRubyPerturbationView : public QWidget
+class EditRubyMeasureView : public QWidget
 {
   Q_OBJECT
 
   public:
 
-  EditRubyPerturbationView();
-  virtual ~EditRubyPerturbationView() {}
+  EditRubyMeasureView();
+  virtual ~EditRubyMeasureView() {}
 
   QLineEdit * nameLineEdit;
 

@@ -3,6 +3,7 @@ $OpenStudio_MinorVersion = "${CMAKE_VERSION_MINOR}"
 $OpenStudio_PatchVersion = "${CMAKE_VERSION_PATCH}"
 $OpenStudio_BuildVersion = "${CMAKE_VERSION_BUILD}"
 $OpenStudio_EnergyPlusVersion = "${ENERGYPLUS_VERSION}"
+$OpenStudio_RubyExe = "${RUBY_EXECUTABLE}"
 
 $OpenStudio_BinaryDir = "${CMAKE_BINARY_DIR}/Products/"
 $OpenStudio_RubyBinaryDir = "${CMAKE_BINARY_DIR}/Products/ruby/"
@@ -20,9 +21,6 @@ if /Visual\sStudio/.match("${CMAKE_GENERATOR}")
   $OpenStudio_BinaryDir += "#{$OpenStudio_Configuration}/"
   $OpenStudio_RubyBinaryDir += "#{$OpenStudio_Configuration}/"
 end
-
-$OpenStudio_SimXML = ( "${BUILD_SIMXML}" == "ON" )
-$OpenStudio_SDD = ( "${BUILD_SDD}" == "ON" )
 
 puts "Loading OpenStudio ruby binaries from #{$OpenStudio_RubyBinaryDir}"
 puts "Loading OpenStudio shared libraries from #{$OpenStudio_BinaryDir}"

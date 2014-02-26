@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ namespace detail {
   SkyTemperature_Impl::SkyTemperature_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == SkyTemperature::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == SkyTemperature::iddObjectType());
   }
 
   SkyTemperature_Impl::SkyTemperature_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -49,7 +49,7 @@ namespace detail {
                                            bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == SkyTemperature::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == SkyTemperature::iddObjectType());
   }
 
   SkyTemperature_Impl::SkyTemperature_Impl(const SkyTemperature_Impl& other,
@@ -107,7 +107,7 @@ namespace detail {
 SkyTemperature::SkyTemperature(const Model& model)
   : ModelObject(SkyTemperature::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::SkyTemperature_Impl>());
+  OS_ASSERT(getImpl<detail::SkyTemperature_Impl>());
 }
 
 // constructor

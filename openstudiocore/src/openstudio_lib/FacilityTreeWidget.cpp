@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -87,9 +87,10 @@ FacilityTreeWidget::FacilityTreeWidget(const model::Model& model, QWidget* paren
   vLayout->addLayout(hLayout);
 
   bool isConnected = false;
+
   isConnected = connect(comboBox, SIGNAL(currentIndexChanged(const QString&)),
                         this, SLOT(onSortByChanged(const QString&)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   this->vLayout()->insertLayout(0, vLayout);
   this->treeWidget()->header()->close();
@@ -102,7 +103,7 @@ FacilityTreeWidget::FacilityTreeWidget(const model::Model& model, QWidget* paren
 
   isConnected = connect(this->treeWidget(), SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
                         this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   // allow time for signals to be connected between this and inspector
   QTimer::singleShot(0, this, SLOT(initialize()));
@@ -207,7 +208,7 @@ void FacilityTreeWidget::onSortByChanged(const QString& text)
       QTimer::singleShot(0, this, SLOT(initialize()));
     }
   }else{
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
   }
 }
 

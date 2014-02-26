@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@
 #include <model/Mixer_Impl.hpp>
 #include <model/Node.hpp>
 #include <model/Node_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 
@@ -79,7 +81,7 @@ boost::optional<ModelObject> Mixer_Impl::lastInletModelObject()
 
 unsigned Mixer_Impl::newInletPortAfterBranch(unsigned branchIndex)
 {
-  std::vector<ModelObject> modelObjects = inletModelObjects();
+  //std::vector<ModelObject> modelObjects = inletModelObjects();
   unsigned stop = nextBranchIndex();
   for(unsigned i = branchIndex; i < stop; i++ )
   {
@@ -168,7 +170,7 @@ Mixer::Mixer(boost::shared_ptr<detail::Mixer_Impl> p)
 Mixer::Mixer(IddObjectType type,const Model& model)
   : HVACComponent(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::Mixer_Impl>());
+  OS_ASSERT(getImpl<detail::Mixer_Impl>());
 }     
 
 unsigned Mixer::outletPort()

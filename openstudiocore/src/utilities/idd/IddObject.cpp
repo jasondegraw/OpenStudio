@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ namespace detail {
     oField = IddField::load("Generic Data Field",
                             "A2; \\field Generic Data Field \n \\type alpha \n \\begin-extensible",
                             m_name);
-    BOOST_ASSERT(oField);
+    OS_ASSERT(oField);
     m_extensibleFields.push_back(*oField);
   }
 
@@ -256,7 +256,7 @@ namespace detail {
     if (!m_nameFieldCache) {
       hasNameField();
     }
-    BOOST_ASSERT(m_nameFieldCache);
+    OS_ASSERT(m_nameFieldCache);
 
     OptionalUnsigned result;
     if (m_nameFieldCache->first) {
@@ -538,10 +538,10 @@ namespace detail {
     // figure out numExtensibleGroupsRequired 
     if (m_properties.minFields > 0){
       unsigned minFields = m_properties.minFields;
-      if (minFields > m_fields.size()){
-        m_properties.numExtensibleGroupsRequired = 
-          std::ceil(static_cast<double>(minFields-m_fields.size())/
-                    static_cast<double>(numExtensible));
+      if (minFields > m_fields.size()) {
+        double numerator(minFields-m_fields.size());
+        double denominator(numExtensible);
+        m_properties.numExtensibleGroupsRequired = unsigned(std::ceil(numerator/denominator));
       }
     }
   }

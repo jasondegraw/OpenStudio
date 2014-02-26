@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ namespace detail {
   Connection_Impl::Connection_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == Connection::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == Connection::iddObjectType());
   }
 
   Connection_Impl::Connection_Impl(const openstudio::detail::WorkspaceObject_Impl& other, 
@@ -51,7 +51,7 @@ namespace detail {
                                    bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == Connection::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == Connection::iddObjectType());
   }
 
   Connection_Impl::Connection_Impl(const Connection_Impl& other, 
@@ -138,7 +138,7 @@ namespace detail {
 Connection::Connection(const Model& model)
   : ModelObject(Connection::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::Connection_Impl>());
+  OS_ASSERT(getImpl<detail::Connection_Impl>());
 }
 
 Connection::Connection(boost::shared_ptr<detail::Connection_Impl> p)

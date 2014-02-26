@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@
 #include <utilities/units/CFMUnit.hpp>
 #include <utilities/units/IPUnit.hpp>
 #include <utilities/units/SIUnit.hpp>
-#include <utilities/units/CelciusUnit.hpp>
+#include <utilities/units/CelsiusUnit.hpp>
 #include <utilities/units/FahrenheitUnit.hpp>
 #include <utilities/units/TemperatureUnit.hpp>
 

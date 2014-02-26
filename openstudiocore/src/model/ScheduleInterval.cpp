@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -100,10 +100,16 @@ boost::optional<ScheduleInterval> ScheduleInterval::fromTimeSeries(const openstu
   boost::optional<ScheduleInterval> result;
   if (timeSeries.intervalLength()){
     result = ScheduleFixedInterval(model);
-    result->setTimeSeries(timeSeries);
+    if(!result->setTimeSeries(timeSeries)){
+      result->remove();
+      return boost::optional<ScheduleInterval>();
+    }
   }else{
     result = ScheduleVariableInterval(model);
-    result->setTimeSeries(timeSeries);
+    if(!result->setTimeSeries(timeSeries)){
+      result->remove();
+      return boost::optional<ScheduleInterval>();
+    }
   }
   return result;
 }
@@ -122,13 +128,13 @@ bool ScheduleInterval::setTimeSeries(const openstudio::TimeSeries& timeSeries)
 ScheduleInterval::ScheduleInterval(IddObjectType type,const Model& model)
   : Schedule(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::ScheduleInterval_Impl>());
+  OS_ASSERT(getImpl<detail::ScheduleInterval_Impl>());
 }
 
 ScheduleInterval::ScheduleInterval(boost::shared_ptr<detail::ScheduleInterval_Impl> impl)
   : Schedule(impl)
 {
-  BOOST_ASSERT(getImpl<detail::ScheduleInterval_Impl>());
+  OS_ASSERT(getImpl<detail::ScheduleInterval_Impl>());
 }
 
 } // model

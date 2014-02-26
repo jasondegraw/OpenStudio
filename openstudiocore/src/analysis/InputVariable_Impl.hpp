@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -35,6 +35,8 @@ namespace runmanager {
 
 namespace analysis {
 
+class InputVariable;
+class Measure;
 class WorkflowStep;
 
 namespace detail {
@@ -42,7 +44,6 @@ namespace detail {
   /** InputVariable_Impl is a Variable_Impl that is the implementation class for
    *  InputVariable */
   class ANALYSIS_API InputVariable_Impl : public Variable_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -97,6 +98,16 @@ namespace detail {
      *  openstudio::Exception if value is invalid for the variable. */
     virtual runmanager::WorkItem createWorkItem(const QVariant& value,
                                                 const openstudio::path& rubyIncludeDirectory) const = 0;
+
+    //@}
+    /** @name Protected in or Absent from Public Class */
+    //@{
+
+    virtual QVariant toVariant() const;
+
+    static InputVariable factoryFromVariant(const QVariant &variant, const VersionString &version);
+
+    static InputVariable factoryFromVariant(const QVariant& variant, const Measure& measure, const VersionString& version);
 
     //@}
    private:

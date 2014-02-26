@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -58,7 +58,7 @@ namespace detail {
                                                                bool keepHandle)
     : SpaceLoadDefinition_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == OtherEquipmentDefinition::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == OtherEquipmentDefinition::iddObjectType());
   }
 
   OtherEquipmentDefinition_Impl::OtherEquipmentDefinition_Impl(
@@ -67,7 +67,7 @@ namespace detail {
       bool keepHandle)
     : SpaceLoadDefinition_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == OtherEquipmentDefinition::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == OtherEquipmentDefinition::iddObjectType());
   }
 
   OtherEquipmentDefinition_Impl::OtherEquipmentDefinition_Impl(
@@ -91,7 +91,7 @@ namespace detail {
 
   std::string OtherEquipmentDefinition_Impl::designLevelCalculationMethod() const {
     boost::optional<std::string> value = getString(OS_OtherEquipment_DefinitionFields::DesignLevelCalculationMethod,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -109,7 +109,7 @@ namespace detail {
 
   double OtherEquipmentDefinition_Impl::fractionLatent() const {
     boost::optional<double> value = getDouble(OS_OtherEquipment_DefinitionFields::FractionLatent,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -119,7 +119,7 @@ namespace detail {
 
   double OtherEquipmentDefinition_Impl::fractionRadiant() const {
     boost::optional<double> value = getDouble(OS_OtherEquipment_DefinitionFields::FractionRadiant,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -129,7 +129,7 @@ namespace detail {
 
   double OtherEquipmentDefinition_Impl::fractionLost() const {
     boost::optional<double> value = getDouble(OS_OtherEquipment_DefinitionFields::FractionLost,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -141,11 +141,11 @@ namespace detail {
     bool result = false;
     if (designLevel) {
       result = setString(OS_OtherEquipment_DefinitionFields::DesignLevelCalculationMethod,"EquipmentLevel");
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       result = setDouble(OS_OtherEquipment_DefinitionFields::DesignLevel, designLevel.get());
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       result = setWattsperSpaceFloorArea(boost::none);
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       result = setWattsperPerson(boost::none);
     } else {
       result = setString(OS_OtherEquipment_DefinitionFields::DesignLevel, "");
@@ -158,10 +158,10 @@ namespace detail {
     bool result = false;
     if (wattsperSpaceFloorArea) {
       result = setString(OS_OtherEquipment_DefinitionFields::DesignLevelCalculationMethod,"Watts/Area");
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       setDesignLevel(boost::none);
       result = setDouble(OS_OtherEquipment_DefinitionFields::WattsperSpaceFloorArea, wattsperSpaceFloorArea.get());
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       result = setWattsperPerson(boost::none);
     } else {
       result = setString(OS_OtherEquipment_DefinitionFields::WattsperSpaceFloorArea, "");
@@ -173,10 +173,10 @@ namespace detail {
     bool result = false;
     if (wattsperPerson) {
       result = setString(OS_OtherEquipment_DefinitionFields::DesignLevelCalculationMethod,"Watts/Person");
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       setDesignLevel(boost::none);
       result = setWattsperSpaceFloorArea(boost::none);
-      BOOST_ASSERT(result);
+      OS_ASSERT(result);
       result = setDouble(OS_OtherEquipment_DefinitionFields::WattsperPerson, wattsperPerson.get());
     } else {
       result = setString(OS_OtherEquipment_DefinitionFields::WattsperPerson, "");
@@ -185,36 +185,33 @@ namespace detail {
   }
 
   bool OtherEquipmentDefinition_Impl::setFractionLatent(double fractionLatent) {
-    bool result = false;
-    result = setDouble(OS_OtherEquipment_DefinitionFields::FractionLatent, fractionLatent);
+    bool result = setDouble(OS_OtherEquipment_DefinitionFields::FractionLatent, fractionLatent);
     return result;
   }
 
   //void OtherEquipmentDefinition_Impl::resetFractionLatent() {
   //  bool result = setString(OS_OtherEquipment_DefinitionFields::FractionLatent, "");
-  //  BOOST_ASSERT(result);
+  //  OS_ASSERT(result);
   //}
 
   bool OtherEquipmentDefinition_Impl::setFractionRadiant(double fractionRadiant) {
-    bool result = false;
-    result = setDouble(OS_OtherEquipment_DefinitionFields::FractionRadiant, fractionRadiant);
+    bool result = setDouble(OS_OtherEquipment_DefinitionFields::FractionRadiant, fractionRadiant);
     return result;
   }
 
   //void OtherEquipmentDefinition_Impl::resetFractionRadiant() {
   //  bool result = setString(OS_OtherEquipment_DefinitionFields::FractionRadiant, "");
-  //  BOOST_ASSERT(result);
+  //  OS_ASSERT(result);
   //}
 
   bool OtherEquipmentDefinition_Impl::setFractionLost(double fractionLost) {
-    bool result = false;
-    result = setDouble(OS_OtherEquipment_DefinitionFields::FractionLost, fractionLost);
+    bool result = setDouble(OS_OtherEquipment_DefinitionFields::FractionLost, fractionLost);
     return result;
   }
 
   //void OtherEquipmentDefinition_Impl::resetFractionLost() {
   //  bool result = setString(OS_OtherEquipment_DefinitionFields::FractionLost, "");
-  //  BOOST_ASSERT(result);
+  //  OS_ASSERT(result);
   //}
 
   double OtherEquipmentDefinition_Impl::getDesignLevel(double floorArea, double numPeople) const {
@@ -230,7 +227,7 @@ namespace detail {
       return wattsperPerson().get() * numPeople;
     }
 
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
     return 0.0;
   }
 
@@ -255,7 +252,7 @@ namespace detail {
       return wattsperPerson().get() * numPeople / floorArea;
     }
 
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
     return 0.0;
   }
 
@@ -279,7 +276,7 @@ namespace detail {
       return wattsperPerson().get();
     }
 
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
     return 0.0;
   }
  
@@ -309,7 +306,7 @@ namespace detail {
 OtherEquipmentDefinition::OtherEquipmentDefinition(const Model& model)
   : SpaceLoadDefinition(OtherEquipmentDefinition::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::OtherEquipmentDefinition_Impl>());
+  OS_ASSERT(getImpl<detail::OtherEquipmentDefinition_Impl>());
   setDesignLevel(0.0);
 }
 

@@ -1,5 +1,5 @@
 ######################################################################
-#  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+#  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 #  All rights reserved.
 #  
 #  This library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ class TimeDependentValuation_Test < Test::Unit::TestCase
     OpenStudio::create_directory(runDir)
 
     # find energyplus
-    ep_hash = OpenStudio::EnergyPlus::find_energyplus(7,2)
+    ep_hash = OpenStudio::EnergyPlus::find_energyplus(8,0)
     ep_exe = OpenStudio::Path.new(ep_hash[:energyplus_exe].to_s)
     weatherFilePath = OpenStudio::Path.new(ep_hash[:energyplus_weatherdata].to_s) / 
         OpenStudio::Path.new("USA_CO_Golden-NREL.724666_TMY3.epw")

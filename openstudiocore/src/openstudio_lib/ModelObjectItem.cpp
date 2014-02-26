@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -55,12 +55,11 @@ ModelObjectItem::ModelObjectItem(const openstudio::model::ModelObject& modelObje
 {
   this->setText(QString::fromStdString(m_modelObject.name().get()));
 
-  bool isConnected = false;
-  isConnected = connect( m_modelObject.getImpl<openstudio::model::detail::ModelObject_Impl>().get(),
-                         SIGNAL(onChange()),
-                         this,
-                         SLOT(onObjectChanged()) );
-  BOOST_ASSERT(isConnected);
+  bool isConnected = connect( m_modelObject.getImpl<openstudio::model::detail::ModelObject_Impl>().get(),
+                              SIGNAL(onChange()),
+                              this,
+                              SLOT(onObjectChanged()) );
+  OS_ASSERT(isConnected);
 
   if (!modelObject.getModelObjectSources<model::ComponentData>().empty()){
     m_bclBadge->setVisible(true);

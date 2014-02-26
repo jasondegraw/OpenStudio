@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,6 +31,8 @@
 #include <utilities/idd/Sizing_Zone_FieldEnums.hxx>
 #include <utilities/idd/DesignSpecification_ZoneAirDistribution_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>
+
+#include <utilities/core/Assert.hpp>
 
 using namespace openstudio::model;
 
@@ -142,7 +144,7 @@ OptionalModelObject ReverseTranslator::translateSizingZone( const WorkspaceObjec
       if (mo){
         if (mo->optionalCast<DesignSpecificationOutdoorAir>()){
           std::vector<Space> spaces = thermalZone.spaces();
-          BOOST_ASSERT(spaces.size() == 1);
+          OS_ASSERT(spaces.size() == 1);
           spaces[0].setDesignSpecificationOutdoorAir(mo->cast<DesignSpecificationOutdoorAir>());
         }
       }

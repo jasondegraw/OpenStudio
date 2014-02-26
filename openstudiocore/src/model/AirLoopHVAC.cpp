@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -37,6 +37,8 @@
 #include <model/AirLoopHVACZoneSplitter_Impl.hpp>
 #include <model/AirLoopHVACZoneMixer.hpp>
 #include <model/AirLoopHVACZoneMixer_Impl.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeCooledBeam.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeCooledBeam_Impl.hpp>
 #include <model/AirTerminalSingleDuctUncontrolled.hpp>
 #include <model/AirTerminalSingleDuctUncontrolled_Impl.hpp>
 #include <model/AirTerminalSingleDuctVAVReheat.hpp>
@@ -81,7 +83,7 @@ namespace detail {
   AirLoopHVAC_Impl::AirLoopHVAC_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : Loop_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == AirLoopHVAC::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == AirLoopHVAC::iddObjectType());
   }
 
   AirLoopHVAC_Impl::AirLoopHVAC_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -89,7 +91,7 @@ namespace detail {
                                      bool keepHandle)
     : Loop_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == AirLoopHVAC::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == AirLoopHVAC::iddObjectType());
   }
 
   AirLoopHVAC_Impl::AirLoopHVAC_Impl(const AirLoopHVAC_Impl& other,
@@ -208,7 +210,7 @@ namespace detail {
 
     for(it = modelObjects.begin();
         it != modelObjects.end();
-        it++)
+        ++it)
     {
       if( boost::optional<WaterToAirComponent> comp = it->optionalCast<WaterToAirComponent>() )
       {
@@ -231,7 +233,7 @@ namespace detail {
 
     for(it = modelObjects.begin();
         it != modelObjects.end();
-        it++)
+        ++it)
     {
       if( OptionalHVACComponent comp = it->optionalCast<HVACComponent>() )
       {
@@ -371,7 +373,7 @@ namespace detail {
       }
     }
 
-    BOOST_ASSERT(node);
+    OS_ASSERT(node);
 
     if( optAirTerminal )
     {
@@ -406,7 +408,7 @@ namespace detail {
 
     for( std::vector<WaterToAirComponent>::iterator it = comps.begin();
          it < comps.end();
-         it++ )
+         ++it )
     {
       if( boost::optional<HVACComponent> comp = it->containingHVACComponent() )
       {
@@ -433,7 +435,7 @@ namespace detail {
 
     for( std::vector<WaterToAirComponent>::iterator it = comps.begin();
          it < comps.end();
-         it++ )
+         ++it )
     {
       if( boost::optional<HVACComponent> comp = it->containingHVACComponent() )
       {
@@ -471,11 +473,11 @@ namespace detail {
       {
         boost::optional<Node> zoneInletNode = zone->inletPortList().airLoopHVACModelObject()->optionalCast<Node>();
 
-        BOOST_ASSERT( zoneInletNode );
+        OS_ASSERT( zoneInletNode );
 
         boost::optional<ModelObject> mo = zoneInletNode->inletModelObject();
 
-        BOOST_ASSERT( mo );
+        OS_ASSERT( mo );
 
         if( ! mo->optionalCast<AirLoopHVACZoneSplitter>() )
         {
@@ -489,7 +491,7 @@ namespace detail {
       {
         boost::optional<ModelObject> mo = node->inletModelObject();
 
-        BOOST_ASSERT( mo );
+        OS_ASSERT( mo );
 
         if( ! mo->optionalCast<AirLoopHVACZoneSplitter>() )
         {
@@ -534,7 +536,7 @@ namespace detail {
         _zoneMixer.removePortForBranch(i);
         for( std::vector<ModelObject>::iterator it = allModelObjects.begin();
              it < allModelObjects.end();
-             it++ )
+             ++it )
         {
           it->cast<HVACComponent>().disconnect();
         }
@@ -548,11 +550,11 @@ namespace detail {
           _model.connect(newNode,newNode.outletPort(),_zoneMixer,_zoneMixer.nextInletPort());
         }
 
-        std::vector<ModelObject> zoneEquipment = thermalZone.equipment();
+        //std::vector<ModelObject> zoneEquipment = thermalZone.equipment();
 
         for( std::vector<ModelObject>::iterator it = allModelObjects.begin();
              it < allModelObjects.end();
-             it++ )
+             ++it )
         {
           if( ! it->optionalCast<ThermalZone>() )
           {
@@ -603,7 +605,7 @@ namespace detail {
     {
       Model _model = model();
       std::vector<Node> inletVec = demandInletNodes();
-      BOOST_ASSERT(inletVec.size()==1);
+      OS_ASSERT(inletVec.size()==1);
       AirLoopHVACZoneSplitter airLoopHVACZoneSplitter(_model);
       _model.connect(inletVec[0],
                     openstudio::OS_NodeFields::OutletPort,
@@ -719,6 +721,13 @@ namespace detail {
     return addBranchForZone(thermalZone,comp);
   }
 
+  bool AirLoopHVAC_Impl::addBranchForZone(ThermalZone & thermalZone, StraightComponent & airTerminal)
+  {
+    boost::optional<StraightComponent> comp = airTerminal;
+
+    return addBranchForZone(thermalZone, comp);
+  }
+
   bool AirLoopHVAC_Impl::addBranchForHVACComponent(HVACComponent airTerminal)
   {
     Model _model = this->model();
@@ -782,7 +791,7 @@ namespace detail {
 
     for( std::vector<SizingSystem>::iterator it = sizingObjects.begin();
          it < sizingObjects.end();
-         it++ )
+         ++it )
     {
       try {
         if( it->airLoopHVAC().handle() == this->handle() )
@@ -814,7 +823,7 @@ namespace detail {
 
     for( std::vector<ModelObject>::iterator it = objects.begin();
          it != objects.end();
-         it++ )
+         ++it )
     {
       result.push_back(it->cast<ThermalZone>());
     }
@@ -858,7 +867,7 @@ namespace detail {
       resetDesignSupplyAirFlowRate();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVAC_Impl::setDesignSupplyAirFlowRate(const OSOptionalQuantity& designSupplyAirFlowRate) {
@@ -880,12 +889,12 @@ namespace detail {
 
   void AirLoopHVAC_Impl::resetDesignSupplyAirFlowRate() {
     bool result = setString(OS_AirLoopHVACFields::DesignSupplyAirFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirLoopHVAC_Impl::autosizeDesignSupplyAirFlowRate() {
     bool result = setString(OS_AirLoopHVACFields::DesignSupplyAirFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   Schedule AirLoopHVAC_Impl::availabilitySchedule() const
@@ -912,9 +921,24 @@ namespace detail {
   {
     boost::optional<WorkspaceObject> wo = getTarget(OS_AirLoopHVACFields::AvailabilityManagerListName);
 
-    Q_ASSERT(wo);
+    OS_ASSERT(wo);
 
     return wo->cast<AvailabilityManagerAssignmentList>();
+  }
+
+  boost::optional<Node> AirLoopHVAC_Impl::mixedAirNode()
+  {
+    boost::optional<Node> result;
+
+    if( boost::optional<AirLoopHVACOutdoorAirSystem> oaSystem = airLoopHVACOutdoorAirSystem() )
+    {
+      if( boost::optional<ModelObject> mo = oaSystem->mixedAirModelObject() )
+      {
+        result = mo->optionalCast<Node>();
+      }
+    }
+
+    return result;
   }
 
 } // detail
@@ -922,7 +946,7 @@ namespace detail {
 AirLoopHVAC::AirLoopHVAC(Model& model)
   : Loop(iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::AirLoopHVAC_Impl>());
+  OS_ASSERT(getImpl<detail::AirLoopHVAC_Impl>());
 
   setString(openstudio::OS_AirLoopHVACFields::DesignSupplyAirFlowRate,"AutoSize");
 
@@ -1076,8 +1100,7 @@ boost::optional<Node> AirLoopHVAC::reliefAirNode()
 
 boost::optional<Node> AirLoopHVAC::mixedAirNode()
 {
-  // ETH@20111101 Adding to get Ruby bindings building.
-  LOG_AND_THROW("Not implemented.");
+  return getImpl<detail::AirLoopHVAC_Impl>()->mixedAirNode();
 }
 
 boost::optional<Node> AirLoopHVAC::returnAirNode()
@@ -1129,6 +1152,11 @@ IddObjectType AirLoopHVAC::iddObjectType() {
 bool AirLoopHVAC::addBranchForZone(openstudio::model::ThermalZone & thermalZone)
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->addBranchForZone(thermalZone);
+}
+
+bool AirLoopHVAC::addBranchForZone(ThermalZone & thermalZone, StraightComponent & airTerminal)
+{
+  return getImpl<detail::AirLoopHVAC_Impl>()->addBranchForZone(thermalZone, airTerminal);
 }
 
 bool AirLoopHVAC::addBranchForHVACComponent(HVACComponent airTerminal)

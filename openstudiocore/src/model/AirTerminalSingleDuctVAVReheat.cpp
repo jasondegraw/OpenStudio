@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -50,14 +50,14 @@ namespace detail{
   AirTerminalSingleDuctVAVReheat_Impl::AirTerminalSingleDuctVAVReheat_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : StraightComponent_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == AirTerminalSingleDuctVAVReheat::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == AirTerminalSingleDuctVAVReheat::iddObjectType());
   }
 
   AirTerminalSingleDuctVAVReheat_Impl::AirTerminalSingleDuctVAVReheat_Impl(
       const openstudio::detail::WorkspaceObject_Impl& other,Model_Impl* model,bool keepHandle)
     : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == AirTerminalSingleDuctVAVReheat::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == AirTerminalSingleDuctVAVReheat::iddObjectType());
   }
 
   AirTerminalSingleDuctVAVReheat_Impl::AirTerminalSingleDuctVAVReheat_Impl(
@@ -104,11 +104,11 @@ namespace detail{
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<AirTerminalSingleDuctVAVReheat_Impl*>(this)->setAvailabilitySchedule(*value);
       value = optionalAvailabilitySchedule();
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -195,8 +195,6 @@ namespace detail{
     Model _model = this->model();
     ModelObject thisObject = this->getObject<ModelObject>();
 
-    std::vector<IdfObject> result;
-
     HVACComponent _reheatCoil = reheatCoil();
 
     boost::optional<ModelObject> sourceModelObject = this->inletModelObject();
@@ -208,7 +206,7 @@ namespace detail{
     std::vector<ThermalZone> thermalZones = _model.getModelObjects<ThermalZone>();
     for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
          it != thermalZones.end();
-         it++ )
+         ++it )
     {
       std::vector<ModelObject> equipment = it->equipment();
 
@@ -352,7 +350,7 @@ namespace detail{
 
   double AirTerminalSingleDuctVAVReheat_Impl::fixedMinimumAirFlowRate()
   {
-    return this->getDouble(OS_AirTerminal_SingleDuct_VAV_ReheatFields::ConstantMinimumAirFlowFraction).get();
+    return this->getDouble(OS_AirTerminal_SingleDuct_VAV_ReheatFields::FixedMinimumAirFlowRate).get();
   }
 
   void AirTerminalSingleDuctVAVReheat_Impl::setFixedMinimumAirFlowRate( double value )
@@ -376,7 +374,7 @@ namespace detail{
 
   void AirTerminalSingleDuctVAVReheat_Impl::resetMinimumAirFlowFractionSchedule() {
     bool result = setString(OS_AirTerminal_SingleDuct_VAV_ReheatFields::MinimumAirFlowFractionScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   boost::optional<double> AirTerminalSingleDuctVAVReheat_Impl::maximumHotWaterOrSteamFlowRate()
@@ -528,7 +526,7 @@ namespace detail{
   HVACComponent AirTerminalSingleDuctVAVReheat_Impl::reheatCoil() const
   {
     boost::optional<HVACComponent> coil = optionalReheatCoil();
-    BOOST_ASSERT(coil);
+    OS_ASSERT(coil);
     return coil.get();
   }
 
@@ -629,7 +627,7 @@ AirTerminalSingleDuctVAVReheat::AirTerminalSingleDuctVAVReheat( const Model& mod
                                                                 HVACComponent & coil )
   : StraightComponent(AirTerminalSingleDuctVAVReheat::iddObjectType(),model) 
 {
-  BOOST_ASSERT(getImpl<detail::AirTerminalSingleDuctVAVReheat_Impl>());
+  OS_ASSERT(getImpl<detail::AirTerminalSingleDuctVAVReheat_Impl>());
 
   bool test = setAvailabilitySchedule(availabilitySchedule);
   if (!test) {

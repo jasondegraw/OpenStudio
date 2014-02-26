@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,6 +31,8 @@ namespace energyplus {
 boost::optional<IdfObject> ForwardTranslator::translateShadowCalculation( ShadowCalculation & modelObject )
 {
   IdfObject idfObject( openstudio::IddObjectType::ShadowCalculation);
+
+  idfObject.setString(ShadowCalculationFields::CalculationMethod,"AverageOverDaysInFrequency");
 
   idfObject.setInt(ShadowCalculationFields::CalculationFrequency,modelObject.calculationFrequency());
 

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include "BCLMeasureDialog.hpp"
 
+#include <utilities/core/Assert.hpp>
+
 #include <QLabel>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -35,7 +37,7 @@ namespace openstudio {
 BCLMeasureDialog::BCLMeasureDialog(QWidget* parent)
   : OSDialog(false, parent)
 {
-  this->setWindowTitle("Create New Measure");
+  setWindowTitle("Create New Measure");
 
   init();
 
@@ -50,7 +52,7 @@ BCLMeasureDialog::BCLMeasureDialog(QWidget* parent)
 BCLMeasureDialog::BCLMeasureDialog(const BCLMeasure& bclMeasure, QWidget* parent)
   : m_bclMeasureToCopy(bclMeasure)
 {
-  this->setWindowTitle("Copy Measure");
+  setWindowTitle("Copy Measure");
 
   init();
 
@@ -66,12 +68,11 @@ BCLMeasureDialog::BCLMeasureDialog(const BCLMeasure& bclMeasure, QWidget* parent
     measureTypeString = "EnergyPlus Measure";
   }else if ( measureType == MeasureType::UtilityMeasure){
     measureTypeString = "Utility Measure";
+  }else if ( measureType == MeasureType::ReportingMeasure){
+    measureTypeString = "Reporting Measure";
   }
   int index = m_measureTypeComboBox->findText(measureTypeString);
   m_measureTypeComboBox->setCurrentIndex(index);
-
-  index = m_measureFunctionComboBox->findText(toQString(bclMeasure.measureFunction().valueDescription()));
-  m_measureFunctionComboBox->setCurrentIndex(index);
 
   QStringList taxonomyParts = toQString(bclMeasure.taxonomyTag()).split('.');
   if (taxonomyParts.size() > 0){
@@ -91,6 +92,11 @@ BCLMeasureDialog::~BCLMeasureDialog()
 {
 }
 
+QSize BCLMeasureDialog::sizeHint() const
+{
+  return QSize(770,540);
+}
+
 boost::optional<openstudio::BCLMeasure> BCLMeasureDialog::createMeasure()
 {
   std::string name = toString(m_nameLineEdit->text());
@@ -106,12 +112,10 @@ boost::optional<openstudio::BCLMeasure> BCLMeasureDialog::createMeasure()
     measureType = MeasureType::EnergyPlusMeasure;
   }else if ( measureTypeStr == "Utility Measure"){
     measureType = MeasureType::UtilityMeasure;
+  }else if ( measureTypeStr == "Reporting Measure"){
+    measureType = MeasureType::ReportingMeasure;
   }
 
-  std::string measureFunctionStr = toString(m_measureFunctionComboBox->currentText());
-  MeasureFunction measureFunction(measureFunctionStr);
-
-  bool requiresEnergyPlusResults = false; //disabled for now, m_requiresEnergyPlusResults->isChecked();
   bool usesSketchUpAPI = false; //disabled for now, m_usesSketchUpAPI->isChecked();
 
   openstudio::path userMeasuresDir = BCLMeasure::userMeasuresDir();
@@ -147,8 +151,6 @@ boost::optional<openstudio::BCLMeasure> BCLMeasureDialog::createMeasure()
       result->setModelerDescription(modelerDescription);
       result->setTaxonomyTag(taxonomyTag);
       result->setMeasureType(measureType);
-      result->setMeasureFunction(measureFunction);
-      result->setRequiresEnergyPlusResults(requiresEnergyPlusResults);
       result->setUsesSketchUpAPI(usesSketchUpAPI);
       result->save();
     }
@@ -156,7 +158,7 @@ boost::optional<openstudio::BCLMeasure> BCLMeasureDialog::createMeasure()
     try{
     // starting new measure
     result = BCLMeasure(name, className, measureDir, taxonomyTag,
-                        measureType, measureFunction, requiresEnergyPlusResults, usesSketchUpAPI);
+                        measureType, usesSketchUpAPI);
     result->setDescription(description);
     result->setModelerDescription(modelerDescription);
     result->save();
@@ -173,31 +175,48 @@ void BCLMeasureDialog::nameChanged(const QString& newName)
   m_classNameLabel->setText(toQString(className));
 }
 
+void BCLMeasureDialog::measureTypeChanged(const QString& newName)
+{
+  if (newName == "Reporting Measure"){
+    int index = m_taxonomyFirstLevelComboBox->findText("Reporting");
+    m_taxonomyFirstLevelComboBox->setCurrentIndex(index);
+  }else{
+    m_taxonomyFirstLevelComboBox->setCurrentIndex(0);
+  }
+}
+
 void BCLMeasureDialog::firstLevelTaxonomyChanged(const QString& newName)
 {
   m_taxonomySecondLevelComboBox->clear();
   m_taxonomySecondLevelComboBox->setEnabled(false);
 
   if (newName == "Envelope"){
-    m_taxonomySecondLevelComboBox->addItem("Fenestration");
-    m_taxonomySecondLevelComboBox->addItem("Daylighting");
     m_taxonomySecondLevelComboBox->addItem("Form");
-    m_taxonomySecondLevelComboBox->addItem("Infiltration");
     m_taxonomySecondLevelComboBox->addItem("Opaque");
+    m_taxonomySecondLevelComboBox->addItem("Fenestration");
+    m_taxonomySecondLevelComboBox->addItem("Construction Sets");
+    m_taxonomySecondLevelComboBox->addItem("Daylighting");
+    m_taxonomySecondLevelComboBox->addItem("Infiltration");
     m_taxonomySecondLevelComboBox->setCurrentIndex(0);
     m_taxonomySecondLevelComboBox->setEnabled(true);
   }else if (newName == "Electric Lighting"){
-    m_taxonomySecondLevelComboBox->addItem("Controls");
+    m_taxonomySecondLevelComboBox->addItem("Electric Lighting Controls");
     m_taxonomySecondLevelComboBox->addItem("Lighting Equipment");
     m_taxonomySecondLevelComboBox->setCurrentIndex(0);
     m_taxonomySecondLevelComboBox->setEnabled(true);
   }else if (newName == "Equipment"){
-    m_taxonomySecondLevelComboBox->addItem("Controls");
+    m_taxonomySecondLevelComboBox->addItem("Equipment Controls");
     m_taxonomySecondLevelComboBox->addItem("Electric Equipment");
+    m_taxonomySecondLevelComboBox->addItem("Gas Equipment");
+    m_taxonomySecondLevelComboBox->setCurrentIndex(0);
+    m_taxonomySecondLevelComboBox->setEnabled(true);
+  }else if (newName == "People"){
+    m_taxonomySecondLevelComboBox->addItem("Characteristics");
+    m_taxonomySecondLevelComboBox->addItem("People Schedules");
     m_taxonomySecondLevelComboBox->setCurrentIndex(0);
     m_taxonomySecondLevelComboBox->setEnabled(true);
   }else if (newName == "HVAC"){
-    m_taxonomySecondLevelComboBox->addItem("Controls");
+    m_taxonomySecondLevelComboBox->addItem("HVAC Controls");
     m_taxonomySecondLevelComboBox->addItem("Heating");
     m_taxonomySecondLevelComboBox->addItem("Cooling");
     m_taxonomySecondLevelComboBox->addItem("Heat Rejection");
@@ -207,8 +226,6 @@ void BCLMeasureDialog::firstLevelTaxonomyChanged(const QString& newName)
     m_taxonomySecondLevelComboBox->addItem("Whole System");
     m_taxonomySecondLevelComboBox->setCurrentIndex(0);
     m_taxonomySecondLevelComboBox->setEnabled(true);
-  }else if (newName == "HVAC"){
-    
   }else if (newName == "Service Water Heating"){
     m_taxonomySecondLevelComboBox->addItem("Water Use");
     m_taxonomySecondLevelComboBox->addItem("Water Heating");
@@ -217,6 +234,11 @@ void BCLMeasureDialog::firstLevelTaxonomyChanged(const QString& newName)
     m_taxonomySecondLevelComboBox->setEnabled(true);
   }else if (newName == "Onsite Power Generation"){
     m_taxonomySecondLevelComboBox->addItem("Photovoltaic");
+    m_taxonomySecondLevelComboBox->setCurrentIndex(0);
+    m_taxonomySecondLevelComboBox->setEnabled(true);
+  }else if (newName == "Whole Building"){
+    m_taxonomySecondLevelComboBox->addItem("Whole Building Schedules");
+    m_taxonomySecondLevelComboBox->addItem("Space Types");
     m_taxonomySecondLevelComboBox->setCurrentIndex(0);
     m_taxonomySecondLevelComboBox->setEnabled(true);
   }else if (newName == "Economics"){
@@ -233,14 +255,20 @@ void BCLMeasureDialog::firstLevelTaxonomyChanged(const QString& newName)
 
 void BCLMeasureDialog::init()
 {
+#ifdef Q_OS_MAC
+  int btnHeight = 44;
+#else
+  int btnHeight = 34;
+#endif
+
   QPushButton* cancelButton = this->cancelButton();
   cancelButton->setText("Cancel");
-  cancelButton->setMinimumHeight(34);
+  cancelButton->setMinimumHeight(btnHeight);
   cancelButton->setDefault(true);
 
   QPushButton* okButton = this->okButton();
   okButton->setText("Create Measure and \n Open for Editing");
-  okButton->setMinimumHeight(34);
+  okButton->setMinimumHeight(btnHeight);
 
   QVBoxLayout* vLayout = new QVBoxLayout;
   vLayout->setContentsMargins(QMargins(0,0,0,0));
@@ -293,20 +321,9 @@ void BCLMeasureDialog::init()
   m_measureTypeComboBox->addItem("OpenStudio Measure");
   m_measureTypeComboBox->addItem("EnergyPlus Measure");
   //m_measureTypeComboBox->addItem("Utility Measure"); // Disable for now
+  m_measureTypeComboBox->addItem("Reporting Measure");
   m_measureTypeComboBox->setCurrentIndex(0);
   vLayout2->addWidget(m_measureTypeComboBox);
-  vLayout2->addSpacing(10);
-
-  label = new QLabel;
-  label->setText("Measure Function:");
-  label->setObjectName("H2");
-  vLayout2->addWidget(label);
-  m_measureFunctionComboBox = new QComboBox(this);
-  m_measureFunctionComboBox->addItem("Measure");
-  //m_measureFunctionComboBox->addItem("Report"); // Disable for now
-  //m_measureFunctionComboBox->addItem("Other"); // Disable for now
-  m_measureFunctionComboBox->setCurrentIndex(0);
-  vLayout2->addWidget(m_measureFunctionComboBox);
   vLayout2->addSpacing(10);
 
   label = new QLabel;
@@ -318,10 +335,12 @@ void BCLMeasureDialog::init()
   m_taxonomyFirstLevelComboBox->addItem("Envelope");
   m_taxonomyFirstLevelComboBox->addItem("Electric Lighting");
   m_taxonomyFirstLevelComboBox->addItem("Equipment");
+  m_taxonomyFirstLevelComboBox->addItem("People");
   m_taxonomyFirstLevelComboBox->addItem("HVAC");
   m_taxonomyFirstLevelComboBox->addItem("Refrigeration");
   m_taxonomyFirstLevelComboBox->addItem("Service Water Heating");
   m_taxonomyFirstLevelComboBox->addItem("Onsite Power Generation");
+  m_taxonomyFirstLevelComboBox->addItem("Whole Building");
   m_taxonomyFirstLevelComboBox->addItem("Economics");
   m_taxonomyFirstLevelComboBox->addItem("Reporting");
   tempHLayout->addWidget(m_taxonomyFirstLevelComboBox);
@@ -329,24 +348,6 @@ void BCLMeasureDialog::init()
   tempHLayout->addWidget(m_taxonomySecondLevelComboBox);
   vLayout2->addLayout(tempHLayout);
   vLayout2->addSpacing(10);
-
-  /* Disable for now 
-  m_requiresEnergyPlusResults = new QRadioButton(this);
-  m_requiresEnergyPlusResults->setText("Yes");
-  m_requiresEnergyPlusResults->setChecked(false);
-  QRadioButton* notRequiresEnergyPlusResults = new QRadioButton(this);
-  notRequiresEnergyPlusResults->setText("No");
-  notRequiresEnergyPlusResults->setChecked(true);
-  tempHLayout = new QHBoxLayout;
-  tempHLayout->addWidget(m_requiresEnergyPlusResults);
-  tempHLayout->addWidget(notRequiresEnergyPlusResults);
-  tempHLayout->addStretch();
-  QGroupBox* groupBox = new QGroupBox(this);
-  groupBox->setTitle("Requires EnergyPlus Results");
-  groupBox->setLayout(tempHLayout);
-  vLayout2->addWidget(groupBox);
-  vLayout2->addSpacing(10);
-  */
 
   /* Disable for now 
   m_usesSketchUpAPI = new QRadioButton(this);
@@ -376,10 +377,13 @@ void BCLMeasureDialog::init()
   upperLayout->addStretch();
 
   bool test = connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(nameChanged(const QString&)));
-  Q_ASSERT(test);
+  OS_ASSERT(test);
 
+  test = connect(m_measureTypeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(measureTypeChanged(const QString&)));
+  OS_ASSERT(test);
+  
   test = connect(m_taxonomyFirstLevelComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(firstLevelTaxonomyChanged(const QString&)));
-  Q_ASSERT(test);
+  OS_ASSERT(test);
 
   this->setWindowModality(Qt::ApplicationModal);
   //this->setSizeGripEnabled(true);

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ namespace detail {
   }
 
   Unit IPUnit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::IP);
+    OS_ASSERT(system() == UnitSystem::IP);
     boost::shared_ptr<IPUnit_Impl> impl(new IPUnit_Impl(*this));
     return IPUnit(impl).cast<Unit>();
   }

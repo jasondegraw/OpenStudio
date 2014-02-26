@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ boost::optional<IdfObject> ForwardTranslator::translateCurveExponentialSkewNorma
   OptionalString s;
   OptionalDouble d;
 
-  if (s = modelObject.name()) {
+  if ((s = modelObject.name())) {
     idfObject.setName(*s);
   }
 
@@ -52,10 +52,10 @@ boost::optional<IdfObject> ForwardTranslator::translateCurveExponentialSkewNorma
   idfObject.setDouble(Curve_ExponentialSkewNormalFields::Coefficient4C4,modelObject.coefficient4C4());
   idfObject.setDouble(Curve_ExponentialSkewNormalFields::MinimumValueofx,modelObject.minimumValueofx());
   idfObject.setDouble(Curve_ExponentialSkewNormalFields::MaximumValueofx,modelObject.maximumValueofx());
-  if (d = modelObject.minimumCurveOutput()) {
+  if ((d = modelObject.minimumCurveOutput())) {
     idfObject.setDouble(Curve_ExponentialSkewNormalFields::MinimumCurveOutput,*d);
   }
-  if (d = modelObject.maximumCurveOutput()) {
+  if ((d = modelObject.maximumCurveOutput())) {
     idfObject.setDouble(Curve_ExponentialSkewNormalFields::MaximumCurveOutput,*d);
   }
   if (!modelObject.isInputUnitTypeforxDefaulted()) {

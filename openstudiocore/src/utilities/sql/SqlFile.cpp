@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -52,6 +52,20 @@ SqlFile::SqlFile(const openstudio::path &t_path, const openstudio::EpwFile &t_ep
 
 SqlFile::~SqlFile ()
 {}
+
+void SqlFile::createIndexes()
+{
+  if (m_impl){
+    m_impl->createIndexes();
+  }
+}
+
+void SqlFile::removeIndexes()
+{
+  if (m_impl){
+    m_impl->removeIndexes();
+  }
+}
 
 bool SqlFile::connectionOpen() const
 {
@@ -1775,6 +1789,15 @@ Table monthlyEndUsesTable(const SqlFile& sqlFile,const EndUseFuelType& fuelType,
   }
 
   return result;
+}
+
+bool SqlFile::supportedVersion() const
+{
+  if (m_impl){
+    return m_impl->isSupportedVersion();
+  }
+
+  return false;
 }
 
 } // openstudio

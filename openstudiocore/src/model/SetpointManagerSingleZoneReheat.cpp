@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -53,14 +53,14 @@ namespace detail{
       const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : HVACComponent_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == SetpointManagerSingleZoneReheat::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == SetpointManagerSingleZoneReheat::iddObjectType());
   }
 
   SetpointManagerSingleZoneReheat_Impl::SetpointManagerSingleZoneReheat_Impl(
       const openstudio::detail::WorkspaceObject_Impl& other, Model_Impl* model, bool keepHandle)
     : HVACComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == SetpointManagerSingleZoneReheat::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == SetpointManagerSingleZoneReheat::iddObjectType());
   }
 
   SetpointManagerSingleZoneReheat_Impl::SetpointManagerSingleZoneReheat_Impl(
@@ -217,7 +217,7 @@ namespace detail{
 SetpointManagerSingleZoneReheat::SetpointManagerSingleZoneReheat(const Model& model)
   : HVACComponent(SetpointManagerSingleZoneReheat::iddObjectType(),model) 
 {
-  BOOST_ASSERT(getImpl<detail::SetpointManagerSingleZoneReheat_Impl>());
+  OS_ASSERT(getImpl<detail::SetpointManagerSingleZoneReheat_Impl>());
 
   setMinimumSupplyAirTemperature(-99.0);
 

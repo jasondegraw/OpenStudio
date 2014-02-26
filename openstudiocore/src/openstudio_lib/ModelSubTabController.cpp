@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -32,18 +32,19 @@
 #include <model/Model_Impl.hpp>
 #include <model/Component.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 namespace openstudio {
 
 ModelSubTabController::ModelSubTabController(ModelSubTabView* subTabView, const model::Model & model)
   : SubTabController(subTabView),
     m_model(model)
 {
-  bool isConnected = false;
-  isConnected = connect(subTabView,
-                        SIGNAL(modelObjectSelected(model::OptionalModelObject &, bool )),
-                        this,
-                        SIGNAL(modelObjectSelected(model::OptionalModelObject &, bool )));
-  BOOST_ASSERT(isConnected);
+  bool isConnected = connect(subTabView,
+                             SIGNAL(modelObjectSelected(model::OptionalModelObject &, bool )),
+                             this,
+                             SIGNAL(modelObjectSelected(model::OptionalModelObject &, bool )));
+  OS_ASSERT(isConnected);
 }
 
 openstudio::model::Model ModelSubTabController::model() const
@@ -74,7 +75,7 @@ boost::optional<model::Component> ModelSubTabController::getComponent(const OSIt
 void ModelSubTabController::onRemoveItem(OSItem* item)
 {
   ModelObjectItem* modelObjectItem = qobject_cast<ModelObjectItem*>(item);
-  BOOST_ASSERT(modelObjectItem);
+  OS_ASSERT(modelObjectItem);
   model::ModelObject modelObject = modelObjectItem->modelObject();
   if (!modelObject.handle().isNull()){
     onRemoveObject(modelObject);
@@ -84,7 +85,7 @@ void ModelSubTabController::onRemoveItem(OSItem* item)
 void ModelSubTabController::onReplaceItem(OSItem* item, const OSItemId& replacementItemId)
 {
   ModelObjectItem* modelObjectItem = qobject_cast<ModelObjectItem*>(item);
-  BOOST_ASSERT(modelObjectItem);
+  OS_ASSERT(modelObjectItem);
   model::ModelObject modelObject = modelObjectItem->modelObject();
   if (!modelObject.handle().isNull()){
     onReplaceObject(modelObject, replacementItemId);

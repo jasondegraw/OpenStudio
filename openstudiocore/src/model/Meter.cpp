@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ namespace detail {
   Meter_Impl::Meter_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == Meter::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == Meter::iddObjectType());
   }
 
   Meter_Impl::Meter_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -55,7 +55,7 @@ namespace detail {
                          bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == Meter::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == Meter::iddObjectType());
   }
 
   Meter_Impl::Meter_Impl(const Meter_Impl& other,
@@ -98,13 +98,13 @@ namespace detail {
 
   std::string Meter_Impl::name() const {
     boost::optional<std::string> value = getString(OS_MeterFields::Name,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   std::string Meter_Impl::reportingFrequency() const {
     boost::optional<std::string> value = getString(OS_MeterFields::ReportingFrequency,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -114,7 +114,7 @@ namespace detail {
 
   bool Meter_Impl::meterFileOnly() const {
     boost::optional<std::string> value = getString(OS_MeterFields::MeterFileOnly,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "True");
   }
 
@@ -124,7 +124,7 @@ namespace detail {
 
   bool Meter_Impl::cumulative() const {
     boost::optional<std::string> value = getString(OS_MeterFields::Cumulative,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "True");
   }
 
@@ -219,7 +219,7 @@ namespace detail {
 
   void Meter_Impl::resetReportingFrequency() {
     bool result = setString(OS_MeterFields::ReportingFrequency, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void Meter_Impl::setMeterFileOnly(bool meterFileOnly) {
@@ -229,12 +229,12 @@ namespace detail {
     } else {
       result = setString(OS_MeterFields::MeterFileOnly, "False");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void Meter_Impl::resetMeterFileOnly() {
     bool result = setString(OS_MeterFields::MeterFileOnly, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void Meter_Impl::setCumulative(bool cumulative) {
@@ -244,22 +244,21 @@ namespace detail {
     } else {
       result = setString(OS_MeterFields::Cumulative, "False");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void Meter_Impl::resetCumulative() {
     bool result = setString(OS_MeterFields::Cumulative, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool Meter_Impl::setSpecificEndUse(const std::string& endUse)
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(endUse, endUseType(), fuelType(), installLocationType(), specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -274,12 +273,11 @@ namespace detail {
 
   bool Meter_Impl::setEndUseType(EndUseType type)
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), type, fuelType(), installLocationType(), specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -289,12 +287,11 @@ namespace detail {
 
   bool Meter_Impl::resetEndUseType()
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), boost::none, fuelType(), installLocationType(), specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -304,12 +301,11 @@ namespace detail {
 
   bool Meter_Impl::setFuelType(FuelType type)
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), endUseType(), type, installLocationType(), specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -319,12 +315,11 @@ namespace detail {
 
   bool Meter_Impl::resetFuelType()
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), endUseType(), boost::none, installLocationType(), specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -334,12 +329,11 @@ namespace detail {
 
   bool Meter_Impl::setInstallLocationType(InstallLocationType type)
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), endUseType(), fuelType(), type, specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -349,12 +343,11 @@ namespace detail {
 
   bool Meter_Impl::resetInstallLocationType()
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), endUseType(), fuelType(), boost::none, specificInstallLocation());
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -364,12 +357,11 @@ namespace detail {
 
   bool Meter_Impl::setSpecificInstallLocation(const std::string& locationName)
   {
-    bool result = false;
     ModelObject object = getObject<ModelObject>();
 
     std::string name = Meter::getName(specificEndUse(), endUseType(), fuelType(), installLocationType(), locationName);
 
-    result = object.setString(OS_MeterFields::Name, name);
+    bool result = object.setString(OS_MeterFields::Name, name);
     if (!result){
       LOG(Error, "Could not set name to '" << name << "'");
     }
@@ -406,6 +398,10 @@ namespace detail {
       std::string frequency = this->reportingFrequency();
       if (openstudio::istringEqual(frequency, "RunPeriod")){
           frequency = "Run Period";
+      }else if (openstudio::istringEqual(frequency, "Timestep")){
+          frequency = "Zone Timestep";
+      }else if (openstudio::istringEqual(frequency, "Detailed")){
+          frequency = "HVAC System Timestep"; 
       }
 
       // currently the key value is not associated with the meter, it is part of the name
@@ -428,7 +424,7 @@ namespace detail {
 Meter::Meter(const Model& model)
   : ModelObject(Meter::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::Meter_Impl>());
+  OS_ASSERT(getImpl<detail::Meter_Impl>());
 }
 
 IddObjectType Meter::iddObjectType() {
@@ -438,7 +434,8 @@ IddObjectType Meter::iddObjectType() {
 
 boost::regex Meter::meterRegex()
 {
-  const static boost::regex result("^(.*?)?:?(InteriorLights|ExteriorLights|InteriorEquipment|ExteriorEquipment|Fans|Pumps|Heating|Cooling|HeatRejection|Humidifier|HeatRecovery|DHW|Cogeneration|Refrigeration|Miscellaneous|HeatingCoils|CoolingCoils|Chillers|Boilers|Baseboard|HeatRecoveryForCooling|HeatRecoveryForHeating)?:?(Electricity|Gasoline|Gas|Diesel|Coal|FuelOil_1|FuelOil_2|Propane|Water|Steam|DistrictCooling|DistrictHeating|EnergyTransfer)?:?(Facility|Building|Zone|System|Plant)?:?([^:]*?)?$");
+  // DLM: Must put more specific terms, e.g. HeatingCoils, before less specific terms, e.g. Heating
+  const static boost::regex result("^(.*?)?:?(InteriorLights|ExteriorLights|InteriorEquipment|ExteriorEquipment|Fans|Pumps|HeatingCoils|Heating|CoolingCoils|Cooling|HeatRejection|Humidifier|HeatRecoveryForCooling|HeatRecoveryForHeating|HeatRecovery|WaterSystems|Cogeneration|Refrigeration|Chillers|Boilers|Baseboard)?:?(Electricity|Gasoline|Gas|Diesel|Coal|FuelOil_1|FuelOil_2|Propane|Water|Steam|DistrictCooling|DistrictHeating|EnergyTransfer)?:?(Facility|Building|HVAC|Zone|System|Plant)?:?([^:]*?)?$");
   return result;
 }
 

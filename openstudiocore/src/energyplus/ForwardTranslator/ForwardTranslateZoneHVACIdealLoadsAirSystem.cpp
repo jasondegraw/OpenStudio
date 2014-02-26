@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -36,6 +36,8 @@
 #include <utilities/idd/ZoneHVAC_IdealLoadsAirSystem_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>
 #include <utilities/idd/IddFactory.hxx>
+
+#include <utilities/core/Assert.hpp>
 
 using namespace openstudio::model;
 
@@ -177,7 +179,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACIdealLoadsAirSyst
         boost::optional<IdfObject> designSpecificationOutdoorAirIdf;
         designSpecificationOutdoorAirIdf = translateAndMapModelObject(*designSpecificationOutdoorAir);
         // the translation should complete successfully
-        BOOST_ASSERT(designSpecificationOutdoorAirIdf);      
+        OS_ASSERT(designSpecificationOutdoorAirIdf);      
         // set the field to reference the design specification outdoor air
         zoneHVACIdealLoadsAirSystem.setString(ZoneHVAC_IdealLoadsAirSystemFields::DesignSpecificationOutdoorAirObjectName,designSpecificationOutdoorAirIdf->name().get()); 
       }

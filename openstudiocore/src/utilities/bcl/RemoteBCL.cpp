@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -38,8 +38,9 @@
 #include <QNetworkRequest>
 #include <QSslError>
 #include <QTextStream>
+#include <QSslSocket>
 
-#define REMOTE_PRODUCTION_SERVER "http://bcl.nrel.gov"
+#define REMOTE_PRODUCTION_SERVER "https://bcl.nrel.gov"
 #define REMOTE_DEVELOPMENT_SERVER "http://bcl7.development.nrel.gov"
 
 namespace openstudio{
@@ -67,7 +68,7 @@ namespace openstudio{
     m_networkManager(new QNetworkAccessManager()),
     m_mutex(new QMutex()),
     m_numResultsPerQuery(10),
-    m_apiVersion("1.1")
+    m_apiVersion("2.0")
   {
     // make sure application is initialized
     openstudio::Application::instance().application(true);
@@ -79,10 +80,11 @@ namespace openstudio{
 
     useRemoteProductionUrl();
 
-    // DLM: this assert was failing for me, wait until SSL is required dependency to try this again
-    //bool isConnected = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
-    //  this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    //Q_ASSERT(isConnected);
+#ifndef QT_NO_OPENSSL
+    bool isConnected = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
+      this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
+    OS_ASSERT(isConnected);
+#endif
   }
 
   RemoteBCL::~RemoteBCL()
@@ -91,6 +93,29 @@ namespace openstudio{
     delete m_mutex;
   }
 
+  bool RemoteBCL::initializeSSL(const openstudio::path &t_pathToSSLLibraries)
+  {
+    QByteArray oldpath = qgetenv("PATH");
+    if (!t_pathToSSLLibraries.empty())
+    {
+      qputenv("PATH", openstudio::toQString(t_pathToSSLLibraries.file_string()).toUtf8());
+    }
+
+#ifdef QT_NO_OPENSSL
+    bool opensslloaded = false;
+#else
+    bool opensslloaded = QSslSocket::supportsSsl();
+#endif
+
+    if (!t_pathToSSLLibraries.empty())
+    {
+      qputenv("PATH", oldpath);
+    }
+
+    return opensslloaded;
+  }
+
+  
   ///////////////////////////////////////////////////////////////////////////
   /// Inherited members
   ///////////////////////////////////////////////////////////////////////////
@@ -208,7 +233,7 @@ namespace openstudio{
 
   int RemoteBCL::checkForComponentUpdates()
   {
-    m_componentsWithUpdates.empty();
+    m_componentsWithUpdates.clear();
 
     Q_FOREACH(BCLComponent component, LocalBCL::instance().components()){
       // can't start another search until the last one is done
@@ -217,21 +242,25 @@ namespace openstudio{
       }
 
       // disconnect all signals from m_networkManager to this
-      bool test = disconnect(m_networkManager, 0, this, 0);
+      disconnect(m_networkManager, 0, this, 0); // returns a bool, but was not checking, so removed
 
       const_cast<RemoteBCL*>(this)->m_lastSearch.clear();
 
-      QString url = toQString(remoteUrl() + "/api/search/?filters=ss_uuid:%1&oauth_consumer_key=%2&api_version=%3").arg(
-        toQString(component.uid()), toQString(authKey()), toQString(m_apiVersion)
+      QString url = toQString(remoteUrl() + "/api/search/?fq[]=ss_uuid:%1&api_version=%2").arg(
+        toQString(component.uid()),
+        toQString(m_apiVersion)
       );
       //LOG(Warn, toString(url));
 
       // when the reply is finished call onSearchResponseComplete
-      test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
-      Q_ASSERT(test);
+      bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
+      OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
       test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
         this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-      Q_ASSERT(test);
+      OS_ASSERT(test);
+#endif
 
       QNetworkRequest request = QNetworkRequest(QUrl(url));
       request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -248,7 +277,7 @@ namespace openstudio{
 
   int RemoteBCL::checkForMeasureUpdates()
   {
-    m_measuresWithUpdates.empty();
+    m_measuresWithUpdates.clear();
 
     Q_FOREACH(BCLMeasure measure, LocalBCL::instance().measures()){
       // can't start another search until the last one is done
@@ -257,21 +286,25 @@ namespace openstudio{
       }
 
       // disconnect all signals from m_networkManager to this
-      bool test = disconnect(m_networkManager, 0, this, 0);
+      disconnect(m_networkManager, 0, this, 0); // returns bool, but no check, so removed
 
       const_cast<RemoteBCL*>(this)->m_lastSearch.clear();
 
-      QString url = toQString(remoteUrl() + "/api/search/?filters=ss_uuid:%1&oauth_consumer_key=%2&api_version=%3").arg(
-        toQString(measure.uid()), toQString(authKey()), toQString(m_apiVersion)
+      QString url = toQString(remoteUrl() + "/api/search/?fq[]=ss_uuid:%1&api_version=%2").arg(
+        toQString(measure.uid()),
+        toQString(m_apiVersion)
       );
       //LOG(Warn, toString(url));
 
       // when the reply is finished call onSearchResponseComplete
-      test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
-      Q_ASSERT(test);
+      bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
+      OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
       test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
         this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-      Q_ASSERT(test);
+      OS_ASSERT(test);
+#endif
 
       QNetworkRequest request = QNetworkRequest(QUrl(url));
       request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -448,7 +481,9 @@ namespace openstudio{
 
   int RemoteBCL::numResultPages() const
   {
-    return std::ceil(static_cast<double>(m_lastTotalResults)/static_cast<double>(m_numResultsPerQuery));
+    double numerator(lastTotalResults());
+    double denominator(resultsPerQuery());
+    return int(std::ceil(numerator/denominator));
   }
 
   bool RemoteBCL::validateAuthKey(const std::string& authKey, const std::string& remoteUrl)
@@ -479,20 +514,23 @@ namespace openstudio{
 
       const_cast<RemoteBCL*>(this)->m_lastSearch.clear();
 
-      QString url = toQString(remoteUrl + "/api/search/?oauth_consumer_key=%1&api_version=%2&show_rows=0").arg(
-        toQString(authKey), toQString(m_apiVersion)
+      QString url = toQString(remoteUrl + "/api/search/?api_version=%1&show_rows=0").arg(
+        toQString(m_apiVersion)
       );
       //LOG(Warn, toString(url));
 
       // disconnect all signals from m_networkManager to this
-      bool test = disconnect(m_networkManager, 0, this, 0);
+      disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
 
       // when the reply is finished call onSearchResponseComplete
-      test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
-      Q_ASSERT(test);
+      bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
+      OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
       test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
         this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-      Q_ASSERT(test);
+      OS_ASSERT(test);
+#endif
 
       QNetworkRequest request = QNetworkRequest(QUrl(url));
       request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -574,13 +612,12 @@ namespace openstudio{
     QUrl url = toQString(remoteUrl() + "/api/component/download");
 
     QByteArray data;
-    url.addQueryItem("oauth_consumer_key", toQString(authKey()));
     url.addQueryItem("uids", toQString(uid));
     url.addQueryItem("api_version", toQString(m_apiVersion));
     data.append(url.encodedQuery());
-    //LOG(Warn, url.toString().toStdString());
+    LOG(Warn, url.toString().toStdString());
 
-    QNetworkRequest request(url);
+    QNetworkRequest request(toQString(remoteUrl() + "/api/component/download"));
     request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17");
 
@@ -589,20 +626,23 @@ namespace openstudio{
     LOG(Info, testString);
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onDownloadComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onDownloadComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onDownloadComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     m_downloadReply = m_networkManager->post(request, data);
         
     test = connect(m_downloadReply, SIGNAL(readyRead()), this, SLOT(downloadData()));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
 
     return true;
   }
@@ -625,15 +665,18 @@ namespace openstudio{
     //LOG(Warn, toString(url));
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onOnDemandGeneratorResponseComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onOnDemandGeneratorResponseComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onOnDemandGeneratorResponseComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -673,18 +716,18 @@ namespace openstudio{
 
       if (it->dataType() == OnDemandGeneratorArgumentType::String){
         boost::optional<std::string> value = it->valueAsString();
-        Q_ASSERT(value);
+        OS_ASSERT(value);
         arguments += toQString(*value);
       }else if (it->dataType() == OnDemandGeneratorArgumentType::Float){
         boost::optional<double> value = it->valueAsDouble();
-        Q_ASSERT(value);
+        OS_ASSERT(value);
         arguments += QString::number(*value);
       }else if (it->dataType() == OnDemandGeneratorArgumentType::Integer){
         boost::optional<int> value = it->valueAsInteger();
-        Q_ASSERT(value);
+        OS_ASSERT(value);
         arguments += QString::number(*value);
       }else{
-        Q_ASSERT(false);
+        OS_ASSERT(false);
       }
 
       if (it < itend-1){
@@ -701,20 +744,23 @@ namespace openstudio{
     //LOG(Warn, url.toString().toStdString());
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onDownloadComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onDownloadComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onDownloadComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     m_downloadReply = m_networkManager->get(request);
 
     test = connect(m_downloadReply, SIGNAL(readyRead()), this, SLOT(downloadData()));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
 
     return true;
   }
@@ -730,28 +776,35 @@ namespace openstudio{
 
     QString url;
     if (componentType.empty() || componentType == "*"){
-      url = toQString(remoteUrl() + "/api/metasearch/%1?filters=type:%2&oauth_consumer_key=%3&api_version=%4").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), toQString(authKey()), toQString(m_apiVersion)
+      url = toQString(remoteUrl() + "/api/metasearch/%1?fq[]=bundle:%2&api_version=%3").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        toQString(m_apiVersion)
       );
     }else{
-      url = toQString(remoteUrl() + "/api/metasearch/%1?filters=type:%2 sm_component_type:\"%3\""
-        "&oauth_consumer_key=%4&api_version=%5").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), toQString(componentType), toQString(authKey()),
+      url = toQString(remoteUrl() + "/api/metasearch/%1?fq[]=bundle:%2&fq[]=%3:\"%4\"&api_version=%5").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        (filterType == "nrel_component" ? "sm_vid_Component_Tags" : "sm_vid_Measure_Tags"),
+        toQString(componentType),
         toQString(m_apiVersion)
       );
     }
     //LOG(Warn, toString(url));
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onMetaSearchResponseComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onMetaSearchResponseComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onMetaSearchResponseComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -772,28 +825,34 @@ namespace openstudio{
 
     QString url;
     if (componentTypeTID == 0){
-      url = toQString(remoteUrl() + "/api/metasearch/%1?filters=type:%2&oauth_consumer_key=%3&api_version=%4").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), toQString(authKey()), toQString(m_apiVersion)
+      url = toQString(remoteUrl() + "/api/metasearch/%1?fq[]=bundle:%2&api_version=%3").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        toQString(m_apiVersion)
       );
     }else{
-      url = toQString(remoteUrl() + "/api/metasearch/%1?filters=type:%2 tid:%3"
-        "&oauth_consumer_key=%4&api_version=%5").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), QString::number(componentTypeTID),
-        toQString(authKey()), toQString(m_apiVersion)
+      url = toQString(remoteUrl() + "/api/metasearch/%1?fq[]=bundle:%2&fq[]=tid:%3&api_version=%4").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        QString::number(componentTypeTID),
+        toQString(m_apiVersion)
       );
     }
     //LOG(Warn, toString(url));
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onMetaSearchResponseComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onMetaSearchResponseComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onMetaSearchResponseComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -814,29 +873,40 @@ namespace openstudio{
 
     QString url;
     if (componentType.empty() || componentType == "*"){
-      url = toQString(remoteUrl() + "/api/search/%1?filters=type:%2&oauth_consumer_key=%3&api_version=%4&show_rows=%5&page=%6").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), toQString(authKey()), toQString(m_apiVersion),
-        QString::number(m_numResultsPerQuery), QString::number(page)
+      url = toQString(remoteUrl() + "/api/search/%1?fq[]=bundle:%2&api_version=%3&show_rows=%4&page=%5").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        toQString(m_apiVersion),
+        QString::number(m_numResultsPerQuery),
+        QString::number(page)
       );
     }else{
-      url = toQString(remoteUrl() + "/api/search/%1?filters=type:%2 sm_component_type:\"%3\""
-        "&oauth_consumer_key=%4&api_version=%5&show_rows=%6&page=%7").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), toQString(componentType), toQString(authKey()),
-        toQString(m_apiVersion), QString::number(m_numResultsPerQuery), QString::number(page)
+      url = toQString(remoteUrl() + "/api/search/%1?fq[]=bundle:%2&fq[]=%3:\"%4\""
+        "&api_version=%5&show_rows=%6&page=%7").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        (filterType == "nrel_component" ? "sm_vid_Component_Tags" : "sm_vid_Measure_Tags"),
+        toQString(componentType),
+        toQString(m_apiVersion),
+        QString::number(m_numResultsPerQuery),
+        QString::number(page)
       );
     }
     //LOG(Warn, toString(url));
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onSearchResponseComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -857,29 +927,38 @@ namespace openstudio{
 
     QString url;
     if (componentTypeTID == 0){
-      url = toQString(remoteUrl() + "/api/search/%1?filters=type:%2&oauth_consumer_key=%3&api_version=%4&show_rows=%5&page=%6").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), toQString(authKey()),
-        toQString(m_apiVersion), QString::number(m_numResultsPerQuery), QString::number(page)
+      url = toQString(remoteUrl() + "/api/search/%1?fq[]=bundle:%2&api_version=%3&show_rows=%4&page=%5").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        toQString(m_apiVersion),
+        QString::number(m_numResultsPerQuery),
+        QString::number(page)
       );
     }else{
-      url = toQString(remoteUrl() + "/api/search/%1?filters=type:%2 tid:%3"
-        "&oauth_consumer_key=%4&api_version=%5&show_rows=%6&page=%7").arg(
-        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"), toQString(filterType), QString::number(componentTypeTID),
-        toQString(authKey()), toQString(m_apiVersion), QString::number(m_numResultsPerQuery), QString::number(page)
+      url = toQString(remoteUrl() + "/api/search/%1?fq[]=bundle:%2&fq[]=tid:%3&api_version=%4&show_rows=%5&page=%6").arg(
+        toQString(searchTerm == "*" ? "" : searchTerm != "" ? searchTerm + ".xml" : "").replace("+", "%2B"),
+        toQString(filterType),
+        QString::number(componentTypeTID),
+        toQString(m_apiVersion),
+        QString::number(m_numResultsPerQuery),
+        QString::number(page)
       );
     }
     //LOG(Warn, toString(url));
 
     // disconnect all signals from m_networkManager to this
-    bool test = disconnect(m_networkManager, 0, this, 0);
-    //Q_ASSERT(test);
+    disconnect(m_networkManager, 0, this, 0); // returns bool, but not checked, so removed
+    //OS_ASSERT(test);
 
     // when the reply is finished call onSearchResponseComplete
-    test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
-    Q_ASSERT(test);
+    bool test = connect(m_networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onSearchResponseComplete(QNetworkReply*)));
+    OS_ASSERT(test);
+
+#ifndef QT_NO_OPENSSL
     test = connect(m_networkManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), 
       this, SLOT(catchSslErrors(QNetworkReply*, const QList<QSslError>&)));
-    Q_ASSERT(test);
+    OS_ASSERT(test);
+#endif
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -964,7 +1043,7 @@ namespace openstudio{
         LOG(Error, "Network Error: Host " << remoteUrl() << " not found");
       }else if (reply->error() == QNetworkReply::UnknownNetworkError && reply->errorString().startsWith("Error creating SSL context")){
         LOG(Error, "Network Error: Unable to create SSL connection.  Verify that SSL libraries are in the system path.");
-        //QMessageBox::warning(0, "Unable to Create SSL Connection", QString("Verify that SSL libraries are in the system path"));
+        //QMessageBox::warning(0, "Unable to Create SSL Connection", "Verify that SSL libraries are in the system path");
       }else{
         LOG(Error, "Network Error: " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() << " - " << reply->errorString().toStdString());
       }
@@ -990,7 +1069,7 @@ namespace openstudio{
   {
     QDomElement root = remoteQueryResponse.domDocument().documentElement();
 
-    if (!root.isNull() && (root.tagName() == "results")){
+    if (!root.isNull() && (root.tagName().startsWith("result"))){
       QDomElement numResultsElement = root.firstChildElement("result_count");
       if (!numResultsElement.isNull()){
         return BCLMetaSearchResult(root);
@@ -1020,7 +1099,7 @@ namespace openstudio{
       while (!componentElement.firstChildElement("name").isNull())
       {
         //Skip components without a uid or version_id
-        if (!componentElement.firstChildElement("uid").isNull() && !componentElement.firstChildElement("version_id").isNull())
+        if (!componentElement.firstChildElement("uuid").isNull() && !componentElement.firstChildElement("vuuid").isNull())
         {
           BCLSearchResult searchResult(componentElement);
           searchResults.push_back(searchResult);
@@ -1051,7 +1130,7 @@ namespace openstudio{
 
   void RemoteBCL::downloadData()
   {
-    Q_ASSERT(m_downloadReply);
+    OS_ASSERT(m_downloadReply);
     m_downloadFile->write(m_downloadReply->readAll());
   }
 
@@ -1133,22 +1212,28 @@ namespace openstudio{
           } else if (componentType == "measure") {
             path measureXmlPath = dest / toPath("measure.xml");
             // open the measure to figure out uid and vid
-            BCLMeasure measure(measureXmlPath.parent_path());
-            std::string uid = measure.uid();
-            std::string versionId = measure.versionId();
+            boost::optional<BCLMeasure> measure;
+            try{
+              measure = BCLMeasure(measureXmlPath.parent_path());
 
-            // check if component has proper uid and vid
-            if (!uid.empty() && !versionId.empty()){
+              std::string uid = measure->uid();
+              std::string versionId = measure->versionId();
 
-              dest = toPath(LocalBCL::instance().libraryPath().append(toQString("/"+uid+"/"+versionId)));
+              // check if component has proper uid and vid
+              if (!uid.empty() && !versionId.empty()){
 
-              removeDirectory(dest);
-              if (copyDirectory(measureXmlPath.parent_path(), dest))
-              {
-                // Add to LocalBCL
-                m_lastMeasureDownload = BCLMeasure(dest);
-                LocalBCL::instance().addMeasure(*m_lastMeasureDownload);
+                dest = toPath(LocalBCL::instance().libraryPath().append(toQString("/"+uid+"/"+versionId)));
+
+                removeDirectory(dest);
+                if (copyDirectory(measureXmlPath.parent_path(), dest))
+                {
+                  // Add to LocalBCL
+                  m_lastMeasureDownload = BCLMeasure(dest);
+                  LocalBCL::instance().addMeasure(*m_lastMeasureDownload);
+                }
               }
+            }catch(const std::exception&){
+              LOG(Error, "Unable to create measure from download: " + toString(measureXmlPath.parent_path()));
             }
           }
         }else{

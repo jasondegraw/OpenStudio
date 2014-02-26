@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -202,6 +202,15 @@ TEST_F(DataFixture, EndUses2)
   EXPECT_EQ(0.0, endUses.getEndUse(EndUseFuelType::Gas, EndUseCategoryType::Cooling, "General"));
   EXPECT_EQ(0.0, endUses.getEndUse(EndUseFuelType::Gas, EndUseCategoryType::Cooling, "Outdoor"));
 
+}
+
+TEST_F(DataFixture, EndUses3)
+{
+  // EndUseCategoryType is a subset of EndUseType
+  BOOST_FOREACH(int i, EndUseCategoryType::getValues()){
+    EndUseCategoryType endUseCategoryType(i);
+    EXPECT_NO_THROW(EndUseType(endUseCategoryType.valueName())) << endUseCategoryType.valueName();
+  }
 }
 
 TEST_F(DataFixture, EndUses_Conversions)

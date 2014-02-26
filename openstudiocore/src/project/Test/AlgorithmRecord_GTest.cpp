@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -39,6 +39,7 @@
 
 #include <utilities/core/FileReference.hpp>
 #include <utilities/core/Containers.hpp>
+#include <utilities/data/Attribute.hpp>
 #include <utilities/data/Tag.hpp>
 
 using namespace openstudio;
@@ -112,19 +113,22 @@ TEST_F(ProjectFixture, DesignOfExperiments_RoundTrip_PostRun) {
                       std::string(),
                       std::string(),
                       std::string(),
-                      true,
-                      true,
                       analysis.problem(),
+                      true,
+                      true,
+                      true,
+                      DataPointRunType::Local,
                       std::vector<QVariant>(),
                       DoubleVector(),
                       openstudio::path(),
                       boost::none,
                       boost::none,
                       boost::none,
+                      FileReferenceVector(),
                       boost::none,
+                      std::vector<openstudio::path>(),
                       TagVector(),
-                      boost::none,
-                      std::vector<openstudio::path>()); // DLM: Elaine is this ok?
+                      AttributeVector());
   EXPECT_TRUE(analysis.addDataPoint(dataPoint));
 
   ProjectDatabase database = getCleanDatabase("DesignOfExperiments_RoundTrip_PostRun");
@@ -183,19 +187,22 @@ TEST_F(ProjectFixture, DesignOfExperiments_RemoveAlgorithm) {
                       std::string(),
                       std::string(),
                       std::string(),
-                      true,
-                      true,
                       analysis.problem(),
+                      true,
+                      true,
+                      true,
+                      DataPointRunType::Local,
                       std::vector<QVariant>(),
                       DoubleVector(),
                       openstudio::path(),
                       boost::none,
                       boost::none,
                       boost::none,
+                      FileReferenceVector(),
                       boost::none,
+                      std::vector<openstudio::path>(),
                       TagVector(),
-                      boost::none,
-                      std::vector<openstudio::path>()); // DLM: Elaine is this ok?
+                      AttributeVector());
   EXPECT_TRUE(analysis.addDataPoint(dataPoint));
 
   ProjectDatabase database = getCleanDatabase("DesignOfExperiments_RemoveAlgorithm");
@@ -245,19 +252,22 @@ TEST_F(ProjectFixture, DesignOfExperiments_RemoveAnalysis) {
                       std::string(),
                       std::string(),
                       std::string(),
-                      true,
-                      true,
                       analysis.problem(),
+                      true,
+                      true,
+                      true,
+                      DataPointRunType::Local,
                       std::vector<QVariant>(),
                       DoubleVector(),
                       openstudio::path(),
                       boost::none,
                       boost::none,
                       boost::none,
+                      FileReferenceVector(),
                       boost::none,
+                      std::vector<openstudio::path>(),
                       TagVector(),
-                      boost::none,
-                      std::vector<openstudio::path>()); // DLM: Elaine is this ok?
+                      AttributeVector());
   EXPECT_TRUE(analysis.addDataPoint(dataPoint));
 
   ProjectDatabase database = getCleanDatabase("DesignOfExperiments_RemoveAnalysis");

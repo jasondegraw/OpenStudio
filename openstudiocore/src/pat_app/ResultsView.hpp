@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,6 +31,9 @@ class QStringList;
 class QTableWidget;
 class QTimer;
 class QPaintEvent;
+class QStackedWidget;
+class QPoint;
+class QMenu;
 
 namespace openstudio{
 
@@ -39,6 +42,8 @@ class OSListView;
 class OpenDirectoryButton;
 
 namespace pat {
+  
+enum DownloadResultsStatus { LOCAL_MODE, RESULTS_DISABLED, RESULTS_DOWNLOADED, RESULTS_UNAVAILABLE, RESULTS_AVAILABLE, RUNNING_DETAILED, RUNNING_SLIM };
 
 class ResultsView : public PatMainTabView
 {
@@ -54,21 +59,60 @@ class ResultsView : public PatMainTabView
 
     OSListView* dataPointResultsListView;
 
+    OSListView* dataPointCalibrationListView;
+
+    double calibrationMaxNMBE() const;
+
+    double calibrationMaxCVRMSE() const;
+
+    void populateMenu(QMenu& menu, const openstudio::path& directory);
+
   signals: 
+
+    void viewSelected(int);
 
     void openButtonClicked(bool clicked);
 
     void openDirButtonClicked(bool clicked);
 
+    void downloadResultsButtonClicked(bool clicked);
+
+    void calibrationThresholdsChanged(double maxNMBE, double maxCVRMSE);
+
   public slots:
+
+    void updateReportButtons();
+
+    void selectView(int index);
 
     void enableViewFileButton(bool enable);
 
     void enableOpenDirectoryButton(bool enable);
 
+    void enableDownloadResultsButton(const DownloadResultsStatus& status);
+
+    void selectCalibrationMethod(const QString &);
+
+  protected slots:
+
+    void openReport();
+
   private:
 
+    void downloadResultsButtonEnabled(bool enabled);
+
+    void openButtonEnabled(bool enabled);
+  
+    QStackedWidget * m_stackedWidget;
+
+    QPushButton * m_standardResultsBtn;
+    QPushButton * m_calibrationResultsBtn;
     QPushButton* m_viewFileButton;
+    QPushButton* m_downloadResultsButton;
+
+    QLabel* m_calibrationMethodLabel;
+    double m_calibrationMaxNMBE;
+    double m_calibrationMaxCVRMSE;
 
     OpenDirectoryButton* m_openDirButton;
 };
@@ -100,6 +144,8 @@ public slots:
   void update();
 
   void setHasEmphasis(bool hasEmphasis);
+
+  void showContextMenu(const QPoint& pos);
 
 protected:
 
@@ -161,7 +207,56 @@ private:
 
   openstudio::analysis::DataPoint m_dataPoint;
   openstudio::analysis::DataPoint m_baselineDataPoint;
+  bool m_hasEmphasis;
   bool m_alternateRow;
+};
+
+class DataPointCalibrationHeaderView : public QWidget
+{
+  Q_OBJECT
+
+public:
+  
+  DataPointCalibrationHeaderView();
+
+private:
+
+};
+
+class DataPointCalibrationView : public QAbstractButton
+{
+  Q_OBJECT
+
+public:
+
+  DataPointCalibrationView(const openstudio::analysis::DataPoint& dataPoint,
+                           const openstudio::analysis::DataPoint& baselineDataPoint,
+                           bool alternateRow, double maxNMBE, double maxCVRMSE);
+
+  virtual ~DataPointCalibrationView() {}
+
+public slots:
+  
+  void update();
+
+  void setHasEmphasis(bool hasEmphasis);
+  
+  void showContextMenu(const QPoint& pos);
+
+protected:
+
+  void paintEvent(QPaintEvent * e);
+
+private:
+
+  QLabel* m_nameLabel;
+
+  openstudio::analysis::DataPoint m_dataPoint;
+  openstudio::analysis::DataPoint m_baselineDataPoint;
+  bool m_alternateRow;
+  bool m_hasEmphasis;
+  double m_calibrationMaxNMBE;
+  double m_calibrationMaxCVRMSE;
 };
 
 }

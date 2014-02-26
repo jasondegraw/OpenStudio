@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ namespace detail {
   LightingDesignDay_Impl::LightingDesignDay_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == LightingDesignDay::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == LightingDesignDay::iddObjectType());
   }
 
   LightingDesignDay_Impl::LightingDesignDay_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -47,7 +47,7 @@ namespace detail {
                                                  bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == LightingDesignDay::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == LightingDesignDay::iddObjectType());
   }
 
   LightingDesignDay_Impl::LightingDesignDay_Impl(const LightingDesignDay_Impl& other,
@@ -75,13 +75,13 @@ namespace detail {
 
   std::string LightingDesignDay_Impl::cieSkyModel() const {
     boost::optional<std::string> value = getString(OS_LightingDesignDayFields::CIESkyModel,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   int LightingDesignDay_Impl::snowIndicator() const {
     boost::optional<int> value = getInt(OS_LightingDesignDayFields::SnowIndicator,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -90,37 +90,35 @@ namespace detail {
   }
 
   bool LightingDesignDay_Impl::setCIESkyModel(std::string cIESkyModel) {
-    bool result = false;
-    result = setString(OS_LightingDesignDayFields::CIESkyModel, cIESkyModel);
+    bool result = setString(OS_LightingDesignDayFields::CIESkyModel, cIESkyModel);
     return result;
   }
 
   bool LightingDesignDay_Impl::setSnowIndicator(int snowIndicator) {
-    bool result = false;
-    result = setInt(OS_LightingDesignDayFields::SnowIndicator, snowIndicator);
+    bool result = setInt(OS_LightingDesignDayFields::SnowIndicator, snowIndicator);
     return result;
   }
 
   void LightingDesignDay_Impl::resetSnowIndicator() {
     bool result = setString(OS_LightingDesignDayFields::SnowIndicator, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   openstudio::Date LightingDesignDay_Impl::date() const
   {
     OptionalInt month = getInt(OS_LightingDesignDayFields::Month, true);
     OptionalInt dayofMonth = getInt(OS_LightingDesignDayFields::DayofMonth, true);
-    BOOST_ASSERT(month);
-    BOOST_ASSERT(dayofMonth);
+    OS_ASSERT(month);
+    OS_ASSERT(dayofMonth);
     return Date(MonthOfYear(*month), *dayofMonth);
   }
 
   bool LightingDesignDay_Impl::setDate(const openstudio::Date& date)
   {
     bool test = setInt(OS_LightingDesignDayFields::Month, date.monthOfYear().value(), false);
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
     test = setInt(OS_LightingDesignDayFields::DayofMonth, date.dayOfMonth());
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
     return true;
   }
 
@@ -130,10 +128,10 @@ namespace detail {
 
     BOOST_FOREACH(const ModelExtensibleGroup& group, castVector<ModelExtensibleGroup>(extensibleGroups()))
     {
-      OptionalInt hour = group.getInt(0, true);
-      OptionalInt minute = group.getInt(1, true);
-      BOOST_ASSERT(hour);
-      BOOST_ASSERT(minute);
+      OptionalInt hour = group.getInt(OS_LightingDesignDayExtensibleFields::HourtoSimulate, true);
+      OptionalInt minute = group.getInt(OS_LightingDesignDayExtensibleFields::MinutetoSimulate, true);
+      OS_ASSERT(hour);
+      OS_ASSERT(minute);
       result.push_back(Time(0, *hour, *minute));
     }
 
@@ -147,10 +145,10 @@ namespace detail {
 
     BOOST_FOREACH(const ModelExtensibleGroup& group, castVector<ModelExtensibleGroup>(extensibleGroups()))
     {
-      OptionalInt hour = group.getInt(0, true);
-      OptionalInt minute = group.getInt(1, true);
-      BOOST_ASSERT(hour);
-      BOOST_ASSERT(minute);
+      OptionalInt hour = group.getInt(OS_LightingDesignDayExtensibleFields::HourtoSimulate, true);
+      OptionalInt minute = group.getInt(OS_LightingDesignDayExtensibleFields::MinutetoSimulate, true);
+      OS_ASSERT(hour);
+      OS_ASSERT(minute);
       result.push_back(DateTime(date, Time(0, *hour, *minute)));
     }
 
@@ -184,12 +182,26 @@ namespace detail {
     clearExtensibleGroups();
   }
 
+  void LightingDesignDay_Impl::ensureNoLeapDays()
+  {
+    boost::optional<int> month;
+    boost::optional<int> day;
+
+    month = getInt(OS_LightingDesignDayFields::Month);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_LightingDesignDayFields::DayofMonth);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_LightingDesignDayFields::DayofMonth, 28);
+      }
+    }
+  }
+
 } // detail
 
 LightingDesignDay::LightingDesignDay(const std::string& cieSkyModel, const openstudio::Date& date, const Model& model)
   : ModelObject(LightingDesignDay::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::LightingDesignDay_Impl>());
+  OS_ASSERT(getImpl<detail::LightingDesignDay_Impl>());
   setCIESkyModel(cieSkyModel);
   setDate(date);
 }
@@ -256,6 +268,11 @@ bool LightingDesignDay::addSimulationTime(const openstudio::Time& time)
 void LightingDesignDay::clearSimulationTimes()
 {
   return getImpl<detail::LightingDesignDay_Impl>()->clearSimulationTimes();
+}
+
+void LightingDesignDay::ensureNoLeapDays()
+{
+  getImpl<detail::LightingDesignDay_Impl>()->ensureNoLeapDays();
 }
 
 /// @cond

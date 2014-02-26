@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -47,9 +47,9 @@ namespace detail {
   SequentialSearchRecord_Impl::SequentialSearchRecord_Impl(const QSqlQuery& query, ProjectDatabase& database)
     : OpenStudioAlgorithmRecord_Impl(query, database)
   {
-    BOOST_ASSERT(query.isValid());
-    BOOST_ASSERT(query.isActive());
-    BOOST_ASSERT(query.isSelect());
+    OS_ASSERT(query.isValid());
+    OS_ASSERT(query.isActive());
+    OS_ASSERT(query.isSelect());
   }
 
   std::vector<ObjectRecord> SequentialSearchRecord_Impl::resources() const {
@@ -95,17 +95,17 @@ namespace detail {
   }
 
   void SequentialSearchRecord_Impl::setLastValues(const QSqlQuery& query, ProjectDatabase& projectDatabase) {
-    BOOST_ASSERT(query.isValid());
-    BOOST_ASSERT(query.isActive());
-    BOOST_ASSERT(query.isSelect());
+    OS_ASSERT(query.isValid());
+    OS_ASSERT(query.isActive());
+    OS_ASSERT(query.isSelect());
 
     OpenStudioAlgorithmRecord_Impl::setLastValues(query,projectDatabase);
   }
 
   bool SequentialSearchRecord_Impl::compareValues(const QSqlQuery& query) const {
-    BOOST_ASSERT(query.isValid());
-    BOOST_ASSERT(query.isActive());
-    BOOST_ASSERT(query.isSelect());
+    OS_ASSERT(query.isValid());
+    OS_ASSERT(query.isActive());
+    OS_ASSERT(query.isSelect());
 
     bool result = OpenStudioAlgorithmRecord_Impl::compareValues(query);
 
@@ -129,7 +129,7 @@ SequentialSearchRecord::SequentialSearchRecord(const analysis::SequentialSearch&
         analysisRecord.projectDatabase(),
         sequentialSearch)
 {
-  BOOST_ASSERT(getImpl<detail::SequentialSearchRecord_Impl>());
+  OS_ASSERT(getImpl<detail::SequentialSearchRecord_Impl>());
 }
 
 SequentialSearchRecord::SequentialSearchRecord(const QSqlQuery& query, ProjectDatabase& database)
@@ -138,7 +138,7 @@ SequentialSearchRecord::SequentialSearchRecord(const QSqlQuery& query, ProjectDa
         database,
         boost::optional<analysis::OpenStudioAlgorithm>())
 {
-  BOOST_ASSERT(getImpl<detail::SequentialSearchRecord_Impl>());
+  OS_ASSERT(getImpl<detail::SequentialSearchRecord_Impl>());
 }
 
 SequentialSearchRecord::SequentialSearchRecord(
@@ -146,7 +146,7 @@ SequentialSearchRecord::SequentialSearchRecord(
     ProjectDatabase database)
     : OpenStudioAlgorithmRecord(impl, database, boost::optional<analysis::OpenStudioAlgorithm>())
 {
-  BOOST_ASSERT(getImpl<detail::SequentialSearchRecord_Impl>());
+  OS_ASSERT(getImpl<detail::SequentialSearchRecord_Impl>());
 }
 
 boost::optional<SequentialSearchRecord> SequentialSearchRecord::factoryFromQuery(

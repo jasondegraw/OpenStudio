@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -24,6 +24,8 @@
 #include <model/Model.hpp>
 #include <model/Model_Impl.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 namespace openstudio {
 
 SimSettingsTabController::SimSettingsTabController(bool isIP, const model::Model & model)
@@ -31,7 +33,7 @@ SimSettingsTabController::SimSettingsTabController(bool isIP, const model::Model
 {
   bool isConnected = connect(this,SIGNAL(toggleUnitsClicked(bool)),
                              mainContentWidget(),SIGNAL(toggleUnitsClicked(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 void SimSettingsTabController::toggleUnits(bool displayIP)

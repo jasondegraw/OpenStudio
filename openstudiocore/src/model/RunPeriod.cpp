@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ namespace detail {
   RunPeriod_Impl::RunPeriod_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ParentObject_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == RunPeriod::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == RunPeriod::iddObjectType());
   }
 
   RunPeriod_Impl::RunPeriod_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -50,7 +50,7 @@ namespace detail {
                                  bool keepHandle)
     : ParentObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == RunPeriod::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == RunPeriod::iddObjectType());
   }
 
   RunPeriod_Impl::RunPeriod_Impl(const RunPeriod_Impl& other,Model_Impl* model,bool keepHandle)
@@ -214,6 +214,27 @@ namespace detail {
     setInt(OS_RunPeriodFields::NumberofTimesRunperiodtobeRepeated,numRepeats);
   }
 
+  void RunPeriod_Impl::ensureNoLeapDays()
+  {
+    boost::optional<int> month;
+    boost::optional<int> day;
+
+    month = getInt(OS_RunPeriodFields::BeginMonth);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_RunPeriodFields::BeginDayofMonth);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_RunPeriodFields::BeginDayofMonth, 28);
+      }
+    }
+
+    month = getInt(OS_RunPeriodFields::EndMonth);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_RunPeriodFields::EndDayofMonth);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_RunPeriodFields::EndDayofMonth, 28);
+      }
+    }
+  }
 
   // return the parent object in the hierarchy
   boost::optional<ParentObject> RunPeriod_Impl::parent() const
@@ -277,7 +298,7 @@ namespace detail {
 RunPeriod::RunPeriod(const Model& model)
   : ParentObject(RunPeriod::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::RunPeriod_Impl>());
+  OS_ASSERT(getImpl<detail::RunPeriod_Impl>());
   setBeginMonth(1);
   setBeginDayOfMonth(1);
   setEndMonth(12);
@@ -387,6 +408,11 @@ void RunPeriod::setUseWeatherFileSnowInd(bool snowInd)
 void RunPeriod::setNumTimePeriodRepeats(int numRepeats)
 {
   getImpl<detail::RunPeriod_Impl>()->setNumTimePeriodRepeats(numRepeats);
+}
+
+void RunPeriod::ensureNoLeapDays()
+{
+  getImpl<detail::RunPeriod_Impl>()->ensureNoLeapDays();
 }
 
 bool RunPeriod::isAnnual() const {

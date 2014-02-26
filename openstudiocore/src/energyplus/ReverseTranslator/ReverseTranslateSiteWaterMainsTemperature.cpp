@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -50,7 +50,7 @@ OptionalModelObject ReverseTranslator::translateSiteWaterMainsTemperature( const
     boost::optional<ModelObject> mo2 = translateAndMapWorkspaceObject(wo.get());
     if( mo2 )
     {
-      if( schedule = mo2->optionalCast<Schedule>() )
+      if( (schedule = mo2->optionalCast<Schedule>()) )
       {
         mo.setTemperatureSchedule(schedule.get());
       }

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -93,7 +93,7 @@ boost::optional<Clause> Clause::factoryFromXml(const QDomElement& element)
 Clause::Clause(boost::shared_ptr<detail::Clause_Impl> impl)
   : RulesetObject(impl)
 {
-  BOOST_ASSERT(getImpl<detail::Clause_Impl>());
+  OS_ASSERT(getImpl<detail::Clause_Impl>());
 }
 /// @endcond
 

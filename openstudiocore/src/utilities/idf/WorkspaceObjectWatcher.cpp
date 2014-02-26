@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -33,12 +33,12 @@ WorkspaceObjectWatcher::WorkspaceObjectWatcher(const openstudio::WorkspaceObject
   bool connected = this->connect(objectImpl.get(), 
       SIGNAL(onRelationshipChange(int,Handle,Handle)), 
       SLOT(relationshipChange(int,Handle,Handle)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = this->connect(objectImpl.get(), 
       SIGNAL(onRemoveFromWorkspace(Handle)), 
       SLOT(removedFromWorkspace(Handle)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 }
 
 WorkspaceObjectWatcher::~WorkspaceObjectWatcher() {}

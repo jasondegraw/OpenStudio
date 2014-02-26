@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,6 +33,8 @@
 #include <utilities/idd/IddFactory.hxx>
 #include <utilities/idd/OS_SpaceInfiltration_DesignFlowRate_FieldEnums.hxx>
 
+#include <utilities/units/QuantityConverter.hpp>
+
 #include <utilities/core/Assert.hpp>
 
 namespace openstudio {
@@ -43,7 +45,7 @@ namespace detail {
   SpaceInfiltrationDesignFlowRate_Impl::SpaceInfiltrationDesignFlowRate_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : SpaceLoad_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == SpaceInfiltrationDesignFlowRate::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == SpaceInfiltrationDesignFlowRate::iddObjectType());
   }
 
   SpaceInfiltrationDesignFlowRate_Impl::SpaceInfiltrationDesignFlowRate_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -51,7 +53,7 @@ namespace detail {
                                                                              bool keepHandle)
     : SpaceLoad_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == SpaceInfiltrationDesignFlowRate::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == SpaceInfiltrationDesignFlowRate::iddObjectType());
   }
 
   SpaceInfiltrationDesignFlowRate_Impl::SpaceInfiltrationDesignFlowRate_Impl(const SpaceInfiltrationDesignFlowRate_Impl& other,
@@ -110,10 +112,15 @@ namespace detail {
       return this->setDesignFlowRate(*flowperExteriorSurfaceArea * exteriorArea);
     }
 
+    boost::optional<double> flowperExteriorWallArea = this->flowperExteriorWallArea();
+    if (flowperExteriorWallArea){
+      double exteriorWallArea = space->exteriorWallArea();
+
+      return this->setDesignFlowRate(*flowperExteriorWallArea * exteriorWallArea);
+    }
+
     boost::optional<double> airChangesperHour = this->airChangesperHour();
     if (airChangesperHour){
-      double floorArea = space->floorArea();
-
       return this->setDesignFlowRate(*airChangesperHour * space->volume() / 3600.0);
     }
 
@@ -132,7 +139,7 @@ namespace detail {
 
   std::string SpaceInfiltrationDesignFlowRate_Impl::designFlowRateCalculationMethod() const {
     boost::optional<std::string> value = getString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -160,6 +167,14 @@ namespace detail {
     return result;  
   }
 
+  boost::optional<double> SpaceInfiltrationDesignFlowRate_Impl::flowperExteriorWallArea() const {
+    boost::optional<double> result;
+    if (istringEqual("Flow/ExteriorWallArea", this->designFlowRateCalculationMethod())){
+      result = getDouble(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea,true);
+    }
+    return result;  
+  }
+
   boost::optional<double> SpaceInfiltrationDesignFlowRate_Impl::airChangesperHour() const {
     boost::optional<double> result;
     if (istringEqual("AirChanges/Hour", this->designFlowRateCalculationMethod())){
@@ -170,7 +185,7 @@ namespace detail {
 
   double SpaceInfiltrationDesignFlowRate_Impl::constantTermCoefficient() const {
     boost::optional<double> value = getDouble(OS_SpaceInfiltration_DesignFlowRateFields::ConstantTermCoefficient,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -180,7 +195,7 @@ namespace detail {
 
   double SpaceInfiltrationDesignFlowRate_Impl::temperatureTermCoefficient() const {
     boost::optional<double> value = getDouble(OS_SpaceInfiltration_DesignFlowRateFields::TemperatureTermCoefficient,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -190,7 +205,7 @@ namespace detail {
 
   double SpaceInfiltrationDesignFlowRate_Impl::velocityTermCoefficient() const {
     boost::optional<double> value = getDouble(OS_SpaceInfiltration_DesignFlowRateFields::VelocityTermCoefficient,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -200,7 +215,7 @@ namespace detail {
 
   double SpaceInfiltrationDesignFlowRate_Impl::velocitySquaredTermCoefficient() const {
     boost::optional<double> value = getDouble(OS_SpaceInfiltration_DesignFlowRateFields::VelocitySquaredTermCoefficient,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -215,15 +230,15 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod, "Flow/Space");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRate, designFlowRate.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperSpaceFloorArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::AirChangesperHour, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("Flow/Space", this->designFlowRateCalculationMethod())){
@@ -240,15 +255,15 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod, "Flow/Area");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRate, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::FlowperSpaceFloorArea, flowperSpaceFloorArea.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::AirChangesperHour, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("Flow/Area", this->designFlowRateCalculationMethod())){
@@ -265,18 +280,43 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod, "Flow/ExteriorArea");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRate, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperSpaceFloorArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, flowperExteriorSurfaceArea.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::AirChangesperHour, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("Flow/ExteriorArea", this->designFlowRateCalculationMethod())){
+        result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, 0.0);
+      }
+    }
+    return result;
+  }
+
+  bool SpaceInfiltrationDesignFlowRate_Impl::setFlowperExteriorWallArea(boost::optional<double> flowperExteriorWallArea) {
+    bool result = true;
+    if (flowperExteriorWallArea) {
+      if (*flowperExteriorWallArea < 0){
+        result = false;
+      }else{
+        result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod, "Flow/ExteriorWallArea");
+        OS_ASSERT(result);
+        result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRate, "");
+        OS_ASSERT(result);
+        result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperSpaceFloorArea, "");
+        OS_ASSERT(result);
+        result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, flowperExteriorWallArea.get());
+        OS_ASSERT(result);
+        result = setString(OS_SpaceInfiltration_DesignFlowRateFields::AirChangesperHour, "");
+        OS_ASSERT(result);
+      }
+    } else {
+      if (istringEqual("Flow/ExteriorWallArea", this->designFlowRateCalculationMethod())){
         result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, 0.0);
       }
     }
@@ -290,15 +330,15 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod, "AirChanges/Hour");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::DesignFlowRate, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperSpaceFloorArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_SpaceInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::AirChangesperHour, airChangesperHour.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("AirChanges/Hour", this->designFlowRateCalculationMethod())){
@@ -309,47 +349,178 @@ namespace detail {
   }
 
   bool SpaceInfiltrationDesignFlowRate_Impl::setConstantTermCoefficient(double constantTermCoefficient) {
-    bool result = false;
-    result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::ConstantTermCoefficient, constantTermCoefficient);
+    bool result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::ConstantTermCoefficient, constantTermCoefficient);
     return result;
   }
 
   void SpaceInfiltrationDesignFlowRate_Impl::resetConstantTermCoefficient() {
     bool result = setString(OS_SpaceInfiltration_DesignFlowRateFields::ConstantTermCoefficient, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool SpaceInfiltrationDesignFlowRate_Impl::setTemperatureTermCoefficient(double temperatureTermCoefficient) {
-    bool result = false;
-    result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::TemperatureTermCoefficient, temperatureTermCoefficient);
+    bool result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::TemperatureTermCoefficient, temperatureTermCoefficient);
     return result;
   }
 
   void SpaceInfiltrationDesignFlowRate_Impl::resetTemperatureTermCoefficient() {
     bool result = setString(OS_SpaceInfiltration_DesignFlowRateFields::TemperatureTermCoefficient, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool SpaceInfiltrationDesignFlowRate_Impl::setVelocityTermCoefficient(double velocityTermCoefficient) {
-    bool result = false;
-    result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::VelocityTermCoefficient, velocityTermCoefficient);
+    bool result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::VelocityTermCoefficient, velocityTermCoefficient);
     return result;
   }
 
   void SpaceInfiltrationDesignFlowRate_Impl::resetVelocityTermCoefficient() {
     bool result = setString(OS_SpaceInfiltration_DesignFlowRateFields::VelocityTermCoefficient, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool SpaceInfiltrationDesignFlowRate_Impl::setVelocitySquaredTermCoefficient(double velocitySquaredTermCoefficient) {
-    bool result = false;
-    result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::VelocitySquaredTermCoefficient, velocitySquaredTermCoefficient);
+    bool result = setDouble(OS_SpaceInfiltration_DesignFlowRateFields::VelocitySquaredTermCoefficient, velocitySquaredTermCoefficient);
     return result;
   }
 
   void SpaceInfiltrationDesignFlowRate_Impl::resetVelocitySquaredTermCoefficient() {
     bool result = setString(OS_SpaceInfiltration_DesignFlowRateFields::VelocitySquaredTermCoefficient, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
+  }
+
+  double SpaceInfiltrationDesignFlowRate_Impl::getDesignFlowRate(double floorArea,
+                                                                 double exteriorSurfaceArea,
+                                                                 double exteriorWallArea,
+                                                                 double airVolume) const
+  {
+    std::string method = designFlowRateCalculationMethod();
+
+    if (method == "Flow/Space") {
+      return designFlowRate().get();
+    }
+    else if (method == "Flow/Area") {
+      return flowperSpaceFloorArea().get() * floorArea;
+    }
+    else if (method == "Flow/ExteriorArea") {
+      return flowperExteriorSurfaceArea().get() * exteriorSurfaceArea;
+    }
+    else if (method == "Flow/ExteriorWallArea") {
+      return flowperExteriorWallArea().get() * exteriorWallArea;
+    }
+    else if (method == "AirChanges/Hour") {
+      return convert(airChangesperHour().get() * airVolume,"m^3/h","m^3/s").get();
+    }
+
+    OS_ASSERT(false);
+    return 0.0;
+  }
+
+  double SpaceInfiltrationDesignFlowRate_Impl::getFlowPerSpaceFloorArea(double floorArea,
+                                                                        double exteriorSurfaceArea,
+                                                                        double exteriorWallArea,
+                                                                        double airVolume) const
+  {
+    std::string method = designFlowRateCalculationMethod();
+
+    if (method == "Flow/Space") {
+      return designFlowRate().get() / floorArea;
+    }
+    else if (method == "Flow/Area") {
+      return flowperSpaceFloorArea().get();
+    }
+    else if (method == "Flow/ExteriorArea") {
+      return flowperExteriorSurfaceArea().get() * (exteriorSurfaceArea / floorArea);
+    }
+    else if (method == "Flow/ExteriorWallArea") {
+      return flowperExteriorWallArea().get() * (exteriorWallArea / floorArea);
+    }
+    else if (method == "AirChanges/Hour") {
+      return convert(airChangesperHour().get() * (airVolume / floorArea),"m/h","m/s").get();
+    }
+
+    OS_ASSERT(false);
+    return 0.0;
+  }
+
+  double SpaceInfiltrationDesignFlowRate_Impl::getFlowPerExteriorSurfaceArea(double floorArea,
+                                                                             double exteriorSurfaceArea,
+                                                                             double exteriorWallArea,
+                                                                             double airVolume) const
+  {
+    std::string method = designFlowRateCalculationMethod();
+
+    if (method == "Flow/Space") {
+      return designFlowRate().get() / exteriorSurfaceArea;
+    }
+    else if (method == "Flow/Area") {
+      return flowperSpaceFloorArea().get() * (floorArea / exteriorSurfaceArea);
+    }
+    else if (method == "Flow/ExteriorArea") {
+      return flowperExteriorSurfaceArea().get();
+    }
+    else if (method == "Flow/ExteriorWallArea") {
+      return flowperExteriorWallArea().get() * (exteriorWallArea / exteriorSurfaceArea);
+    }
+    else if (method == "AirChanges/Hour") {
+      return convert(airChangesperHour().get() * (airVolume / exteriorSurfaceArea),"m/h","m/s").get();
+    }
+
+    OS_ASSERT(false);
+    return 0.0;
+  }
+
+  double SpaceInfiltrationDesignFlowRate_Impl::getFlowPerExteriorWallArea(double floorArea,
+                                                                          double exteriorSurfaceArea,
+                                                                          double exteriorWallArea,
+                                                                          double airVolume) const
+  {
+    std::string method = designFlowRateCalculationMethod();
+
+    if (method == "Flow/Space") {
+      return designFlowRate().get() / exteriorWallArea;
+    }
+    else if (method == "Flow/Area") {
+      return flowperSpaceFloorArea().get() * (floorArea / exteriorWallArea);
+    }
+    else if (method == "Flow/ExteriorArea") {
+      return flowperExteriorSurfaceArea().get() * (exteriorSurfaceArea / exteriorWallArea);
+    }
+    else if (method == "Flow/ExteriorWallArea") {
+      return flowperExteriorWallArea().get();
+    }
+    else if (method == "AirChanges/Hour") {
+      return convert(airChangesperHour().get() * (airVolume / exteriorWallArea),"m/h","m/s").get();
+    }
+
+    OS_ASSERT(false);
+    return 0.0;
+  }
+
+  double SpaceInfiltrationDesignFlowRate_Impl::getAirChangesPerHour(double floorArea,
+                                                                    double exteriorSurfaceArea,
+                                                                    double exteriorWallArea,
+                                                                    double airVolume) const
+  {
+    std::string method = designFlowRateCalculationMethod();
+
+    if (method == "Flow/Space") {
+      return convert(designFlowRate().get() / airVolume, "1/s", "1/h").get();
+    }
+    else if (method == "Flow/Area") {
+      return convert(flowperSpaceFloorArea().get() * (floorArea / airVolume), "1/s", "1/h").get();
+    }
+    else if (method == "Flow/ExteriorArea") {
+      return convert(flowperExteriorSurfaceArea().get() * (exteriorSurfaceArea / airVolume), "1/s", "1/h").get();
+    }
+    else if (method == "Flow/ExteriorWallArea") {
+      return convert(flowperExteriorWallArea().get() * (exteriorWallArea / airVolume), "1/s", "1/h").get();
+    }
+    else if (method == "AirChanges/Hour") {
+      return airChangesperHour().get();
+    }
+
+    OS_ASSERT(false);
+    return 0.0;
   }
 
   int SpaceInfiltrationDesignFlowRate_Impl::spaceIndex() const {
@@ -421,14 +592,34 @@ namespace detail {
 SpaceInfiltrationDesignFlowRate::SpaceInfiltrationDesignFlowRate(const Model& model)
   : SpaceLoad(SpaceInfiltrationDesignFlowRate::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>());
+  OS_ASSERT(getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>());
   bool test = this->setDesignFlowRate(0);
-  BOOST_ASSERT(test);
+  OS_ASSERT(test);
 }
 
 IddObjectType SpaceInfiltrationDesignFlowRate::iddObjectType() {
   IddObjectType result(IddObjectType::OS_SpaceInfiltration_DesignFlowRate);
   return result;
+}
+
+boost::optional<Schedule> SpaceInfiltrationDesignFlowRate::schedule() const
+{
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->schedule();
+}
+
+bool SpaceInfiltrationDesignFlowRate::isScheduleDefaulted() const
+{
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->isScheduleDefaulted();
+}
+
+bool SpaceInfiltrationDesignFlowRate::setSchedule(Schedule& schedule)
+{
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->setSchedule(schedule);
+}
+
+void SpaceInfiltrationDesignFlowRate::resetSchedule()
+{
+  getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->resetSchedule();
 }
 
 std::vector<std::string> SpaceInfiltrationDesignFlowRate::designFlowRateCalculationMethodValues() {
@@ -454,6 +645,10 @@ boost::optional<double> SpaceInfiltrationDesignFlowRate::flowperSpaceFloorArea()
 
 boost::optional<double> SpaceInfiltrationDesignFlowRate::flowperExteriorSurfaceArea() const {
   return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->flowperExteriorSurfaceArea();
+}
+
+boost::optional<double> SpaceInfiltrationDesignFlowRate::flowperExteriorWallArea() const {
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->flowperExteriorWallArea();
 }
 
 boost::optional<double> SpaceInfiltrationDesignFlowRate::airChangesperHour() const {
@@ -504,6 +699,10 @@ bool SpaceInfiltrationDesignFlowRate::setFlowperExteriorSurfaceArea(double flowp
   return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->setFlowperExteriorSurfaceArea(flowperExteriorSurfaceArea);
 }
 
+bool SpaceInfiltrationDesignFlowRate::setFlowperExteriorWallArea(double flowperExteriorWallArea) {
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->setFlowperExteriorWallArea(flowperExteriorWallArea);
+}
+
 bool SpaceInfiltrationDesignFlowRate::setAirChangesperHour(double airChangesperHour) {
   return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->setAirChangesperHour(airChangesperHour);
 }
@@ -540,24 +739,59 @@ void SpaceInfiltrationDesignFlowRate::resetVelocitySquaredTermCoefficient() {
   getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->resetVelocitySquaredTermCoefficient();
 }
 
-boost::optional<Schedule> SpaceInfiltrationDesignFlowRate::schedule() const
+double SpaceInfiltrationDesignFlowRate::getDesignFlowRate(double floorArea,
+                                                          double exteriorSurfaceArea,
+                                                          double exteriorWallArea,
+                                                          double airVolume) const
 {
-  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->schedule();
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->getDesignFlowRate(floorArea,
+                                                                                    exteriorSurfaceArea,
+                                                                                    exteriorWallArea,
+                                                                                    airVolume);
 }
 
-bool SpaceInfiltrationDesignFlowRate::isScheduleDefaulted() const
+double SpaceInfiltrationDesignFlowRate::getFlowPerSpaceFloorArea(double floorArea,
+                                                                 double exteriorSurfaceArea,
+                                                                 double exteriorWallArea,
+                                                                 double airVolume) const
 {
-  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->isScheduleDefaulted();
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->getFlowPerSpaceFloorArea(floorArea,
+                                                                                           exteriorSurfaceArea,
+                                                                                           exteriorWallArea,
+                                                                                           airVolume);
 }
 
-bool SpaceInfiltrationDesignFlowRate::setSchedule(Schedule& schedule)
+double SpaceInfiltrationDesignFlowRate::getFlowPerExteriorSurfaceArea(double floorArea,
+                                                                      double exteriorSurfaceArea,
+                                                                      double exteriorWallArea,
+                                                                      double airVolume) const
 {
-  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->setSchedule(schedule);
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->getFlowPerExteriorSurfaceArea(floorArea,
+                                                                                                exteriorSurfaceArea,
+                                                                                                exteriorWallArea,
+                                                                                                airVolume);
 }
 
-void SpaceInfiltrationDesignFlowRate::resetSchedule()
+double SpaceInfiltrationDesignFlowRate::getFlowPerExteriorWallArea(double floorArea,
+                                                                   double exteriorSurfaceArea,
+                                                                   double exteriorWallArea,
+                                                                   double airVolume) const
 {
-  getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->resetSchedule();
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->getFlowPerExteriorWallArea(floorArea,
+                                                                                             exteriorSurfaceArea,
+                                                                                             exteriorWallArea,
+                                                                                             airVolume);
+}
+
+double SpaceInfiltrationDesignFlowRate::getAirChangesPerHour(double floorArea,
+                                                             double exteriorSurfaceArea,
+                                                             double exteriorWallArea,
+                                                             double airVolume) const
+{
+  return getImpl<detail::SpaceInfiltrationDesignFlowRate_Impl>()->getAirChangesPerHour(floorArea,
+                                                                                       exteriorSurfaceArea,
+                                                                                       exteriorWallArea,
+                                                                                       airVolume);
 }
 
 /// @cond

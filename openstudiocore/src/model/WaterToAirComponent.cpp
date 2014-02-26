@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -478,7 +478,7 @@ bool WaterToAirComponent_Impl::removeFromPlantLoop()
       int i = splitter.branchIndexForOutletModelObject(sourceModelObject.get());
       int j = mixer.branchIndexForInletModelObject(targetModelObject.get());
 
-      BOOST_ASSERT(i == j);
+      OS_ASSERT(i == j);
 
       splitter.removePortForBranch(i);
       mixer.removePortForBranch(i);
@@ -519,7 +519,7 @@ bool WaterToAirComponent_Impl::removeFromPlantLoop()
 WaterToAirComponent::WaterToAirComponent(IddObjectType type,const Model& model)
   : HVACComponent(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::WaterToAirComponent_Impl>());
+  OS_ASSERT(getImpl<detail::WaterToAirComponent_Impl>());
 }     
 
 WaterToAirComponent::WaterToAirComponent(boost::shared_ptr<detail::WaterToAirComponent_Impl> p)

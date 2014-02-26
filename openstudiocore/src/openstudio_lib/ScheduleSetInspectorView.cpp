@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -743,7 +743,7 @@ ScheduleSetInspectorView::ScheduleSetInspectorView(const model::Model& model,
 
   row += 2;
 
-  BOOST_ASSERT(m_vectorControllers.size() == 10);
+  OS_ASSERT(m_vectorControllers.size() == 10);
 
   configDropZones();
 

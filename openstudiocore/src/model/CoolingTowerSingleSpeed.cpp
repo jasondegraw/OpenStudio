@@ -36,7 +36,7 @@ namespace detail {
                                                              bool keepHandle)
     : StraightComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == CoolingTowerSingleSpeed::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == CoolingTowerSingleSpeed::iddObjectType());
   }
 
   CoolingTowerSingleSpeed_Impl::CoolingTowerSingleSpeed_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -44,7 +44,7 @@ namespace detail {
                                                              bool keepHandle)
     : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == CoolingTowerSingleSpeed::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == CoolingTowerSingleSpeed::iddObjectType());
   }
 
   CoolingTowerSingleSpeed_Impl::CoolingTowerSingleSpeed_Impl(const CoolingTowerSingleSpeed_Impl& other,
@@ -209,7 +209,7 @@ namespace detail {
 
   std::string CoolingTowerSingleSpeed_Impl::performanceInputMethod() const {
     boost::optional<std::string> value = getString(OS_CoolingTower_SingleSpeedFields::PerformanceInputMethod,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -237,14 +237,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::basinHeaterCapacity() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterCapacity,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getBasinHeaterCapacity(bool returnIP) const {
     OptionalDouble value = basinHeaterCapacity();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterCapacity, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -254,14 +254,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::basinHeaterSetpointTemperature() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterSetpointTemperature,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getBasinHeaterSetpointTemperature(bool returnIP) const {
     OptionalDouble value = basinHeaterSetpointTemperature();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterSetpointTemperature, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -279,14 +279,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::evaporationLossFactor() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::EvaporationLossFactor,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getEvaporationLossFactor(bool returnIP) const {
     OptionalDouble value = evaporationLossFactor();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::EvaporationLossFactor, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -296,14 +296,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::driftLossPercent() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::DriftLossPercent,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getDriftLossPercent(bool returnIP) const {
     OptionalDouble value = driftLossPercent();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::DriftLossPercent, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -317,14 +317,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::blowdownConcentrationRatio() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::BlowdownConcentrationRatio,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getBlowdownConcentrationRatio(bool returnIP) const {
     OptionalDouble value = blowdownConcentrationRatio();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::BlowdownConcentrationRatio, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -338,7 +338,7 @@ namespace detail {
 
   std::string CoolingTowerSingleSpeed_Impl::capacityControl() const {
     boost::optional<std::string> value = getString(OS_CoolingTower_SingleSpeedFields::CapacityControl,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -348,7 +348,7 @@ namespace detail {
 
   int CoolingTowerSingleSpeed_Impl::numberofCells() const {
     boost::optional<int> value = getInt(OS_CoolingTower_SingleSpeedFields::NumberofCells,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -358,7 +358,7 @@ namespace detail {
 
   std::string CoolingTowerSingleSpeed_Impl::cellControl() const {
     boost::optional<std::string> value = getString(OS_CoolingTower_SingleSpeedFields::CellControl,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -368,14 +368,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::cellMinimumWaterFlowRateFraction() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::CellMinimumWaterFlowRateFraction,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getCellMinimumWaterFlowRateFraction(bool returnIP) const {
     OptionalDouble value = cellMinimumWaterFlowRateFraction();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::CellMinimumWaterFlowRateFraction, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -385,14 +385,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::cellMaximumWaterFlowRateFraction() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::CellMaximumWaterFlowRateFraction,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getCellMaximumWaterFlowRateFraction(bool returnIP) const {
     OptionalDouble value = cellMaximumWaterFlowRateFraction();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::CellMaximumWaterFlowRateFraction, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -402,14 +402,14 @@ namespace detail {
 
   double CoolingTowerSingleSpeed_Impl::sizingFactor() const {
     boost::optional<double> value = getDouble(OS_CoolingTower_SingleSpeedFields::SizingFactor,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity CoolingTowerSingleSpeed_Impl::getSizingFactor(bool returnIP) const {
     OptionalDouble value = sizingFactor();
     OSOptionalQuantity result = getQuantityFromDouble(OS_CoolingTower_SingleSpeedFields::SizingFactor, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -444,12 +444,12 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetDesignWaterFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::DesignWaterFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoolingTowerSingleSpeed_Impl::autosizeDesignWaterFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::DesignWaterFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setDesignAirFlowRate(boost::optional<double> designAirFlowRate) {
@@ -479,7 +479,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::autosizeDesignAirFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::DesignAirFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setFanPoweratDesignAirFlowRate(boost::optional<double> fanPoweratDesignAirFlowRate) {
@@ -509,7 +509,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::autosizeFanPoweratDesignAirFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::FanPoweratDesignAirFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setUFactorTimesAreaValueatDesignAirFlowRate(boost::optional<double> uFactorTimesAreaValueatDesignAirFlowRate) {
@@ -539,12 +539,12 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetUFactorTimesAreaValueatDesignAirFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::UFactorTimesAreaValueatDesignAirFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoolingTowerSingleSpeed_Impl::autosizeUFactorTimesAreaValueatDesignAirFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::UFactorTimesAreaValueatDesignAirFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setAirFlowRateinFreeConvectionRegime(boost::optional<double> airFlowRateinFreeConvectionRegime) {
@@ -574,12 +574,12 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetAirFlowRateinFreeConvectionRegime() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::AirFlowRateinFreeConvectionRegime, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoolingTowerSingleSpeed_Impl::autosizeAirFlowRateinFreeConvectionRegime() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::AirFlowRateinFreeConvectionRegime, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setUFactorTimesAreaValueatFreeConvectionAirFlowRate(boost::optional<double> uFactorTimesAreaValueatFreeConvectionAirFlowRate) {
@@ -609,23 +609,22 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetUFactorTimesAreaValueatFreeConvectionAirFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::UFactorTimesAreaValueatFreeConvectionAirFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoolingTowerSingleSpeed_Impl::autosizeUFactorTimesAreaValueatFreeConvectionAirFlowRate() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::UFactorTimesAreaValueatFreeConvectionAirFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setPerformanceInputMethod(std::string performanceInputMethod) {
-    bool result = false;
-    result = setString(OS_CoolingTower_SingleSpeedFields::PerformanceInputMethod, performanceInputMethod);
+    bool result = setString(OS_CoolingTower_SingleSpeedFields::PerformanceInputMethod, performanceInputMethod);
     return result;
   }
 
   void CoolingTowerSingleSpeed_Impl::resetPerformanceInputMethod() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::PerformanceInputMethod, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setNominalCapacity(boost::optional<double> nominalCapacity) {
@@ -655,7 +654,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetNominalCapacity() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::NominalCapacity, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setFreeConvectionCapacity(boost::optional<double> freeConvectionCapacity) {
@@ -685,12 +684,11 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetFreeConvectionCapacity() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::FreeConvectionCapacity, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setBasinHeaterCapacity(double basinHeaterCapacity) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterCapacity, basinHeaterCapacity);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterCapacity, basinHeaterCapacity);
     return result;
   }
 
@@ -704,12 +702,11 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetBasinHeaterCapacity() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::BasinHeaterCapacity, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setBasinHeaterSetpointTemperature(double basinHeaterSetpointTemperature) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterSetpointTemperature, basinHeaterSetpointTemperature);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::BasinHeaterSetpointTemperature, basinHeaterSetpointTemperature);
     return result;
   }
 
@@ -723,7 +720,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetBasinHeaterSetpointTemperature() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::BasinHeaterSetpointTemperature, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setBasinHeaterOperatingSchedule(Schedule& schedule) {
@@ -736,7 +733,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetBasinHeaterOperatingSchedule() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::BasinHeaterOperatingScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setEvaporationLossMode(boost::optional<std::string> evaporationLossMode) {
@@ -751,13 +748,12 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetEvaporationLossMode() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::EvaporationLossMode, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoolingTowerSingleSpeed_Impl::setEvaporationLossFactor(double evaporationLossFactor) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::EvaporationLossFactor, evaporationLossFactor);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::EvaporationLossFactor, evaporationLossFactor);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setEvaporationLossFactor(const Quantity& evaporationLossFactor) {
@@ -772,13 +768,12 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetEvaporationLossFactor() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::EvaporationLossFactor, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoolingTowerSingleSpeed_Impl::setDriftLossPercent(double driftLossPercent) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::DriftLossPercent, driftLossPercent);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::DriftLossPercent, driftLossPercent);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setDriftLossPercent(const Quantity& driftLossPercent) {
@@ -794,7 +789,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetDriftLossPercent() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::DriftLossPercent, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setBlowdownCalculationMode(boost::optional<std::string> blowdownCalculationMode) {
@@ -809,12 +804,11 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetBlowdownCalculationMode() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::BlowdownCalculationMode, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setBlowdownConcentrationRatio(double blowdownConcentrationRatio) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::BlowdownConcentrationRatio, blowdownConcentrationRatio);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::BlowdownConcentrationRatio, blowdownConcentrationRatio);
     return result;
   }
 
@@ -828,7 +822,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetBlowdownConcentrationRatio() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::BlowdownConcentrationRatio, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setBlowdownMakeupWaterUsageSchedule(Schedule& schedule) {
@@ -841,45 +835,41 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetBlowdownMakeupWaterUsageSchedule() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::BlowdownMakeupWaterUsageScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setCapacityControl(std::string capacityControl) {
-    bool result = false;
-    result = setString(OS_CoolingTower_SingleSpeedFields::CapacityControl, capacityControl);
+    bool result = setString(OS_CoolingTower_SingleSpeedFields::CapacityControl, capacityControl);
     return result;
   }
 
   void CoolingTowerSingleSpeed_Impl::resetCapacityControl() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::CapacityControl, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setNumberofCells(int numberofCells) {
-    bool result = false;
-    result = setInt(OS_CoolingTower_SingleSpeedFields::NumberofCells, numberofCells);
+    bool result = setInt(OS_CoolingTower_SingleSpeedFields::NumberofCells, numberofCells);
     return result;
   }
 
   void CoolingTowerSingleSpeed_Impl::resetNumberofCells() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::NumberofCells, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setCellControl(std::string cellControl) {
-    bool result = false;
-    result = setString(OS_CoolingTower_SingleSpeedFields::CellControl, cellControl);
+    bool result = setString(OS_CoolingTower_SingleSpeedFields::CellControl, cellControl);
     return result;
   }
 
   void CoolingTowerSingleSpeed_Impl::resetCellControl() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::CellControl, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setCellMinimumWaterFlowRateFraction(double cellMinimumWaterFlowRateFraction) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::CellMinimumWaterFlowRateFraction, cellMinimumWaterFlowRateFraction);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::CellMinimumWaterFlowRateFraction, cellMinimumWaterFlowRateFraction);
     return result;
   }
 
@@ -893,12 +883,11 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetCellMinimumWaterFlowRateFraction() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::CellMinimumWaterFlowRateFraction, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setCellMaximumWaterFlowRateFraction(double cellMaximumWaterFlowRateFraction) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::CellMaximumWaterFlowRateFraction, cellMaximumWaterFlowRateFraction);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::CellMaximumWaterFlowRateFraction, cellMaximumWaterFlowRateFraction);
     return result;
   }
 
@@ -912,12 +901,11 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetCellMaximumWaterFlowRateFraction() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::CellMaximumWaterFlowRateFraction, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoolingTowerSingleSpeed_Impl::setSizingFactor(double sizingFactor) {
-    bool result = false;
-    result = setDouble(OS_CoolingTower_SingleSpeedFields::SizingFactor, sizingFactor);
+    bool result = setDouble(OS_CoolingTower_SingleSpeedFields::SizingFactor, sizingFactor);
     return result;
   }
 
@@ -931,7 +919,7 @@ namespace detail {
 
   void CoolingTowerSingleSpeed_Impl::resetSizingFactor() {
     bool result = setString(OS_CoolingTower_SingleSpeedFields::SizingFactor, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   openstudio::OSOptionalQuantity CoolingTowerSingleSpeed_Impl::designWaterFlowRate_SI() const {
@@ -1139,7 +1127,7 @@ namespace detail {
 CoolingTowerSingleSpeed::CoolingTowerSingleSpeed(const Model& model)
   : StraightComponent(CoolingTowerSingleSpeed::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::CoolingTowerSingleSpeed_Impl>());
+  OS_ASSERT(getImpl<detail::CoolingTowerSingleSpeed_Impl>());
 
   autosizeDesignWaterFlowRate();
 

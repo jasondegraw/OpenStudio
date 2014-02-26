@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -256,7 +256,7 @@ IddFile IddFileAndFactoryWrapper::iddFile() const {
 
 IddFileType IddFileAndFactoryWrapper::iddFileType() const {
   if (m_iddFileType) { return *m_iddFileType; }
-  BOOST_ASSERT(m_iddFile);
+  OS_ASSERT(m_iddFile);
   return IddFileType(IddFileType::UserCustom);
 }
 

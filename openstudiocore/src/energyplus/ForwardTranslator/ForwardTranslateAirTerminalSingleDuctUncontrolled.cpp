@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -68,7 +68,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirTerminalSingleDuctUnco
   {
     idfObject.setString(openstudio::AirTerminal_SingleDuct_UncontrolledFields::MaximumAirFlowRate,"AutoSize");
   }
-  else if( value = modelObject.maximumAirFlowRate() )
+  else if( (value = modelObject.maximumAirFlowRate()) )
   {
     idfObject.setDouble(openstudio::AirTerminal_SingleDuct_UncontrolledFields::MaximumAirFlowRate,value.get());
   }

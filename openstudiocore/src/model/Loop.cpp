@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -38,6 +38,8 @@
 #include <model/AirLoopHVACOutdoorAirSystem.hpp>
 #include <model/AirLoopHVACOutdoorAirSystem_Impl.hpp>
 #include <model/Model.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 
@@ -86,7 +88,7 @@ namespace detail {
     //modelObjects = this->supplyComponents();
     //for(it = modelObjects.begin();
     //    it != modelObjects.end();
-    //    it++)
+    //    ++it)
     //{
     //  if( it->optionalCast<Node>() ) continue;
     //  it->remove();
@@ -94,7 +96,7 @@ namespace detail {
     //modelObjects = this->demandComponents();
     //for(it = modelObjects.begin();
     //    it != modelObjects.end();
-    //    it++)
+    //    ++it)
     //{
     //  it->remove();
     //}
@@ -109,7 +111,7 @@ namespace detail {
     ModelObjectVector::iterator it;
     for( it = allComponents.begin();
          it != allComponents.end();
-         it++ )
+         ++it )
     {
       if( it->handle() == handle )
       {
@@ -127,7 +129,7 @@ namespace detail {
     ModelObjectVector::iterator it;
     for( it = allComponents.begin();
          it != allComponents.end();
-         it++ )
+         ++it )
     {
       if( it->handle() == handle )
       {
@@ -145,7 +147,7 @@ namespace detail {
     ModelObjectVector::iterator it;
     for( it = allComponents.begin();
          it != allComponents.end();
-         it++ )
+         ++it )
     {
       if( it->handle() == handle )
       {
@@ -346,7 +348,7 @@ namespace detail {
 
         for( std::vector<ModelObject>::iterator it = outletModelObjects.begin();
              it != outletModelObjects.end();
-             it++ )
+             ++it )
         {
           thisBranchModelObjects.clear();
           OptionalModelObject branchObject = OptionalModelObject(*it);
@@ -476,7 +478,7 @@ namespace detail {
 
       for(it = modelObjects.begin();
           it != modelObjects.end();
-          it++)
+          ++it)
       {
         if(it->iddObject().type() == type)
         {
@@ -657,7 +659,7 @@ namespace detail {
 
         for( std::vector<ModelObject>::iterator it = outletModelObjects.begin();
              it != outletModelObjects.end();
-             it++ )
+             ++it )
         {
           thisBranchModelObjects.clear();
           OptionalModelObject branchObject = OptionalModelObject(*it);
@@ -784,7 +786,7 @@ namespace detail {
 
       for(it = modelObjects.begin();
           it != modelObjects.end();
-          it++)
+          ++it)
       {
         if(it->iddObject().type() == type)
         {
@@ -825,7 +827,7 @@ namespace detail {
 Loop::Loop(IddObjectType type,const Model& model)
   : ParentObject(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::Loop_Impl>());
+  OS_ASSERT(getImpl<detail::Loop_Impl>());
 }     
 
 Loop::Loop(boost::shared_ptr<detail::Loop_Impl> p)

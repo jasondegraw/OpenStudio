@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@
 #include <model/ParentObject_Impl.hpp>
 
 #include <utilities/data/Attribute.hpp>
+#include <utilities/data/CalibrationResult.hpp>
 #include <utilities/data/EndUses.hpp>
 #include <utilities/data/DataEnums.hpp>
 
@@ -373,6 +374,9 @@ namespace detail {
 
     boost::optional<EndUses> endUses() const;
     boost::optional<Attribute> endUsesAttribute() const;
+
+    boost::optional<CalibrationResult> calibrationResult() const;
+    boost::optional<Attribute> calibrationResultAttribute() const;
 
     //@}
    protected:

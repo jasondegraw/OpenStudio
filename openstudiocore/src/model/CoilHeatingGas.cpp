@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -30,6 +30,10 @@
 #include <model/ZoneHVACWaterToAirHeatPump_Impl.hpp>
 #include <model/Schedule.hpp>
 #include <model/Schedule_Impl.hpp>
+#include <model/CurveCubic.hpp>
+#include <model/CurveCubic_Impl.hpp>
+#include <model/CurveQuadratic.hpp>
+#include <model/CurveQuadratic_Impl.hpp>
 #include <utilities/idd/OS_Coil_Heating_Gas_FieldEnums.hxx>
 #include <utilities/core/Compare.hpp>
 #include <utilities/core/Assert.hpp>
@@ -45,7 +49,7 @@ namespace detail{
   CoilHeatingGas_Impl::CoilHeatingGas_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : StraightComponent_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == CoilHeatingGas::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == CoilHeatingGas::iddObjectType());
   }
 
   CoilHeatingGas_Impl::CoilHeatingGas_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -53,7 +57,7 @@ namespace detail{
                                            bool keepHandle)
                                              : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == CoilHeatingGas::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == CoilHeatingGas::iddObjectType());
   }
 
   CoilHeatingGas_Impl::CoilHeatingGas_Impl(const CoilHeatingGas_Impl& other,
@@ -104,11 +108,11 @@ namespace detail{
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<CoilHeatingGas_Impl*>(this)->setAvailabilitySchedule(*value);
       value = optionalAvailabilitySchedule();
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
   bool CoilHeatingGas_Impl::setAvailabilitySchedule(Schedule& schedule) {
@@ -161,7 +165,7 @@ namespace detail{
 
     for( std::vector<AirTerminalSingleDuctVAVReheat>::iterator it = airTerminalSingleDuctVAVReheatObjects.begin();
     it < airTerminalSingleDuctVAVReheatObjects.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->reheatCoil() )
       {
@@ -180,7 +184,7 @@ namespace detail{
 
     for( std::vector<AirTerminalSingleDuctParallelPIUReheat>::iterator it = airTerminalSingleDuctParallelPIUReheatObjects.begin();
     it < airTerminalSingleDuctParallelPIUReheatObjects.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->reheatCoil() )
       {
@@ -199,7 +203,7 @@ namespace detail{
 
     for( std::vector<AirLoopHVACUnitaryHeatPumpAirToAir>::iterator it = airLoopHVACUnitaryHeatPumpAirToAirs.begin();
     it < airLoopHVACUnitaryHeatPumpAirToAirs.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> supplementalHeatingCoil = it->supplementalHeatingCoil() )
       {
@@ -224,7 +228,7 @@ namespace detail{
 
     for( std::vector<ZoneHVACWaterToAirHeatPump>::iterator it = zoneHVACWaterToAirHeatPumps.begin();
     it < zoneHVACWaterToAirHeatPumps.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->supplementalHeatingCoil() )
       {
@@ -285,7 +289,7 @@ namespace detail{
       resetNominalCapacity();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingGas_Impl::setNominalCapacity(const OSOptionalQuantity& nominalCapacity) {
@@ -307,12 +311,63 @@ namespace detail{
 
   void CoilHeatingGas_Impl::resetNominalCapacity() {
     bool result = setString(OS_Coil_Heating_GasFields::NominalCapacity, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoilHeatingGas_Impl::autosizeNominalCapacity() {
     bool result = setString(OS_Coil_Heating_GasFields::NominalCapacity, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
+  }
+
+  boost::optional<Curve> CoilHeatingGas_Impl::partLoadFractionCorrelationCurve() const
+  {
+    boost::optional<Curve> curve;
+
+    curve = getObject<ModelObject>().getModelObjectTarget<Curve>(
+              OS_Coil_Heating_GasFields::PartLoadFractionCorrelationCurveName);
+
+    return curve;
+  }
+
+  bool CoilHeatingGas_Impl::setPartLoadFractionCorrelationCurve( const Curve& curve )
+  {
+    bool accepted = false;
+
+    if( curve.optionalCast<CurveQuadratic>() || curve.optionalCast<CurveCubic>() )
+    {
+      accepted = setPointer(OS_Coil_Heating_GasFields::PartLoadFractionCorrelationCurveName,curve.handle());
+    }
+
+    return accepted;
+  }
+
+  void CoilHeatingGas_Impl::resetPartLoadFractionCorrelationCurve()
+  {
+    setString(OS_Coil_Heating_GasFields::PartLoadFractionCorrelationCurveName,"");
+  }
+
+  std::vector<ModelObject> CoilHeatingGas_Impl::children() const
+  {
+    std::vector<ModelObject> result;
+
+    if( boost::optional<Curve> curve = partLoadFractionCorrelationCurve() )
+    {
+      result.push_back(curve.get());
+    }
+
+    return result;
+  }
+
+  ModelObject CoilHeatingGas_Impl::clone(Model model) const
+  {
+    CoilHeatingGas newCoil = ModelObject_Impl::clone(model).cast<CoilHeatingGas>();
+
+    if( boost::optional<Curve> curve1 = partLoadFractionCorrelationCurve() )
+    {
+      newCoil.setPartLoadFractionCorrelationCurve(curve1->clone(model).cast<Curve>());
+    }
+
+    return newCoil;
   }
 
 }// detail
@@ -322,7 +377,7 @@ CoilHeatingGas::CoilHeatingGas(const Model& model,
                                Schedule& schedule)
   : StraightComponent(CoilHeatingGas::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::CoilHeatingGas_Impl>());
+  OS_ASSERT(getImpl<detail::CoilHeatingGas_Impl>());
   bool ok = setAvailableSchedule(schedule);
   if (!ok) {
     remove();
@@ -412,6 +467,21 @@ void CoilHeatingGas::resetNominalCapacity() {
 
 void CoilHeatingGas::autosizeNominalCapacity() {
   getImpl<detail::CoilHeatingGas_Impl>()->autosizeNominalCapacity();
+}
+
+boost::optional<Curve> CoilHeatingGas::partLoadFractionCorrelationCurve() const
+{
+  return getImpl<detail::CoilHeatingGas_Impl>()->partLoadFractionCorrelationCurve();
+}
+
+bool CoilHeatingGas::setPartLoadFractionCorrelationCurve( const Curve& curve )
+{
+  return getImpl<detail::CoilHeatingGas_Impl>()->setPartLoadFractionCorrelationCurve(curve);
+}
+
+void CoilHeatingGas::resetPartLoadFractionCorrelationCurve()
+{
+  getImpl<detail::CoilHeatingGas_Impl>()->resetPartLoadFractionCorrelationCurve();
 }
 
 IddObjectType CoilHeatingGas::iddObjectType() {

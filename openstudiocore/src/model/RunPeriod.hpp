@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,11 +31,10 @@ namespace detail {
 } // detail
 
 
-/** RunPeriod derives from ParentObject and is an interface to the OpenStudio IDD object named "RunPeriod".
+/** RunPeriod derives from ParentObject and is an interface to the unique OpenStudio IDD object named "RunPeriod".
  *
  *  RunPeriod defines a period of time over which to run an EnergyPlus weather file simulation.  Some applications 
- *  require a full annual EnergyPlus simulation, in which case only a single RunPeriod object is needed.  However,
- *  other applications may desire to have multiple RunPeriod objects.
+ *  require a full annual EnergyPlus simulation, others do not.
  */
 class MODEL_API RunPeriod : public ParentObject {
  public:
@@ -79,6 +78,9 @@ class MODEL_API RunPeriod : public ParentObject {
   void setUseWeatherFileRainInd(bool rainInd);
   void setUseWeatherFileSnowInd(bool snowInd);
   void setNumTimePeriodRepeats(int numRepeats);
+
+  // ensure that this object does not contain the date 2/29
+  void ensureNoLeapDays();
 
   //@}
 

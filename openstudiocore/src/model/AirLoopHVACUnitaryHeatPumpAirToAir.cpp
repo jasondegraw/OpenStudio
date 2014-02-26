@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,6 +38,8 @@
 #include <model/CoilHeatingGas_Impl.hpp>
 #include <model/FanConstantVolume.hpp>
 #include <model/FanConstantVolume_Impl.hpp>
+#include <model/FanOnOff.hpp>
+#include <model/FanOnOff_Impl.hpp>
 #include <model/Node.hpp>
 #include <model/Node_Impl.hpp>
 
@@ -54,7 +56,7 @@ namespace detail {
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl::AirLoopHVACUnitaryHeatPumpAirToAir_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : StraightComponent_Impl(idfObject,model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == AirLoopHVACUnitaryHeatPumpAirToAir::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == AirLoopHVACUnitaryHeatPumpAirToAir::iddObjectType());
   }
 
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl::AirLoopHVACUnitaryHeatPumpAirToAir_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -62,7 +64,7 @@ namespace detail {
                                                                                    bool keepHandle)
     : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == AirLoopHVACUnitaryHeatPumpAirToAir::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == AirLoopHVACUnitaryHeatPumpAirToAir::iddObjectType());
   }
 
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl::AirLoopHVACUnitaryHeatPumpAirToAir_Impl(const AirLoopHVACUnitaryHeatPumpAirToAir_Impl& other,
@@ -152,11 +154,11 @@ namespace detail {
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<AirLoopHVACUnitaryHeatPumpAirToAir_Impl*>(this)->setAvailabilitySchedule(*value);
       value = getObject<ModelObject>().getModelObjectTarget<Schedule>(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::AvailabilityScheduleName);
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -228,7 +230,7 @@ namespace detail {
     result =  getObject<ModelObject>().getModelObjectTarget<HVACComponent>(
                 OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFanName);
 
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     return result.get();
   }
@@ -240,7 +242,7 @@ namespace detail {
     result =  getObject<ModelObject>().getModelObjectTarget<HVACComponent>(
                 OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::HeatingCoilName);
 
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     return result.get();
   }
@@ -252,7 +254,7 @@ namespace detail {
     result =  getObject<ModelObject>().getModelObjectTarget<HVACComponent>(
                 OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::CoolingCoilName);
 
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     return result.get();
   }
@@ -264,7 +266,7 @@ namespace detail {
     result =  getObject<ModelObject>().getModelObjectTarget<HVACComponent>(
                 OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplementalHeatingCoilName);
 
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     return result.get();
   }
@@ -284,7 +286,7 @@ namespace detail {
 
   double AirLoopHVACUnitaryHeatPumpAirToAir_Impl::maximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation() const {
     boost::optional<double> value = getDouble(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -294,7 +296,7 @@ namespace detail {
 
   std::string AirLoopHVACUnitaryHeatPumpAirToAir_Impl::fanPlacement() const {
     boost::optional<std::string> value = getString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::FanPlacement,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -310,7 +312,7 @@ namespace detail {
 
   std::string AirLoopHVACUnitaryHeatPumpAirToAir_Impl::dehumidificationControlType() const {
     boost::optional<std::string> value = getString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::DehumidificationControlType,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -339,7 +341,7 @@ namespace detail {
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::autosizeSupplyAirFlowRateDuringCoolingOperation() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateDuringCoolingOperation, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setSupplyAirFlowRateDuringHeatingOperation(boost::optional<double> n2) {
@@ -354,7 +356,7 @@ namespace detail {
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::autosizeSupplyAirFlowRateDuringHeatingOperation() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateDuringHeatingOperation, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setSupplyAirFlowRateWhenNoCoolingorHeatingisNeeded(boost::optional<double> supplyAirFlowRateWhenNoCoolingorHeatingisNeeded) {
@@ -369,12 +371,12 @@ namespace detail {
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::resetSupplyAirFlowRateWhenNoCoolingorHeatingisNeeded() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateWhenNoCoolingorHeatingisNeeded, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::autosizeSupplyAirFlowRateWhenNoCoolingorHeatingisNeeded() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateWhenNoCoolingorHeatingisNeeded, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setControllingZone( ThermalZone & zone )
@@ -389,7 +391,7 @@ namespace detail {
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setSupplyAirFan( HVACComponent & hvacComponent )
   {
-    if( ! hvacComponent.optionalCast<FanConstantVolume>() ) { return; };
+    if( ! hvacComponent.optionalCast<FanConstantVolume>() && ! hvacComponent.optionalCast<FanOnOff>() ) { return; };
 
     setPointer(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFanName,hvacComponent.handle());
   }
@@ -434,34 +436,32 @@ namespace detail {
     } else {
       result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumSupplyAirTemperaturefromSupplementalHeater, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::autosizeMaximumSupplyAirTemperaturefromSupplementalHeater() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumSupplyAirTemperaturefromSupplementalHeater, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation(double maximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation) {
-    bool result = false;
-    result = setDouble(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation, maximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation);
+    bool result = setDouble(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation, maximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation);
     return result;
   }
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::resetMaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setFanPlacement(std::string fanPlacement) {
-    bool result = false;
-    result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::FanPlacement, fanPlacement);
+    bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::FanPlacement, fanPlacement);
     return result;
   }
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::resetFanPlacement() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::FanPlacement, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setSupplyAirFanOperatingModeSchedule( Schedule & schedule ) {
@@ -474,18 +474,17 @@ namespace detail {
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::resetSupplyAirFanOperatingModeSchedule() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFanOperatingModeScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirLoopHVACUnitaryHeatPumpAirToAir_Impl::setDehumidificationControlType(std::string dehumidificationControlType) {
-    bool result = false;
-    result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::DehumidificationControlType, dehumidificationControlType);
+    bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::DehumidificationControlType, dehumidificationControlType);
     return result;
   }
 
   void AirLoopHVACUnitaryHeatPumpAirToAir_Impl::resetDehumidificationControlType() {
     bool result = setString(OS_AirLoopHVAC_UnitaryHeatPump_AirToAirFields::DehumidificationControlType, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   boost::optional<ModelObject> AirLoopHVACUnitaryHeatPumpAirToAir_Impl::availabilityScheduleAsModelObject() const {
@@ -624,7 +623,7 @@ AirLoopHVACUnitaryHeatPumpAirToAir::AirLoopHVACUnitaryHeatPumpAirToAir( const Mo
                                                                         HVACComponent & supplementalHeatingCoil )
   : StraightComponent(AirLoopHVACUnitaryHeatPumpAirToAir::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::AirLoopHVACUnitaryHeatPumpAirToAir_Impl>());
+  OS_ASSERT(getImpl<detail::AirLoopHVACUnitaryHeatPumpAirToAir_Impl>());
 
   setAvailabilitySchedule( availabilitySchedule );
   setSupplyAirFan( supplyFan );

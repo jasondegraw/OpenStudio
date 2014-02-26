@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <utilities/units/SIUnit.hpp>
 #include <utilities/units/SIUnit_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace detail {
@@ -60,7 +62,7 @@ namespace detail {
   }
 
   Unit SIUnit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::SI);
+    OS_ASSERT(system() == UnitSystem::SI);
     boost::shared_ptr<SIUnit_Impl> impl(new SIUnit_Impl(*this));
     return SIUnit(impl).cast<Unit>();
   }

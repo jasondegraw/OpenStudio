@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <utilities/units/FahrenheitUnit.hpp>
 #include <utilities/units/FahrenheitUnit_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace detail {
@@ -40,7 +42,7 @@ namespace detail {
   }
 
   Unit FahrenheitUnit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::Fahrenheit);
+    OS_ASSERT(system() == UnitSystem::Fahrenheit);
     boost::shared_ptr<FahrenheitUnit_Impl> impl(new FahrenheitUnit_Impl(*this));
     return FahrenheitUnit(impl).cast<Unit>();
   }

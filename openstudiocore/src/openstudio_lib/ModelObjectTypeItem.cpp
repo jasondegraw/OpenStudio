@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ IddObjectType ModelObjectTypeItem::iddObjectType() const
 {
   OSItemList* itemList = this->itemList();
   ModelObjectListView* modelObjectListView = qobject_cast<ModelObjectListView*>(itemList);
-  BOOST_ASSERT(modelObjectListView);
+  OS_ASSERT(modelObjectListView);
   return modelObjectListView->iddObjectType();
 }
 

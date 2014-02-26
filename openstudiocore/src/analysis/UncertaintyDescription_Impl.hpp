@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ namespace detail {
 
     bool isSet(const std::string& attributeName) const;
 
-   std::vector<AttributeDescription> attributeDescriptions() const;
+    std::vector<AttributeDescription> attributeDescriptions() const;
 
     AttributeDescription getAttributeDescription(const std::string& attributeName) const;
 

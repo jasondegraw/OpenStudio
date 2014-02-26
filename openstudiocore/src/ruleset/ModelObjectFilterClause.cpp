@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@ namespace detail {
 ModelObjectFilterClause::ModelObjectFilterClause(boost::shared_ptr<detail::ModelObjectFilterClause_Impl> impl)
   : FilterClause(impl)
 {
-  BOOST_ASSERT(getImpl<detail::ModelObjectFilterClause_Impl>());
+  OS_ASSERT(getImpl<detail::ModelObjectFilterClause_Impl>());
 }
 /// @endcond
 

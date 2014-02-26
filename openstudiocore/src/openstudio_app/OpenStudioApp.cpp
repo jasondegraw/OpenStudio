@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -32,6 +32,7 @@
 #include <utilities/idf/ValidityReport.hpp>
 #include <utilities/idf/IdfFile.hpp>
 
+#include <utilities/core/Assert.hpp>
 #include <utilities/core/ApplicationPathHelpers.hpp>
 #include <utilities/core/Compare.hpp>
 #include <utilities/idf/IdfFile.hpp>
@@ -39,13 +40,18 @@
 #include <utilities/idf/ValidityReport.hpp>
 #include <utilities/idf/Workspace.hpp>
 
+#include <model/EvaporativeFluidCoolerSingleSpeed.hpp>
 #include <model/AirLoopHVACOutdoorAirSystem.hpp>
 #include <model/AirLoopHVACUnitaryHeatPumpAirToAir.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeCooledBeam.hpp>
+#include <model/AirTerminalSingleDuctConstantVolumeReheat.hpp>
 #include <model/AirTerminalSingleDuctParallelPIUReheat.hpp>
 #include <model/AirTerminalSingleDuctUncontrolled.hpp>
 #include <model/AirTerminalSingleDuctVAVReheat.hpp>
+#include <model/AirTerminalSingleDuctVAVNoReheat.hpp>
 #include <model/AvailabilityManagerScheduled.hpp>
 #include <model/BuildingStory.hpp>
+#include <model/CoilCoolingCooledBeam.hpp>
 #include <model/CoilCoolingDXSingleSpeed.hpp>
 #include <model/CoilCoolingDXTwoSpeed.hpp>
 #include <model/CoilCoolingWaterToAirHeatPumpEquationFit.hpp>
@@ -64,6 +70,7 @@
 #include <model/FanConstantVolume.hpp>
 #include <model/FanOnOff.hpp>
 #include <model/FanVariableVolume.hpp>
+#include <model/FanZoneExhaust.hpp>
 #include <model/Model.hpp>
 #include <model/ScheduleCompact.hpp>
 #include <model/SetpointManagerMixedAir.hpp>
@@ -71,8 +78,11 @@
 #include <model/SetpointManagerSingleZoneReheat.hpp>
 #include <model/ZoneHVACBaseboardConvectiveWater.hpp>
 #include <model/ZoneHVACFourPipeFanCoil.hpp>
-#include <model/ZoneHVACPackagedTerminalAirConditioner.hpp>
+#include <model/ZoneHVACLowTempRadiantConstFlow.hpp>
+#include <model/ZoneHVACLowTemperatureRadiantElectric.hpp>
+#include <model/ZoneHVACLowTempRadiantVarFlow.hpp>
 #include <model/ZoneHVACPackagedTerminalHeatPump.hpp>
+#include <model/ZoneHVACPackagedTerminalAirConditioner.hpp>
 #include <model/ZoneHVACUnitHeater.hpp>
 #include <model/ZoneHVACWaterToAirHeatPump.hpp>
 
@@ -282,15 +292,15 @@ void OpenStudioApp::buildCompLibraries()
   osversion::VersionTranslator versionTranslator;
 
   path p = resourcesPath() / toPath("MinimalTemplate.osm");
-  BOOST_ASSERT(exists(p));
+  OS_ASSERT(exists(p));
   boost::optional<Model> temp = versionTranslator.loadModel(p);
-  BOOST_ASSERT(temp);
+  OS_ASSERT(temp);
   m_compLibrary = temp.get();
 
   p = resourcesPath() / toPath("hvaclibrary/hvac_library.osm");
-  BOOST_ASSERT(exists(p));
+  OS_ASSERT(exists(p));
   temp = versionTranslator.loadModel(p);
-  BOOST_ASSERT(temp);
+  OS_ASSERT(temp);
   m_hvacCompLibrary = temp.get();
 }
 
@@ -406,7 +416,7 @@ void OpenStudioApp::importIdf()
                                                                      model) );
         m_osDocument->markAsModified();
         // ETH: parent should change now ...
-        parent = m_osDocument->mainWindow();
+        //parent = m_osDocument->mainWindow();
 
         connect( m_osDocument.get(), SIGNAL(closeClicked()), this, SLOT(onCloseClicked()) );
         connect( m_osDocument.get(), SIGNAL(exitClicked()), this,SLOT(quit()) );
@@ -430,7 +440,7 @@ void OpenStudioApp::importIdf()
 
         for( std::vector<LogMessage>::iterator it = messages.begin();
              it < messages.end();
-             it++ )
+             ++it )
         {
           log.append(QString::fromStdString(it->logMessage()));
           log.append("\n");
@@ -441,7 +451,7 @@ void OpenStudioApp::importIdf()
 
         for( std::vector<LogMessage>::iterator it = messages.begin();
              it < messages.end();
-             it++ )
+             ++it )
         {
           log.append(QString::fromStdString(it->logMessage()));
           log.append("\n");
@@ -499,7 +509,7 @@ void OpenStudioApp::importSDD()
                                                                    *model) );
       m_osDocument->markAsModified();
       // ETH: parent should change now ...
-      parent = m_osDocument->mainWindow();
+      //parent = m_osDocument->mainWindow();
 
       connect( m_osDocument.get(), SIGNAL(closeClicked()), this, SLOT(onCloseClicked()) );
       connect( m_osDocument.get(), SIGNAL(exitClicked()), this,SLOT(quit()) );
@@ -522,7 +532,7 @@ void OpenStudioApp::importSDD()
 
       for( std::vector<LogMessage>::iterator it = messages.begin();
            it < messages.end();
-           it++ )
+           ++it )
       {
         errorsOrWarnings = true;
 
@@ -535,7 +545,7 @@ void OpenStudioApp::importSDD()
 
       for( std::vector<LogMessage>::iterator it = messages.begin();
            it < messages.end();
-           it++ )
+           ++it )
       {
         errorsOrWarnings = true;
 
@@ -667,11 +677,9 @@ void OpenStudioApp::open()
 
 void OpenStudioApp::loadLibrary()
 {
-  QWidget * parent = NULL;
-
   if( this->currentDocument() )
   {
-    parent = this->currentDocument()->mainWindow();
+    QWidget * parent = this->currentDocument()->mainWindow();
   
 
     QString fileName = QFileDialog::getOpenFileName( parent,
@@ -757,9 +765,11 @@ bool OpenStudioApp::notify(QObject* receiver, QEvent* event)
   return QApplication::notify(receiver, event);
 }
 
-void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& translator, bool successful, const QString& fileName, 
-    const openstudio::path &tempModelDir) {
-  
+void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& translator, 
+                                            bool successful, 
+                                            const QString& fileName, 
+                                            const openstudio::path &tempModelDir) 
+{  
   QMessageBox messageBox; 
 
   QString log;
@@ -768,7 +778,7 @@ void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& 
 
   for( std::vector<LogMessage>::iterator it = messages.begin();
        it < messages.end();
-       it++ )
+       ++it )
   {
     log.append(QString::fromStdString(it->logMessage()));
     log.append("\n");
@@ -779,7 +789,7 @@ void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& 
 
   for( std::vector<LogMessage>::iterator it = messages.begin();
        it < messages.end();
-       it++ )
+       ++it )
   {
     log.append(QString::fromStdString(it->logMessage()));
     log.append("\n");

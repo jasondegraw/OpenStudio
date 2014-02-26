@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -83,7 +83,9 @@ class ANALYSIS_API SamplingAlgorithmOptions : public DakotaAlgorithmOptions {
   SamplingAlgorithmOptions();
 
   /** Constructor provided for deserialization; not for general use. */
-  SamplingAlgorithmOptions(const std::vector<Attribute>& options);
+  SamplingAlgorithmOptions(const boost::optional<SamplingAlgorithmSampleType>& sampleType,
+                           const boost::optional<SamplingAlgorithmRNGType>& rngType,
+                           const std::vector<Attribute>& options);
 
   virtual ~SamplingAlgorithmOptions() {}
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,6 +38,8 @@
 #include <utilities/idd/OutdoorAir_Mixer_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>
 #include <utilities/idd/IddFactory.hxx>
+
+#include <utilities/core/Assert.hpp>
 
 using namespace openstudio::model;
 
@@ -93,7 +95,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACOutdoorAirSyst
 
   if (addGroup) {
     IdfExtensibleGroup eg = controllerListIdf.pushExtensibleGroup(groupFields);
-    BOOST_ASSERT(!eg.empty());
+    OS_ASSERT(!eg.empty());
   }
 
   // Field: Availability Manager List Name //////////////////////////////////
@@ -173,7 +175,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACOutdoorAirSyst
   unsigned i = 3;
   for( oaIt = oaModelObjects.begin();
        oaIt != oaModelObjects.end();
-       oaIt++ )
+       ++oaIt )
   {
     if( ! oaIt->optionalCast<Node>() )
     {
@@ -196,7 +198,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACOutdoorAirSyst
 
   for( oaIt = oaModelObjects.begin();
        oaIt != oaModelObjects.end();
-       oaIt++ )
+       ++oaIt )
   {
     translateAndMapModelObject(*oaIt);
   }

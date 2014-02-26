@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -27,8 +27,8 @@
 #include <analysis/DataPoint.hpp>
 
 #include <QObject>
-#include <QSharedPointer>
 #include <QPointer>
+#include <QSharedPointer>
 
 namespace openstudio {
   
@@ -38,6 +38,8 @@ class ResultsView;
 class BaselineDataPointResultListController;
 class DataPointResultsListController;
 class DataPointResultItemDelegate;
+class DataPointCalibrationListController;
+class DataPointCalibrationItemDelegate;
 
 class ResultsTabController : public QObject
 {
@@ -53,26 +55,35 @@ class ResultsTabController : public QObject
 
   private slots:
 
+    void selectView(int);
+
     void onOpenButtonClicked();
 
     void openDirectory();
 
+    void downloadResults();
+
+    void dataPointDetailsComplete(const openstudio::UUID& analysis, const openstudio::UUID& dataPoint);
+
+    void enableDownloadResultsButton();
+
     void enableViewFileButton();
 
-    void disableViewFileButton();
-
     void enableOpenDirectoryButton();
-
-    void disableOpenDirectoryButton();
 
   private:
 
     QSharedPointer<BaselineDataPointResultListController> m_baselineDataPointResultListController;
     QSharedPointer<DataPointResultsListController> m_dataPointResultsListController;
     QSharedPointer<DataPointResultItemDelegate> m_dataPointResultItemDelegate;
+    QSharedPointer<DataPointCalibrationListController> m_dataPointCalibrationListController;
+    QSharedPointer<DataPointCalibrationItemDelegate> m_dataPointCalibrationItemDelegate;
+
+    QSharedPointer<OSItemSelectionController> m_currentSelectionController;
 };
 
 /// Item representing a data point on the results tab
+/// Used for both the standard and calibration results
 class DataPointResultListItem : public OSListItem
 {
   Q_OBJECT
@@ -81,19 +92,19 @@ class DataPointResultListItem : public OSListItem
 
   DataPointResultListItem(const openstudio::analysis::DataPoint& dataPoint,
                           const openstudio::analysis::DataPoint& baselineDataPoint,
-                          bool aleternateRow);
+                          bool alternateRow);
 
   virtual ~DataPointResultListItem() {}
 
   openstudio::analysis::DataPoint dataPoint() const;
   openstudio::analysis::DataPoint baselineDataPoint() const;
-  bool aleternateRow() const;
+  bool alternateRow() const;
 
  private:
 
   openstudio::analysis::DataPoint m_dataPoint;
   openstudio::analysis::DataPoint m_baselineDataPoint;
-  bool m_aleternateRow;
+  bool m_alternateRow;
 };
 
 /// Delegate which creates a DataPointResultListItem
@@ -109,7 +120,31 @@ class DataPointResultItemDelegate : public OSItemDelegate
   QWidget * view(QSharedPointer<OSListItem> dataSource);
 };
 
-/// Controller class for the list of baseline data points on the run tab
+/// Delegate which creates a DataPointCalibrationListItem
+class DataPointCalibrationItemDelegate : public OSItemDelegate
+{
+  Q_OBJECT
+
+  public:
+
+  DataPointCalibrationItemDelegate(double maxNMBE, double maxCVRMSE);
+
+  virtual ~DataPointCalibrationItemDelegate() {}
+
+  /// Widget returned will be a DataPointCalibrationListItem
+  QWidget * view(QSharedPointer<OSListItem> dataSource);
+
+  public slots:
+    
+  void setCalibrationThresholds(double maxNMBE, double maxCVRMSE);
+
+  private:
+
+  double m_calibrationMaxNMBE;
+  double m_calibrationMaxCVRMSE;
+};
+
+/// Controller class for the list of baseline data points on the results tab
 class BaselineDataPointResultListController : public OSListController
 {
   Q_OBJECT
@@ -130,7 +165,7 @@ class BaselineDataPointResultListController : public OSListController
    openstudio::analysis::Analysis m_analysis;
 };
 
-/// Controller class for the list of non data points on the run tab
+/// Controller class for the list of non data points on the results tab
 class DataPointResultsListController : public OSListController
 {
   Q_OBJECT
@@ -142,6 +177,29 @@ class DataPointResultsListController : public OSListController
   virtual ~DataPointResultsListController() {}
 
   /// The OSListItem returned will be a DataPointResultListItem
+  QSharedPointer<OSListItem> itemAt(int i);
+
+  int count();
+
+ private:
+
+   std::vector<openstudio::analysis::DataPoint> dataPoints();
+
+   openstudio::analysis::Analysis m_analysis;
+};
+
+/// Controller class for the list of calibration results on the results tab
+class DataPointCalibrationListController : public OSListController
+{
+  Q_OBJECT
+
+ public:
+
+  DataPointCalibrationListController(const openstudio::analysis::Analysis& analysis);
+
+  virtual ~DataPointCalibrationListController() {}
+
+  /// The OSListItem returned will be a DataPointCalibrationListItem
   QSharedPointer<OSListItem> itemAt(int i);
 
   int count();

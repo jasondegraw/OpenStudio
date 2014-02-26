@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -20,6 +20,8 @@
 #include <utilities/plot/ProgressBar.hpp>
 
 #include <utilities/core/Application.hpp>
+
+#include <cmath>
 
 namespace openstudio{
 
@@ -173,7 +175,7 @@ namespace openstudio{
       newPercentage = 100.0 * (value - min) / range;
     }
 
-    if (abs(newPercentage-m_percentage) >= 1.0){
+    if (fabs(newPercentage-m_percentage) >= 1.0){
       m_percentage = newPercentage;
       emit percentageUpdated(m_percentage);
       onPercentageUpdated(m_percentage);

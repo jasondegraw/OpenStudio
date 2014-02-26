@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -29,6 +29,8 @@
 #include <model/AccessPolicyStore.hpp>
 
 #include <utilities/core/Application.hpp>
+#include <utilities/core/Assert.hpp>
+
 #include <utilities/idd/IddFile.hpp>
 #include <utilities/idd/IddObject.hpp>
 #include <utilities/idd/IddFactory.hxx>
@@ -159,8 +161,8 @@ bool InspectorDialog::setSelectedObjectHandles(const std::vector<openstudio::Han
   }
 
   // see if same selection
-  bool allMatch = true;
   if (m_selectedObjectHandles.size() == selectedObjectHandles.size()){
+    bool allMatch = true;
     for (unsigned i = 0; i < m_selectedObjectHandles.size(); ++i){
       if (m_selectedObjectHandles[i] != selectedObjectHandles[i]){
         allMatch = false;
@@ -192,7 +194,7 @@ bool InspectorDialog::setSelectedObjectHandles(const std::vector<openstudio::Han
   for (int i = 0; i < m_tableWidget->rowCount(); ++i){
 
     QString handleString = m_tableWidget->item(i,0)->data(Qt::UserRole).toString();
-    std::string temp = toString(handleString);
+    //std::string temp = toString(handleString);
     Handle handle(handleString);
 
     std::vector<Handle>::iterator it = std::find(m_selectedObjectHandles.begin(),
@@ -214,12 +216,12 @@ bool InspectorDialog::setSelectedObjectHandles(const std::vector<openstudio::Han
     m_inspectorGadget->clear(true);
   }else if (m_selectedObjectHandles.size() == 1){
     boost::optional<WorkspaceObject> workspaceObject = m_model.getObject(m_selectedObjectHandles[0]);
-    BOOST_ASSERT(workspaceObject);
+    OS_ASSERT(workspaceObject);
     m_inspectorGadget->layoutModelObj(*workspaceObject,false,false,false,true);
     m_inspectorGadget->createAllFields();
   }else{
     // temporary do not allow multi select
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
   }
 
   bool enableAdd = (m_disableAddTypes.find(m_iddObjectType) == m_disableAddTypes.end());
@@ -228,7 +230,7 @@ bool InspectorDialog::setSelectedObjectHandles(const std::vector<openstudio::Han
   bool enablePurge = (m_disablePurgeTypes.find(m_iddObjectType) == m_disablePurgeTypes.end());
 
   boost::optional<IddObject> iddObject = IddFactory::instance().getObject(m_iddObjectType);
-  BOOST_ASSERT(iddObject);
+  OS_ASSERT(iddObject);
 
   if (iddObject->properties().unique){
     enableCopy = false;
@@ -572,6 +574,7 @@ void InspectorDialog::init(InspectorDialogClient client)
       m_typesToDisplay.insert(IddObjectType::OS_Rendering_Color);
       m_typesToDisplay.insert(IddObjectType::OS_DesignSpecification_OutdoorAir);
       m_typesToDisplay.insert(IddObjectType::OS_SpaceType);
+      m_typesToDisplay.insert(IddObjectType::OS_ShadingControl);
 
       m_typesToDisplay.insert(IddObjectType::OS_Material);
       m_typesToDisplay.insert(IddObjectType::OS_Material_AirGap);
@@ -651,10 +654,11 @@ void InspectorDialog::init(InspectorDialogClient client)
       m_typesToDisplay.insert(IddObjectType::OS_Output_Variable);
 
       // DISABLE ADD
-
+      
       m_disableAddTypes.insert(IddObjectType::OS_RunPeriod);
       m_disableAddTypes.insert(IddObjectType::OS_Site);
       m_disableAddTypes.insert(IddObjectType::OS_WeatherFile);
+      m_disableAddTypes.insert(IddObjectType::OS_ShadingControl);
       m_disableAddTypes.insert(IddObjectType::OS_InteriorPartitionSurface);
       m_disableAddTypes.insert(IddObjectType::OS_InteriorPartitionSurfaceGroup);
       m_disableAddTypes.insert(IddObjectType::OS_ShadingSurface);
@@ -715,7 +719,7 @@ void InspectorDialog::init(InspectorDialogClient client)
       break;
   }
 
-  BOOST_ASSERT(!m_typesToDisplay.empty());
+  OS_ASSERT(!m_typesToDisplay.empty());
 
   Qt::WindowFlags flags = Qt::Dialog | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint; // | Qt::WindowStaysOnTopHint;
   this->setWindowFlags(flags);
@@ -879,7 +883,7 @@ void InspectorDialog::createWidgets()
   m_inspectorGadget = new InspectorGadget(this);
   bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)),
                              m_inspectorGadget, SIGNAL(toggleUnitsClicked(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   QVBoxLayout* inspectorGadgetHolderLayout = new QVBoxLayout;
   inspectorGadgetHolderLayout->addWidget(inspectorGadgetLabel);
@@ -921,55 +925,55 @@ void InspectorDialog::connectSelfSignalsAndSlots()
                       SIGNAL(clicked(bool)),
                       this,
                       SLOT(onPushButtonNew(bool)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_pushButtonCopy,
                       SIGNAL(clicked(bool)),
                       this,
                       SLOT(onPushButtonCopy(bool)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_pushButtonDelete,
                       SIGNAL(clicked(bool)),
                       this,
                       SLOT(onPushButtonDelete(bool)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_pushButtonPurge,
                       SIGNAL(clicked(bool)),
                       this,
                       SLOT(onPushButtonPurge(bool)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_listWidget,
                       SIGNAL(itemSelectionChanged()),
                       this,
                       SLOT(onListWidgetSelectionChanged()));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_tableWidget,
                       SIGNAL(itemSelectionChanged()),
                       this,
                       SLOT(onTableWidgetSelectionChanged()));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(this,
                      SIGNAL(iddObjectTypeChanged(const openstudio::IddObjectType&)),
                      this,
                      SLOT(onIddObjectTypeChanged(const openstudio::IddObjectType&)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(this,
                      SIGNAL(selectedObjectHandlesChanged(const std::vector<openstudio::Handle>&)),
                      this,
                      SLOT(onSelectedObjectHandlesChanged(const std::vector<openstudio::Handle>&)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(this,
                      SIGNAL(modelChanged(openstudio::model::Model&)),
                      this,
                      SLOT(onModelChanged(openstudio::model::Model&)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 }
 
 void InspectorDialog::connectModelSignalsAndSlots()
@@ -980,19 +984,19 @@ void InspectorDialog::connectModelSignalsAndSlots()
                      SIGNAL(addWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                      this,
                      SLOT(onAddWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_model.getImpl<openstudio::model::detail::Model_Impl>().get(),
                      SIGNAL(onChange()),
                      this,
                      SLOT(onWorkspaceChange()));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(m_model.getImpl<openstudio::model::detail::Model_Impl>().get(),
                      SIGNAL(removeWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                      this,
                      SLOT(onRemoveWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>)));
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 }
 
 void InspectorDialog::hideSelectionWidget(bool hideSelectionWidget)
@@ -1139,7 +1143,6 @@ void InspectorDialog::loadTableWidgetData()
   int i=0, j=0;
   //bool connected;
   //QCheckBox * checkBox;
-  QTableWidgetItem * tableItem = NULL;
 
   std::vector<WorkspaceObject> objects = m_model.getObjectsByType(m_iddObjectType);
 
@@ -1156,10 +1159,10 @@ void InspectorDialog::loadTableWidgetData()
     unsigned numSources = object.numSources();
     displayName += QString(" (") + QString::number(numSources) + QString(")");
 
-    tableItem = new QTableWidgetItem(displayName);
+    QTableWidgetItem * tableItem = new QTableWidgetItem(displayName);
     tableItem->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     QString handleString(object.handle());
-    std::string temp = toString(handleString);
+    //std::string temp = toString(handleString);
     tableItem->setData(Qt::UserRole, handleString);
     m_tableWidget->setItem(i,j++,tableItem);
 
@@ -1191,7 +1194,7 @@ void InspectorDialog::getTableWidgetSelected(std::vector<openstudio::Handle>& se
     int column = m_tableWidget->column(selectedItems.at(i));
     if (column == 0){
       QString handleString = selectedItems.at(i)->data(Qt::UserRole).toString();
-      std::string temp = toString(handleString);
+      //std::string temp = toString(handleString);
       selectedHandles.push_back(Handle(handleString));
     }
   }

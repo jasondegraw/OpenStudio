@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -50,14 +50,14 @@ namespace detail{
       bool keepHandle)
         : StraightComponent_Impl(idfObject, model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == AirTerminalSingleDuctUncontrolled::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == AirTerminalSingleDuctUncontrolled::iddObjectType());
   }
 
   AirTerminalSingleDuctUncontrolled_Impl::AirTerminalSingleDuctUncontrolled_Impl(
       const openstudio::detail::WorkspaceObject_Impl& other,Model_Impl* model,bool keepHandle)
         : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == AirTerminalSingleDuctUncontrolled::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == AirTerminalSingleDuctUncontrolled::iddObjectType());
   }
 
   AirTerminalSingleDuctUncontrolled_Impl::AirTerminalSingleDuctUncontrolled_Impl(
@@ -99,11 +99,11 @@ namespace detail{
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<AirTerminalSingleDuctUncontrolled_Impl*>(this)->setAvailabilitySchedule(*value);
       value = optionalAvailabilitySchedule();
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -192,7 +192,7 @@ namespace detail{
     std::vector<ThermalZone> thermalZones = _model.getModelObjects<ThermalZone>();
     for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
          it != thermalZones.end();
-         it++ )
+         ++it )
     {
       std::vector<ModelObject> equipment = it->equipment();
 
@@ -292,7 +292,7 @@ namespace detail{
 
   void AirTerminalSingleDuctUncontrolled_Impl::autosizeMaximumAirFlowRate() {
     bool result = setString(OS_AirTerminal_SingleDuct_UncontrolledFields::MaximumAirFlowRate, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
 } // detail
@@ -301,7 +301,7 @@ AirTerminalSingleDuctUncontrolled::AirTerminalSingleDuctUncontrolled(const Model
                                                                      Schedule & availabilitySchedule)
   : StraightComponent(AirTerminalSingleDuctUncontrolled::iddObjectType(),model) 
 {
-  BOOST_ASSERT(getImpl<detail::AirTerminalSingleDuctUncontrolled_Impl>());
+  OS_ASSERT(getImpl<detail::AirTerminalSingleDuctUncontrolled_Impl>());
 
   setString(openstudio::OS_AirTerminal_SingleDuct_UncontrolledFields::MaximumAirFlowRate,"AutoSize" );
 

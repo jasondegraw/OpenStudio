@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -77,15 +77,20 @@
 
 #include <utilities/core/Assert.hpp>
 
+#include <QFile>
+#include <qjson/parser.h>
+
 namespace openstudio {
 namespace model {
 
 namespace detail {
 
+  QMap<QString, QVariant> SpaceType_Impl::m_standardsSpaceTypeMap;
+
   SpaceType_Impl::SpaceType_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ResourceObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == SpaceType::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == SpaceType::iddObjectType());
   }
 
   SpaceType_Impl::SpaceType_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -93,7 +98,7 @@ namespace detail {
                                  bool keepHandle)
     : ResourceObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == SpaceType::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == SpaceType::iddObjectType());
   }
 
   SpaceType_Impl::SpaceType_Impl(const SpaceType_Impl& other,
@@ -253,6 +258,171 @@ namespace detail {
     setString(OS_SpaceTypeFields::GroupRenderingName, "");
   }
 
+  boost::optional<std::string> SpaceType_Impl::standardsBuildingType() const
+  {
+    return getString(OS_SpaceTypeFields::StandardsBuildingType, false, true);
+  }
+
+  std::vector<std::string> SpaceType_Impl::suggestedStandardsBuildingTypes() const
+  {
+    std::vector<std::string> result;
+  
+    boost::optional<std::string> standardsBuildingType = this->standardsBuildingType();
+
+    // include values from json
+    parseStandardsSpaceTypeMap();
+    QMap<QString, QVariant>::const_iterator i = m_standardsSpaceTypeMap.constBegin();
+    for (; i != m_standardsSpaceTypeMap.constEnd(); ++i) {
+      result.push_back(toString(i.key()));
+    }
+
+    // include values from model
+
+    boost::optional<Building> building = this->model().getOptionalUniqueModelObject<Building>();
+    boost::optional<std::string> buildingStandardsBuildingType;
+    if (building){
+      buildingStandardsBuildingType = building->standardsBuildingType();
+    }
+
+    BOOST_FOREACH(const SpaceType& other, this->model().getConcreteModelObjects<SpaceType>()){
+      if (other.handle() == this->handle()){
+        continue;
+      }
+      boost::optional<std::string> otherBuildingType = other.standardsBuildingType();
+      if (otherBuildingType){
+        result.push_back(*otherBuildingType);
+      }
+    }
+
+    // remove buildingStandardsBuildingType and standardsBuildingType
+    IstringFind finder;
+    if (buildingStandardsBuildingType){
+      finder.addTarget(*buildingStandardsBuildingType);
+    }
+    if (standardsBuildingType){
+      finder.addTarget(*standardsBuildingType);
+    }
+    std::vector<std::string>::iterator it = std::remove_if(result.begin(), result.end(), finder); 
+    result.resize( std::distance(result.begin(),it) ); 
+
+    // make unique
+    it = std::unique(result.begin(), result.end(), IstringEqual()); 
+    result.resize( std::distance(result.begin(),it) ); 
+
+    // sort
+    std::sort(result.begin(), result.end(), IstringCompare());
+
+    // add building value to front
+    if (buildingStandardsBuildingType){
+      result.insert(result.begin(), *buildingStandardsBuildingType);
+    }
+
+    // add current to front
+    if (standardsBuildingType){
+      result.insert(result.begin(), *standardsBuildingType);
+    }
+
+    return result;
+  }
+
+  bool SpaceType_Impl::setStandardsBuildingType(const std::string& standardsBuildingType)
+  {
+    bool test = setString(OS_SpaceTypeFields::StandardsBuildingType, standardsBuildingType);
+    OS_ASSERT(test);
+    return test;
+  }
+
+  void SpaceType_Impl::resetStandardsBuildingType()
+  {
+    bool test = setString(OS_SpaceTypeFields::StandardsBuildingType, "");
+    OS_ASSERT(test);
+  }
+
+  boost::optional<std::string> SpaceType_Impl::standardsSpaceType() const
+  {
+    return getString(OS_SpaceTypeFields::StandardsSpaceType, false, true);
+  }
+
+  std::vector<std::string> SpaceType_Impl::suggestedStandardsSpaceTypes() const
+  {
+    std::vector<std::string> result;
+
+    boost::optional<std::string> standardsBuildingType = this->standardsBuildingType();
+    boost::optional<std::string> standardsSpaceType = this->standardsSpaceType();
+
+    // include values from json
+    parseStandardsSpaceTypeMap();
+    if (standardsBuildingType){
+      if (m_standardsSpaceTypeMap.contains(toQString(*standardsBuildingType))){
+        QList<QVariant> values = m_standardsSpaceTypeMap[toQString(*standardsBuildingType)].toList();
+        QList<QVariant>::const_iterator i = values.constBegin();
+        for (; i != values.constEnd(); ++i) {
+          result.push_back(toString(i->toString()));
+        }
+      }
+    }
+
+    // include values from model
+    BOOST_FOREACH(const SpaceType& other, this->model().getConcreteModelObjects<SpaceType>()){
+      if (other.handle() == this->handle()){
+        continue;
+      }
+
+      boost::optional<std::string> otherBuildingType = other.standardsBuildingType();
+      if (standardsBuildingType && otherBuildingType){
+        // need to be the same
+        if (standardsBuildingType.get() != otherBuildingType.get()){
+          continue;
+        }
+      }else if (!standardsBuildingType && !otherBuildingType){
+        // both empty
+      }else{
+        // different
+        continue;
+      }
+
+      boost::optional<std::string> otherSpaceType = other.standardsSpaceType();
+      if (otherSpaceType){
+        result.push_back(*otherSpaceType);
+      }
+    }
+
+    // remove buildingStandardsBuildingType and standardsBuildingType
+    IstringFind finder;
+    if (standardsSpaceType){
+      finder.addTarget(*standardsSpaceType);
+    }
+    std::vector<std::string>::iterator it = std::remove_if(result.begin(), result.end(), finder); 
+    result.resize( std::distance(result.begin(),it) ); 
+
+    // make unique
+    it = std::unique(result.begin(), result.end(), IstringEqual()); 
+    result.resize( std::distance(result.begin(),it) ); 
+
+    // sort
+    std::sort(result.begin(), result.end(), IstringCompare());
+
+    // add current to front
+    if (standardsSpaceType){
+      result.insert(result.begin(), *standardsSpaceType);
+    }
+
+    return result;
+  }
+
+  bool SpaceType_Impl::setStandardsSpaceType(const std::string& standardsSpaceType)
+  {
+    bool test = setString(OS_SpaceTypeFields::StandardsSpaceType, standardsSpaceType);
+    OS_ASSERT(test);
+    return test;
+  }
+
+  void SpaceType_Impl::resetStandardsSpaceType()
+  {
+    bool test = setString(OS_SpaceTypeFields::StandardsSpaceType, "");
+    OS_ASSERT(test);
+  }
+
   std::vector<Space> SpaceType_Impl::spaces() const
   {
     std::vector<Space> result;
@@ -352,7 +522,7 @@ namespace detail {
   void SpaceType_Impl::resetDesignSpecificationOutdoorAir()
   {
     bool test = setString(OS_SpaceTypeFields::DesignSpecificationOutdoorAirObjectName, "");
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
   }
 
   void SpaceType_Impl::hardApplySpaceLoadSchedules()
@@ -409,12 +579,12 @@ namespace detail {
 
     // set space type and people perSpaceFloorArea
     bool ok(true);
-    BOOST_ASSERT(myPeople);
+    OS_ASSERT(myPeople);
     myPeople->makeUnique();
-    ok = myPeople->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myPeople->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myPeople->peopleDefinition().setPeopleperSpaceFloorArea(peoplePerFloorArea);
-    BOOST_ASSERT(ok);
-    ok = myPeople->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myPeople->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other people
     PeopleVector allMyPeople = people();
@@ -461,12 +631,12 @@ namespace detail {
 
     // set space type and people perSpaceFloorArea
     bool ok(true);
-    BOOST_ASSERT(myPeople);
+    OS_ASSERT(myPeople);
     myPeople->makeUnique();
-    ok = myPeople->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myPeople->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myPeople->peopleDefinition().setSpaceFloorAreaperPerson(spaceFloorAreaPerPerson);
-    BOOST_ASSERT(ok);
-    ok = myPeople->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myPeople->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other people
     PeopleVector allMyPeople = people();
@@ -545,12 +715,12 @@ namespace detail {
 
     // set space type and lighting power per space floor area
     bool ok(true);
-    BOOST_ASSERT(myLights);
+    OS_ASSERT(myLights);
     myLights->makeUnique();
-    ok = myLights->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myLights->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myLights->lightsDefinition().setWattsperSpaceFloorArea(lightingPowerPerFloorArea);
-    BOOST_ASSERT(ok);
-    ok = myLights->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myLights->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other lights
     LightsVector allMyLights = lights();
@@ -613,12 +783,12 @@ namespace detail {
 
     // set space type and lighting power per person
     bool ok(true);
-    BOOST_ASSERT(myLights);
+    OS_ASSERT(myLights);
     myLights->makeUnique();
-    ok = myLights->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myLights->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myLights->lightsDefinition().setWattsperPerson(lightingPowerPerPerson);
-    BOOST_ASSERT(ok);
-    ok = myLights->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myLights->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other lights
     LightsVector allMyLights = lights();
@@ -717,12 +887,12 @@ namespace detail {
 
     // set space type and electric equipment WattsperSpaceFloorArea
     bool ok(true);
-    BOOST_ASSERT(myEquipment);
+    OS_ASSERT(myEquipment);
     myEquipment->makeUnique();
-    ok = myEquipment->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myEquipment->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myEquipment->electricEquipmentDefinition().setWattsperSpaceFloorArea(electricEquipmentPowerPerFloorArea);
-    BOOST_ASSERT(ok);
-    ok = myEquipment->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myEquipment->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other electric equipment
     ElectricEquipmentVector allMyEquipment = electricEquipment();
@@ -780,12 +950,12 @@ namespace detail {
 
     // set space type and electric equipment WattsperSpaceFloorArea
     bool ok(true);
-    BOOST_ASSERT(myEquipment);
+    OS_ASSERT(myEquipment);
     myEquipment->makeUnique();
-    ok = myEquipment->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myEquipment->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myEquipment->electricEquipmentDefinition().setWattsperPerson(electricEquipmentPowerPerPerson);
-    BOOST_ASSERT(ok);
-    ok = myEquipment->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myEquipment->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other electric equipment
     ElectricEquipmentVector allMyEquipment = electricEquipment();
@@ -871,12 +1041,12 @@ namespace detail {
 
     // set space type and gas equipment WattsperSpaceFloorArea
     bool ok(true);
-    BOOST_ASSERT(myEquipment);
+    OS_ASSERT(myEquipment);
     myEquipment->makeUnique();
-    ok = myEquipment->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myEquipment->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myEquipment->gasEquipmentDefinition().setWattsperSpaceFloorArea(gasEquipmentPowerPerFloorArea);
-    BOOST_ASSERT(ok);
-    ok = myEquipment->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myEquipment->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other gas equipment
     GasEquipmentVector allMyEquipment = gasEquipment();
@@ -933,12 +1103,12 @@ namespace detail {
 
     // set space type and gas equipment WattsperSpaceFloorArea
     bool ok(true);
-    BOOST_ASSERT(myEquipment);
+    OS_ASSERT(myEquipment);
     myEquipment->makeUnique();
-    ok = myEquipment->setSpaceType(getObject<SpaceType>()); BOOST_ASSERT(ok);
+    ok = myEquipment->setSpaceType(getObject<SpaceType>()); OS_ASSERT(ok);
     ok = myEquipment->gasEquipmentDefinition().setWattsperPerson(gasEquipmentPowerPerPerson);
-    BOOST_ASSERT(ok);
-    ok = myEquipment->setMultiplier(1); BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
+    ok = myEquipment->setMultiplier(1); OS_ASSERT(ok);
 
     // remove all other gas equipment
     GasEquipmentVector allMyEquipment = gasEquipment();
@@ -1155,7 +1325,22 @@ namespace detail {
       }
       it->remove();
     }
-    BOOST_ASSERT(count == 1);
+    OS_ASSERT(count == 1);
+  }
+
+  void SpaceType_Impl::parseStandardsSpaceTypeMap() const
+  {
+    if (m_standardsSpaceTypeMap.empty()){
+      QFile file(":/resources/standards/nrel_space_types.json");
+      if (file.open(QFile::ReadOnly)) {
+        QJson::Parser parser;
+        bool ok(false);
+        QVariant variant = parser.parse(&file,&ok);
+        OS_ASSERT(ok);
+        file.close();
+        m_standardsSpaceTypeMap = variant.toMap();
+      }
+    }
   }
 
 } // detail
@@ -1163,7 +1348,7 @@ namespace detail {
 SpaceType::SpaceType(const Model& model)
   : ResourceObject(SpaceType::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::SpaceType_Impl>());
+  OS_ASSERT(getImpl<detail::SpaceType_Impl>());
 }
 
 IddObjectType SpaceType::iddObjectType() {
@@ -1219,6 +1404,46 @@ bool SpaceType::setRenderingColor(const RenderingColor& renderingColor)
 void SpaceType::resetRenderingColor()
 {
   getImpl<detail::SpaceType_Impl>()->resetRenderingColor();
+}
+
+boost::optional<std::string> SpaceType::standardsBuildingType() const
+{
+  return getImpl<detail::SpaceType_Impl>()->standardsBuildingType();
+}
+
+std::vector<std::string> SpaceType::suggestedStandardsBuildingTypes() const
+{
+  return getImpl<detail::SpaceType_Impl>()->suggestedStandardsBuildingTypes();
+}
+
+bool SpaceType::setStandardsBuildingType(const std::string& standardsBuildingType)
+{
+  return getImpl<detail::SpaceType_Impl>()->setStandardsBuildingType(standardsBuildingType);
+}
+
+void SpaceType::resetStandardsBuildingType()
+{
+  getImpl<detail::SpaceType_Impl>()->resetStandardsBuildingType();
+}
+
+boost::optional<std::string> SpaceType::standardsSpaceType() const
+{
+  return getImpl<detail::SpaceType_Impl>()->standardsSpaceType();
+}
+
+std::vector<std::string> SpaceType::suggestedStandardsSpaceTypes() const
+{
+  return getImpl<detail::SpaceType_Impl>()->suggestedStandardsSpaceTypes();
+}
+
+bool SpaceType::setStandardsSpaceType(const std::string& standardsSpaceType)
+{
+  return getImpl<detail::SpaceType_Impl>()->setStandardsSpaceType(standardsSpaceType);
+}
+
+void SpaceType::resetStandardsSpaceType()
+{
+  getImpl<detail::SpaceType_Impl>()->resetStandardsSpaceType();
 }
 
 std::vector<Space> SpaceType::spaces() const

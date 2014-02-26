@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -34,4 +34,14 @@ TEST(System, IdleTime)
   #else
 
   #endif
+}
+
+TEST(System, ExceptionHandling)
+{
+  System::testExceptions1();
+  System::testExceptions2();
+  System::testExceptions3();
+  System::testExceptions4();
+  System::testExceptions5();
+
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <pat_app/HorizontalTabWidget.hpp>
 #include "../shared_gui_components/OSViewSwitcher.hpp"
+
+#include <utilities/core/Assert.hpp>
 
 #include <QBoxLayout>
 #include <QPainter>
@@ -86,10 +88,8 @@ void HorizontalTabWidget::addTab( int id,
 
   m_tabButtons.push_back(button);
 
-  bool isConnected = false;
-
-  isConnected = connect(button,SIGNAL(clicked()),this,SLOT(select()));
-  Q_ASSERT(isConnected);
+  bool isConnected = connect(button,SIGNAL(clicked()),this,SLOT(select()));
+  OS_ASSERT(isConnected);
 
   m_ids.push_back(id);
 
@@ -104,7 +104,7 @@ void HorizontalTabWidget::select()
 
   for( std::vector<QPushButton*>::iterator  it = m_tabButtons.begin();
        it < m_tabButtons.end();
-       it++ )
+       ++it )
   {
     if( *it == button )
     {

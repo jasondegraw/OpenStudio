@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -56,7 +56,7 @@ namespace detail {
 PlantLoop_Impl::PlantLoop_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
   : Loop_Impl(idfObject, model, keepHandle)
 {
-  BOOST_ASSERT(idfObject.iddObject().type() == PlantLoop::iddObjectType());
+  OS_ASSERT(idfObject.iddObject().type() == PlantLoop::iddObjectType());
 }
 
 PlantLoop_Impl::PlantLoop_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -64,7 +64,7 @@ PlantLoop_Impl::PlantLoop_Impl(const openstudio::detail::WorkspaceObject_Impl& o
                                    bool keepHandle)
   : Loop_Impl(other,model,keepHandle)
 {
-  BOOST_ASSERT(other.iddObject().type() == PlantLoop::iddObjectType());
+  OS_ASSERT(other.iddObject().type() == PlantLoop::iddObjectType());
 }
 
 PlantLoop_Impl::PlantLoop_Impl(const PlantLoop_Impl& other,
@@ -91,7 +91,7 @@ std::vector<openstudio::IdfObject> PlantLoop_Impl::remove()
 
   for(it = modelObjects.begin();
       it != modelObjects.end();
-      it++)
+      ++it)
   {
     if( boost::optional<WaterToAirComponent> comp = it->optionalCast<WaterToAirComponent>() )
     {
@@ -107,7 +107,7 @@ std::vector<openstudio::IdfObject> PlantLoop_Impl::remove()
 
   for(it = modelObjects.begin();
       it != modelObjects.end();
-      it++)
+      ++it)
   {
     if( OptionalHVACComponent comp = it->optionalCast<HVACComponent>() )
     {
@@ -349,7 +349,7 @@ bool PlantLoop_Impl::removeBranchWithComponent( HVACComponent component, Splitte
 
   for( std::vector<ModelObject>::iterator it = allComponents.begin();
        it < allComponents.end();
-       it++ )
+       ++it )
   {
     if( ! it->optionalCast<Node>() )
     {
@@ -543,7 +543,7 @@ Node PlantLoop_Impl::loopTemperatureSetpointNode()
 
   node = getObject<ModelObject>().getModelObjectTarget<Node>(OS_PlantLoopFields::LoopTemperatureSetpointNodeName);
 
-  BOOST_ASSERT(node);
+  OS_ASSERT(node);
 
   return node.get();
 }
@@ -575,7 +575,7 @@ SizingPlant PlantLoop_Impl::sizingPlant() const
 
   for( std::vector<SizingPlant>::iterator it = sizingObjects.begin();
        it < sizingObjects.end();
-       it++ )
+       ++it )
   {
     if( it->plantLoop().handle() == this->handle() )
     {
@@ -613,7 +613,7 @@ void PlantLoop_Impl::resetCommonPipeSimulation()
 PlantLoop::PlantLoop(Model& model)
   : Loop(PlantLoop::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::PlantLoop_Impl>());
+  OS_ASSERT(getImpl<detail::PlantLoop_Impl>());
 
   SizingPlant sizingPlant(model,*this);
 

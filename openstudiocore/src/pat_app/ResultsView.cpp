@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -18,7 +18,8 @@
 **********************************************************************/
 
 #include <pat_app/ResultsView.hpp>
-
+#include <pat_app/ResultsTabController.hpp>
+#include <pat_app/CloudMonitor.hpp>
 #include <pat_app/PatApp.hpp>
 
 #include "../shared_gui_components/Buttons.hpp"
@@ -28,10 +29,10 @@
 #include <analysis/Analysis_Impl.hpp>
 #include <analysis/DataPoint.hpp>
 #include <analysis/DataPoint_Impl.hpp>
-#include <analysis/DiscretePerturbation.hpp>
-#include <analysis/DiscretePerturbation_Impl.hpp>
-#include <analysis/NullPerturbation.hpp>
-#include <analysis/NullPerturbation_Impl.hpp>
+#include <analysis/Measure.hpp>
+#include <analysis/Measure_Impl.hpp>
+#include <analysis/NullMeasure.hpp>
+#include <analysis/NullMeasure_Impl.hpp>
 #include <analysis/Problem.hpp>
 #include <analysis/Problem_Impl.hpp>
 #include <analysis/Variable.hpp>
@@ -44,7 +45,11 @@
 #include <project/AnalysisRecord.hpp>
 #include <project/AnalysisRecord_Impl.hpp>
 
+#include <model/UtilityBill.hpp>
+
 #include <utilities/data/Attribute.hpp>
+#include <utilities/data/CalibrationResult.hpp>
+#include <utilities/core/Path.hpp>
 #include <utilities/units/Quantity.hpp>
 #include <utilities/units/QuantityConverter.hpp>
 #include <utilities/units/Unit.hpp>
@@ -63,21 +68,73 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTimer>
+#include <QButtonGroup>
+#include <QStackedWidget>
+#include <QComboBox>
+#include <QPoint>
+#include <QMenu>
+#include <QFont>
+#include <QDesktopServices>
+
+#include <boost/filesystem.hpp>
 
 #define NAME_LABEL_WIDTH 90
 #define SPACER_WIDTH 3
 #define RESULT_LABEL_WIDTH 90
-#define RESULT_DIV_LABEL_WIDTH 5
-#define RESULT_PCT_LABEL_WIDTH 40
+#define CALIBRATION_LABEL_WIDTH 140
 #define SCROLL_SPACER_WIDTH 18
 
 namespace openstudio {
   
 namespace pat {
 
+
+boost::optional<double> getNMBE(const FuelType& fuelType, const analysis::DataPoint& dataPoint){
+  boost::optional<Attribute> attribute = dataPoint.getOutputAttribute(CalibrationResult::attributeName());
+  if(attribute){
+    boost::optional<CalibrationResult> calibrationResult = CalibrationResult::fromAttribute(*attribute);
+    if (calibrationResult){
+      Q_FOREACH(const CalibrationUtilityBill& bill, calibrationResult->utilityBills()){
+        if (bill.fuelType() == fuelType){
+          return bill.NMBE();
+        }
+      }
+    }
+  }
+  return boost::none;
+}
+
+boost::optional<double> getCVRMSE(const FuelType& fuelType, const analysis::DataPoint& dataPoint){
+  boost::optional<Attribute> attribute = dataPoint.getOutputAttribute(CalibrationResult::attributeName());
+  if(attribute){
+    boost::optional<CalibrationResult> calibrationResult = CalibrationResult::fromAttribute(*attribute);
+    if (calibrationResult){
+      Q_FOREACH(const CalibrationUtilityBill& bill, calibrationResult->utilityBills()){
+        if (bill.fuelType() == fuelType){
+          return bill.CVRMSE();
+        }
+      }
+    }
+  }
+  return boost::none;
+}
+
+bool hasCalibrationResults(const analysis::DataPoint& dataPoint){
+  Q_FOREACH(int i, FuelType::getValues()){
+    FuelType fuelType(i);
+    if (getNMBE(fuelType, dataPoint) || getCVRMSE(fuelType, dataPoint)){
+      return true;
+    }
+  }
+  return false;
+}
+
 ResultsView::ResultsView()
   : PatMainTabView()
 {
+  QSharedPointer<CloudMonitor> cloudMonitor = PatApp::instance()->cloudMonitor();
+  CloudStatus cloudStatus = cloudMonitor->status(); // CLOUD_STARTING, CLOUD_RUNNING, CLOUD_STOPPING, CLOUD_STOPPED, CLOUD_ERROR 
+
   setTitle("Create and View Reports");
 
   // Main Content
@@ -89,14 +146,44 @@ ResultsView::ResultsView()
   mainContentVLayout->setSpacing(0);
   mainContentVLayout->setAlignment(Qt::AlignTop);
   mainContent->setLayout(mainContentVLayout);
+  viewSwitcher->setView(mainContent);
+  
+  // Make Selection Button Widget
+  
+  QHBoxLayout* hLayout = new QHBoxLayout(this);
+  QLabel* reportLabel = new QLabel("View: ",this);
+  reportLabel->setObjectName("H2");
+  reportLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+  hLayout->addWidget(reportLabel, 0, Qt::AlignLeft | Qt::AlignTop);
 
-  QVBoxLayout * innerContentVLayout = new QVBoxLayout();
+  QButtonGroup* buttonGroup = new QButtonGroup(this);
+  bool isConnected = connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SIGNAL(viewSelected(int)));
+  OS_ASSERT(isConnected);
+
+  m_standardResultsBtn = new QPushButton("Standard",this);
+  m_standardResultsBtn->setCheckable(true);
+  hLayout->addWidget(m_standardResultsBtn, 0, Qt::AlignLeft | Qt::AlignTop);
+  buttonGroup->addButton(m_standardResultsBtn,0);
+
+  m_calibrationResultsBtn = new QPushButton("Calibration",this);
+  m_calibrationResultsBtn->setCheckable(true);
+  hLayout->addWidget(m_calibrationResultsBtn, 0, Qt::AlignLeft | Qt::AlignTop);
+  buttonGroup->addButton(m_calibrationResultsBtn,1);
+
+  hLayout->addStretch();
+  QWidget* widget = new QWidget(this);
+  widget->setLayout(hLayout);
+  mainContentVLayout->addWidget(widget);
+
+  m_stackedWidget = new QStackedWidget(this);
+  mainContentVLayout->addWidget(m_stackedWidget);
+
+  //********************************************* PAGE 1 *********************************************
+
+  QVBoxLayout* innerContentVLayout = new QVBoxLayout();
   innerContentVLayout->setContentsMargins(5,5,5,5);
   innerContentVLayout->setSpacing(5);
   innerContentVLayout->setAlignment(Qt::AlignTop);
-  mainContentVLayout->addLayout(innerContentVLayout);
-
-  viewSwitcher->setView(mainContent);
 
   // Baseline header
   QWidget * baselineHeader = new ResultsHeader(true);
@@ -127,7 +214,56 @@ ResultsView::ResultsView()
   dataPointResultsListView->setStyleSheet("openstudio--OSListView { border: 1px solid black; }");
   innerContentVLayout->addWidget(dataPointResultsListView);
 
-  bool isConnected = false;
+  // create widget for stacked widget
+  widget = new QWidget(this);
+  widget->setLayout(innerContentVLayout);
+  m_stackedWidget->addWidget(widget);
+
+  //********************************************* PAGE 2 *********************************************
+
+  innerContentVLayout = new QVBoxLayout();
+  innerContentVLayout->setContentsMargins(5,5,5,5);
+  innerContentVLayout->setSpacing(5);
+  innerContentVLayout->setAlignment(Qt::AlignTop);
+
+  // select calibration method
+  hLayout = new QHBoxLayout();
+
+  QComboBox* calibrationComboBox = new QComboBox();
+  Q_FOREACH(const std::string& calibrationGuideline, model::UtilityBill::calibrationGuidelines()){
+    calibrationComboBox->addItem(toQString(calibrationGuideline));
+  }
+  calibrationComboBox->setCurrentIndex(-1); // needed so change to index 0 emits signal
+  hLayout->addWidget(calibrationComboBox);
+
+  m_calibrationMethodLabel = new QLabel();
+  hLayout->addWidget(m_calibrationMethodLabel);
+
+  hLayout->addStretch();
+
+  isConnected = connect(calibrationComboBox, SIGNAL(currentIndexChanged(const QString &)),
+    this, SLOT(selectCalibrationMethod(const QString &)));
+  OS_ASSERT(isConnected);
+
+  innerContentVLayout->addLayout(hLayout);
+
+  // Results header
+  resultsHeader = new DataPointCalibrationHeaderView();
+  innerContentVLayout->addWidget(resultsHeader);
+
+  // Calibration list 
+  dataPointCalibrationListView = new OSListView(true);
+  dataPointCalibrationListView->setVerticalScrollBarAlwaysOn(true);
+  dataPointCalibrationListView->setSpacing(0);
+  dataPointCalibrationListView->setContentsMargins(1,1,1,1);
+  dataPointCalibrationListView->setStyleSheet("openstudio--OSListView { border: 1px solid black; }");
+  innerContentVLayout->addWidget(dataPointCalibrationListView);
+
+  widget = new QWidget(this);
+  widget->setLayout(innerContentVLayout);
+  m_stackedWidget->addWidget(widget);
+
+  //********************************************* Footer *********************************************
 
   QWidget * footer = new QWidget();
   footer->setObjectName("Footer");
@@ -139,19 +275,35 @@ ResultsView::ResultsView()
   footer->setStyleSheet(style);
 
   // Open File Button
-  QHBoxLayout* hLayout = new QHBoxLayout();
+  hLayout = new QHBoxLayout();
   hLayout->setContentsMargins(5,5,5,5);
   hLayout->setSpacing(10);
   footer->setLayout(hLayout);
+  
+  m_downloadResultsButton = new QPushButton();
+  m_downloadResultsButton->setFlat(true);
+  m_downloadResultsButton->setFixedSize(195,29);
+  hLayout->addWidget(m_downloadResultsButton);
 
-  m_viewFileButton = new GrayButton();
-  m_viewFileButton->setFixedHeight(42);
-  m_viewFileButton->setEnabled(false);
-  m_viewFileButton->setText("Open a COPY of the Selected File\nin the OpenStudio Application");
+  if (cloudStatus == CLOUD_RUNNING){
+    enableDownloadResultsButton(RESULTS_DISABLED);
+  }else{
+    enableDownloadResultsButton(LOCAL_MODE);
+  }
+  
+  isConnected = connect(m_downloadResultsButton, SIGNAL(clicked(bool)),
+    this, SIGNAL(downloadResultsButtonClicked(bool)));
+  OS_ASSERT(isConnected);
+
+  m_viewFileButton = new QPushButton();
+  m_viewFileButton->setFlat(true);
+  m_viewFileButton->setFixedSize(195,29);
+  enableViewFileButton(false);
   hLayout->addWidget(m_viewFileButton);
   
-  isConnected = connect(m_viewFileButton, SIGNAL(clicked(bool)), this, SIGNAL(openButtonClicked(bool)));
-  Q_ASSERT(isConnected);
+  isConnected = connect(m_viewFileButton, SIGNAL(clicked(bool)),
+    this, SIGNAL(openButtonClicked(bool)));
+  OS_ASSERT(isConnected); 
 
   m_openDirButton = new OpenDirectoryButton(this);
   m_openDirButton->setToolTip("Open the directory for the selected file.");
@@ -159,20 +311,293 @@ ResultsView::ResultsView()
   hLayout->addWidget(m_openDirButton);
 
   isConnected = connect(m_openDirButton, SIGNAL(clicked(bool)), this, SIGNAL(openDirButtonClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   
   hLayout->addStretch();
   mainContentVLayout->addWidget(footer);
+
+  updateReportButtons();
+  calibrationComboBox->setCurrentIndex(0);
+}
+
+double ResultsView::calibrationMaxNMBE() const
+{
+  return m_calibrationMaxNMBE;
+}
+
+double ResultsView::calibrationMaxCVRMSE() const
+{
+  return m_calibrationMaxCVRMSE;
+}
+
+void ResultsView::updateReportButtons()
+{
+  boost::optional<analysisdriver::SimpleProject> project = PatApp::instance()->project();
+  if(project){
+
+    analysis::DataPoint baselineDataPoint = project.get().baselineDataPoint();
+
+    bool hasUtilityBills = hasCalibrationResults(baselineDataPoint);
+
+    if (hasUtilityBills){
+      m_standardResultsBtn->setEnabled(true);
+      m_calibrationResultsBtn->setEnabled(true);
+    }else{
+      m_standardResultsBtn->setEnabled(false);
+      m_calibrationResultsBtn->setEnabled(false);
+    }
+  }
+
+}
+
+void ResultsView::selectView(int index)
+{
+  m_stackedWidget->setCurrentIndex(index);
 }
 
 void ResultsView::enableViewFileButton(bool enable)
 {
+  QString style;
+  if(enable){
+    style = ("QPushButton {"
+                           "background-image:url(':/images/open_file_in_OS_button.png');"
+                           "  border:none;"
+                           "}");
+  } else {
+    style = ("QPushButton {"
+                           "background-image:url(':/images/open_file_in_OS_button_disabled.png');"
+                           "  border:none;"
+                           "}");
+  }
+  m_viewFileButton->setStyleSheet(style);
   m_viewFileButton->setEnabled(enable);
+}
+
+void ResultsView::enableDownloadResultsButton(const DownloadResultsStatus& status)
+{
+  bool visible = false;
+  bool enable = false;
+  QString style;
+
+  switch (status){
+    case LOCAL_MODE:
+      visible = false;
+      enable = false;
+      style = ("");
+      break;
+    case RESULTS_DISABLED:
+      visible = true;
+      enable = false;
+      style = ("QPushButton {"
+                           "background-image:url(':/images/download_detailed_results_disabled.png');"
+                           "  border:none;"
+                           "}");
+      break;
+    case RESULTS_DOWNLOADED:
+      visible = true;
+      enable = false;
+      style = ("QPushButton {"
+                           "background-image:url(':/images/download_detailed_results_downloaded.png');"
+                           "  border:none;"
+                           "}");
+      break;
+    case RESULTS_UNAVAILABLE:
+      visible = true;
+      enable = false;
+      style = ("QPushButton {"
+                           "background-image:url(':/images/download_detailed_results_na_button.png');"
+                           "  border:none;"
+                           "}");
+
+      break;    
+    case RESULTS_AVAILABLE:
+      visible = true;
+      enable = true;
+      style = ("QPushButton {"
+                           "background-image:url(':/images/download_detailed_results_button.png');"
+                           "  border:none;"
+                           "}");
+      break;
+    case RUNNING_DETAILED:
+      visible = true;
+      enable = false;
+      style = ("QPushButton {"
+                           "background-image:url(':/images/download_detailed_results_queued.png');"
+                           "  border:none;"
+                           "}");
+      break;
+    case RUNNING_SLIM:
+      visible = true;
+      enable = true;
+      style = ("QPushButton {"
+                           "background-image:url(':/images/download_detailed_results_button.png');"
+                           "  border:none;"
+                           "}");
+      break;
+    default:
+      visible = false;
+      enable = false;
+      style = ("");
+      break;
+  }
+   
+  m_downloadResultsButton->setVisible(visible);
+  m_downloadResultsButton->setStyleSheet(style);
+  m_downloadResultsButton->setEnabled(enable);
 }
 
 void ResultsView::enableOpenDirectoryButton(bool enable)
 {
   m_openDirButton->setEnabled(enable);
+}
+
+void ResultsView::selectCalibrationMethod(const QString& value)
+{
+  std::string calibrationGuideline = toString(value);
+  boost::optional<double> maxNMBE = model::UtilityBill::maxNMBE(calibrationGuideline);
+  boost::optional<double> maxCVRMSE = model::UtilityBill::maxCVRMSE(calibrationGuideline);
+  OS_ASSERT(maxNMBE);
+  OS_ASSERT(maxCVRMSE);
+
+  m_calibrationMaxNMBE = *maxNMBE;
+  m_calibrationMaxCVRMSE = *maxCVRMSE;
+  
+  QString text("NBME of ");
+  text += QString::number(m_calibrationMaxNMBE);
+  text += "% or less and CV(RSME) of ";
+  text += QString::number(m_calibrationMaxCVRMSE);
+  text += "% relative to monthly data.\nMust contain all utility data for one year and real weather data.\nCheck the guideline for additional requirements.";
+  m_calibrationMethodLabel->setText(text);
+
+  emit calibrationThresholdsChanged(m_calibrationMaxNMBE, m_calibrationMaxCVRMSE);
+}
+
+// need to sort paths by number so 8-UserScript-0, shows up before 11-UserScript-0
+struct ResultsPathSorter
+{
+  bool operator()(const openstudio::path& left, const openstudio::path& right){
+    openstudio::path leftParent = left.parent_path().stem();
+    openstudio::path rightParent = right.parent_path().stem();
+
+    QRegExp regexp("^(\\d)+.*");
+
+    boost::optional<int> leftInt;
+    if (regexp.exactMatch(toQString(leftParent))){
+      QStringList leftParts = regexp.capturedTexts();
+      OS_ASSERT(leftParts.size() == 2);
+      leftInt = leftParts[1].toInt();
+    }
+
+    boost::optional<int> rightInt;
+    if (regexp.exactMatch(toQString(rightParent))){
+      QStringList rightParts = regexp.capturedTexts();
+      OS_ASSERT(rightParts.size() == 2);
+      rightInt = rightParts[1].toInt();
+    }
+
+    if (leftInt && rightInt){
+      return leftInt.get() < rightInt.get();
+    }else if (leftInt){
+      return true;
+    }else if (rightInt){
+      return false;
+    }
+
+    return (left < right);
+  }
+};
+
+void ResultsView::populateMenu(QMenu& menu, const openstudio::path& directory)
+{
+  menu.setTitle("Detailed Reports:");
+
+  QAction* labelAction = new QAction("Detailed Reports:", &menu);
+  labelAction->setCheckable(false);
+  labelAction->setEnabled(false);
+  menu.addAction(labelAction);
+
+  menu.addSeparator();
+
+  // mirroring code in ResultsView::searchForExistingResults
+  std::vector<openstudio::path> reports;
+  if (exists(directory) && !directory.empty()){
+    for ( boost::filesystem::basic_recursive_directory_iterator<openstudio::path> end, dir(directory); dir != end; ++dir ) {
+      openstudio::path p = *dir;
+      if (openstudio::toString(p.filename()) == "report.html") {
+        reports.push_back(p);
+      } else if (openstudio::toString(p.filename()) == "eplustbl.htm") {
+        reports.push_back(p);
+      }
+    }
+  }
+
+  // sort paths as directory iterator order is undefined
+  std::sort(reports.begin(), reports.end(), ResultsPathSorter());
+  
+  // mirrors ResultsView::populateComboBox
+  if (!reports.empty()){
+    unsigned num = 0;
+    Q_FOREACH(openstudio::path report, reports){
+
+      QString fullPathString = toQString(report.string());
+      QFile file(fullPathString);
+      fullPathString.prepend("file:///");
+      QString name;
+
+      if (openstudio::toString(report.filename()) == "eplustbl.htm"){
+
+        name = "EnergyPlus Results";
+
+      }else{
+
+        ++num;
+        
+        if (file.open(QFile::ReadOnly)){
+          QDomDocument doc;
+          doc.setContent(&file);
+          file.close();
+          QString string = doc.toString();
+          int startingIndex = string.indexOf("<title>");
+          int endingIndex = string.indexOf("</title>");
+          if((startingIndex == -1) | (endingIndex == -1) | (startingIndex >= endingIndex)){
+            name = QString("Custom Report ") + QString::number(num);
+          } else {
+            // length of "<title>" = 7
+            name = string.mid(startingIndex+7, endingIndex-startingIndex-7);
+          }
+        }
+      }
+
+      QAction* openAct = new QAction(name, &menu);
+      openAct->setToolTip(fullPathString);
+      openAct->setData(fullPathString);
+      bool test = connect(openAct, SIGNAL(triggered()), this, SLOT(openReport()));
+      OS_ASSERT(test);
+      menu.addAction(openAct);
+    }
+  }else{
+    labelAction = new QAction("None available", &menu);
+    QFont font = labelAction->font();
+    font.setItalic(true);
+    labelAction->setFont(font);
+    labelAction->setCheckable(false);
+    labelAction->setEnabled(false);
+    menu.addAction(labelAction);
+  }
+
+}
+
+void ResultsView::openReport()
+{
+  QObject* sender = this->sender();
+  if (sender){
+    QAction* openAct = qobject_cast<QAction*>(sender);
+    if (openAct){
+      QString fullPathString = openAct->data().toString();
+      // Might need error handling - If this returns false, it failed to open
+      QDesktopServices::openUrl(fullPathString);
+    }
+  }
 }
 
 ResultsHeader::ResultsHeader(bool isBaseline)
@@ -323,7 +748,7 @@ ResultsHeader::ResultsHeader(bool isBaseline)
 DataPointResultsView::DataPointResultsView(const openstudio::analysis::DataPoint& dataPoint,
                                            const openstudio::analysis::DataPoint& baselineDataPoint, 
                                            bool alternateRow)
-  : QAbstractButton(), m_dataPoint(dataPoint), m_baselineDataPoint(baselineDataPoint), m_alternateRow(alternateRow)
+  : QAbstractButton(), m_dataPoint(dataPoint), m_baselineDataPoint(baselineDataPoint), m_alternateRow(alternateRow), m_hasEmphasis(false)
 {
   this->setMinimumHeight(75);
 
@@ -508,10 +933,15 @@ DataPointResultsView::DataPointResultsView(const openstudio::analysis::DataPoint
   hLayout->addWidget(m_scrollSpacer);
 
   bool test = dataPoint.connect(SIGNAL(changed(ChangeType)), this, SLOT(update()));
-  Q_ASSERT(test);
+  OS_ASSERT(test);
 
   test = baselineDataPoint.connect(SIGNAL(changed(ChangeType)), this, SLOT(update()));
-  Q_ASSERT(test);
+  OS_ASSERT(test);
+
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+  test = connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+    this, SLOT(showContextMenu(const QPoint&)));
+  OS_ASSERT(test);
 
   update();
 }
@@ -519,7 +949,7 @@ DataPointResultsView::DataPointResultsView(const openstudio::analysis::DataPoint
 void DataPointResultsView::update()
 {
   QString name;
-  QString measures;
+  QString listOfMeasures;
 
   boost::optional<double> netSiteEnergyIntensity;
   boost::optional<double> peakElectricDemand;
@@ -548,7 +978,7 @@ void DataPointResultsView::update()
   if (m_dataPoint.uuid() == m_baselineDataPoint.uuid()){
 
     name = "Baseline";
-    measures = "";
+    listOfMeasures = "";
     
     netSiteEnergyIntensity = getBaselineValue("Net Site Energy Use Intentsity");
     peakElectricDemand = getBaselineValue("Instantaneous Peak Electricity Demand");
@@ -573,18 +1003,18 @@ void DataPointResultsView::update()
     if(project){
       openstudio::analysis::Problem problem = project->analysis().problem();
       std::vector<QVariant> variableValues = m_dataPoint.variableValues();
-      std::vector<boost::optional<analysis::DiscretePerturbation> > discretePerturbations = problem.getDiscretePerturbations(variableValues);
-      Q_FOREACH(boost::optional<analysis::DiscretePerturbation> discretePerturbation, discretePerturbations){
-        if (discretePerturbation){
-          if (!discretePerturbation->optionalCast<analysis::NullPerturbation>()){
-            measures += discretePerturbation->name().c_str();
-            measures += '\n';
+      std::vector<boost::optional<analysis::Measure> > measures = problem.getMeasures(variableValues);
+      Q_FOREACH(boost::optional<analysis::Measure> measure, measures){
+        if (measure){
+          if (!measure->optionalCast<analysis::NullMeasure>()){
+            listOfMeasures += measure->name().c_str();
+            listOfMeasures += '\n';
           }
         }
       }
     }
 
-    measures = measures.trimmed();
+    listOfMeasures = listOfMeasures.trimmed();
 
     netSiteEnergyIntensity = getDifference("Net Site Energy Use Intentsity");
     peakElectricDemand = getDifference("Instantaneous Peak Electricity Demand");
@@ -640,7 +1070,7 @@ void DataPointResultsView::update()
   }else{
 
     m_nameLabel->setText(name);
-    m_nameLabel->setToolTip(measures);
+    m_nameLabel->setToolTip(listOfMeasures);
     m_nameLabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
     m_nameLabel->setMinimumWidth(NAME_LABEL_WIDTH);
     //m_nameLabel->setFixedWidth(NAME_LABEL_WIDTH);
@@ -762,6 +1192,8 @@ void DataPointResultsView::setResultPctLabelText(QLabel * label, const boost::op
 
 void DataPointResultsView::setHasEmphasis(bool hasEmphasis)
 {
+  m_hasEmphasis = hasEmphasis;
+
   if( hasEmphasis ){
     setStyleSheet("openstudio--pat--DataPointResultsView { background: #FECD60; border: 2px solid #EE641A; }");
   }else{
@@ -773,6 +1205,24 @@ void DataPointResultsView::setHasEmphasis(bool hasEmphasis)
       setStyleSheet("openstudio--pat--DataPointResultsView {background: #D0D0D0;}");
     }
   }
+}
+
+void DataPointResultsView::showContextMenu(const QPoint& pos)
+{
+  if (!m_hasEmphasis){
+    return;
+  }
+
+  openstudio::path directory = m_dataPoint.directory();
+
+  ResultsView* resultsView = PatApp::instance()->resultsTabController()->resultsView;
+  OS_ASSERT(resultsView);
+
+  QMenu menu;
+  resultsView->populateMenu(menu, directory);
+
+  QPoint globalPos = this->mapToGlobal(pos);
+  menu.exec(globalPos);
 }
 
 void DataPointResultsView::paintEvent(QPaintEvent * e)
@@ -831,7 +1281,7 @@ boost::optional<double> DataPointResultsView::getValue(const std::string& attrib
       }
       else{
         // should never get here
-        Q_ASSERT(false);
+        OS_ASSERT(false);
       }
 
       Quantity currentQuantity(*currentResult,currentUnit);
@@ -839,7 +1289,7 @@ boost::optional<double> DataPointResultsView::getValue(const std::string& attrib
       if(desiredQuantity){
         desiredResult = desiredQuantity->value();
         Unit unit = desiredQuantity->units();
-        std::string standardString = unit.standardString();
+        //std::string standardString = unit.standardString();
       }
     }
   }
@@ -919,6 +1369,195 @@ boost::optional<double> DataPointResultsView::simplePayback()
   }
   return result;
 }
+
+
+DataPointCalibrationHeaderView::DataPointCalibrationHeaderView()
+  : QWidget()
+{
+  this->setMinimumHeight(75);
+
+  QHBoxLayout* hLayout = new QHBoxLayout();
+  hLayout->setContentsMargins(0,0,0,0);
+  hLayout->setSpacing(0);
+  this->setLayout(hLayout);
+
+  QString style("QLabel {font-size: 12px; font: bold; color: black;}");
+
+  QLabel* nameLabel = new QLabel();
+  nameLabel->setStyleSheet(style);
+  nameLabel->setMinimumWidth(NAME_LABEL_WIDTH);
+  //nameLabel->setFixedWidth(NAME_LABEL_WIDTH);
+  nameLabel->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+  nameLabel->setText("Design\nAlternative\nName");
+  hLayout->addWidget(nameLabel);
+  hLayout->setStretchFactor(nameLabel, 100);
+  
+  QLabel* space = new QLabel();
+  space->setStyleSheet(style);
+  space->setFixedWidth(SPACER_WIDTH);
+  space->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+  hLayout->addWidget(space);
+
+  boost::optional<analysisdriver::SimpleProject> project = PatApp::instance()->project();
+  if(project){
+
+    analysis::DataPoint baselineDataPoint = project.get().baselineDataPoint();
+
+    Q_FOREACH(int i, FuelType::getValues()){
+      FuelType fuelType(i);
+      if (getNMBE(fuelType, baselineDataPoint) || getCVRMSE(fuelType, baselineDataPoint)){
+        QLabel* label = new QLabel();
+        label->setStyleSheet(style);
+        label->setFixedWidth(CALIBRATION_LABEL_WIDTH);
+        label->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+        label->setText(toQString(fuelType.valueDescription() + "\nConsumption\nNMBE"));
+        hLayout->addWidget(label);
+
+        label = new QLabel();
+        label->setStyleSheet(style);
+        label->setFixedWidth(CALIBRATION_LABEL_WIDTH);
+        label->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+        label->setText(toQString(fuelType.valueDescription() + "\nConsumption\nCVRMSE"));
+        hLayout->addWidget(label);
+      }
+    }
+  }
+
+  hLayout->addStretch(10);
+
+  QLabel* scrollSpacer = new QLabel();
+  scrollSpacer->setStyleSheet(style);
+  scrollSpacer->setFixedWidth(SCROLL_SPACER_WIDTH);
+  hLayout->addWidget(scrollSpacer);
+}
+
+DataPointCalibrationView::DataPointCalibrationView(const openstudio::analysis::DataPoint& dataPoint,
+                                                   const openstudio::analysis::DataPoint& baselineDataPoint,
+                                                   bool alternateRow, double maxNMBE, double maxCVRMSE)
+  : QAbstractButton(), m_dataPoint(dataPoint), m_baselineDataPoint(baselineDataPoint), 
+    m_alternateRow(alternateRow), m_hasEmphasis(false), m_calibrationMaxNMBE(maxNMBE), m_calibrationMaxCVRMSE(maxCVRMSE)
+{
+  this->setMinimumHeight(75);
+
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  bool test = connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+    this, SLOT(showContextMenu(const QPoint&)));
+  OS_ASSERT(test);
+
+  update();
+}
+
+void DataPointCalibrationView::update()
+{
+  QHBoxLayout* hLayout = new QHBoxLayout;
+  hLayout->setContentsMargins(0,0,0,0);
+  hLayout->setSpacing(0);
+  this->setLayout(hLayout);
+
+  QString style("QLabel {color: black;}");
+  QString borderStyle("QLabel {border-right: 1px solid black; color: black;}");
+
+  m_nameLabel = new QLabel();
+  m_nameLabel->setWordWrap(true);
+  m_nameLabel->setStyleSheet(style);
+  m_nameLabel->setMinimumWidth(NAME_LABEL_WIDTH);
+  //m_nameLabel->setFixedWidth(NAME_LABEL_WIDTH);
+  m_nameLabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+  m_nameLabel->setText(m_dataPoint.name().c_str());
+  hLayout->addWidget(m_nameLabel);
+  hLayout->setStretchFactor(m_nameLabel, 100);
+
+  QLabel* space = new QLabel();
+  space->setStyleSheet(borderStyle);
+  space->setFixedWidth(SPACER_WIDTH);
+  space->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+  hLayout->addWidget(space);
+
+  Q_FOREACH(int i, FuelType::getValues()){
+    FuelType fuelType(i);
+    if (getNMBE(fuelType, m_baselineDataPoint) || getCVRMSE(fuelType, m_baselineDataPoint)){
+      boost::optional<double> nmbe = getNMBE(fuelType, m_dataPoint);
+      boost::optional<double> cvrmse = getCVRMSE(fuelType, m_dataPoint);
+
+      QLabel* label = new QLabel();
+      label->setStyleSheet(style);
+      label->setFixedWidth(CALIBRATION_LABEL_WIDTH);
+      label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+      if (nmbe){
+        if (std::abs(*nmbe) > m_calibrationMaxNMBE){
+          label->setText("<font color=\"red\">" + QString::number(*nmbe, 'f', 2) + "%</font>");
+        }else{
+          label->setText(QString::number(*nmbe, 'f', 2) + "%");
+        }
+      }else{
+        label->setText("--");
+      }
+      hLayout->addWidget(label);
+
+      label = new QLabel();
+      label->setStyleSheet(borderStyle);
+      label->setFixedWidth(CALIBRATION_LABEL_WIDTH);
+      label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+      if (cvrmse){
+        if (*cvrmse > m_calibrationMaxCVRMSE){
+          label->setText("<font color=\"red\">" + QString::number(*cvrmse, 'f', 2) + "%</font>");
+        }else{
+          label->setText(QString::number(*cvrmse, 'f', 2) + "%");
+        }
+      }else{
+        label->setText("--");
+      }
+      hLayout->addWidget(label);
+    }
+  }
+
+  hLayout->addStretch(10);
+}
+
+void DataPointCalibrationView::setHasEmphasis(bool hasEmphasis)
+{
+  m_hasEmphasis = hasEmphasis;
+
+  if( hasEmphasis ){
+    setStyleSheet("openstudio--pat--DataPointCalibrationView { background: #FECD60; border: 2px solid #EE641A; }");
+  }else{
+    if (m_dataPoint.uuid() == m_baselineDataPoint.uuid()){
+      setStyleSheet("openstudio--pat--DataPointCalibrationView {background: #B6B5B6;}");
+    }else if (m_alternateRow){
+      setStyleSheet("openstudio--pat--DataPointCalibrationView {background: #E0E0E0;}");
+    }else{
+      setStyleSheet("openstudio--pat--DataPointCalibrationView {background: #D0D0D0;}");
+    }
+  }
+}
+
+void DataPointCalibrationView::showContextMenu(const QPoint& pos)
+{
+  if (!m_hasEmphasis){
+    return;
+  }
+
+  openstudio::path directory = m_dataPoint.directory();
+
+  ResultsView* resultsView = PatApp::instance()->resultsTabController()->resultsView;
+  OS_ASSERT(resultsView);
+
+  QMenu menu;
+  resultsView->populateMenu(menu, directory);
+
+  QPoint globalPos = this->mapToGlobal(pos);
+  menu.exec(globalPos);
+}
+
+void DataPointCalibrationView::paintEvent(QPaintEvent * e)
+{
+  QStyleOption opt;
+  opt.init(this);
+  QPainter p(this);
+  style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+}
+
 
 } // pat
 

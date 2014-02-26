@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ boost::optional<IdfObject> ForwardTranslator::translateCurveCubic(
   OptionalString s;
   OptionalDouble d;
 
-  if (s = modelObject.name()) {
+  if ((s = modelObject.name())) {
     idfObject.setName(*s);
   }
 
@@ -52,10 +52,10 @@ boost::optional<IdfObject> ForwardTranslator::translateCurveCubic(
   idfObject.setDouble(Curve_CubicFields::Coefficient4x_POW_3,modelObject.coefficient4xPOW3());
   idfObject.setDouble(Curve_CubicFields::MinimumValueofx,modelObject.minimumValueofx());
   idfObject.setDouble(Curve_CubicFields::MaximumValueofx,modelObject.maximumValueofx());
-  if (d = modelObject.minimumCurveOutput()) {
+  if ((d = modelObject.minimumCurveOutput())) {
     idfObject.setDouble(Curve_CubicFields::MinimumCurveOutput,*d);
   }
-  if (d = modelObject.maximumCurveOutput()) {
+  if ((d = modelObject.maximumCurveOutput())) {
     idfObject.setDouble(Curve_CubicFields::MaximumCurveOutput,*d);
   }
   if (!modelObject.isInputUnitTypeforXDefaulted()) {

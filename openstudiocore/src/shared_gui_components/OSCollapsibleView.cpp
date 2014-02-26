@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -24,11 +24,14 @@
 #include <QPainter>
 #include <QPushButton>
 
+#include <utilities/core/Assert.hpp>
+
 namespace openstudio {
 
 OSHeader::OSHeader(QPushButton * button)
-  : QWidget()
+  : QPushButton()
 {
+  this->setFlat(true);
   toggleButton = button;
 }
 
@@ -66,10 +69,9 @@ void OSCollapsibleView::setHeader(QWidget * header)
   {
     bool bingo = connect(m_osHeader->toggleButton,SIGNAL(toggled(bool)),this,SLOT(setExpanded(bool)));
 
-    Q_ASSERT(bingo);
+    OS_ASSERT(bingo);
   }
 }
-
 
 void OSCollapsibleView::setContent(QWidget * content)
 {

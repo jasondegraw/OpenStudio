@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -36,7 +36,6 @@ namespace project {
 namespace detail {
 
   class PROJECT_API ProjectDatabaseRecord_Impl : public ObjectRecord_Impl {
-    Q_OBJECT;
    public:
 
     /// constructors

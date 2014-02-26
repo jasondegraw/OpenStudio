@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ namespace detail {
   CoilHeatingDXSingleSpeed_Impl::CoilHeatingDXSingleSpeed_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : StraightComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == CoilHeatingDXSingleSpeed::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == CoilHeatingDXSingleSpeed::iddObjectType());
   }
 
   CoilHeatingDXSingleSpeed_Impl::CoilHeatingDXSingleSpeed_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -57,7 +57,7 @@ namespace detail {
                                                                bool keepHandle)
                                                                  : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == CoilHeatingDXSingleSpeed::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == CoilHeatingDXSingleSpeed::iddObjectType());
   }
 
   CoilHeatingDXSingleSpeed_Impl::CoilHeatingDXSingleSpeed_Impl(const CoilHeatingDXSingleSpeed_Impl& other,
@@ -105,7 +105,7 @@ namespace detail {
 
   double CoilHeatingDXSingleSpeed_Impl::ratedCOP() const {
     boost::optional<double> value = getDouble(OS_Coil_Heating_DX_SingleSpeedFields::RatedCOP,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -124,7 +124,7 @@ namespace detail {
 
   double CoilHeatingDXSingleSpeed_Impl::minimumOutdoorDryBulbTemperatureforCompressorOperation() const {
     boost::optional<double> value = getDouble(OS_Coil_Heating_DX_SingleSpeedFields::MinimumOutdoorDryBulbTemperatureforCompressorOperation,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -134,7 +134,7 @@ namespace detail {
 
   double CoilHeatingDXSingleSpeed_Impl::maximumOutdoorDryBulbTemperatureforDefrostOperation() const {
     boost::optional<double> value = getDouble(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforDefrostOperation,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -144,7 +144,7 @@ namespace detail {
 
   double CoilHeatingDXSingleSpeed_Impl::crankcaseHeaterCapacity() const {
     boost::optional<double> value = getDouble(OS_Coil_Heating_DX_SingleSpeedFields::CrankcaseHeaterCapacity,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -154,7 +154,7 @@ namespace detail {
 
   double CoilHeatingDXSingleSpeed_Impl::maximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation() const {
     boost::optional<double> value = getDouble(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -164,7 +164,7 @@ namespace detail {
 
   std::string CoilHeatingDXSingleSpeed_Impl::defrostStrategy() const {
     boost::optional<std::string> value = getString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostStrategy,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -174,7 +174,7 @@ namespace detail {
 
   std::string CoilHeatingDXSingleSpeed_Impl::defrostControl() const {
     boost::optional<std::string> value = getString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostControl,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -184,7 +184,7 @@ namespace detail {
 
   double CoilHeatingDXSingleSpeed_Impl::defrostTimePeriodFraction() const {
     boost::optional<double> value = getDouble(OS_Coil_Heating_DX_SingleSpeedFields::DefrostTimePeriodFraction,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -221,12 +221,11 @@ namespace detail {
 
   void CoilHeatingDXSingleSpeed_Impl::autosizeRatedTotalHeatingCapacity() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::RatedTotalHeatingCapacity, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setRatedCOP(double ratedCOP) {
-    bool result = false;
-    result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::RatedCOP, ratedCOP);
+    bool result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::RatedCOP, ratedCOP);
     return result;
   }
 
@@ -242,84 +241,77 @@ namespace detail {
 
   void CoilHeatingDXSingleSpeed_Impl::autosizeRatedAirFlowRate() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::RatedAirFlowRate, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setMinimumOutdoorDryBulbTemperatureforCompressorOperation(double minimumOutdoorDryBulbTemperatureforCompressorOperation) {
-    bool result = false;
-    result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::MinimumOutdoorDryBulbTemperatureforCompressorOperation, minimumOutdoorDryBulbTemperatureforCompressorOperation);
+    bool result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::MinimumOutdoorDryBulbTemperatureforCompressorOperation, minimumOutdoorDryBulbTemperatureforCompressorOperation);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetMinimumOutdoorDryBulbTemperatureforCompressorOperation() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::MinimumOutdoorDryBulbTemperatureforCompressorOperation, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setMaximumOutdoorDryBulbTemperatureforDefrostOperation(double maximumOutdoorDryBulbTemperatureforDefrostOperation) {
-    bool result = false;
-    result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforDefrostOperation, maximumOutdoorDryBulbTemperatureforDefrostOperation);
+    bool result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforDefrostOperation, maximumOutdoorDryBulbTemperatureforDefrostOperation);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetMaximumOutdoorDryBulbTemperatureforDefrostOperation() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforDefrostOperation, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setCrankcaseHeaterCapacity(double crankcaseHeaterCapacity) {
-    bool result = false;
-    result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::CrankcaseHeaterCapacity, crankcaseHeaterCapacity);
+    bool result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::CrankcaseHeaterCapacity, crankcaseHeaterCapacity);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetCrankcaseHeaterCapacity() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::CrankcaseHeaterCapacity, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setMaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation(double maximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation) {
-    bool result = false;
-    result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation, maximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation);
+    bool result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation, maximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetMaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::MaximumOutdoorDryBulbTemperatureforCrankcaseHeaterOperation, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setDefrostStrategy(std::string defrostStrategy) {
-    bool result = false;
-    result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostStrategy, defrostStrategy);
+    bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostStrategy, defrostStrategy);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetDefrostStrategy() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostStrategy, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setDefrostControl(std::string defrostControl) {
-    bool result = false;
-    result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostControl, defrostControl);
+    bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostControl, defrostControl);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetDefrostControl() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostControl, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setDefrostTimePeriodFraction(double defrostTimePeriodFraction) {
-    bool result = false;
-    result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::DefrostTimePeriodFraction, defrostTimePeriodFraction);
+    bool result = setDouble(OS_Coil_Heating_DX_SingleSpeedFields::DefrostTimePeriodFraction, defrostTimePeriodFraction);
     return result;
   }
 
   void CoilHeatingDXSingleSpeed_Impl::resetDefrostTimePeriodFraction() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::DefrostTimePeriodFraction, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool CoilHeatingDXSingleSpeed_Impl::setResistiveDefrostHeaterCapacity(boost::optional<double> resistiveDefrostHeaterCapacity) {
@@ -334,12 +326,12 @@ namespace detail {
 
   void CoilHeatingDXSingleSpeed_Impl::resetResistiveDefrostHeaterCapacity() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::ResistiveDefrostHeaterCapacity, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void CoilHeatingDXSingleSpeed_Impl::autosizeResistiveDefrostHeaterCapacity() {
     bool result = setString(OS_Coil_Heating_DX_SingleSpeedFields::ResistiveDefrostHeaterCapacity, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   unsigned CoilHeatingDXSingleSpeed_Impl::inletPort()
@@ -360,11 +352,11 @@ namespace detail {
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<CoilHeatingDXSingleSpeed_Impl*>(this)->setAvailabilitySchedule(*value);
       value = getObject<ModelObject>().getModelObjectTarget<Schedule>(OS_Coil_Heating_DX_SingleSpeedFields::AvailabilityScheduleName);
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -386,7 +378,7 @@ namespace detail {
         getObject<ModelObject>().getModelObjectTarget<Curve>(
             OS_Coil_Heating_DX_SingleSpeedFields::TotalHeatingCapacityFunctionofTemperatureCurveName);
 
-    BOOST_ASSERT(curve);
+    OS_ASSERT(curve);
 
     return curve.get();
   }
@@ -399,7 +391,7 @@ namespace detail {
         getObject<ModelObject>().getModelObjectTarget<Curve>(
             OS_Coil_Heating_DX_SingleSpeedFields::TotalHeatingCapacityFunctionofFlowFractionCurveName);
 
-    BOOST_ASSERT(curve);
+    OS_ASSERT(curve);
 
     return curve.get();
   }
@@ -412,7 +404,7 @@ namespace detail {
         getObject<ModelObject>().getModelObjectTarget<Curve>(
             OS_Coil_Heating_DX_SingleSpeedFields::EnergyInputRatioFunctionofTemperatureCurveName);
 
-    BOOST_ASSERT(curve);
+    OS_ASSERT(curve);
 
     return curve.get();
   }
@@ -425,7 +417,7 @@ namespace detail {
         getObject<ModelObject>().getModelObjectTarget<Curve>(
             OS_Coil_Heating_DX_SingleSpeedFields::EnergyInputRatioFunctionofFlowFractionCurveName);
 
-    BOOST_ASSERT(curve);
+    OS_ASSERT(curve);
 
     return curve.get();
   }
@@ -438,7 +430,7 @@ namespace detail {
         getObject<ModelObject>().getModelObjectTarget<Curve>(
             OS_Coil_Heating_DX_SingleSpeedFields::PartLoadFractionCorrelationCurveName);
 
-    BOOST_ASSERT(curve);
+    OS_ASSERT(curve);
 
     return curve.get();
   }
@@ -478,7 +470,7 @@ namespace detail {
       accepted = true;
     }
 
-    BOOST_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::TotalHeatingCapacityFunctionofTemperatureCurveName,curve.handle()));
+    OS_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::TotalHeatingCapacityFunctionofTemperatureCurveName,curve.handle()));
 
     return accepted;
   }
@@ -503,7 +495,7 @@ namespace detail {
       accepted = true;
     }
 
-    BOOST_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::TotalHeatingCapacityFunctionofFlowFractionCurveName,curve.handle()));
+    OS_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::TotalHeatingCapacityFunctionofFlowFractionCurveName,curve.handle()));
 
     return accepted;
   }
@@ -532,7 +524,7 @@ namespace detail {
       accepted = true;
     }
 
-    BOOST_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::EnergyInputRatioFunctionofTemperatureCurveName,curve.handle()));
+    OS_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::EnergyInputRatioFunctionofTemperatureCurveName,curve.handle()));
 
     return accepted;
   }
@@ -557,7 +549,7 @@ namespace detail {
       accepted = true;
     }
 
-    BOOST_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::EnergyInputRatioFunctionofFlowFractionCurveName,curve.handle()));
+    OS_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::EnergyInputRatioFunctionofFlowFractionCurveName,curve.handle()));
 
     return accepted;
   }
@@ -582,7 +574,7 @@ namespace detail {
       accepted = true;
     }
 
-    BOOST_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::PartLoadFractionCorrelationCurveName,curve.handle()));
+    OS_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::PartLoadFractionCorrelationCurveName,curve.handle()));
 
     return accepted;
   }
@@ -601,7 +593,7 @@ namespace detail {
       if( curve->optionalCast<CurveBiquadratic>() )
       {
         accepted = true;
-        BOOST_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::DefrostEnergyInputRatioFunctionofTemperatureCurveName,curve->handle()));
+        OS_ASSERT(this->setPointer(OS_Coil_Heating_DX_SingleSpeedFields::DefrostEnergyInputRatioFunctionofTemperatureCurveName,curve->handle()));
       }
     }
     //if no curve was passed in, then set it to "" (this is to accomodate the reset method)
@@ -646,7 +638,7 @@ namespace detail {
 
     for( std::vector<AirLoopHVACUnitaryHeatPumpAirToAir>::iterator it = airLoopHVACUnitaryHeatPumpAirToAirs.begin();
     it < airLoopHVACUnitaryHeatPumpAirToAirs.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->heatingCoil() )
       {
@@ -670,7 +662,7 @@ namespace detail {
 
     for( std::vector<ZoneHVACPackagedTerminalHeatPump>::iterator it = zoneHVACPackagedTerminalHeatPumps.begin();
     it < zoneHVACPackagedTerminalHeatPumps.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->heatingCoil() )
       {
@@ -725,7 +717,7 @@ CoilHeatingDXSingleSpeed::CoilHeatingDXSingleSpeed( const Model& model,
                                                   )
   : StraightComponent(CoilHeatingDXSingleSpeed::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::CoilHeatingDXSingleSpeed_Impl>());
+  OS_ASSERT(getImpl<detail::CoilHeatingDXSingleSpeed_Impl>());
 
   setAvailabilitySchedule(availabilitySchedule);
 

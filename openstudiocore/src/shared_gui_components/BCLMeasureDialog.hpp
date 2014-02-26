@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -46,6 +46,8 @@ class BCLMeasureDialog : public OSDialog
 
     virtual ~BCLMeasureDialog();
 
+    QSize sizeHint() const;
+
     /// After calling exec() and getting appropriate return code
     /// Call createMeasure to create the new measure
     boost::optional<openstudio::BCLMeasure> createMeasure();
@@ -53,6 +55,8 @@ class BCLMeasureDialog : public OSDialog
   private slots:
 
     void nameChanged(const QString& newName);
+
+    void measureTypeChanged(const QString& newName);
 
     void firstLevelTaxonomyChanged(const QString& newName);
 
@@ -65,10 +69,8 @@ class BCLMeasureDialog : public OSDialog
     QTextEdit* m_descriptionTextEdit;
     QTextEdit* m_modelerDescriptionTextEdit;
     QComboBox* m_measureTypeComboBox;
-    QComboBox* m_measureFunctionComboBox;
     QComboBox* m_taxonomyFirstLevelComboBox;
     QComboBox* m_taxonomySecondLevelComboBox;
-    QRadioButton* m_requiresEnergyPlusResults;
     QRadioButton* m_usesSketchUpAPI;
 
     boost::optional<BCLMeasure> m_bclMeasureToCopy;

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -1325,10 +1325,10 @@ TEST_F(IdfFixture,Workspace_LocateURLs) {
   //
   std::vector<std::pair<QUrl, openstudio::path> > located = ws.locateUrls(std::vector<URLSearchPath>(), true, openstudio::path());
 
-  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ01.csv");
+  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ13.csv");
   ASSERT_EQ(located.size(), 1u);
   EXPECT_TRUE(located[0].first == QUrl::fromLocalFile(openstudio::toQString(absoluteTdvFilePath)));
-  EXPECT_EQ(located[0].second, openstudio::toPath("TDV_2008_kBtu_CZ01.csv"));
+  EXPECT_EQ(located[0].second, openstudio::toPath("TDV_2008_kBtu_CZ13.csv"));
 
 
   // test making path absolute again, by searching with an absolute search path
@@ -1344,7 +1344,7 @@ TEST_F(IdfFixture,Workspace_LocateURLs) {
 
   // Make the path relative again
   ws.locateUrls(std::vector<URLSearchPath>(), true, openstudio::path());
-  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ01.csv");
+  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ13.csv");
 
   // test making path absolute again, this time, let's find it relative to a made-up location of the osm
   searchpaths.clear();
@@ -1359,14 +1359,14 @@ TEST_F(IdfFixture,Workspace_LocateURLs) {
 
   // Make the path relative again
   ws.locateUrls(std::vector<URLSearchPath>(), true, openstudio::path());
-  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ01.csv");
+  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ13.csv");
 
   // This time we want to fail, by providing it with a search that should work, but we give it the wrong object type
   searchpaths.clear();
   searchpaths.push_back(URLSearchPath(QUrl::fromLocalFile("utilities/Filetypes"), URLSearchPath::ToInputFile,
         IddObjectType::OS_Version));
   located = ws.locateUrls(searchpaths, false, resourcesPath() / toPath("madeuposm.osm")); // give the search algo a relative place to start from
-  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ01.csv");
+  EXPECT_EQ(tdv.getString(OS_TimeDependentValuationFields::Url).get(), "file:TDV_2008_kBtu_CZ13.csv");
   ASSERT_EQ(located.size(), 0u);
 
   // And finally, provide the correct field type for the search path, find it
@@ -1883,4 +1883,79 @@ TEST_F(IdfFixture, Workspace_DaylightingControlsZoneName)
   ASSERT_TRUE(daylightingControl->getString(0,false,true));
   EXPECT_EQ("Zone 1", daylightingControl->getString(0,false,true).get());
 
+}
+
+TEST_F(IdfFixture, Workspace_NextName) 
+{
+  Workspace ws(StrictnessLevel::Draft, IddFileType::EnergyPlus);
+
+  EXPECT_EQ("Zone 1", ws.nextName(IddObjectType::Zone, false));
+  EXPECT_EQ("Zone 1", ws.nextName(IddObjectType::Zone, true));
+
+  boost::optional<WorkspaceObject> zone = ws.addObject(IdfObject(IddObjectType::Zone));
+  ASSERT_TRUE(zone);
+  EXPECT_EQ("Zone 1", zone->name().get());
+  EXPECT_EQ("Zone 2", ws.nextName(IddObjectType::Zone, false));
+  EXPECT_EQ("Zone 2", ws.nextName(IddObjectType::Zone, true));
+
+  zone->setName("Zone 2");
+  EXPECT_EQ("Zone 2", zone->name().get());
+  EXPECT_EQ("Zone 3", ws.nextName(IddObjectType::Zone, false));
+  EXPECT_EQ("Zone 1", ws.nextName(IddObjectType::Zone, true));
+
+  zone->setName("{af63d539-6e16-4fd1-a10e-dafe3793373b}");
+  EXPECT_EQ("{af63d539-6e16-4fd1-a10e-dafe3793373b}", zone->name().get());
+  EXPECT_EQ("Zone 1", ws.nextName(IddObjectType::Zone, false));
+  EXPECT_EQ("Zone 1", ws.nextName(IddObjectType::Zone, true));
+
+  zone->setName("Zone 1");
+
+  zone = ws.addObject(IdfObject(IddObjectType::Zone));
+  zone->setName("Zone 2");
+  EXPECT_EQ("Zone 2", zone->name().get());
+  EXPECT_EQ("Zone 3", ws.nextName(IddObjectType::Zone, false));
+  EXPECT_EQ("Zone 3", ws.nextName(IddObjectType::Zone, true));
+
+  zone->setName("{af63d539-6e16-4fd1-a10e-dafe3793373b}");
+  EXPECT_EQ("{af63d539-6e16-4fd1-a10e-dafe3793373b}", zone->name().get());
+  EXPECT_EQ("Zone 2", ws.nextName(IddObjectType::Zone, false));
+  EXPECT_EQ("Zone 2", ws.nextName(IddObjectType::Zone, true));
+}
+
+TEST_F(IdfFixture, Workspace_GetObjectsByNameUUID) 
+{
+  Workspace ws(StrictnessLevel::Draft, IddFileType::EnergyPlus);
+
+  boost::optional<WorkspaceObject> zone = ws.addObject(IdfObject(IddObjectType::Zone));
+  EXPECT_EQ("Zone 1", zone->name().get());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone", false).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone 1", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone 1", false).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone 2", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone 2", false).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("{af63d539-6e16-4fd1-a10e-dafe3793373b}", true).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("{af63d539-6e16-4fd1-a10e-dafe3793373b}", false).size());
+
+  zone->setName("Zone 2");
+  EXPECT_EQ("Zone 2", zone->name().get());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone", false).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone 1", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone 1", false).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone 2", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("Zone 2", false).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("{af63d539-6e16-4fd1-a10e-dafe3793373b}", true).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("{af63d539-6e16-4fd1-a10e-dafe3793373b}", false).size());
+
+  zone->setName("{af63d539-6e16-4fd1-a10e-dafe3793373b}");
+  EXPECT_EQ("{af63d539-6e16-4fd1-a10e-dafe3793373b}", zone->name().get());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone", true).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone", false).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone 1", true).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone 1", false).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone 2", true).size());
+  EXPECT_EQ(0u, ws.getObjectsByName("Zone 2", false).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("{af63d539-6e16-4fd1-a10e-dafe3793373b}", true).size());
+  EXPECT_EQ(1u, ws.getObjectsByName("{af63d539-6e16-4fd1-a10e-dafe3793373b}", false).size());
 }

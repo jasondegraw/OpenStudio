@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -48,11 +48,11 @@ boost::optional<model::ModelObject> ReverseTranslator::translateExteriorLights(
   OptionalString s;
   OptionalDouble d;
 
-  if (s = workspaceObject.name()) {
+  if ((s = workspaceObject.name())) {
     definition.setName(*s + " Definition");
   }
 
-  if (d = workspaceObject.getDouble(Exterior_LightsFields::DesignLevel)) {
+  if ((d = workspaceObject.getDouble(Exterior_LightsFields::DesignLevel))){
     definition.setDesignLevel(*d);
   }
 
@@ -79,17 +79,17 @@ boost::optional<model::ModelObject> ReverseTranslator::translateExteriorLights(
     exteriorLights = model::ExteriorLights(definition);
   }
 
-  BOOST_ASSERT(exteriorLights);
+  OS_ASSERT(exteriorLights);
 
-  if (s = workspaceObject.name()) {
+  if ((s = workspaceObject.name())) {
     exteriorLights->setName(*s);
   }
 
-  if (s = workspaceObject.getString(Exterior_LightsFields::ControlOption,false,true)) {
+  if ((s = workspaceObject.getString(Exterior_LightsFields::ControlOption,false,true))) {
     exteriorLights->setControlOption(*s);
   }
 
-  if (s = workspaceObject.getString(Exterior_LightsFields::EndUseSubcategory,false,true)) {
+  if ((s = workspaceObject.getString(Exterior_LightsFields::EndUseSubcategory,false,true))) {
     exteriorLights->setEndUseSubcategory(*s);
   }
 

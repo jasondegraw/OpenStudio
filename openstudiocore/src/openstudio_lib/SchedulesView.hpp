@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -90,6 +90,8 @@ class YearOverview;
 class ScheduleTab;
 
 class OSCheckBox;
+
+class OSCheckBox2;
 
 class OSLineEdit;
 
@@ -609,19 +611,19 @@ class ScheduleRuleView : public QWidget
 
   boost::optional<model::YearDescription> m_yearDescription;
 
-  OSCheckBox * m_sundayButton;
+  OSCheckBox2 * m_sundayButton;
 
-  OSCheckBox * m_mondayButton;
+  OSCheckBox2 * m_mondayButton;
 
-  OSCheckBox * m_tuesdayButton;
+  OSCheckBox2 * m_tuesdayButton;
 
-  OSCheckBox * m_wednesdayButton;
+  OSCheckBox2 * m_wednesdayButton;
 
-  OSCheckBox * m_thursdayButton;
+  OSCheckBox2 * m_thursdayButton;
 
-  OSCheckBox * m_fridayButton;
+  OSCheckBox2 * m_fridayButton;
 
-  OSCheckBox * m_saturdayButton;
+  OSCheckBox2 * m_saturdayButton;
 
   OSLineEdit * m_nameEditField;
 

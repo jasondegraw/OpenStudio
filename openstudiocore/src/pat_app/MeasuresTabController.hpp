@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@
 
 #include "../shared_gui_components/OSListController.hpp"
 #include "../shared_gui_components/OSListView.hpp"
-#include <analysis/DiscreteVariable.hpp>
-#include <analysis/RubyPerturbation.hpp>
-#include <analysis/RubyPerturbation.hpp>
+#include <analysis/MeasureGroup.hpp>
+#include <analysis/RubyMeasure.hpp>
+#include <analysis/RubyMeasure.hpp>
 #include <utilities/bcl/BCLMeasure.hpp>
 #include <QObject>
 #include <QPointer>

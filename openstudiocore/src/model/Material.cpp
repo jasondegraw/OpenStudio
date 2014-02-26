@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <model/Material.hpp>
 #include <model/Material_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 #include <boost/foreach.hpp>
 
@@ -54,7 +56,7 @@ namespace detail {
 Material::Material(IddObjectType type,const Model& model)
   : ResourceObject(type,model) 
 {
-  BOOST_ASSERT(getImpl<detail::Material_Impl>());
+  OS_ASSERT(getImpl<detail::Material_Impl>());
 }
 
 double Material::thickness() const {

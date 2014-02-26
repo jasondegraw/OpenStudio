@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,12 +37,12 @@ namespace detail {
   RunPeriodControlDaylightSavingTime_Impl::RunPeriodControlDaylightSavingTime_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == RunPeriodControlDaylightSavingTime::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == RunPeriodControlDaylightSavingTime::iddObjectType());
 
     bool result = setString(OS_RunPeriodControl_DaylightSavingTimeFields::StartDate, "2nd Sunday in March");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = setString(OS_RunPeriodControl_DaylightSavingTimeFields::EndDate, "1st Sunday in November");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   RunPeriodControlDaylightSavingTime_Impl::RunPeriodControlDaylightSavingTime_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -50,7 +50,7 @@ namespace detail {
                                                      bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == RunPeriodControlDaylightSavingTime::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == RunPeriodControlDaylightSavingTime::iddObjectType());
   }
 
   RunPeriodControlDaylightSavingTime_Impl::RunPeriodControlDaylightSavingTime_Impl(const RunPeriodControlDaylightSavingTime_Impl& other,
@@ -87,25 +87,25 @@ namespace detail {
 
   openstudio::Date RunPeriodControlDaylightSavingTime_Impl::startDate() const {
     boost::optional<std::string> text = getString(OS_RunPeriodControl_DaylightSavingTimeFields::StartDate);
-    BOOST_ASSERT(text);
+    OS_ASSERT(text);
     return getDate(*text);
   }
 
   boost::optional<openstudio::NthDayOfWeekInMonth> RunPeriodControlDaylightSavingTime_Impl::startNthDayOfWeekInMonth() const {
     boost::optional<std::string> text = getString(OS_RunPeriodControl_DaylightSavingTimeFields::StartDate);
-    BOOST_ASSERT(text);
+    OS_ASSERT(text);
     return getNthDayOfWeekInMonth(*text);
   }
 
   openstudio::Date RunPeriodControlDaylightSavingTime_Impl::endDate() const {
     boost::optional<std::string> text = getString(OS_RunPeriodControl_DaylightSavingTimeFields::EndDate);
-    BOOST_ASSERT(text);
+    OS_ASSERT(text);
     return getDate(*text);
   }
 
   boost::optional<openstudio::NthDayOfWeekInMonth> RunPeriodControlDaylightSavingTime_Impl::endNthDayOfWeekInMonth() const {
     boost::optional<std::string> text = getString(OS_RunPeriodControl_DaylightSavingTimeFields::EndDate);
-    BOOST_ASSERT(text);
+    OS_ASSERT(text);
     return getNthDayOfWeekInMonth(*text);
   }
 
@@ -147,7 +147,7 @@ namespace detail {
         ss << "5th " << dayOfWeek.valueName() << " in " << monthOfYear.valueName();
         break;
       default:
-        BOOST_ASSERT(false);
+        OS_ASSERT(false);
     }
     
     return setString(OS_RunPeriodControl_DaylightSavingTimeFields::StartDate, ss.str());
@@ -191,10 +191,15 @@ namespace detail {
         ss << "5th " << dayOfWeek.valueName() << " in " << monthOfYear.valueName();
         break;
       default:
-        BOOST_ASSERT(false);
+        OS_ASSERT(false);
     }
     
     return setString(OS_RunPeriodControl_DaylightSavingTimeFields::EndDate, ss.str());
+  }
+
+  void RunPeriodControlDaylightSavingTime_Impl::ensureNoLeapDays()
+  {
+    LOG(Warn, "Ensure no leap days is not yet implemented for run control daylight saving time");
   }
 
   openstudio::Date RunPeriodControlDaylightSavingTime_Impl::getDate(const std::string& text) const
@@ -310,6 +315,11 @@ bool RunPeriodControlDaylightSavingTime::setEndDate(const openstudio::MonthOfYea
 
 bool RunPeriodControlDaylightSavingTime::setEndDate(const openstudio::NthDayOfWeekInMonth& nth, const openstudio::DayOfWeek& dayOfWeek, const openstudio::MonthOfYear& monthOfYear){
   return getImpl<detail::RunPeriodControlDaylightSavingTime_Impl>()->setEndDate(nth, dayOfWeek, monthOfYear);
+}
+
+void RunPeriodControlDaylightSavingTime::ensureNoLeapDays()
+{
+  getImpl<detail::RunPeriodControlDaylightSavingTime_Impl>()->ensureNoLeapDays();
 }
 
 /// @cond

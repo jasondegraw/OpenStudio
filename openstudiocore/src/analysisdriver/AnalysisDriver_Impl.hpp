@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 
 #include <analysisdriver/AnalysisDriverAPI.hpp>
 #include <analysisdriver/CurrentAnalysis.hpp>
+#include <analysisdriver/AnalysisDriverEnums.hpp>
 
 #include <project/ProjectDatabase.hpp>
 
@@ -104,6 +105,8 @@ namespace detail {
 
     bool isRunning() const;
 
+    AnalysisStatus status() const;
+
     /** Call this method between .run calls and code that should execute once the analysis is
      *  finished. */
     bool waitForFinished(int m_secs);
@@ -150,13 +153,18 @@ namespace detail {
 
     void analysisStopped(const openstudio::UUID& analysis);
 
+    void analysisStatusChanged(analysisdriver::AnalysisStatus newStatus);
+
    private:
     REGISTER_LOGGER("openstudio.analysisdriver.AnalysisDriver");
 
     bool m_running;
     std::vector<UUID> m_stopping;
+    AnalysisStatus m_status;
     project::ProjectDatabase m_database;
     std::vector<CurrentAnalysis> m_currentAnalyses;
+    
+    void setStatus(AnalysisStatus status);
 
     void cleanOutIncompleteJobs(analysis::Analysis& analysis);
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,6 +37,8 @@ class SetpointManagerScheduled;
 class SetpointManagerFollowOutdoorAirTemperature;
 
 class SetpointManagerOutdoorAirReset;
+
+class SetpointManagerWarmest;
 
 namespace detail {
   class Node_Impl;
@@ -101,6 +103,15 @@ class MODEL_API Node : public StraightComponent {
 
   /** Returns the optional SetpointManagerOutdoorAirReset associated with this Node.  **/
   boost::optional<SetpointManagerOutdoorAirReset> setpointManagerOutdoorAirReset() const;
+
+  /** Removes any SetpointManagerWarmest objects from this Node. **/
+  void removeSetpointManagerWarmest();
+
+  /** Returns the optional SetpointManagerWarmest associated with this Node.  **/
+  boost::optional<SetpointManagerWarmest> setpointManagerWarmest() const;
+
+  /** Adds setPointManager of type SetpointManagerWarmest to this Node. **/
+  void addSetpointManagerWarmest( SetpointManagerWarmest & setPointManager );
 
   bool addToNode(Node & node);
 

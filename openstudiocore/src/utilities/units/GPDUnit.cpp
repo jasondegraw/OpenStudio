@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <utilities/units/GPDUnit.hpp>
 #include <utilities/units/GPDUnit_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace detail {
@@ -60,7 +62,7 @@ namespace detail {
   }
 
   Unit GPDUnit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::GPD);
+    OS_ASSERT(system() == UnitSystem::GPD);
     boost::shared_ptr<GPDUnit_Impl> impl(new GPDUnit_Impl(*this));
     return GPDUnit(impl).cast<Unit>();
   }

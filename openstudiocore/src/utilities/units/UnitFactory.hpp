@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -87,6 +87,10 @@ class UTILITIES_API UnitFactorySingleton {
  private:
   REGISTER_LOGGER("openstudio.units.UnitFactory");
   UnitFactorySingleton();
+
+  typedef std::map<std::string,boost::optional<Unit> > ResultCacheMap;
+
+  mutable ResultCacheMap m_resultCacheMap;
 
   typedef std::map<std::string,CreateUnitCallback> StandardStringCallbackMap;
   typedef std::map<UnitSystem,StandardStringCallbackMap> CallbackMapMap;

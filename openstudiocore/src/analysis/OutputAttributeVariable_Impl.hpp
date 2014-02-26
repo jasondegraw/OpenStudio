@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -26,12 +26,13 @@
 namespace openstudio {
 namespace analysis {
 
+class OutputAttributeVariable;
+
 namespace detail {
 
   /** OutputAttributeVariable_Impl is an OutputVariable_Impl that is the implementation
    *  class for OutputAttributeVariable.*/
   class ANALYSIS_API OutputAttributeVariable_Impl : public OutputVariable_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -72,6 +73,14 @@ namespace detail {
     //@{
 
     void setAttributeName(const std::string& attributeName);
+
+    //@}
+    /** @name Protected in Public Class */
+    //@{
+
+    virtual QVariant toVariant() const;
+
+    static OutputAttributeVariable fromVariant(const QVariant& variant, const VersionString& version);
 
     //@}
    private:

@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -18,10 +18,14 @@
 **********************************************************************/
 
 #include <utilities/bcl/BCLXML.hpp>
-#include <utilities/core/System.hpp>
+
 #include <utilities/data/Attribute.hpp>
+
 #include <utilities/units/Unit.hpp>
 #include <utilities/units/Quantity.hpp>
+
+#include <utilities/core/String.hpp>
+#include <utilities/core/System.hpp>
 
 #include <QDomDocument>
 #include <QFile>
@@ -31,8 +35,8 @@ namespace openstudio{
   BCLXML::BCLXML(const BCLXMLType& bclXMLType)
     : m_bclXMLType(bclXMLType)
   {
-    m_uid = UUID::createUuid().toString().replace("{", "").replace("}", "").toStdString();
-    m_versionId = UUID::createUuid().toString().replace("{", "").replace("}", "").toStdString();
+    m_uid = removeBraces(UUID::createUuid());
+    m_versionId = removeBraces(UUID::createUuid());
   }
 
   BCLXML::BCLXML(const openstudio::path& xmlPath):
@@ -92,7 +96,7 @@ namespace openstudio{
           softwareProgramVersion = versionElement.firstChildElement("identifier").firstChild().nodeValue().toStdString();
         }
         std::string fileName = fileElement.firstChildElement("filename").firstChild().nodeValue().toStdString();
-        std::string fileType = fileElement.firstChildElement("filetype").firstChild().nodeValue().toStdString();
+        //std::string fileType = fileElement.firstChildElement("filetype").firstChild().nodeValue().toStdString();
         std::string usageType = fileElement.firstChildElement("usage_type").firstChild().nodeValue().toStdString();
         std::string checksum = fileElement.firstChildElement("checksum").firstChild().nodeValue().toStdString();
 
@@ -500,7 +504,7 @@ namespace openstudio{
           dataType = "float";
           break;
         case AttributeValueType::Quantity :
-          value = boost::lexical_cast<double>(attribute.valueAsQuantity());
+          value = toString(attribute.valueAsQuantity().value());
           dataType = "float";
           break;
         case AttributeValueType::Unit :
@@ -613,12 +617,12 @@ namespace openstudio{
 
   void BCLXML::changeUID()
   {
-    m_uid = UUID::createUuid().toString().replace("{", "").replace("}", "").toStdString();
+    m_uid = removeBraces(UUID::createUuid());
   }
 
   void BCLXML::incrementVersionId()
   {
-    m_versionId = UUID::createUuid().toString().replace("{", "").replace("}", "").toStdString();
+    m_versionId = removeBraces(UUID::createUuid());
   }
 
 

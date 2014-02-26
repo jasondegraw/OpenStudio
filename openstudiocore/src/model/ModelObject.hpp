@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -304,6 +304,7 @@ class MODEL_API ModelObject : public openstudio::WorkspaceObject {
   typedef detail::ModelObject_Impl ImplType;
 
   friend class openstudio::IdfObject;
+  friend class openstudio::IdfExtensibleGroup;
   friend class openstudio::detail::IdfObject_Impl;
   friend class detail::ModelObject_Impl;
   friend class openstudio::ModelObjectSelectorView;

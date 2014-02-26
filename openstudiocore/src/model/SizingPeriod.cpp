@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -85,13 +85,19 @@ namespace detail {
 SizingPeriod::SizingPeriod(IddObjectType type,const Model& model)
   : ParentObject(type,model) 
 {
-  BOOST_ASSERT(getImpl<detail::SizingPeriod_Impl>());
+  OS_ASSERT(getImpl<detail::SizingPeriod_Impl>());
 }
 
 // constructor
 SizingPeriod::SizingPeriod(boost::shared_ptr<detail::SizingPeriod_Impl> impl)
   : ParentObject(impl)
 {}
+
+// ensure that this object does not contain the date 2/29
+void SizingPeriod::ensureNoLeapDays()
+{
+  getImpl<detail::SizingPeriod_Impl>()->ensureNoLeapDays();
+}
 
 } // model
 } // openstudio

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -73,6 +73,94 @@ namespace detail {
   {
     m_osresult = r;
   }
+
+  void ToolBasedJob::ErrorInfo::osResult(const std::vector<openstudio::ruleset::OSResult> &r)
+  {
+    if (r.size() > 1)
+    {
+      boost::optional<LogMessage> initialCondition;
+      boost::optional<LogMessage> finalCondition;
+
+      std::vector<LogMessage> errors;
+      std::vector<LogMessage> warnings;
+      std::vector<LogMessage> info;
+
+
+      openstudio::ruleset::OSResultValue value = openstudio::ruleset::OSResultValue::NA;
+
+      openstudio::ruleset::OSResult result;
+
+      for (size_t i = 0; i < r.size(); ++i)
+      {
+        boost::optional<LogMessage> rinitialCondition = r[i].initialCondition();
+        boost::optional<LogMessage> rfinalCondition = r[i].finalCondition();
+
+        std::vector<LogMessage> rerrors = r[i].errors();
+        std::vector<LogMessage> rwarnings = r[i].warnings();
+        std::vector<LogMessage> rinfo = r[i].info();
+
+        openstudio::ruleset::OSResultValue rvalue = r[i].value();
+
+
+        if (initialCondition && rinitialCondition)
+        {
+          initialCondition = LogMessage(initialCondition->logLevel(), initialCondition->logChannel(), initialCondition->logMessage() + " Script: " + boost::lexical_cast<std::string>(i+1) + " " + rinitialCondition->logMessage());
+        } else if (rinitialCondition) {
+          initialCondition = LogMessage(rinitialCondition->logLevel(), rinitialCondition->logChannel(), "Script: " + boost::lexical_cast<std::string>(i+1) + " " + rinitialCondition->logMessage());
+        }
+
+        if (finalCondition && rfinalCondition)
+        {
+          finalCondition = LogMessage(finalCondition->logLevel(), finalCondition->logChannel(), finalCondition->logMessage() + " Script: " + boost::lexical_cast<std::string>(i+1) + " " + rfinalCondition->logMessage());
+        } else if (rfinalCondition) {
+          finalCondition = LogMessage(rfinalCondition->logLevel(), rfinalCondition->logChannel(), "Script: " + boost::lexical_cast<std::string>(i+1) + " " + rfinalCondition->logMessage());
+        }
+
+        for (std::vector<LogMessage>::const_iterator itr = rerrors.begin();
+             itr != rerrors.end();
+             ++itr)
+        {
+          result.addError(itr->logChannel(), "Script: " + boost::lexical_cast<std::string>(i+1) + " " + itr->logMessage());
+        }
+
+        for (std::vector<LogMessage>::const_iterator itr = rwarnings.begin();
+             itr != rwarnings.end();
+             ++itr)
+        {
+          result.addWarning(itr->logChannel(), "Script: " + boost::lexical_cast<std::string>(i+1) + " " + itr->logMessage());
+        }
+
+        for (std::vector<LogMessage>::const_iterator itr = rinfo.begin();
+             itr != rinfo.end();
+             ++itr)
+        {
+          result.addInfo(itr->logChannel(), "Script: " + boost::lexical_cast<std::string>(i+1) + " " + itr->logMessage());
+        }
+
+        if (value == openstudio::ruleset::OSResultValue::Fail || rvalue == openstudio::ruleset::OSResultValue::Fail)
+        {
+          value = openstudio::ruleset::OSResultValue::Fail;
+        } else if (value == openstudio::ruleset::OSResultValue::Success|| rvalue == openstudio::ruleset::OSResultValue::Success) {
+          value = openstudio::ruleset::OSResultValue::Success;
+        }
+      }
+
+      result.setValue(value);
+
+      if (initialCondition)
+      {
+        result.setInitialCondition(initialCondition->logChannel(), initialCondition->logMessage());
+      }
+
+      if (finalCondition)
+      {
+        result.setFinalCondition(finalCondition->logChannel(), finalCondition->logMessage());
+      }
+    } else if (r.size() == 1) {
+      m_osresult = r.front();
+    }
+  }
+
 
   void ToolBasedJob::ErrorInfo::addLogMessages(openstudio::runmanager::ErrorType t_type, 
       const std::vector<openstudio::LogMessage> &t_msgs, std::vector<std::pair<ErrorType, std::string> > &t_errors)
@@ -437,6 +525,31 @@ namespace detail {
   std::vector<std::pair<openstudio::path, openstudio::path> > ToolBasedJob::acquireRequiredFiles(
       const std::vector<std::pair<QUrl, openstudio::path> > &t_urls)
   {
+    class RequiredFileChecker
+    {
+      public:
+        /// Track which required files have been added, returning false if the destination exists
+        /// while logging an error as to what exactly happened
+        bool addFile(const openstudio::path &t_from, const openstudio::path &t_to)
+        {
+          std::map<openstudio::path, openstudio::path>::const_iterator itr = m_files.find(t_to);
+
+          if (itr != m_files.end())
+          {
+            LOG(Error, "acquireRequiredFiles: Unable to add file From: '" << openstudio::toString(t_from) << "' to '" << openstudio::toString(t_to) << "'. Existing required file from: '" << openstudio::toString(itr->second) << "' to '" << openstudio::toString(itr->first) << "' already exists.");
+            return false;
+          } else {
+            m_files[t_to] = t_from;
+            return true;
+          }
+        }
+
+      private:
+      std::map<openstudio::path, openstudio::path> m_files;
+    };
+
+    RequiredFileChecker rfc;
+
     std::vector<std::pair<openstudio::path, openstudio::path> > retval;
 
     for (std::vector<std::pair<QUrl, openstudio::path> >::const_iterator itr = t_urls.begin();
@@ -517,19 +630,24 @@ namespace detail {
                     relative = addfolder / relative;
                   }
 
-                  m_addedRequiredFiles.insert(std::make_pair(p, relative));
+                  if (rfc.addFile(p, itr->second.parent_path() / relative))
+                  {
+                    m_addedRequiredFiles.insert(std::make_pair(p, relative));
 
-                  LOG(Info, "Adding OSM requesite file: " << openstudio::toString(p) 
-                      << " to be installed at: " << openstudio::toString(relative));
-                  retval.push_back(std::make_pair(p, itr->second.parent_path() / relative));
+                    LOG(Info, "Adding OSM requesite file: " << openstudio::toString(p) 
+                        << " to be installed at: " << openstudio::toString(relative));
+                    retval.push_back(std::make_pair(p, itr->second.parent_path() / relative));
+                  }
                 }
               }
             }
-
           }
         }
 
-        retval.push_back(std::make_pair(file, itr->second));
+        if (rfc.addFile(file, itr->second))
+        {
+          retval.push_back(std::make_pair(file, itr->second));
+        }
 
       } else {
         throw std::runtime_error("Unsupported file scheme: " + toString(itr->first.scheme()));
@@ -548,8 +666,10 @@ namespace detail {
     openstudio::path outpath = outdir();
 
     QWriteLocker l(&m_mutex);
+	std::vector<std::pair<openstudio::path, openstudio::path> > requiredFiles = acquireRequiredFiles(complete_required_files());
+	//m_copiedRequiredFiles.insert(requiredFiles.begin(), requiredFiles.end());
     boost::shared_ptr<Process> process = m_process_creator->createProcess(ti,
-        acquireRequiredFiles(complete_required_files()), m_parameters[t_toolName],
+        requiredFiles, m_parameters[t_toolName],
         outpath, std::vector<openstudio::path>(m_expectedOutputFiles.begin(), m_expectedOutputFiles.end()), "\n\n",
         getBasePath(),
         getRemoteId());
@@ -595,7 +715,7 @@ namespace detail {
       throw std::runtime_error("No more tool names");
     }
 
-    std::string name = m_toolNames.at(m_currentToolIndex);
+    std::string name = m_toolNames[m_currentToolIndex];
     ++m_currentToolIndex;
 
     return name;
@@ -608,7 +728,7 @@ namespace detail {
     try {
 //      LOG(Debug, "Getting next tool name: " << toString(uuid()));
       nextToolName = getNextToolName();
-    } catch (const std::exception &) {
+    } catch (const std::runtime_error &) {
       LOG(Debug, "Last Tool Completed: " << toString(uuid()));
       updateOutOfDateStatus(outOfDate());
       quit();
@@ -631,7 +751,8 @@ namespace detail {
       openstudio::path outpath = outdir();
       boost::filesystem::create_directories(outpath);
       openstudio::path stdoutpath = outpath / toPath("stdout");
-      std::ofstream ofs(toString(stdoutpath).c_str(), std::ios_base::out | std::ios_base::trunc);
+      // this ofstream exists to handle a corner case timing issue, to ensure that stdout is created no matter what
+      std::ofstream(toString(stdoutpath).c_str(), std::ios_base::out | std::ios_base::trunc);
     }
 
     QWriteLocker l(&m_mutex);
@@ -655,9 +776,6 @@ namespace detail {
     using namespace boost::filesystem;
 
     m_error_info = ErrorInfo(); // Reset error tracking for this run
-
-    // reset the output collected so far, in case this is the second run
-    m_output.clear();
 
     // reset parameters and files
     m_required_files.clear();
@@ -783,7 +901,7 @@ namespace detail {
 
   void ToolBasedJob::standardCleanImpl()
   {
-    /*
+    
     QReadLocker l(&m_mutex);
 
     for (std::map<ToolInfo, boost::shared_ptr<Process> >::iterator itr = m_processes.begin();
@@ -792,7 +910,7 @@ namespace detail {
     {
       itr->second->cleanUpRequiredFiles();
     }  
-  */  
+    
   }
 
   void ToolBasedJob::copyRequiredFiles(const FileInfo &infile, const std::string &extin, const openstudio::path &filename)
@@ -885,10 +1003,19 @@ namespace detail {
     return f;
   }
 
-  std::string ToolBasedJob::getOutput() const
-  {
-    QReadLocker l(&m_mutex);
-    return m_output;
+  std::string ToolBasedJob::getOutput() const {
+    std::string result;
+    QWriteLocker l(&m_mutex);
+    std::ifstream ifs(toString(outdir() / toPath("stdout")).c_str(), std::ios_base::in | std::ios::binary);
+    if (ifs) {
+      ifs.seekg(0,std::ios::end);
+      result.resize(ifs.tellg());
+      ifs.seekg(0,std::ios::beg);
+      ifs.read(&result[0],result.size());
+      ifs.close();
+    }
+    l.unlock();
+    return result;
   }
 
   void ToolBasedJob::processError(QProcess::ProcessError t_e, const std::string &t_desc)
@@ -928,20 +1055,46 @@ namespace detail {
       m_error_info.errorFile(openstudio::energyplus::ErrorFile(errpath));
     }
 
-    openstudio::path resultpath = outpath / toPath("result.ossr");
-    if (boost::filesystem::exists(resultpath))
+    std::vector<FileInfo> resultpaths = outfiles.getAllByFilename("result.ossr").files();
+    if (!resultpaths.empty())
     {
-      LOG(Debug, "Setting osresult file: " << openstudio::toString(resultpath));
-      boost::optional<openstudio::ruleset::OSResult> osresult = openstudio::ruleset::OSResult::load(resultpath);
-
-      if (osresult)
+      std::vector<openstudio::ruleset::OSResult> results;
+      for (std::vector<FileInfo>::const_iterator itr = resultpaths.begin();
+           itr != resultpaths.end();
+           ++itr)
       {
-        m_error_info.osResult(*osresult);
-      } else {
-        LOG(Error, "Error loading osresult file: " << openstudio::toString(resultpath));
+        openstudio::path p = itr->fullPath;
+        std::string parent_path = openstudio::toString(p.parent_path().filename());
+        size_t numpos = parent_path.find("mergedjob-");
+        int num = 0;
+        if (numpos == 0)
+        {
+          num = atoi(parent_path.substr(std::string("mergedjob-").size()).c_str());
+        }
+
+
+        if (results.size() < static_cast<size_t>(num+1))
+        {
+          results.resize(num+1);
+        }
+
+        LOG(Debug, "Attempting to load results for merged job: " << num);
+
+        boost::optional<openstudio::ruleset::OSResult> osresult = openstudio::ruleset::OSResult::load(p);
+
+        if (osresult)
+        {
+          results[num] = *osresult;
+        } else {
+          LOG(Error, "Error loading osresult file: " << openstudio::toString(p));
+        }
       }
+
+      LOG(Debug, "Setting osresult files: " << results.size());
+      m_error_info.osResult(results);
+
     } else {
-      LOG(Debug, "No osresult file found at: " << openstudio::toString(resultpath));
+      LOG(Debug, "No osresult file found at: " << openstudio::toString(outpath));
     }
 
     JobErrors e = m_error_info.errors();
@@ -988,18 +1141,18 @@ namespace detail {
 
   void ToolBasedJob::processStandardErrDataAdded(const std::string &data)
   {
+    QWriteLocker l(&m_mutex);
     std::ofstream ofs(toString(outdir() / toPath("stderr")).c_str(), std::ios_base::out | std::ios_base::app);
     ofs << data;
+    l.unlock();
   }
 
-  void ToolBasedJob::processStandardOutDataAdded(const std::string &data)
-  {
+  void ToolBasedJob::processStandardOutDataAdded(const std::string &data) {
     LOG(Trace, "stdout: " << boost::trim_copy(data));
-    std::ofstream ofs(toString(outdir() / toPath("stdout")).c_str(), std::ios_base::out | std::ios_base::app);
-    ofs << data;
 
     QWriteLocker l(&m_mutex);
-    m_output += data;
+    std::ofstream ofs(toString(outdir() / toPath("stdout")).c_str(), std::ios_base::out | std::ios_base::app);
+    ofs << data;
     l.unlock();
 
     emitOutputDataAdded(data);

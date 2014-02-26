@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,6 +33,8 @@
 #include <utilities/idd/ElectricEquipment_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>
 
+#include <utilities/core/Assert.hpp>
+
 using namespace openstudio::model;
 
 namespace openstudio {
@@ -55,7 +57,7 @@ OptionalModelObject ReverseTranslator::translateElectricEquipment( const Workspa
   }
 
   s = workspaceObject.getString(openstudio::ElectricEquipmentFields::DesignLevelCalculationMethod, true);
-  BOOST_ASSERT(s);
+  OS_ASSERT(s);
 
   OptionalDouble d;
   if (istringEqual("EquipmentLevel", *s)){

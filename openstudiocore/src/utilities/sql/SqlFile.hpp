@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -73,11 +73,18 @@ class UTILITIES_API SqlFile {
   explicit SqlFile(const openstudio::path& path);
 
   /// initializes a new sql file for output
+  /// Does not create the indexes, that must be done manually
   SqlFile(const openstudio::path &t_path, const openstudio::EpwFile &t_epwFile, const openstudio::DateTime &t_simulationTime,
       const openstudio::Calendar &t_calendar);
 
   // virtual destructor
   virtual ~SqlFile();
+
+  // Remove indexes that exist, useful for performance reasons.
+  void removeIndexes();
+
+  // create indexes on the sql file if they do not exist
+  void createIndexes();
 
   //@}
   /** @name File Queries and Operations */
@@ -88,6 +95,9 @@ class UTILITIES_API SqlFile {
 
   /// get the path
   openstudio::path path() const;
+
+  /// \returns true if the sqlfile is of a version that's in our supported range
+  bool supportedVersion() const;
 
   /// close the file
   bool close();

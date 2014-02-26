@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -178,7 +178,7 @@ boost::optional<IdfObject> ForwardTranslator::translateThermalZone( ThermalZone 
   if (spaces.empty()){
     LOG(Warn, "ThermalZone " << modelObject.name().get() << " does not have any geometry or loads associated with it.");
   }else{
-    BOOST_ASSERT(spaces.size() == 1);
+    OS_ASSERT(spaces.size() == 1);
 
     if (!spaces[0].isDirectionofRelativeNorthDefaulted()){
       idfObject.setDouble(openstudio::ZoneFields::DirectionofRelativeNorth, spaces[0].directionofRelativeNorth());
@@ -503,7 +503,7 @@ boost::optional<IdfObject> ForwardTranslator::translateThermalZone( ThermalZone 
     // Thermostat
     boost::optional<ThermostatSetpointDualSetpoint> thermostat;
     boost::optional<IdfObject> idfThermostat;
-    if(thermostat = modelObject.thermostatSetpointDualSetpoint() )
+    if((thermostat = modelObject.thermostatSetpointDualSetpoint()))
     {
       IdfObject zoneControlThermostat(openstudio::IddObjectType::ZoneControl_Thermostat);
       zoneControlThermostat.setString(ZoneControl_ThermostatFields::Name,modelObject.name().get() + " Thermostat");
@@ -629,7 +629,7 @@ boost::optional<IdfObject> ForwardTranslator::translateThermalZone( ThermalZone 
     if (sizingPeriod.size() > 0){
       SizingZone sizingZone = modelObject.sizingZone();
       sizingZoneIdf = translateAndMapModelObject(sizingZone);
-      BOOST_ASSERT(sizingZoneIdf);
+      OS_ASSERT(sizingZoneIdf);
     }
 
     // map the design specification outdoor air

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,12 +23,18 @@
 #include <model/Component.hpp>
 #include <model/ModelObject.hpp>
 #include <model/ModelObject_Impl.hpp>
+#include <model/Node.hpp>
+#include <model/Node_Impl.hpp>
+#include <model/AirLoopHVAC.hpp>
+#include <model/AirLoopHVAC_Impl.hpp>
 #include <model/Facility.hpp>
 #include <model/Facility_Impl.hpp>
 #include <model/Building.hpp>
 #include <model/Building_Impl.hpp>
 #include <model/ThermalZone.hpp>
 #include <model/ThermalZone_Impl.hpp>
+#include <model/ShadingSurfaceGroup.hpp>
+#include <model/ShadingSurfaceGroup_Impl.hpp>
 #include <model/Site.hpp>
 #include <model/Site_Impl.hpp>
 #include <model/WeatherFile.hpp>
@@ -43,12 +49,23 @@
 #include <model/Timestep.hpp>
 #include <model/Timestep_Impl.hpp>
 #include <model/Meter.hpp>
+#include <model/OutputVariable.hpp>
 #include <model/SimulationControl.hpp>
 #include <model/SimulationControl_Impl.hpp>
 #include <model/RunPeriod.hpp>
 #include <model/RunPeriod_Impl.hpp>
 #include <model/YearDescription.hpp>
 #include <model/YearDescription_Impl.hpp>
+#include <model/OutputControlReportingTolerances.hpp>
+#include <model/OutputControlReportingTolerances_Impl.hpp>
+#include <model/ChillerElectricEIR.hpp>
+#include <model/ChillerElectricEIR_Impl.hpp>
+#include <model/CoolingTowerSingleSpeed.hpp>
+#include <model/CoolingTowerSingleSpeed_Impl.hpp>
+#include <model/BoilerHotWater.hpp>
+#include <model/BoilerHotWater_Impl.hpp>
+#include <model/SizingParameters.hpp>
+#include <model/SizingParameters_Impl.hpp>
 
 #include <energyplus/ReverseTranslator.hpp>
 
@@ -74,6 +91,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QThread>
+#include <QFileInfo>
 
 namespace openstudio {
 namespace sdd {
@@ -169,26 +187,44 @@ namespace sdd {
 
     // get project, assume one project per file
     QDomElement projectElement = element.firstChildElement("Proj");
-    if (!projectElement.isNull()){
+    if (projectElement.isNull()){
+      LOG(Error, "Could not find required element 'Proj'");
+    }else{
 
       result = openstudio::model::Model();
       result->setFastNaming(true);
 
       // do runperiod
       boost::optional<model::ModelObject> runPeriod = translateRunPeriod(projectElement, doc, *result);
-      //BOOST_ASSERT(!runPeriod.empty()); // what type of error handling do we want?
+      //OS_ASSERT(!runPeriod.empty()); // what type of error handling do we want?
 
       // do design days
       std::vector<WorkspaceObject> designDays = translateDesignDays(projectElement, doc, *result);
-      //BOOST_ASSERT(!designDays.empty()); // what type of error handling do we want?
+      //OS_ASSERT(!designDays.empty()); // what type of error handling do we want?
 
       // do weather file
       boost::optional<model::ModelObject> weatherFile = translateWeatherFile(projectElement, doc, *result);
-      //BOOST_ASSERT(weatherFile); // what type of error handling do we want?
+      //OS_ASSERT(weatherFile); // what type of error handling do we want?
 
       // do site after design days and weather file
       boost::optional<model::ModelObject> site = translateSite(projectElement, doc, *result);
-      BOOST_ASSERT(site); // what type of error handling do we want?
+      //OS_ASSERT(site); // what type of error handling do we want?
+      if (!site){
+        LOG(Error, "Could not find site information in SDD");
+      }
+
+      // Shading Model
+      QDomElement solDistributionElement = projectElement.firstChildElement("SolDistribution");
+      if(istringEqual("FullExterior",solDistributionElement.text().toStdString()))
+      {
+        model::SimulationControl simulationControl = result->getUniqueModelObject<model::SimulationControl>();
+        simulationControl.setSolarDistribution("FullExterior");
+      }
+      else if(istringEqual("MinimalShadowing",solDistributionElement.text().toStdString()))
+      {
+        model::SimulationControl simulationControl = result->getUniqueModelObject<model::SimulationControl>();
+        simulationControl.setSolarDistribution("MinimalShadowing");
+      }
 
       // HVACAutoSizing
       QDomElement hvacAutoSizingElement = projectElement.firstChildElement("HVACAutoSizing");
@@ -196,6 +232,10 @@ namespace sdd {
       {
         m_autosize = false;
       }
+
+      model::SizingParameters sp = result->getUniqueModelObject<model::SizingParameters>();
+      sp.setHeatingSizingFactor(1.0);
+      sp.setCoolingSizingFactor(1.0);
 
       // do materials before constructions
       QDomNodeList materialElements = projectElement.elementsByTagName("Mat");
@@ -209,7 +249,7 @@ namespace sdd {
       for (int i = 0; i < materialElements.count(); i++){
         QDomElement materialElement = materialElements.at(i).toElement();
         boost::optional<model::ModelObject> material = translateMaterial(materialElement, doc, *result);
-        BOOST_ASSERT(material); // what type of error handling do we want?
+        OS_ASSERT(material); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -230,7 +270,7 @@ namespace sdd {
       for (int i = 0; i < constructionElements.count(); i++){
         QDomElement constructionElement = constructionElements.at(i).toElement();
         boost::optional<model::ModelObject> construction = translateConstructAssembly(constructionElement, doc, *result);
-        BOOST_ASSERT(construction); // what type of error handling do we want?
+        OS_ASSERT(construction); // what type of error handling do we want?
                 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -249,7 +289,7 @@ namespace sdd {
       for (int i = 0; i < doorConstructionElements.count(); i++){
         QDomElement doorConstructionElement = doorConstructionElements.at(i).toElement();
         boost::optional<model::ModelObject> doorConstruction = translateDoorConstruction(doorConstructionElement, doc, *result);
-        BOOST_ASSERT(doorConstruction); // what type of error handling do we want?
+        OS_ASSERT(doorConstruction); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -268,7 +308,7 @@ namespace sdd {
       for (int i = 0; i < fenestrationConstructionElements.count(); i++){
         QDomElement fenestrationConstructionElement = fenestrationConstructionElements.at(i).toElement();
         boost::optional<model::ModelObject> fenestrationConstruction = translateFenestrationConstruction(fenestrationConstructionElement, doc, *result);
-        BOOST_ASSERT(fenestrationConstruction); // what type of error handling do we want?
+        OS_ASSERT(fenestrationConstruction); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -279,21 +319,21 @@ namespace sdd {
       for (int i = 0; i < crvDblQuadElements.count(); i++){
         QDomElement crvDblQuadElement = crvDblQuadElements.at(i).toElement();
         boost::optional<model::ModelObject> curve = translateCrvDblQuad(crvDblQuadElement, doc, *result);
-        BOOST_ASSERT(curve);
+        OS_ASSERT(curve);
       }
 
       QDomNodeList crvCubicElements = projectElement.elementsByTagName("CrvCubic");
       for (int i = 0; i < crvCubicElements.count(); i++){
         QDomElement crvCubicElement = crvCubicElements.at(i).toElement();
         boost::optional<model::ModelObject> curve = translateCrvCubic(crvCubicElement, doc, *result);
-        BOOST_ASSERT(curve);
+        OS_ASSERT(curve);
       }
 
       QDomNodeList crvQuadElements = projectElement.elementsByTagName("CrvQuad");
       for (int i = 0; i < crvQuadElements.count(); i++){
         QDomElement crvQuadElement = crvQuadElements.at(i).toElement();
         boost::optional<model::ModelObject> curve = translateCrvQuad(crvQuadElement, doc, *result);
-        BOOST_ASSERT(curve);
+        OS_ASSERT(curve);
       }
 
       // do schedules before loads
@@ -308,7 +348,7 @@ namespace sdd {
       for (int i = 0; i < scheduleDayElements.count(); i++){
         QDomElement scheduleDayElement = scheduleDayElements.at(i).toElement();
         boost::optional<model::ModelObject> scheduleDay = translateScheduleDay(scheduleDayElement, doc, *result);
-        BOOST_ASSERT(scheduleDay); // what type of error handling do we want?
+        OS_ASSERT(scheduleDay); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -326,7 +366,7 @@ namespace sdd {
       for (int i = 0; i < scheduleWeekElements.count(); i++){
         QDomElement scheduleWeekElement = scheduleWeekElements.at(i).toElement();
         boost::optional<model::ModelObject> scheduleWeek = translateScheduleWeek(scheduleWeekElement, doc, *result);
-        BOOST_ASSERT(scheduleWeek); // what type of error handling do we want?
+        OS_ASSERT(scheduleWeek); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -344,7 +384,7 @@ namespace sdd {
       for (int i = 0; i < scheduleElements.count(); i++){
         QDomElement scheduleElement = scheduleElements.at(i).toElement();
         boost::optional<model::ModelObject> schedule = translateSchedule(scheduleElement, doc, *result);
-        BOOST_ASSERT(schedule); // what type of error handling do we want?
+        OS_ASSERT(schedule); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -362,7 +402,7 @@ namespace sdd {
       for (int i = 0; i < holidayElements.count(); i++){
         QDomElement holidayElement = holidayElements.at(i).toElement();
         boost::optional<model::ModelObject> holiday = translateHoliday(holidayElement, doc, *result);
-        BOOST_ASSERT(holiday); // what type of error handling do we want?
+        OS_ASSERT(holiday); // what type of error handling do we want?
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -389,7 +429,7 @@ namespace sdd {
 
         QDomElement fluidSysElement = fluidSysElements.at(i).toElement();
         boost::optional<model::ModelObject> plantLoop = translateFluidSys(fluidSysElement,doc,*result);
-        BOOST_ASSERT(plantLoop);
+        OS_ASSERT(plantLoop);
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -410,21 +450,33 @@ namespace sdd {
 
         QDomElement fluidSysElement = fluidSysElements.at(i).toElement();
         boost::optional<model::ModelObject> plantLoop = translateFluidSys(fluidSysElement,doc,*result);
-        BOOST_ASSERT(plantLoop);
+        OS_ASSERT(plantLoop);
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
         }
       }
 
+      // translate shadingSurfaces
+      QDomNodeList exteriorShadingElements = element.elementsByTagName("ExtShdgObj");
+      model::ShadingSurfaceGroup shadingSurfaceGroup(*result);
+      shadingSurfaceGroup.setName("Site ShadingGroup");
+      shadingSurfaceGroup.setShadingSurfaceType("Site");
+      for (int i = 0; i < exteriorShadingElements.count(); ++i){
+        if (exteriorShadingElements.at(i).parentNode() == projectElement){
+          boost::optional<model::ModelObject> exteriorShading = translateShadingSurface(exteriorShadingElements.at(i).toElement(), doc, shadingSurfaceGroup);
+          OS_ASSERT(exteriorShading);
+        }
+      }
+
       // translate the building
       QDomElement buildingElement = projectElement.firstChildElement("Bldg");
-      BOOST_ASSERT(!buildingElement.isNull()); // what type of error handling do we want?
+      OS_ASSERT(!buildingElement.isNull()); // what type of error handling do we want?
 
       openstudio::model::Facility facility = result->getUniqueModelObject<openstudio::model::Facility>();
 
       boost::optional<model::ModelObject> building = translateBuilding(buildingElement, doc, *result);
-      BOOST_ASSERT(building); // what type of error handling do we want?
+      OS_ASSERT(building); // what type of error handling do we want?
 
       result->setFastNaming(false);
 
@@ -444,7 +496,7 @@ namespace sdd {
 
         QDomElement airSystemElement = airSystemElements.at(i).toElement();
         boost::optional<model::ModelObject> airLoopHVAC = translateAirSystem(airSystemElement,doc,*result);
-        BOOST_ASSERT(airLoopHVAC);
+        OS_ASSERT(airLoopHVAC);
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -467,7 +519,7 @@ namespace sdd {
 
         QDomElement thermalZoneElement = thermalZoneElements.at(i).toElement();
         boost::optional<model::ModelObject> thermalZone = translateThermalZone(thermalZoneElement,doc,*result);
-        BOOST_ASSERT(thermalZone);
+        OS_ASSERT(thermalZone);
 
         if (m_progressBar){
           m_progressBar->setValue(m_progressBar->value() + 1);
@@ -488,8 +540,9 @@ namespace sdd {
             fuelType == FuelType::FuelOil_2 ||
             fuelType == FuelType::Propane ||
             fuelType == FuelType::Water ||
-            fuelType == FuelType::Steam){
-          // skip these to avoid E+ warning
+            fuelType == FuelType::Steam ||
+            fuelType == FuelType::EnergyTransfer){
+          // skip these to avoid E+ warning, EnergyTransfer is internal to the simulation
           continue;
         }
 
@@ -501,6 +554,17 @@ namespace sdd {
 
         std::set<int> endUseTypes = EndUseType::getValues();
         BOOST_FOREACH(int endUseType, endUseTypes){
+
+          if (endUseType == EndUseType::HeatingCoils ||
+              endUseType == EndUseType::CoolingCoils ||
+              endUseType == EndUseType::Boilers ||
+              endUseType == EndUseType::Baseboard ||
+              endUseType == EndUseType::HeatRecoveryForCooling ||
+              endUseType == EndUseType::HeatRecoveryForHeating){
+            // ignore energy transfer meters
+            continue;
+          }
+
           // meter for this fuel type and end use
           // DLM: many of these will not be applicable and will cause E+ warnings
           model::Meter meter(*result);
@@ -510,8 +574,314 @@ namespace sdd {
           meter.setReportingFrequency("Hourly");
         }
       }
-    }
 
+      // request specific meters
+      // ElectricEquipment - Receptacle, Process, Refrig
+      model::Meter meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::InteriorEquipment);
+      meter.setSpecificEndUse("Receptacle");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::InteriorEquipment);
+      meter.setSpecificEndUse("Process");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::InteriorEquipment);
+      meter.setSpecificEndUse("Refrig");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::ExteriorEquipment);
+      meter.setSpecificEndUse("Receptacle");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::ExteriorEquipment);
+      meter.setSpecificEndUse("Process");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::ExteriorEquipment);
+      meter.setSpecificEndUse("Refrig");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      // GasEquipment - Receptacle, Process
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Gas);
+      meter.setEndUseType(EndUseType::InteriorEquipment);
+      meter.setSpecificEndUse("Receptacle");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Gas);
+      meter.setEndUseType(EndUseType::InteriorEquipment);
+      meter.setSpecificEndUse("Process");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Gas);
+      meter.setEndUseType(EndUseType::ExteriorEquipment);
+      meter.setSpecificEndUse("Receptacle");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Gas);
+      meter.setEndUseType(EndUseType::ExteriorEquipment);
+      meter.setSpecificEndUse("Process");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      // Lights - Reg Ltg, NonReg Ltg
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::InteriorLights);
+      meter.setSpecificEndUse("Reg Ltg");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::InteriorLights);
+      meter.setSpecificEndUse("NonReg Ltg");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::ExteriorLights);
+      meter.setSpecificEndUse("Reg Ltg");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      meter = model::Meter(*result);
+      meter.setFuelType(FuelType::Electricity);
+      meter.setEndUseType(EndUseType::ExteriorLights);
+      meter.setSpecificEndUse("NonReg Ltg");
+      meter.setInstallLocationType(InstallLocationType::Facility);
+      meter.setReportingFrequency("Hourly");
+
+      // Output Variables
+
+      QDomElement simVarsIntervalElement = projectElement.firstChildElement("SimVarsInterval");
+
+      std::string interval = simVarsIntervalElement.text().toStdString();
+
+      // SimVarsSite
+
+      QDomElement simVarsSiteElement = projectElement.firstChildElement("SimVarsSite");
+
+      if( simVarsSiteElement.text().toInt() == 1 )
+      {
+        model::OutputVariable var("Site Outdoor Air Drybulb Temperature",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Site Outdoor Air Wetbulb Temperature",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Site Direct Solar Radiation Rate per Area",*result);
+        var.setReportingFrequency(interval);
+      }
+
+      // SimVarsThrmlZn
+
+      QDomElement simVarsThrmlZnElement = projectElement.firstChildElement("SimVarsThrmlZn");      
+
+      if( simVarsThrmlZnElement.text().toInt() == 1 )
+      {
+        model::OutputVariable var("Zone Air Temperature",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Zone Lights Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Daylighting Reference Point 1 Illuminance",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Daylighting Reference Point 2 Illuminance",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Daylighting Lighting Power Multiplier",*result);
+        var.setReportingFrequency(interval);
+      }
+
+      // SimVarsHVACZn
+
+      QDomElement simVarsHVACZnElement = projectElement.firstChildElement("SimVarsHVACZn");
+
+      if( simVarsHVACZnElement.text().toInt() == 1 )
+      {
+        model::OutputVariable var("Zone Air Terminal VAV Damper Position",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Zone Packaged Terminal Heat Pump Total Heating Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Zone Packaged Terminal Heat Pump Total Cooling Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Zone Packaged Terminal Air Conditioner Total Heating Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Zone Packaged Terminal Air Conditioner Total Cooling Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Baseboard Total Heating Rate",*result);
+        var.setReportingFrequency(interval);
+      }
+
+      // SimVarsHVACSec
+
+      QDomElement simVarsHVACSecElement = projectElement.firstChildElement("SimVarsHVACSec");
+
+      if( simVarsHVACSecElement.text().toInt() == 1 )
+      {
+        model::OutputVariable var("Heating Coil Heating Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Cooling Coil Total Cooling Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Fan Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Heating Coil Gas Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Heating Coil Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        std::vector<model::AirLoopHVAC> airloops = result->getModelObjects<model::AirLoopHVAC>();
+
+        for( std::vector<model::AirLoopHVAC>::iterator it = airloops.begin();
+             it != airloops.end();
+             ++it )
+        {
+          var = model::OutputVariable("System Node Temperature",*result);
+          var.setReportingFrequency(interval);
+          var.setKeyValue(it->supplyInletNode().name().get());
+
+          var = model::OutputVariable("System Node Mass Flow Rate",*result);
+          var.setReportingFrequency(interval);
+          var.setKeyValue(it->supplyInletNode().name().get());
+
+          var = model::OutputVariable("System Node Temperature",*result);
+          var.setReportingFrequency(interval);
+          var.setKeyValue(it->supplyOutletNode().name().get());
+
+          var = model::OutputVariable("System Node Mass Flow Rate",*result);
+          var.setReportingFrequency(interval);
+          var.setKeyValue(it->supplyOutletNode().name().get());
+
+          if( boost::optional<model::Node> node = it->mixedAirNode() )
+          {
+            var = model::OutputVariable("System Node Temperature",*result);
+            var.setReportingFrequency(interval);
+            var.setKeyValue(node->name().get());
+
+            var = model::OutputVariable("System Node Mass Flow Rate",*result);
+            var.setReportingFrequency(interval);
+            var.setKeyValue(node->name().get());
+          }
+        }
+      }
+
+      // SimVarsHVACPri
+
+      QDomElement simVarsHVACPriElement = projectElement.firstChildElement("SimVarsHVACPri");
+
+      if( (simVarsHVACPriElement.text().toInt() == 1) ||
+          autosize() )
+      {
+        model::OutputVariable var("Chiller Evaporator Cooling Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Cooling Tower Heat Transfer Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Boiler Heating Rate",*result);
+        var.setReportingFrequency(interval);
+      }
+
+      if( simVarsHVACPriElement.text().toInt() == 1 )
+      {
+        model::OutputVariable var("Pump Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Pump Mass Flow Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Pump Outlet Temperature",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Debug Plant Loop Bypass Fraction",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Debug Plant Loop Bypass Fraction",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Chiller Condenser Heat Transfer Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Chiller Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Cooling Tower Heat Transfer Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Cooling Tower Fan Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Boiler Gas Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Boiler Ancillary Electric Power",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Plant Supply Side Cooling Demand Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Plant Supply Side Heating Demand Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Chiller Evaporator Cooling Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Boiler Heating Rate",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Plant Supply Side Inlet Temperature",*result);
+        var.setReportingFrequency(interval);
+
+        var = model::OutputVariable("Plant Supply Side Outlet Temperature",*result);
+        var.setReportingFrequency(interval);
+      }
+
+
+      model::OutputControlReportingTolerances rt = result->getUniqueModelObject<model::OutputControlReportingTolerances>();
+      rt.setToleranceforTimeCoolingSetpointNotMet(0.56);
+      rt.setToleranceforTimeHeatingSetpointNotMet(0.56);
+    }
+    
     return result;
   }
 
@@ -571,15 +941,17 @@ namespace sdd {
     }
 
     model::SimulationControl simulationControl = model.getUniqueModelObject<model::SimulationControl>();
+
+    simulationControl.setMaximumNumberofWarmupDays(50);
     
-    //if ((hvacAutoSizingElement.text().toInt() == 0) && (runDesignDaysElement.text().toInt() == 0)){
-    //  simulationControl.setRunSimulationforSizingPeriods(false);
-    //}else{
-    //  simulationControl.setRunSimulationforSizingPeriods(true);
-    //}
-    
-    // We will probably never have completely autosized models so at least for now we need to ask for sizing runs.
-    simulationControl.setRunSimulationforSizingPeriods(true);
+    if( (runDesignDaysElement.text().toInt() == 1) || (hvacAutoSizingElement.text().toInt() == 1) || m_masterAutosize )
+    {
+      simulationControl.setRunSimulationforSizingPeriods(true);
+    }
+    else
+    {
+      simulationControl.setRunSimulationforSizingPeriods(false);
+    }
 
     if (beginMonthElement.text().toInt() == 0){
       simulationControl.setRunSimulationforWeatherFileRunPeriods(false);
@@ -596,7 +968,15 @@ namespace sdd {
       model::YearDescription yearDescription = model.getUniqueModelObject<model::YearDescription>();
       yearDescription.setCalendarYear(yearElement.text().toInt());
 
+      std::string runPeriodName = "Run Period";
+      QDomElement annualWeatherFileElement = element.firstChildElement("AnnualWeatherFile");
+      if (!annualWeatherFileElement.isNull()){
+        QFileInfo annualWeatherFile(annualWeatherFileElement.text());
+        runPeriodName = toString(annualWeatherFile.baseName());
+      }
+
       model::RunPeriod runPeriod = model.getUniqueModelObject<model::RunPeriod>();
+      runPeriod.setName(runPeriodName);
       runPeriod.setBeginMonth(beginMonthElement.text().toInt());
       runPeriod.setBeginDayOfMonth(beginDayElement.text().toInt());
       runPeriod.setEndMonth(endMonthElement.text().toInt());
@@ -729,7 +1109,7 @@ namespace sdd {
     boost::optional<EpwFile> epwFile;
     try{
       epwFile = EpwFile(epwFilePath);
-      BOOST_ASSERT(epwFile);
+      OS_ASSERT(epwFile);
     }catch(std::exception&){
       LOG(Error, "Could not open epw file '" << toString(epwFilePath) << "'");
     }

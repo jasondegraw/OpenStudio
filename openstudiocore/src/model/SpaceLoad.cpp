@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -87,7 +87,7 @@ namespace detail {
 
   void SpaceLoad_Impl::resetSpaceType() {
     bool ok = setString(this->spaceIndex(), "");
-    BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
   }
 
   boost::optional<ModelObject> SpaceLoad_Impl::spaceTypeAsModelObject() const {
@@ -120,7 +120,7 @@ namespace detail {
 SpaceLoad::SpaceLoad(IddObjectType type,const Model& model)
   : SpaceItem(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::SpaceLoad_Impl>());
+  OS_ASSERT(getImpl<detail::SpaceLoad_Impl>());
 }
 
 SpaceLoad::SpaceLoad(boost::shared_ptr<detail::SpaceLoad_Impl> impl)

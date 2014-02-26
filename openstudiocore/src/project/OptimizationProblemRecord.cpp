@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -46,9 +46,9 @@ namespace detail {
                                                                  ProjectDatabase& database)
     : ProblemRecord_Impl(query, database)
   {
-    BOOST_ASSERT(query.isValid());
-    BOOST_ASSERT(query.isActive());
-    BOOST_ASSERT(query.isSelect());
+    OS_ASSERT(query.isValid());
+    OS_ASSERT(query.isActive());
+    OS_ASSERT(query.isSelect());
   }
 
   std::vector<ObjectRecord> OptimizationProblemRecord_Impl::children() const {
@@ -126,17 +126,17 @@ namespace detail {
   }
 
   void OptimizationProblemRecord_Impl::setLastValues(const QSqlQuery& query, ProjectDatabase& projectDatabase) {
-    BOOST_ASSERT(query.isValid());
-    BOOST_ASSERT(query.isActive());
-    BOOST_ASSERT(query.isSelect());
+    OS_ASSERT(query.isValid());
+    OS_ASSERT(query.isActive());
+    OS_ASSERT(query.isSelect());
 
     ProblemRecord_Impl::setLastValues(query,projectDatabase);
   }
 
   bool OptimizationProblemRecord_Impl::compareValues(const QSqlQuery& query) const {
-    BOOST_ASSERT(query.isValid());
-    BOOST_ASSERT(query.isActive());
-    BOOST_ASSERT(query.isSelect());
+    OS_ASSERT(query.isValid());
+    OS_ASSERT(query.isActive());
+    OS_ASSERT(query.isSelect());
 
     bool result = ProblemRecord_Impl::compareValues(query);
 
@@ -160,7 +160,7 @@ OptimizationProblemRecord::OptimizationProblemRecord(
         new detail::OptimizationProblemRecord_Impl(optimizationProblem, database)),
         database)
 {
-  BOOST_ASSERT(getImpl<detail::OptimizationProblemRecord_Impl>());
+  OS_ASSERT(getImpl<detail::OptimizationProblemRecord_Impl>());
   OptimizationProblemRecord copyOfThis(getImpl<detail::OptimizationProblemRecord_Impl>());
   bool isNew = database.isNewRecord(copyOfThis);
 
@@ -191,7 +191,7 @@ OptimizationProblemRecord::OptimizationProblemRecord(const QSqlQuery& query,
         new detail::OptimizationProblemRecord_Impl(query, database)),
         database)
 {
-  BOOST_ASSERT(getImpl<detail::OptimizationProblemRecord_Impl>());
+  OS_ASSERT(getImpl<detail::OptimizationProblemRecord_Impl>());
 }
 
 OptimizationProblemRecord::OptimizationProblemRecord(
@@ -199,7 +199,7 @@ OptimizationProblemRecord::OptimizationProblemRecord(
     ProjectDatabase database)
   : ProblemRecord(impl, database)
 {
-  BOOST_ASSERT(getImpl<detail::OptimizationProblemRecord_Impl>());
+  OS_ASSERT(getImpl<detail::OptimizationProblemRecord_Impl>());
 }
 
 boost::optional<OptimizationProblemRecord> OptimizationProblemRecord::factoryFromQuery(

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,10 +19,20 @@
 
 #include <model/YearDescription.hpp>
 #include <model/YearDescription_Impl.hpp>
+#include <model/RunPeriod.hpp>
+#include <model/RunPeriod_Impl.hpp>
 #include <model/RunPeriodControlDaylightSavingTime.hpp>
 #include <model/RunPeriodControlDaylightSavingTime_Impl.hpp>
 #include <model/RunPeriodControlSpecialDays.hpp>
 #include <model/RunPeriodControlSpecialDays_Impl.hpp>
+#include <model/SizingPeriod.hpp>
+#include <model/SizingPeriod_Impl.hpp>
+#include <model/ScheduleBase.hpp>
+#include <model/ScheduleBase_Impl.hpp>
+#include <model/ScheduleRule.hpp>
+#include <model/ScheduleRule_Impl.hpp>
+#include <model/LightingDesignDay.hpp>
+#include <model/LightingDesignDay_Impl.hpp>
 #include <model/Model.hpp>
 #include <model/Model_Impl.hpp>
 
@@ -41,7 +51,7 @@ namespace detail {
   YearDescription_Impl::YearDescription_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ParentObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == YearDescription::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == YearDescription::iddObjectType());
   }
 
   YearDescription_Impl::YearDescription_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -49,7 +59,7 @@ namespace detail {
                                              bool keepHandle)
     : ParentObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == YearDescription::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == YearDescription::iddObjectType());
   }
 
   YearDescription_Impl::YearDescription_Impl(const YearDescription_Impl& other,
@@ -109,7 +119,7 @@ namespace detail {
     }
 
     boost::optional<std::string> value = getString(OS_YearDescriptionFields::DayofWeekforStartDay,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -127,7 +137,7 @@ namespace detail {
     }
 
     boost::optional<std::string> value = getString(OS_YearDescriptionFields::IsLeapYear,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
@@ -136,6 +146,8 @@ namespace detail {
   }
 
   void YearDescription_Impl::setCalendarYear(boost::optional<int> calendarYear) {
+    bool wasLeapYear = this->isLeapYear();
+
     bool result = false;
     if (calendarYear) {
       result = setInt(OS_YearDescriptionFields::CalendarYear, calendarYear.get());
@@ -144,12 +156,20 @@ namespace detail {
     } else {
       result = setString(OS_YearDescriptionFields::CalendarYear, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
+
+    bool isLeapYear = this->isLeapYear();
+    updateModelLeapYear(wasLeapYear, isLeapYear);
   }
 
   void YearDescription_Impl::resetCalendarYear() {
+    bool wasLeapYear = this->isLeapYear();
+
     bool result = setString(OS_YearDescriptionFields::CalendarYear, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
+
+    bool isLeapYear = this->isLeapYear();
+    updateModelLeapYear(wasLeapYear, isLeapYear);
   }
 
   bool YearDescription_Impl::setDayofWeekforStartDay(std::string dayofWeekforStartDay) {
@@ -162,11 +182,13 @@ namespace detail {
 
   void YearDescription_Impl::resetDayofWeekforStartDay() {
     bool result = setString(OS_YearDescriptionFields::DayofWeekforStartDay, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool YearDescription_Impl::setIsLeapYear(bool isLeapYear) {
     bool result = false;
+    bool wasLeapYear = this->isLeapYear();
+
     if (!this->calendarYear()){
       if (isLeapYear) {
         result = setString(OS_YearDescriptionFields::IsLeapYear, "Yes");
@@ -174,12 +196,22 @@ namespace detail {
         result = setString(OS_YearDescriptionFields::IsLeapYear, "No");
       }
     }
+
+    if (result){
+      updateModelLeapYear(wasLeapYear, isLeapYear);
+    }
+
     return result;
   }
 
   void YearDescription_Impl::resetIsLeapYear() {
+    bool wasLeapYear = this->isLeapYear();
+
     bool result = setString(OS_YearDescriptionFields::IsLeapYear, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
+
+    bool isLeapYear = this->isLeapYear();
+    updateModelLeapYear(wasLeapYear, isLeapYear);
   }
 
   int YearDescription_Impl::assumedYear() const
@@ -253,6 +285,48 @@ namespace detail {
     }
 
     return openstudio::Date::fromDayOfYear(dayOfYear, *year);
+  }
+
+  void YearDescription_Impl::updateModelLeapYear(bool wasLeapYear, bool isLeapYear)
+  {
+    if (wasLeapYear == isLeapYear){
+      return;
+    }
+
+    if (!wasLeapYear && isLeapYear){
+      return;
+    }
+
+    model::Model model = this->model();
+    if (wasLeapYear && !isLeapYear){
+      BOOST_FOREACH(RunPeriod runPeriod, model.getModelObjects<RunPeriod>()){
+        runPeriod.ensureNoLeapDays();
+      }
+
+      BOOST_FOREACH(RunPeriodControlDaylightSavingTime runPeriodControlDaylightSavingTime, model.getModelObjects<RunPeriodControlDaylightSavingTime>()){
+        runPeriodControlDaylightSavingTime.ensureNoLeapDays();
+      }
+
+      BOOST_FOREACH(RunPeriodControlSpecialDays runPeriodControlSpecialDays, model.getModelObjects<RunPeriodControlSpecialDays>()){
+        runPeriodControlSpecialDays.ensureNoLeapDays();
+      }
+
+      BOOST_FOREACH(SizingPeriod sizingPeriod, model.getModelObjects<SizingPeriod>()){
+        sizingPeriod.ensureNoLeapDays();
+      }
+
+      BOOST_FOREACH(ScheduleBase scheduleBase, model.getModelObjects<ScheduleBase>()){
+        scheduleBase.ensureNoLeapDays();
+      } 
+
+      BOOST_FOREACH(ScheduleRule scheduleRule, model.getModelObjects<ScheduleRule>()){
+        scheduleRule.ensureNoLeapDays();
+      }
+
+      BOOST_FOREACH(LightingDesignDay lightingDesignDay, model.getModelObjects<LightingDesignDay>()){
+        lightingDesignDay.ensureNoLeapDays();
+      }
+    }
   }
 
 } // detail

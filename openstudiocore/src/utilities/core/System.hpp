@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -38,6 +38,13 @@ namespace openstudio {
 
     /// Returns the number of processors on this computer
     static unsigned numberOfProcessors();
+
+    /// Utility for testing exception handling within the system
+    static void testExceptions1();
+    static void testExceptions2();
+    static void testExceptions3();
+    static void testExceptions4();
+    static void testExceptions5();
   };
 
 } // openstudio

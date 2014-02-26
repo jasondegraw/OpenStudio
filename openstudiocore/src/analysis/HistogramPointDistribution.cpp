@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <analysis/HistogramPointDistribution.hpp>
 #include <analysis/UncertaintyDescription_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace analysis {
@@ -58,11 +60,9 @@ boost::optional<int> HistogramPointDistribution::numPairs() const {
 }
 
 bool HistogramPointDistribution::setAbscissas(const std::vector<double>& value) {
-  double previousValue;
-  double currentValue;
   for(std::vector<double>::size_type i = 1; i != value.size(); i++) {
-    previousValue = value[i-1];
-    currentValue = value[i];
+    double previousValue = value[i-1];
+    double currentValue = value[i];
     if (previousValue >= currentValue) {
       LOG(Warn,"Abscissas values must be strictly increasing.");
       return false;
@@ -89,7 +89,7 @@ bool HistogramPointDistribution::setCounts(const std::vector<double>& value) {
 HistogramPointDistribution::HistogramPointDistribution(boost::shared_ptr<detail::UncertaintyDescription_Impl> impl)
   : UncertaintyDescription(impl)
 {
-  BOOST_ASSERT(type() == HistogramPointDistribution::type());
+  OS_ASSERT(type() == HistogramPointDistribution::type());
 }
 
 } // analysis

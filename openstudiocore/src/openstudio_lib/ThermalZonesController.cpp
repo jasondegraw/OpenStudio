@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -33,6 +33,9 @@
 #include <model/Space_Impl.hpp>
 #include <model/ThermostatSetpointDualSetpoint.hpp>
 #include <model/ThermostatSetpointDualSetpoint_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
+
 #include <QApplication>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -61,15 +64,15 @@ ThermalZonesController::ThermalZonesController(bool isIP, const model::Model & m
 
   //isConnected = connect(m_thermalZonesView,SIGNAL(componentDropped(model::ThermalZone &, Handle &)),
   //        this,SLOT(addComponentToZone(model::ThermalZone &, Handle &)));
-  //BOOST_ASSERT(isConnected);
+  //OS_ASSERT(isConnected);
 
   //isConnected = connect( m_thermalZonesView,SIGNAL(removeZoneHVACComponentClicked( model::ZoneHVACComponent & )),
   //         this,SLOT(removeZoneHVACComponent( model::ZoneHVACComponent & )) );
-  //BOOST_ASSERT(isConnected);
+  //OS_ASSERT(isConnected);
 
   //isConnected = connect( m_thermalZonesView,SIGNAL(zoneHVACComponentClicked( model::ZoneHVACComponent & )),
   //         this,SLOT(onZoneHVACComponentClicked( model::ZoneHVACComponent & )) );
-  //BOOST_ASSERT(isConnected);
+  //OS_ASSERT(isConnected);
 }
 
 //void ThermalZonesController::removeThermalZone(model::ThermalZone & thermalZone)
@@ -148,7 +151,7 @@ void ThermalZonesController::addComponentToZone(model::ThermalZone & zone, Handl
 
     for( std::vector<model::ModelObject>::iterator it = existingComps.begin();
          it < existingComps.end();
-         it++ )
+         ++it )
     {
       if( boost::optional<model::ZoneHVACComponent> hvacComp = it->optionalCast<model::ZoneHVACComponent>() )
       {
@@ -222,7 +225,7 @@ void ThermalZonesController::onSelectItem(OSItem *item)
 
 void ThermalZonesController::onAddObject(const openstudio::IddObjectType& iddObjectType)
 {
-  BOOST_ASSERT(IddObjectType::OS_ThermalZone == iddObjectType.value());
+  OS_ASSERT(IddObjectType::OS_ThermalZone == iddObjectType.value());
   openstudio::model::ThermalZone(this->model());
 }
 

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ bool OSOptionalQuantity::isSet() const {
 }
 
 Quantity OSOptionalQuantity::get() const {
-  BOOST_ASSERT(m_value);
+  OS_ASSERT(m_value);
   return Quantity(*m_value,units());
 }
 

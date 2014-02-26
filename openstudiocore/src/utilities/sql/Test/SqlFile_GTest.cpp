@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -63,7 +63,8 @@ TEST_F(SqlFileFixture, EnvPeriods)
   std::vector<std::string> availableEnvPeriods = sqlFile.availableEnvPeriods();
   ASSERT_FALSE(availableEnvPeriods.empty());
   EXPECT_EQ(static_cast<unsigned>(1), availableEnvPeriods.size());
-  EXPECT_EQ("Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300", availableEnvPeriods[0]);
+  //EXPECT_EQ("Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300", availableEnvPeriods[0]);
+  EXPECT_EQ("CHICAGO OHARE INTL AP IL USA TMY3 WMO#=725300", availableEnvPeriods[0]);
 }
 
 TEST_F(SqlFileFixture, TimeSeriesValues)
@@ -71,9 +72,10 @@ TEST_F(SqlFileFixture, TimeSeriesValues)
   std::vector<std::string> availableEnvPeriods = sqlFile.availableEnvPeriods();
   ASSERT_FALSE(availableEnvPeriods.empty());
   EXPECT_EQ(static_cast<unsigned>(1), availableEnvPeriods.size());
-  EXPECT_EQ("Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300", availableEnvPeriods[0]);
+  //EXPECT_EQ("Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300", availableEnvPeriods[0]);
+  EXPECT_EQ("CHICAGO OHARE INTL AP IL USA TMY3 WMO#=725300", availableEnvPeriods[0]);
 
-  openstudio::OptionalTimeSeries ts = sqlFile.timeSeries(availableEnvPeriods[0], "Hourly", "Outdoor Dry Bulb",  "Environment");
+  openstudio::OptionalTimeSeries ts = sqlFile.timeSeries(availableEnvPeriods[0], "Hourly", "Site Outdoor Air Drybulb Temperature",  "Environment");
   ASSERT_TRUE(ts);
 //  ASSERT_EQ(static_cast<unsigned>(8760), ts->dateTimes().size());
   ASSERT_EQ(static_cast<unsigned>(8760), ts->daysFromFirstReport().size());
@@ -90,12 +92,13 @@ TEST_F(SqlFileFixture, TimeSeriesValues)
 //  EXPECT_EQ(DateTime(Date(MonthOfYear::Dec, 31), Time(0,24,0,0)), ts->dateTimes().back());
   EXPECT_EQ(DateTime(Date(MonthOfYear::Dec, 31), Time(0,24,0,0)), ts->firstReportDateTime()+Time(ts->daysFromFirstReport(ts->daysFromFirstReport().size()-1)));
   EXPECT_DOUBLE_EQ(-5.6875, ts->values()[8759]);
+  EXPECT_DOUBLE_EQ(-4.775, ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,22,59,59))));
   EXPECT_DOUBLE_EQ(-4.775, ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,23,0,0))));
   EXPECT_DOUBLE_EQ(-5.6875, ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,23,0,1))));
   EXPECT_DOUBLE_EQ(-5.6875, ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,24,0,0))));
   EXPECT_DOUBLE_EQ(ts->outOfRangeValue(), ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,24,0,1))));
 
-  ts = sqlFile.timeSeries(availableEnvPeriods[0], "HVAC System Timestep", "Outdoor Dry Bulb",  "Environment");
+  ts = sqlFile.timeSeries(availableEnvPeriods[0], "HVAC System Timestep", "Site Outdoor Air Drybulb Temperature",  "Environment");
   ASSERT_TRUE(ts);
 //  EXPECT_EQ(DateTime(Date(MonthOfYear::Jan, 1), Time(0,0,15,0)), ts->dateTimes().front());
   EXPECT_EQ(DateTime(Date(MonthOfYear::Jan, 1), Time(0,0,15,0)), ts->firstReportDateTime());
@@ -108,6 +111,7 @@ TEST_F(SqlFileFixture, TimeSeriesValues)
   EXPECT_DOUBLE_EQ(-12.2 , ts->value(DateTime(Date(MonthOfYear::Jan, 1), Time(0,1,0,0))));
 //  EXPECT_EQ(DateTime(Date(MonthOfYear::Dec, 31), Time(0,24,0,0)), ts->dateTimes().back());
   EXPECT_EQ(DateTime(Date(MonthOfYear::Dec, 31), Time(0,24,0,0)), ts->firstReportDateTime()+Time(ts->daysFromFirstReport(ts->daysFromFirstReport().size()-1)));
+  EXPECT_DOUBLE_EQ(-5.0  , ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,22,59,59))));
   EXPECT_DOUBLE_EQ(-5.0  , ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,23,0,0))));
   EXPECT_DOUBLE_EQ(-5.275, ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,23,0,1))));
   EXPECT_DOUBLE_EQ(-5.275, ts->value(DateTime(Date(MonthOfYear::Dec, 31), Time(0,23,15,0))));

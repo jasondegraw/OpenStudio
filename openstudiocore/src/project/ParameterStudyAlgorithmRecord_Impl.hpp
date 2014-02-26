@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -36,7 +36,6 @@ namespace detail {
   /** ParameterStudyAlgorithmRecord_Impl is a DakotaAlgorithmRecord_Impl that is the implementation
    *  class for ParameterStudyAlgorithmRecord.*/
   class PROJECT_API ParameterStudyAlgorithmRecord_Impl : public DakotaAlgorithmRecord_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{

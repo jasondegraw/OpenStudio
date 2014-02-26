@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ namespace detail {
   IlluminanceMap_Impl::IlluminanceMap_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : SpaceItem_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == IlluminanceMap::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == IlluminanceMap::iddObjectType());
   }
 
   IlluminanceMap_Impl::IlluminanceMap_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -45,7 +45,7 @@ namespace detail {
                                            bool keepHandle)
     : SpaceItem_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == IlluminanceMap::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == IlluminanceMap::iddObjectType());
   }
 
   IlluminanceMap_Impl::IlluminanceMap_Impl(const IlluminanceMap_Impl& other,
@@ -68,25 +68,25 @@ namespace detail {
 
   double IlluminanceMap_Impl::originXCoordinate() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::OriginXCoordinate,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double IlluminanceMap_Impl::originYCoordinate() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::OriginYCoordinate,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double IlluminanceMap_Impl::originZCoordinate() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::OriginZCoordinate,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double IlluminanceMap_Impl::psiRotationAroundXAxis() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::PsiRotationAroundXAxis,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -96,7 +96,7 @@ namespace detail {
 
   double IlluminanceMap_Impl::thetaRotationAroundYAxis() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::ThetaRotationAroundYAxis,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -106,7 +106,7 @@ namespace detail {
 
   double IlluminanceMap_Impl::phiRotationAroundZAxis() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::PhiRotationAroundZAxis,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -116,7 +116,7 @@ namespace detail {
 
   double IlluminanceMap_Impl::xLength() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::XLength,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -126,7 +126,7 @@ namespace detail {
 
   int IlluminanceMap_Impl::numberofXGridPoints() const {
     boost::optional<int> value = getInt(OS_IlluminanceMapFields::NumberofXGridPoints,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -136,7 +136,7 @@ namespace detail {
 
   double IlluminanceMap_Impl::yLength() const {
     boost::optional<double> value = getDouble(OS_IlluminanceMapFields::YLength,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -146,7 +146,7 @@ namespace detail {
 
   int IlluminanceMap_Impl::numberofYGridPoints() const {
     boost::optional<int> value = getInt(OS_IlluminanceMapFields::NumberofYGridPoints,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -155,98 +155,88 @@ namespace detail {
   }
 
   void IlluminanceMap_Impl::setOriginXCoordinate(double originXCoordinate) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::OriginXCoordinate, originXCoordinate);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_IlluminanceMapFields::OriginXCoordinate, originXCoordinate);
+    OS_ASSERT(result);
   }
 
   void IlluminanceMap_Impl::setOriginYCoordinate(double originYCoordinate) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::OriginYCoordinate, originYCoordinate);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_IlluminanceMapFields::OriginYCoordinate, originYCoordinate);
+    OS_ASSERT(result);
   }
 
   void IlluminanceMap_Impl::setOriginZCoordinate(double originZCoordinate) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::OriginZCoordinate, originZCoordinate);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_IlluminanceMapFields::OriginZCoordinate, originZCoordinate);
+    OS_ASSERT(result);
   }
 
   bool IlluminanceMap_Impl::setPsiRotationAroundXAxis(double psiRotationAroundXAxis) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::PsiRotationAroundXAxis, psiRotationAroundXAxis);
+    bool result = setDouble(OS_IlluminanceMapFields::PsiRotationAroundXAxis, psiRotationAroundXAxis);
     return result;
   }
 
   void IlluminanceMap_Impl::resetPsiRotationAroundXAxis() {
     bool result = setString(OS_IlluminanceMapFields::PsiRotationAroundXAxis, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool IlluminanceMap_Impl::setThetaRotationAroundYAxis(double thetaRotationAroundYAxis) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::ThetaRotationAroundYAxis, thetaRotationAroundYAxis);
+    bool result = setDouble(OS_IlluminanceMapFields::ThetaRotationAroundYAxis, thetaRotationAroundYAxis);
     return result;
   }
 
   void IlluminanceMap_Impl::resetThetaRotationAroundYAxis() {
     bool result = setString(OS_IlluminanceMapFields::ThetaRotationAroundYAxis, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool IlluminanceMap_Impl::setPhiRotationAroundZAxis(double phiRotationAroundZAxis) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::PhiRotationAroundZAxis, phiRotationAroundZAxis);
+    bool result = setDouble(OS_IlluminanceMapFields::PhiRotationAroundZAxis, phiRotationAroundZAxis);
     return result;
   }
 
   void IlluminanceMap_Impl::resetPhiRotationAroundZAxis() {
     bool result = setString(OS_IlluminanceMapFields::PhiRotationAroundZAxis, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void IlluminanceMap_Impl::setXLength(double xLength) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::XLength, xLength);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_IlluminanceMapFields::XLength, xLength);
+    OS_ASSERT(result);
   }
 
   void IlluminanceMap_Impl::resetXLength() {
     bool result = setString(OS_IlluminanceMapFields::XLength, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool IlluminanceMap_Impl::setNumberofXGridPoints(int numberofXGridPoints) {
-    bool result = false;
-    result = setInt(OS_IlluminanceMapFields::NumberofXGridPoints, numberofXGridPoints);
+    bool result = setInt(OS_IlluminanceMapFields::NumberofXGridPoints, numberofXGridPoints);
     return result;
   }
 
   void IlluminanceMap_Impl::resetNumberofXGridPoints() {
     bool result = setString(OS_IlluminanceMapFields::NumberofXGridPoints, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void IlluminanceMap_Impl::setYLength(double yLength) {
-    bool result = false;
-    result = setDouble(OS_IlluminanceMapFields::YLength, yLength);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_IlluminanceMapFields::YLength, yLength);
+    OS_ASSERT(result);
   }
 
   void IlluminanceMap_Impl::resetYLength() {
     bool result = setString(OS_IlluminanceMapFields::YLength, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool IlluminanceMap_Impl::setNumberofYGridPoints(int numberofYGridPoints) {
-    bool result = false;
-    result = setInt(OS_IlluminanceMapFields::NumberofYGridPoints, numberofYGridPoints);
+    bool result = setInt(OS_IlluminanceMapFields::NumberofYGridPoints, numberofYGridPoints);
     return result;
   }
 
   void IlluminanceMap_Impl::resetNumberofYGridPoints() {
     bool result = setString(OS_IlluminanceMapFields::NumberofYGridPoints, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   openstudio::Transformation IlluminanceMap_Impl::transformation() const
@@ -275,11 +265,11 @@ namespace detail {
 
     EulerAngles eulerAngles = transformation.eulerAngles();
     test = this->setPsiRotationAroundXAxis(radToDeg(eulerAngles.psi()));
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
     test = this->setThetaRotationAroundYAxis(radToDeg(eulerAngles.theta()));
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
     test = this->setPhiRotationAroundZAxis(radToDeg(eulerAngles.phi()));
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
 
     return true;
   }
@@ -317,7 +307,7 @@ namespace detail {
 IlluminanceMap::IlluminanceMap(const Model& model)
   : SpaceItem(IlluminanceMap::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::IlluminanceMap_Impl>());
+  OS_ASSERT(getImpl<detail::IlluminanceMap_Impl>());
 }
 
 IddObjectType IlluminanceMap::iddObjectType() {

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ namespace detail {
                                              bool keepHandle)
     : StraightComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == DistrictHeating::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == DistrictHeating::iddObjectType());
   }
 
   DistrictHeating_Impl::DistrictHeating_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -45,7 +45,7 @@ namespace detail {
                                              bool keepHandle)
     : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == DistrictHeating::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == DistrictHeating::iddObjectType());
   }
 
   DistrictHeating_Impl::DistrictHeating_Impl(const DistrictHeating_Impl& other,
@@ -68,14 +68,14 @@ namespace detail {
 
   double DistrictHeating_Impl::nominalCapacity() const {
     boost::optional<double> value = getDouble(OS_DistrictHeatingFields::NominalCapacity,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity DistrictHeating_Impl::getNominalCapacity(bool returnIP) const {
     OptionalDouble value = nominalCapacity();
     OSOptionalQuantity result = getQuantityFromDouble(OS_DistrictHeatingFields::NominalCapacity, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -90,8 +90,7 @@ namespace detail {
   }
   
   bool DistrictHeating_Impl::setNominalCapacity(double nominalCapacity) {
-    bool result = false;
-    result = setDouble(OS_DistrictHeatingFields::NominalCapacity, nominalCapacity);
+    bool result = setDouble(OS_DistrictHeatingFields::NominalCapacity, nominalCapacity);
     return result;
   }
 
@@ -128,7 +127,7 @@ namespace detail {
 DistrictHeating::DistrictHeating(const Model& model)
   : StraightComponent(DistrictHeating::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::DistrictHeating_Impl>());
+  OS_ASSERT(getImpl<detail::DistrictHeating_Impl>());
 }
 
 IddObjectType DistrictHeating::iddObjectType() {

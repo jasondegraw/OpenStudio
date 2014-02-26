@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ namespace detail {
                                                                                      bool keepHandle)
     : ZoneHVACComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == ZoneHVACBaseboardConvectiveElectric::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == ZoneHVACBaseboardConvectiveElectric::iddObjectType());
   }
 
   ZoneHVACBaseboardConvectiveElectric_Impl::ZoneHVACBaseboardConvectiveElectric_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -48,7 +48,7 @@ namespace detail {
                                                                                      bool keepHandle)
     : ZoneHVACComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == ZoneHVACBaseboardConvectiveElectric::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == ZoneHVACBaseboardConvectiveElectric::iddObjectType());
   }
 
   ZoneHVACBaseboardConvectiveElectric_Impl::ZoneHVACBaseboardConvectiveElectric_Impl(const ZoneHVACBaseboardConvectiveElectric_Impl& other,
@@ -109,14 +109,14 @@ namespace detail {
 
   double ZoneHVACBaseboardConvectiveElectric_Impl::efficiency() const {
     boost::optional<double> value = getDouble(OS_ZoneHVAC_Baseboard_Convective_ElectricFields::Efficiency,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity ZoneHVACBaseboardConvectiveElectric_Impl::getEfficiency(bool returnIP) const {
     OptionalDouble value = efficiency();
     OSOptionalQuantity result = getQuantityFromDouble(OS_ZoneHVAC_Baseboard_Convective_ElectricFields::Efficiency, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -137,7 +137,7 @@ namespace detail {
     if (nominalCapacity) {
       result = setDouble(OS_ZoneHVAC_Baseboard_Convective_ElectricFields::NominalCapacity, nominalCapacity.get());
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool ZoneHVACBaseboardConvectiveElectric_Impl::setNominalCapacity(const OSOptionalQuantity& nominalCapacity) {
@@ -159,7 +159,7 @@ namespace detail {
 
   void ZoneHVACBaseboardConvectiveElectric_Impl::autosizeNominalCapacity() {
     bool result = setString(OS_ZoneHVAC_Baseboard_Convective_ElectricFields::NominalCapacity, "autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool ZoneHVACBaseboardConvectiveElectric_Impl::setEfficiency(double efficiency) {
@@ -177,7 +177,7 @@ namespace detail {
 
   void ZoneHVACBaseboardConvectiveElectric_Impl::resetEfficiency() {
     bool result = setString(OS_ZoneHVAC_Baseboard_Convective_ElectricFields::Efficiency, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   boost::optional<Schedule> ZoneHVACBaseboardConvectiveElectric_Impl::optionalAvailabilitySchedule() const {
@@ -228,19 +228,21 @@ namespace detail {
   
   boost::optional<ThermalZone> ZoneHVACBaseboardConvectiveElectric_Impl::thermalZone()
   {
-    boost::optional<ThermalZone> result;
     Model m = this->model();
+    ModelObject thisObject = this->getObject<ModelObject>();
     std::vector<ThermalZone> thermalZones = m.getModelObjects<ThermalZone>();
-    BOOST_FOREACH(ThermalZone& thermalZone, thermalZones){
-      std::vector<ModelObject> equipments = thermalZone.equipment(); 
-      BOOST_FOREACH(ModelObject& equipment, equipments){
-        if (equipment.handle() == this->handle()){
-          result = thermalZone;
-        }
+    for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
+         it != thermalZones.end();
+         it++ )
+    {
+      std::vector<ModelObject> equipment = it->equipment();
+
+      if( std::find(equipment.begin(),equipment.end(),thisObject) != equipment.end() )
+      {
+        return *it;
       }
     }
-
-    return result;
+    return boost::none;
   }
   
   bool ZoneHVACBaseboardConvectiveElectric_Impl::addToThermalZone(ThermalZone & thermalZone)
@@ -263,22 +265,8 @@ namespace detail {
   
   void ZoneHVACBaseboardConvectiveElectric_Impl::removeFromThermalZone()
   {
-    boost::optional<ThermalZone> thermalZone = this->thermalZone();
-    Model m = this->model();
-    ModelObject thisObject = this->getObject<ModelObject>();
-    std::vector<ThermalZone> thermalZones = m.getModelObjects<ThermalZone>();
-    for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
-         it != thermalZones.end();
-         it++ )
-    {
-      std::vector<ModelObject> equipment = it->equipment();
-
-      if( std::find(equipment.begin(),equipment.end(),thisObject) != equipment.end() )
-      {
-        it->removeEquipment(thisObject);
-
-        break;
-      }
+    if ( boost::optional<ThermalZone> thermalZone = this->thermalZone() ) {
+      thermalZone->removeEquipment(this->getObject<ZoneHVACComponent>());
     }
   }
 
@@ -287,7 +275,7 @@ namespace detail {
 ZoneHVACBaseboardConvectiveElectric::ZoneHVACBaseboardConvectiveElectric(const Model& model)
   : ZoneHVACComponent(ZoneHVACBaseboardConvectiveElectric::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::ZoneHVACBaseboardConvectiveElectric_Impl>());
+  OS_ASSERT(getImpl<detail::ZoneHVACBaseboardConvectiveElectric_Impl>());
 
   autosizeNominalCapacity();
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -53,7 +53,7 @@ namespace detail {
   LightsDefinition_Impl::LightsDefinition_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : SpaceLoadDefinition_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == LightsDefinition::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == LightsDefinition::iddObjectType());
   }
 
   LightsDefinition_Impl::LightsDefinition_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -61,7 +61,7 @@ namespace detail {
                                                bool keepHandle)
     : SpaceLoadDefinition_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == LightsDefinition::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == LightsDefinition::iddObjectType());
   }
 
   LightsDefinition_Impl::LightsDefinition_Impl(const LightsDefinition_Impl& other,
@@ -84,7 +84,7 @@ namespace detail {
 
   std::string LightsDefinition_Impl::designLevelCalculationMethod() const {
     boost::optional<std::string> value = getString(OS_Lights_DefinitionFields::DesignLevelCalculationMethod,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -92,7 +92,7 @@ namespace detail {
     boost::optional<double> result;
     if (istringEqual("LightingLevel", this->designLevelCalculationMethod())){
       result = getDouble(OS_Lights_DefinitionFields::LightingLevel,true);
-      //BOOST_ASSERT(result);
+      //OS_ASSERT(result);
     }
     return result;
   }
@@ -101,7 +101,7 @@ namespace detail {
     boost::optional<double> result;
     if (istringEqual("Watts/Area", this->designLevelCalculationMethod())){
       result = getDouble(OS_Lights_DefinitionFields::WattsperSpaceFloorArea,true);
-      //BOOST_ASSERT(result);
+      //OS_ASSERT(result);
     }
     return result;
   }
@@ -110,14 +110,14 @@ namespace detail {
     boost::optional<double> result;
     if (istringEqual("Watts/Person", this->designLevelCalculationMethod())){
       result = getDouble(OS_Lights_DefinitionFields::WattsperPerson,true);
-      //BOOST_ASSERT(result);
+      //OS_ASSERT(result);
     }
     return result;
   }
 
   double LightsDefinition_Impl::fractionRadiant() const {
     boost::optional<double> value = getDouble(OS_Lights_DefinitionFields::FractionRadiant,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -127,7 +127,7 @@ namespace detail {
 
   double LightsDefinition_Impl::fractionVisible() const {
     boost::optional<double> value = getDouble(OS_Lights_DefinitionFields::FractionVisible,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -137,7 +137,7 @@ namespace detail {
 
   double LightsDefinition_Impl::returnAirFraction() const {
     boost::optional<double> value = getDouble(OS_Lights_DefinitionFields::ReturnAirFraction,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -147,7 +147,7 @@ namespace detail {
 
   bool LightsDefinition_Impl::returnAirFractionCalculatedfromPlenumTemperature() const {
     boost::optional<std::string> value = getString(OS_Lights_DefinitionFields::ReturnAirFractionCalculatedfromPlenumTemperature,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
@@ -157,7 +157,7 @@ namespace detail {
 
   double LightsDefinition_Impl::returnAirFractionFunctionofPlenumTemperatureCoefficient1() const {
     boost::optional<double> value = getDouble(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient1,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -167,7 +167,7 @@ namespace detail {
 
   double LightsDefinition_Impl::returnAirFractionFunctionofPlenumTemperatureCoefficient2() const {
     boost::optional<double> value = getDouble(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient2,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -182,13 +182,13 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_Lights_DefinitionFields::DesignLevelCalculationMethod, "LightingLevel");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_Lights_DefinitionFields::LightingLevel, lightingLevel.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_Lights_DefinitionFields::WattsperSpaceFloorArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_Lights_DefinitionFields::WattsperPerson, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("LightingLevel", this->designLevelCalculationMethod())){
@@ -205,13 +205,13 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_Lights_DefinitionFields::DesignLevelCalculationMethod, "Watts/Area");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_Lights_DefinitionFields::LightingLevel, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_Lights_DefinitionFields::WattsperSpaceFloorArea, wattsperSpaceFloorArea.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_Lights_DefinitionFields::WattsperPerson, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("Watts/Area", this->designLevelCalculationMethod())){
@@ -228,13 +228,13 @@ namespace detail {
         result = false;
       }else{
         result = setString(OS_Lights_DefinitionFields::DesignLevelCalculationMethod, "Watts/Person");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_Lights_DefinitionFields::LightingLevel, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setString(OS_Lights_DefinitionFields::WattsperSpaceFloorArea, "");
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
         result = setDouble(OS_Lights_DefinitionFields::WattsperPerson, wattsperPerson.get());
-        BOOST_ASSERT(result);
+        OS_ASSERT(result);
       }
     } else {
       if (istringEqual("Watts/Person", this->designLevelCalculationMethod())){
@@ -245,36 +245,33 @@ namespace detail {
   }
 
   bool LightsDefinition_Impl::setFractionRadiant(double fractionRadiant) {
-    bool result = false;
-    result = setDouble(OS_Lights_DefinitionFields::FractionRadiant, fractionRadiant);
+    bool result = setDouble(OS_Lights_DefinitionFields::FractionRadiant, fractionRadiant);
     return result;
   }
 
   //void LightsDefinition_Impl::resetFractionRadiant() {
   //  bool result = setString(OS_Lights_DefinitionFields::FractionRadiant, "");
-  //  BOOST_ASSERT(result);
+  //  OS_ASSERT(result);
   //}
 
   bool LightsDefinition_Impl::setFractionVisible(double fractionVisible) {
-    bool result = false;
-    result = setDouble(OS_Lights_DefinitionFields::FractionVisible, fractionVisible);
+    bool result = setDouble(OS_Lights_DefinitionFields::FractionVisible, fractionVisible);
     return result;
   }
 
   //void LightsDefinition_Impl::resetFractionVisible() {
   //  bool result = setString(OS_Lights_DefinitionFields::FractionVisible, "");
-  //  BOOST_ASSERT(result);
+  //  OS_ASSERT(result);
   //}
 
   bool LightsDefinition_Impl::setReturnAirFraction(double returnAirFraction) {
-    bool result = false;
-    result = setDouble(OS_Lights_DefinitionFields::ReturnAirFraction, returnAirFraction);
+    bool result = setDouble(OS_Lights_DefinitionFields::ReturnAirFraction, returnAirFraction);
     return result;
   }
 
   //void LightsDefinition_Impl::resetReturnAirFraction() {
   //  bool result = setString(OS_Lights_DefinitionFields::ReturnAirFraction, "");
-  //  BOOST_ASSERT(result);
+  //  OS_ASSERT(result);
   //}
 
   void LightsDefinition_Impl::setReturnAirFractionCalculatedfromPlenumTemperature(bool returnAirFractionCalculatedfromPlenumTemperature) {
@@ -284,34 +281,32 @@ namespace detail {
     } else {
       result = setString(OS_Lights_DefinitionFields::ReturnAirFractionCalculatedfromPlenumTemperature, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void LightsDefinition_Impl::resetReturnAirFractionCalculatedfromPlenumTemperature() {
     bool result = setString(OS_Lights_DefinitionFields::ReturnAirFractionCalculatedfromPlenumTemperature, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool LightsDefinition_Impl::setReturnAirFractionFunctionofPlenumTemperatureCoefficient1(double returnAirFractionFunctionofPlenumTemperatureCoefficient1) {
-    bool result = false;
-    result = setDouble(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient1, returnAirFractionFunctionofPlenumTemperatureCoefficient1);
+    bool result = setDouble(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient1, returnAirFractionFunctionofPlenumTemperatureCoefficient1);
     return result;
   }
 
   void LightsDefinition_Impl::resetReturnAirFractionFunctionofPlenumTemperatureCoefficient1() {
     bool result = setString(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient1, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool LightsDefinition_Impl::setReturnAirFractionFunctionofPlenumTemperatureCoefficient2(double returnAirFractionFunctionofPlenumTemperatureCoefficient2) {
-    bool result = false;
-    result = setDouble(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient2, returnAirFractionFunctionofPlenumTemperatureCoefficient2);
+    bool result = setDouble(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient2, returnAirFractionFunctionofPlenumTemperatureCoefficient2);
     return result;
   }
 
   void LightsDefinition_Impl::resetReturnAirFractionFunctionofPlenumTemperatureCoefficient2() {
     bool result = setString(OS_Lights_DefinitionFields::ReturnAirFractionFunctionofPlenumTemperatureCoefficient2, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   double LightsDefinition_Impl::getLightingPower(double floorArea, double numPeople) const {
@@ -327,7 +322,7 @@ namespace detail {
       return wattsperPerson().get() * numPeople;
     }
 
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
     return 0.0;
   }
 
@@ -351,7 +346,7 @@ namespace detail {
       return wattsperPerson().get() * numPeople / floorArea;
     }
 
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
     return 0.0;
   }
 
@@ -374,7 +369,7 @@ namespace detail {
       return wattsperPerson().get();
     }
 
-    BOOST_ASSERT(false);
+    OS_ASSERT(false);
     return 0.0;
   }
 
@@ -403,8 +398,8 @@ namespace detail {
 LightsDefinition::LightsDefinition(const Model& model)
   : SpaceLoadDefinition(LightsDefinition::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::LightsDefinition_Impl>());
-  BOOST_ASSERT(this->setLightingLevel(0.0));
+  OS_ASSERT(getImpl<detail::LightsDefinition_Impl>());
+  OS_ASSERT(this->setLightingLevel(0.0));
 }
 
 IddObjectType LightsDefinition::iddObjectType() {

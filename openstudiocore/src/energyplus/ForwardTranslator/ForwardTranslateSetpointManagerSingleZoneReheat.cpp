@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@ boost::optional<IdfObject> ForwardTranslator::translateSetpointManagerSingleZone
   {
     if( boost::optional<ModelObject> mo = thermalZone->inletPortList().airLoopHVACModelObject() )
     {
-      if( node = mo->optionalCast<Node>() )
+      if( (node = mo->optionalCast<Node>()) )
       {
         idfObject.setString(SetpointManager_SingleZone_ReheatFields::ZoneInletNodeName,node->name().get());
       }

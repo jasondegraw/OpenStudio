@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,9 @@
 #include <openstudio_lib/ModelObjectListView.hpp>
 
 #include <model/Model_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
+
 #include <QStyleOption>
 #include <QPainter>
 #include <QVBoxLayout>
@@ -41,7 +44,7 @@ BuildingStoriesView::BuildingStoriesView(const openstudio::model::Model& model,
                parent)
 {
   ModelObjectListView* modelObjectListView = qobject_cast<ModelObjectListView*>(this->itemSelector());
-  BOOST_ASSERT(modelObjectListView);
+  OS_ASSERT(modelObjectListView);
   modelObjectListView->setItemsDraggable(false);
 }
 

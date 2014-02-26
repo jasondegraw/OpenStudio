@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -68,7 +68,7 @@ namespace model {
     {
       // connect signals
       bool connected = connect(this, SIGNAL(onChange()), this, SLOT(clearCachedVariables()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
     }
 
     // constructor
@@ -79,7 +79,7 @@ namespace model {
     {
       // connect signals
       bool connected = connect(this, SIGNAL(onChange()), this, SLOT(clearCachedVariables()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
     }
 
     PlanarSurface_Impl::PlanarSurface_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -89,7 +89,7 @@ namespace model {
     {
       // connect signals
       bool connected = connect(this, SIGNAL(onChange()), this, SLOT(clearCachedVariables()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
     }
 
     PlanarSurface_Impl::PlanarSurface_Impl(const PlanarSurface_Impl& other,
@@ -99,7 +99,7 @@ namespace model {
     {
       // connect signals
       bool connected = connect(this, SIGNAL(onChange()), this, SLOT(clearCachedVariables()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
     }
 
     boost::optional<ConstructionBase> PlanarSurface_Impl::construction() const
@@ -192,7 +192,7 @@ namespace model {
         values.push_back(toString(vertex.z()));
 
         ModelExtensibleGroup group = pushExtensibleGroup(values, false).cast<ModelExtensibleGroup>();
-        BOOST_ASSERT(!group.empty());
+        OS_ASSERT(!group.empty());
       }
 
       LOG(Debug, "After setVertices have " << numFields() << " fields.  Size of vertices is "
@@ -205,13 +205,13 @@ namespace model {
 
     bool PlanarSurface_Impl::setUFactor(boost::optional<double> value) {
       // DLM: change interface to take a double?
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       return setUFactor(*value);
     }
 
     bool PlanarSurface_Impl::setThermalConductance(boost::optional<double> value) {
       // DLM: change interface to take a double?
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       return setThermalConductance(*value);
     }
 
@@ -225,10 +225,12 @@ namespace model {
         LayeredConstruction construction = oConstruction->cast<LayeredConstruction>();
         if (construction.numLayers() == 1) {
           MaterialVector layers = construction.layers();
-          BOOST_ASSERT(layers.size() == 1u);
+          OS_ASSERT(layers.size() == 1u);
           result = layers[0].optionalCast<AirWallMaterial>();
-        }
-        else {
+        }else if (construction.numLayers() == 0) {
+          LOG(Error, "Air wall detected with zero layers, classifying as air wall");
+          result = true;
+        }else {
           LOG(Error, "Air wall detected with more than one layer, classifying as non-air wall");
           result = false;
         }
@@ -277,7 +279,12 @@ namespace model {
         Point3dVector vertices = this->vertices();
         m_cachedOutwardNormal = getOutwardNormal(vertices);
         if(!m_cachedOutwardNormal){
-          LOG_AND_THROW("Cannot compute outward normal for vertices " << vertices);
+          std::string surfaceNameMsg;
+          boost::optional<std::string> name = this->name();
+          if (name){
+            surfaceNameMsg = ", surface name = '" + *name + "'";
+          }
+          LOG_AND_THROW("Cannot compute outward normal for vertices " << vertices << surfaceNameMsg);
         }
       }
       return m_cachedOutwardNormal.get();
@@ -502,6 +509,34 @@ namespace model {
       return m_cachedPlane.get();
     }
 
+    std::vector<std::vector<Point3d> > PlanarSurface_Impl::triangulation() const
+    {
+      if (m_cachedTriangulation.empty()){
+        Transformation faceTransformation = Transformation::alignFace(this->vertices());
+        Transformation faceTransformationInverse = faceTransformation.inverse();
+
+        std::vector<Point3d> faceVertices = faceTransformationInverse*this->vertices();
+
+        std::vector<std::vector<Point3d> > faceHoles;
+        BOOST_FOREACH(const ModelObject& child, this->children()){
+          OptionalPlanarSurface surface = child.optionalCast<PlanarSurface>();
+          if (surface){
+            if (surface->subtractFromGrossArea()){
+              faceHoles.push_back(faceTransformationInverse*surface->vertices());
+            }
+          }
+        }
+
+        std::vector<std::vector<Point3d> > faceTriangulation = computeTriangulation(faceVertices, faceHoles);
+
+        BOOST_FOREACH(const std::vector<Point3d>& faceTriangle, faceTriangulation){
+          m_cachedTriangulation.push_back(faceTransformation*faceTriangle);
+        }
+      }
+      return m_cachedTriangulation;
+    }
+
+
     boost::optional<ModelObject> PlanarSurface_Impl::constructionAsModelObject() const
     {
       return static_cast<boost::optional<ModelObject> >(this->construction());
@@ -530,6 +565,7 @@ namespace model {
       m_cachedVertices.reset();
       m_cachedPlane.reset();
       m_cachedOutwardNormal.reset();
+      m_cachedTriangulation.clear();
     }
 
     bool PlanarSurface_Impl::setConstructionAsModelObject(boost::optional<ModelObject> modelObject)
@@ -553,11 +589,11 @@ PlanarSurface::PlanarSurface(IddObjectType type, const std::vector<Point3d>& ver
                              const Model& model)
   : ParentObject(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::PlanarSurface_Impl>());
+  OS_ASSERT(getImpl<detail::PlanarSurface_Impl>());
   bool ok = this->setVertices(vertices);
   if (!ok){
-    LOG_AND_THROW("Cannot create a surface with vertices " << vertices);
     this->remove();
+    LOG_AND_THROW("Cannot create a surface with vertices " << vertices);
   }
 }
 
@@ -705,6 +741,11 @@ Plane PlanarSurface::plane() const
   return getImpl<detail::PlanarSurface_Impl>()->plane();
 }
 
+std::vector<std::vector<Point3d> > PlanarSurface::triangulation() const
+{
+  return getImpl<detail::PlanarSurface_Impl>()->triangulation();
+}
+
 std::vector<PlanarSurface> PlanarSurface::findPlanarSurfaces(const std::vector<PlanarSurface>& planarSurfaces,
                                                              boost::optional<double> minDegreesFromNorth,
                                                              boost::optional<double> maxDegreesFromNorth,
@@ -837,7 +878,7 @@ double PlanarSurface::filmResistance(const FilmResistanceType& type) {
     default:
       LOG_AND_THROW("Unknown FilmResistanceType.");
   };
-  BOOST_ASSERT(false);
+  OS_ASSERT(false);
   return 0.0;
 }
 

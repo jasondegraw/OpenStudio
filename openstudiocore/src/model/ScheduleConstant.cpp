@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ namespace detail {
   ScheduleConstant_Impl::ScheduleConstant_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : Schedule_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == ScheduleConstant::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == ScheduleConstant::iddObjectType());
   }
 
   ScheduleConstant_Impl::ScheduleConstant_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -57,7 +57,7 @@ namespace detail {
                                              bool keepHandle)
     : Schedule_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == ScheduleConstant::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == ScheduleConstant::iddObjectType());
   }
 
   ScheduleConstant_Impl::ScheduleConstant_Impl(const ScheduleConstant_Impl& other,
@@ -131,7 +131,7 @@ namespace detail {
 
   void ScheduleConstant_Impl::setValue(double value) {
     bool ok = setDouble(OS_Schedule_ConstantFields::Value, value);
-    BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
   }
 
   bool ScheduleConstant_Impl::setValue(const Quantity& value) {
@@ -143,13 +143,18 @@ namespace detail {
     return false;
   }
 
+  void ScheduleConstant_Impl::ensureNoLeapDays()
+  {
+    // nothing to do
+  }
+
 } // detail
 
 // create a new ScheduleConstant object in the model's workspace
 ScheduleConstant::ScheduleConstant(const Model& model)
   : Schedule(ScheduleConstant::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::ScheduleConstant_Impl>());
+  OS_ASSERT(getImpl<detail::ScheduleConstant_Impl>());
   setValue(0.0);
 }
 

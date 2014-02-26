@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -43,13 +43,13 @@ class MODEL_API Shade : public ShadingMaterial {
   //@{
 
   explicit Shade(const Model& model,
-    double solarTransmittance = 0.1,
-    double solarReflectance = 0.1,
-    double visibleTransmittance = 0.1,
-    double visibleReflectance = 0.1,
-    double thermalHemisphericalEmissivity = 0.1,
-    double thermalTransmittance = 0.1,
-    double thickness = 0.1,
+    double solarTransmittance = 0.4,
+    double solarReflectance = 0.5,
+    double visibleTransmittance = 0.4,
+    double visibleReflectance = 0.5,
+    double thermalHemisphericalEmissivity = 0.9,
+    double thermalTransmittance = 0.0,
+    double thickness = 0.005,
     double conductivity = 0.1);
 
   virtual ~Shade() {}

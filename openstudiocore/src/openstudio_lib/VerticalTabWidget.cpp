@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -18,6 +18,8 @@
  **********************************************************************/
 
 #include <openstudio_lib/VerticalTabWidget.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 #include <QHBoxLayout>
 #include <QKeySequence>
@@ -63,11 +65,11 @@ VerticalTabWidget::VerticalTabWidget(QWidget * parent)
 
   QShortcut* nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this);
   bool isConnected = connect(nextTabShortcut, SIGNAL(activated()), this, SLOT(nextTab()));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   QShortcut* previousTabShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Tab), this);
   isConnected = connect(previousTabShortcut, SIGNAL(activated()), this, SLOT(previousTab()));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 
@@ -106,7 +108,7 @@ void VerticalTabWidget::select()
 
   for( std::vector<QPushButton*>::iterator  it = m_tabButtons.begin();
        it < m_tabButtons.end();
-       it++ )
+       ++it )
   {
     if( *it == button )
     {
@@ -149,7 +151,7 @@ void VerticalTabWidget::setCurrentIndex(int index)
 
     QString style;
 
-    if (i == index)
+    if (i == static_cast<unsigned>(index))
     {
       imagePath = m_selectedPixmaps[i];
 

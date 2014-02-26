@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -25,7 +25,11 @@
 #include <utilities/data/Vector.hpp>
 #include <utilities/data/Matrix.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 #include <boost/foreach.hpp>
+
+#include <iomanip>
 
 namespace openstudio{
 
@@ -35,7 +39,7 @@ namespace openstudio{
     // test that normal has length 1
     double length = m_a*m_a + m_b*m_b + m_c*m_c;
     double tol = 0.0001;
-    BOOST_ASSERT(abs(1.0-length) < tol);
+    OS_ASSERT(fabs(1.0-length) < tol);
   }
 
   Plane::Plane(const Point3d& point, const Vector3d& outwardNormal)
@@ -87,29 +91,34 @@ namespace openstudio{
 
     }else{
 
-      bool test = false;
+      bool foundSolution = false;
       double tol = 1e-8; // 0.0001 was too big for the determinant tolerance, 1e-12 was too small
+      double maxDet = tol;
 
-      if (!test){
+      // solve the equation ax+by+cz+d=0 in a few different ways, keep the best one
+
+      {
         // Ax = b, x = [a/c; b/c; d/c]
         Matrix A(N,3);
         Matrix At(3,N);
         Vector b(N);
         for (unsigned i = 0; i < N; ++i){
-          A(i,0) = points[i].x(); 
-          A(i,1) = points[i].y();
+          A(i,0) = points[i].x() - points[0].x(); 
+          A(i,1) = points[i].y() - points[0].y();
           A(i,2) = 1.0;
           At(0,i) = A(i,0); 
           At(1,i) = A(i,1);
           At(2,i) = A(i,2);
-          b[i] = -points[i].z();
+          b[i] = -(points[i].z() - points[0].z());
         }
       
         Matrix AtA = prod(At, A);
-        if (det3x3(AtA) >= tol){
+        double det = det3x3(AtA); // always positive for A'*A
+        if (det > maxDet){
           Matrix AtAInv(3,3);
-          test = invert(AtA, AtAInv);
+          bool test = invert(AtA, AtAInv);
           if (test){
+            maxDet = det;
             Vector x = prod(prod(AtAInv, At), b);
             double a_c = x[0];
             double b_c = x[1];
@@ -124,31 +133,34 @@ namespace openstudio{
             m_c = 1.0/sqrt(a_c*a_c + b_c*b_c + 1.0);
             m_a = a_c*m_c;
             m_b = b_c*m_c;
-            m_d = d_c*m_c;
+            m_d = d_c*m_c - m_a*points[0].x() - m_b*points[0].y() - m_c*points[0].z();
+            foundSolution = true;
           }
         }
       }
 
-      if (!test){
+      {
         // Ax = b, x = [a/b; c/b; d/b]
         Matrix A(N,3);
         Matrix At(3,N);
         Vector b(N);
         for (unsigned i = 0; i < N; ++i){
-          A(i,0) = points[i].x(); 
-          A(i,1) = points[i].z();
+          A(i,0) = points[i].x() - points[0].x(); 
+          A(i,1) = points[i].z() - points[0].z();
           A(i,2) = 1.0;
           At(0,i) = A(i,0); 
           At(1,i) = A(i,1);
           At(2,i) = A(i,2);
-          b[i] = -points[i].y();
+          b[i] = -(points[i].y() - points[0].y());
         }
       
         Matrix AtA = prod(At, A);
-        if (det3x3(AtA) >= tol){
+        double det = det3x3(AtA); // always positive for A'*A
+        if (det > maxDet){
           Matrix AtAInv(3,3);
-          test = invert(AtA, AtAInv);
+          bool test = invert(AtA, AtAInv);
           if (test){
+            maxDet = det;
             Vector x = prod(prod(AtAInv, At), b);
             double a_b = x[0];
             double c_b = x[1];
@@ -163,31 +175,34 @@ namespace openstudio{
             m_b = 1.0/sqrt(a_b*a_b + c_b*c_b + 1.0);
             m_a = a_b*m_b;
             m_c = c_b*m_b;
-            m_d = d_b*m_b;
+            m_d = d_b*m_b - m_a*points[0].x() - m_b*points[0].y() - m_c*points[0].z();
+            foundSolution = true;
           }
         }
       }
 
-      if (!test){
+      {
         // Ax = b, x = [b/a; c/a; d/a]
         Matrix A(N,3);
         Matrix At(3,N);
         Vector b(N);
         for (unsigned i = 0; i < N; ++i){
-          A(i,0) = points[i].y(); 
-          A(i,1) = points[i].z();
+          A(i,0) = points[i].y() - points[0].y(); 
+          A(i,1) = points[i].z() - points[0].z();
           A(i,2) = 1.0;
           At(0,i) = A(i,0); 
           At(1,i) = A(i,1);
           At(2,i) = A(i,2);
-          b[i] = -points[i].x();
+          b[i] = -(points[i].x() - points[0].x());
         }
       
         Matrix AtA = prod(At, A);
-        if (det3x3(AtA) >= tol){
+        double det = det3x3(AtA); // always positive for A'*A
+        if (det > maxDet){
           Matrix AtAInv(3,3);
-          test = invert(AtA, AtAInv);
+          bool test = invert(AtA, AtAInv);
           if (test){
+            maxDet = det;
             Vector x = prod(prod(AtAInv, At), b);
             double b_a = x[0];
             double c_a = x[1];
@@ -202,12 +217,16 @@ namespace openstudio{
             m_a = 1.0/sqrt(b_a*b_a + c_a*c_a + 1.0);
             m_b = b_a*m_a;
             m_c = c_a*m_a;
-            m_d = d_a*m_a;
+            m_d = d_a*m_a - m_a*points[0].x() - m_b*points[0].y() - m_c*points[0].z();
+            foundSolution = true;
           }
         }
       }
 
-      if (!test){
+      if (!foundSolution){
+        //std::stringstream ss;
+        //ss << std::fixed << std::setprecision(20) << points << std::endl;
+        //std::string s = ss.str();
         LOG_AND_THROW("Cannot compute plane for points " << points);
       }
 
@@ -227,7 +246,7 @@ namespace openstudio{
       // test that normal has length 1
       double length = m_a*m_a + m_b*m_b + m_c*m_c;
       tol = 0.0001;
-      BOOST_ASSERT(abs(1.0-length) <= tol);
+      OS_ASSERT(fabs(1.0-length) <= tol);
     }
   }
 
@@ -237,7 +256,7 @@ namespace openstudio{
     // test that normal has length 1
     double length = m_a*m_a + m_b*m_b + m_c*m_c;
     double tol = 0.0001;
-    BOOST_ASSERT(abs(1.0-length) <= tol);
+    OS_ASSERT(fabs(1.0-length) <= tol);
   }
 
   Plane::~Plane()
@@ -253,7 +272,7 @@ namespace openstudio{
   {
     // dot product of outward normals should be 1 or negative 1
     double dot = (m_a*other.a() + m_b*other.b() + m_c*other.c());
-    bool result = (abs(dot) >= 1.0-tol);
+    bool result = (fabs(dot) >= 1.0-tol);
     return result;
   }
 
@@ -263,7 +282,7 @@ namespace openstudio{
   {
     double dot = (m_a*other.a() + m_b*other.b() + m_c*other.c());
     double dist = m_d - other.d();
-    bool result = (dot >= 1-tol) && (abs(dist) <= tol);
+    bool result = (dot >= 1-tol) && (fabs(dist) <= tol);
     return result;
   }
 
@@ -273,7 +292,7 @@ namespace openstudio{
   {
     double dot = (m_a*other.a() + m_b*other.b() + m_c*other.c());
     double dist = m_d + other.d();
-    bool result = (dot <= -1+tol) && (abs(dist) <= tol);
+    bool result = (dot <= -1+tol) && (fabs(dist) <= tol);
     return result;
   }
 

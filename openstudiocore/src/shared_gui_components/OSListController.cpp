@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -18,7 +18,9 @@
  **********************************************************************/
 
 #include "OSListController.hpp"
+#include <utilities/core/Assert.hpp>
 #include <algorithm>
+#include <QWidget>
 
 namespace openstudio {
 
@@ -32,7 +34,7 @@ OSListController::OSListController()
 
 OSListController::~OSListController()
 {
-  Q_ASSERT(m_selectionController);
+  OS_ASSERT(m_selectionController);
 
   m_selectionController->unregisterListController(this);
 }
@@ -77,7 +79,7 @@ void OSListController::unregisterItem(QPointer<OSListItem> item)
   std::vector<QPointer<OSListItem> >::iterator it = std::find(m_registeredItems.begin(),m_registeredItems.end(),item);
 
   // This should be true because we manage m_registeredItems and the use of the acccessor methods.
-  Q_ASSERT(it != m_registeredItems.end());
+  OS_ASSERT(it != m_registeredItems.end());
 
   m_registeredItems.erase(it);
 }
@@ -213,7 +215,7 @@ void OSItemSelectionController::unselectAllItems()
 
   for( std::vector<QPointer<OSListItem> >::const_iterator it = selectedItems.begin();
        it != selectedItems.end();
-       it++ )
+       ++it )
   {
     (*it)->setSelected(false);
   }
@@ -225,18 +227,23 @@ void OSItemSelectionController::selectAllItems()
   {
     for( std::vector<QPointer<OSListController> >::iterator listIt = m_listControllers.begin(); 
          listIt != m_listControllers.end();
-         listIt++ )
+         ++listIt )
     {
       QPointer<OSListController> t_listController = (*listIt);
 
       for( std::vector<QPointer<OSListItem> >::iterator itemit = t_listController->m_registeredItems.begin();
            itemit != t_listController->m_registeredItems.end();
-           itemit++ )
+           ++itemit )
       {
         (*itemit)->setSelected(true);
       }
     }
   }
+}
+
+void OSItemSelectionController::emitSelectionChanged()
+{
+  emit selectionChanged(m_selectedItems);
 }
 
 std::vector<QPointer<OSListItem> > OSItemSelectionController::selectedItems() const
@@ -259,23 +266,23 @@ void OSItemSelectionController::unregisterListController(OSListController * list
   std::vector<QPointer<OSListController> >::iterator it = std::find(m_listControllers.begin(),m_listControllers.end(),listController);
 
   // This should be true because we manage m_listControllers and the use of the acccessor methods.
-  Q_ASSERT(it != m_listControllers.end());
+  OS_ASSERT(it != m_listControllers.end());
 
   m_listControllers.erase(it);
 }
 
 void OSItemSelectionController::addSelectedItem(OSListItem * item)
 {
-  Q_ASSERT(item);
+  OS_ASSERT(item);
 
   m_selectedItems.push_back(item);
 
-  emit selectionChanged(m_selectedItems);
+  emitSelectionChanged();
 }
 
 void OSItemSelectionController::removeSelectedItem(OSListItem * item)
 {
-  Q_ASSERT(item);
+  OS_ASSERT(item);
 
   std::vector<QPointer<OSListItem> >::iterator it = 
     std::find(m_selectedItems.begin(),m_selectedItems.end(),item);
@@ -284,10 +291,19 @@ void OSItemSelectionController::removeSelectedItem(OSListItem * item)
   {
     m_selectedItems.erase(it);
 
-    emit selectionChanged(m_selectedItems);
+    emitSelectionChanged();
   }
 }
 
+QWidget * OSItemDelegate::view(QSharedPointer<OSListItem> dataSource) 
+{ 
+  return new QWidget();
+}
+
+QGraphicsObject * OSGraphicsItemDelegate::view(QSharedPointer<OSListItem> dataSource) 
+{ 
+  return NULL;
+}
 
 } // openstudio
 

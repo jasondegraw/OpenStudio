@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ namespace detail {
   RunPeriodControlSpecialDays_Impl::RunPeriodControlSpecialDays_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == RunPeriodControlSpecialDays::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == RunPeriodControlSpecialDays::iddObjectType());
   }
 
   RunPeriodControlSpecialDays_Impl::RunPeriodControlSpecialDays_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -47,7 +47,7 @@ namespace detail {
                                                                      bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == RunPeriodControlSpecialDays::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == RunPeriodControlSpecialDays::iddObjectType());
   }
 
   RunPeriodControlSpecialDays_Impl::RunPeriodControlSpecialDays_Impl(const RunPeriodControlSpecialDays_Impl& other,Model_Impl* model,bool keepHandle)
@@ -60,21 +60,21 @@ namespace detail {
     Date result;
     YearDescription yd = this->model().getUniqueModelObject<YearDescription>();
     boost::optional<std::string> text = getString(OS_RunPeriodControl_SpecialDaysFields::StartDate);
-    BOOST_ASSERT(text);
+    OS_ASSERT(text);
     return getDate(*text);
   }
 
   unsigned RunPeriodControlSpecialDays_Impl::duration() const
   {
     boost::optional<int> result = getInt(OS_RunPeriodControl_SpecialDaysFields::Duration, true);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     return *result;
   }
 
   std::string RunPeriodControlSpecialDays_Impl::specialDayType() const
   {
     boost::optional<std::string> result = getString(OS_RunPeriodControl_SpecialDaysFields::SpecialDayType, true);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     return *result;
   }
 
@@ -116,7 +116,7 @@ namespace detail {
         ss << "5th " << dayOfWeek.valueName() << " in " << monthOfYear.valueName();
         break;
       default:
-        BOOST_ASSERT(false);
+        OS_ASSERT(false);
     }
     
     return setString(OS_RunPeriodControl_SpecialDaysFields::StartDate, ss.str());
@@ -130,6 +130,11 @@ namespace detail {
   bool RunPeriodControlSpecialDays_Impl::setSpecialDayType(const std::string& specialDayType)
   {
     return setString(OS_RunPeriodControl_SpecialDaysFields::SpecialDayType, specialDayType);
+  }
+
+  void RunPeriodControlSpecialDays_Impl::ensureNoLeapDays()
+  {
+    LOG(Warn, "Ensure no leap days is not yet implemented for run control special days");
   }
 
   // return the parent object in the hierarchy
@@ -224,7 +229,7 @@ namespace detail {
 RunPeriodControlSpecialDays::RunPeriodControlSpecialDays(const std::string& startDate, Model& model)
   : ModelObject(RunPeriodControlSpecialDays::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::RunPeriodControlSpecialDays_Impl>());
+  OS_ASSERT(getImpl<detail::RunPeriodControlSpecialDays_Impl>());
   bool test = getImpl<detail::RunPeriodControlSpecialDays_Impl>()->setStartDate(startDate);
   if (!test){
     LOG_AND_THROW("'" << startDate << "' is not correctly formatted");
@@ -234,7 +239,7 @@ RunPeriodControlSpecialDays::RunPeriodControlSpecialDays(const std::string& star
 RunPeriodControlSpecialDays::RunPeriodControlSpecialDays(const openstudio::MonthOfYear& monthOfYear, unsigned day, Model& model)
   : ModelObject(RunPeriodControlSpecialDays::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::RunPeriodControlSpecialDays_Impl>());
+  OS_ASSERT(getImpl<detail::RunPeriodControlSpecialDays_Impl>());
   getImpl<detail::RunPeriodControlSpecialDays_Impl>()->setStartDate(monthOfYear, day);
   Date test = this->startDate();
 }
@@ -242,7 +247,7 @@ RunPeriodControlSpecialDays::RunPeriodControlSpecialDays(const openstudio::Month
 RunPeriodControlSpecialDays::RunPeriodControlSpecialDays(const openstudio::NthDayOfWeekInMonth& nth, const openstudio::DayOfWeek& dayOfWeek, const openstudio::MonthOfYear& monthOfYear, Model& model)
   : ModelObject(RunPeriodControlSpecialDays::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::RunPeriodControlSpecialDays_Impl>());
+  OS_ASSERT(getImpl<detail::RunPeriodControlSpecialDays_Impl>());
   getImpl<detail::RunPeriodControlSpecialDays_Impl>()->setStartDate(nth, dayOfWeek, monthOfYear);
   Date test = this->startDate();
 }
@@ -285,6 +290,11 @@ bool RunPeriodControlSpecialDays::setDuration(unsigned duration)
 bool RunPeriodControlSpecialDays::setSpecialDayType(const std::string& specialDayType)
 {
   return getImpl<detail::RunPeriodControlSpecialDays_Impl>()->setSpecialDayType(specialDayType);
+}
+
+void RunPeriodControlSpecialDays::ensureNoLeapDays()
+{
+  getImpl<detail::RunPeriodControlSpecialDays_Impl>()->ensureNoLeapDays();
 }
 
 RunPeriodControlSpecialDays::RunPeriodControlSpecialDays(boost::shared_ptr<detail::RunPeriodControlSpecialDays_Impl> impl)

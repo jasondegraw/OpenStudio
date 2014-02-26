@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -1409,7 +1409,7 @@ DefaultConstructionSetInspectorView::DefaultConstructionSetInspectorView(const m
   gridLayout->addWidget(label,row,leftCol);
   gridLayout->addWidget(m_interiorPartitionsDZ,row+1,leftCol);
 
-  BOOST_ASSERT(m_vectorControllers.size() == 24);
+  OS_ASSERT(m_vectorControllers.size() == 24);
 
   configDropZones();
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -176,6 +176,11 @@ LibraryItemView::LibraryItemView(QWidget * parent)
   mainHBoxLayout->setContentsMargins(5,0,5,0);
 
   setLayout(mainHBoxLayout);
+
+  m_measureTypeBadge = new QLabel(this);
+  m_measureTypeBadge->setFixedSize(25,25);
+  m_measureTypeBadge->setVisible(false);
+  mainHBoxLayout->addWidget(m_measureTypeBadge,Qt::AlignLeft);
 
   m_bclBadge = new QLabel("BCL",this);
   m_bclBadge->setFixedWidth(25);

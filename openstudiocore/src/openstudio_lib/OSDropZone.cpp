@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -24,6 +24,9 @@
 #include <model/Model_Impl.hpp>
 #include <model/ModelObject.hpp>
 #include <model/ModelObject_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
+
 #include <QBoxLayout>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -36,6 +39,9 @@
 #include <QScrollArea>
 #include <QStyleOption>
 #include <QTimer>
+#include <QGraphicsSceneDragDropEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
 
 using namespace openstudio::model;
 
@@ -87,7 +93,7 @@ OSDropZone::OSDropZone(OSVectorController* vectorController,
   mainLayout->addWidget(m_scrollArea);
 
  // for now we will allow this drop zone to manage memory of the vectorController
-  BOOST_ASSERT(!m_vectorController->parent());
+  OS_ASSERT(!m_vectorController->parent());
   m_vectorController->setParent(this);
 
   m_addButton = new QPushButton(this);
@@ -112,33 +118,33 @@ OSDropZone::OSDropZone(OSVectorController* vectorController,
   bool isConnected = false;
 
   isConnected = connect(m_addButton,SIGNAL(clicked()),this,SIGNAL(addButtonClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(this, SIGNAL(itemsRequested()),
                         vectorController, SLOT(reportItems()),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(this, SIGNAL(itemRemoveClicked(OSItem*)),
                         vectorController, SLOT(removeItem(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(this, SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)),
                         vectorController, SLOT(replaceItem(OSItem*, const OSItemId&)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(this, SIGNAL(itemDropped(const OSItemId&)),
                         vectorController, SLOT(drop(const OSItemId&)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(this, SIGNAL(addButtonClicked()),
                         vectorController, SLOT(makeNewItem()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(vectorController, SIGNAL(itemIds(const std::vector<OSItemId>&)),
                         this, SLOT(setItemIds(const std::vector<OSItemId>&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   emit itemsRequested();
 
@@ -280,15 +286,15 @@ void OSDropZone::setItemIds(const std::vector<OSItemId>& itemIds)
     bool isConnected = false;
     isConnected = connect( item,SIGNAL(itemRemoveClicked(OSItem*)),
                            this,SIGNAL(itemRemoveClicked(OSItem*)) );
-    BOOST_ASSERT(isConnected);
+    OS_ASSERT(isConnected);
 
     isConnected = connect( item,SIGNAL(itemClicked(OSItem*)),
                            this,SIGNAL(itemClicked(OSItem*)) );
-    BOOST_ASSERT(isConnected);
+    OS_ASSERT(isConnected);
 
     isConnected = connect( item,SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)),
                            this,SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)) );
-    BOOST_ASSERT(isConnected);
+    OS_ASSERT(isConnected);
 
     item->setDraggable(m_itemsDraggable);
 
@@ -315,9 +321,8 @@ void OSDropZone::setItemIds(const std::vector<OSItemId>& itemIds)
     OSItemDropZone* dropZone = new OSItemDropZone(this->m_growsHorizontally);
     m_mainBoxLayout->addWidget(dropZone,0,Qt::AlignLeft);
 
-    bool isConnected = false;
-    isConnected = connect(dropZone, SIGNAL(dropped(QDropEvent*)), this, SLOT(handleDrop(QDropEvent*)));
-    BOOST_ASSERT(isConnected);
+    bool isConnected = connect(dropZone, SIGNAL(dropped(QDropEvent*)), this, SLOT(handleDrop(QDropEvent*)));
+    OS_ASSERT(isConnected);
 
     if( m_maxItems == 1 )
     {
@@ -451,6 +456,92 @@ void OSItemDropZone::dropEvent(QDropEvent *event)
   event->accept();
   if(event->proposedAction() == Qt::CopyAction){
     emit dropped(event);
+  }
+}
+
+OSDropZoneItem::OSDropZoneItem()
+  : QGraphicsObject(), 
+    m_mouseDown(false)
+{
+  setAcceptHoverEvents(true);
+  setAcceptDrops(true);
+
+  setSize(100,50);
+}
+
+void OSDropZoneItem::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+  event->accept();
+
+  if(event->proposedAction() == Qt::CopyAction)
+  {
+    OSItemId id = OSItemId(event->mimeData());
+
+    emit componentDropped(id);
+  }
+}
+
+QRectF OSDropZoneItem::boundingRect() const
+{
+  return QRectF(0,0,m_width,m_height);
+}
+
+void OSDropZoneItem::setSize(double width, double height)
+{
+  prepareGeometryChange();
+  m_width = width;
+  m_height = height;
+  m_text = QString("Drop Item");
+}
+
+void OSDropZoneItem::setText(const QString & text)
+{
+  m_text = text;
+  update();
+}
+
+void OSDropZoneItem::paint( QPainter *painter, 
+                                                 const QStyleOptionGraphicsItem *option, 
+                                                 QWidget *widget )
+{
+  painter->setRenderHint(QPainter::Antialiasing, true);
+  painter->setBrush(Qt::NoBrush);
+  painter->setPen(QPen(QColor(109,109,109),2,Qt::DashLine, Qt::RoundCap));
+
+  painter->drawRect(boundingRect());
+
+  QFont font = painter->font();
+  font.setPointSize(25);
+  painter->setFont(font);
+  painter->setPen(QPen(QColor(109,109,109),2,Qt::DashLine, Qt::RoundCap));
+  painter->drawText(boundingRect(),Qt::AlignCenter | Qt::TextWordWrap,m_text);
+}
+
+void OSDropZoneItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+  m_mouseDown = true;
+
+  this->update();
+
+  event->accept();
+}
+
+void OSDropZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+{
+  if( m_mouseDown )
+  {
+    m_mouseDown = false;
+
+    this->update();
+
+    QApplication::processEvents();
+
+    if( shape().contains(event->pos()) )
+    {
+      event->accept();
+
+      emit mouseClicked();
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@ void WindowMaterialSimpleGlazingSystemInspectorView::createLayout()
 
   m_uFactor = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_uFactor, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_uFactor,row++,0,1,3);
 
   // Solar Heat Gain Coefficient
@@ -89,7 +89,7 @@ void WindowMaterialSimpleGlazingSystemInspectorView::createLayout()
 
   m_solarHeatGainCoefficient = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_solarHeatGainCoefficient, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_solarHeatGainCoefficient,row++,0,1,3);
 
     // Visible Transmittance
@@ -100,7 +100,7 @@ void WindowMaterialSimpleGlazingSystemInspectorView::createLayout()
 
   m_visibleTransmittance = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_visibleTransmittance, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_visibleTransmittance,row++,0,1,3);
 
   // Stretch

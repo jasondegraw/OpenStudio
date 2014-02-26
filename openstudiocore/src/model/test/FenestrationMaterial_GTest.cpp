@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -117,16 +117,16 @@ TEST_F(ModelFixture, FenestrationMaterial_Blind_Attributes)
   Attribute blindThickness = blind.getAttribute("thickness").get();
   EXPECT_TRUE(blindThickness.valueType() == AttributeValueType::Double);
 
-  EXPECT_DOUBLE_EQ(0.00025, blindThickness.valueAsDouble());
+  EXPECT_DOUBLE_EQ(0.001, blindThickness.valueAsDouble());
   EXPECT_TRUE(blind.getDouble(OS_WindowMaterial_BlindFields::SlatWidth));
 
   // should be settable
-  EXPECT_TRUE(blind.setAttribute("thickness", 0.001));
+  EXPECT_TRUE(blind.setAttribute("thickness", 0.0025));
 
   ASSERT_TRUE(blind.getAttribute("thickness"));
   blindThickness = blind.getAttribute("thickness").get();
   EXPECT_TRUE(blindThickness.valueType() == AttributeValueType::Double);
-  EXPECT_DOUBLE_EQ(0.001, blindThickness.valueAsDouble());
+  EXPECT_DOUBLE_EQ(0.0025, blindThickness.valueAsDouble());
 }
 
 TEST_F(ModelFixture, FenestrationMaterial_Gas_Constructors)

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -27,6 +27,8 @@
 #include <model/ZoneHVACComponent_Impl.hpp>
 #include <model/HVACComponent.hpp>
 #include <model/HVACComponent_Impl.hpp>
+#include <model/UtilityBill.hpp>
+#include <model/UtilityBill_Impl.hpp>
 
 #include <utilities/core/Assert.hpp>
 #include <utilities/bcl/LocalBCL.hpp>
@@ -46,14 +48,14 @@ ModelObjectListController::ModelObjectListController(const openstudio::IddObject
                         this,
                         SLOT(objectAdded(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(model.getImpl<model::detail::Model_Impl>().get(), 
                         SIGNAL(removeWorkspaceObject(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         this,
                         SLOT(objectRemoved(boost::shared_ptr<openstudio::detail::WorkspaceObject_Impl>, const openstudio::IddObjectType&, const openstudio::UUID&)),
                         Qt::QueuedConnection);
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
 }
 
@@ -101,7 +103,7 @@ std::vector<OSItemId> ModelObjectListController::makeVector()
 
     for( std::vector<BCLComponent>::iterator it = bclresults.begin(); 
          it != bclresults.end();
-         it++ )
+         ++it )
     {
       result.push_back(bclComponentToItemId(*it));
     }
@@ -152,7 +154,7 @@ IddObjectType ModelObjectListView::iddObjectType() const
 {
   OSVectorController* vectorController = this->vectorController();
   ModelObjectListController* modelObjectListController = qobject_cast<ModelObjectListController*>(vectorController);
-  BOOST_ASSERT(modelObjectListController);
+  OS_ASSERT(modelObjectListController);
   return modelObjectListController->iddObjectType();
 }
 

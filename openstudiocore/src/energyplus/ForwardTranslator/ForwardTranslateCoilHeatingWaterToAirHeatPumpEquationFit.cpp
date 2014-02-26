@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -49,13 +49,13 @@ boost::optional<IdfObject> ForwardTranslator::translateCoilHeatingWaterToAirHeat
   boost::optional<double> value;
   boost::optional<Node> node;
   
-  // Make sure the modelObject gets ut into the map, and the new idfObject gets put into the final file.
+  // Make sure the modelObject gets put into the map, and the new idfObject gets put into the final file.
   // Also sets the idfObjects name
 
   IdfObject idfObject = createRegisterAndNameIdfObject(IddObjectType::Coil_Heating_WaterToAirHeatPump_EquationFit,modelObject);
   
   // Object Name
-  std::string baseName = idfObject.name().get();
+  //std::string baseName = idfObject.name().get();
 
   // Water Inlet Node Name  
   if( boost::optional<ModelObject> mo = modelObject.waterInletModelObject() )
@@ -98,7 +98,7 @@ boost::optional<IdfObject> ForwardTranslator::translateCoilHeatingWaterToAirHeat
   {
     idfObject.setString(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedAirFlowRate,"Autosize");
   }
-  else if(value = modelObject.ratedAirFlowRate())
+  else if((value = modelObject.ratedAirFlowRate()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedAirFlowRate,value.get());
   }
@@ -108,7 +108,7 @@ boost::optional<IdfObject> ForwardTranslator::translateCoilHeatingWaterToAirHeat
   {
     idfObject.setString(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedWaterFlowRate,"Autosize");
   }
-  else if(value = modelObject.ratedAirFlowRate())
+  else if((value = modelObject.ratedAirFlowRate()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedWaterFlowRate,value.get());
   }  
@@ -119,73 +119,73 @@ boost::optional<IdfObject> ForwardTranslator::translateCoilHeatingWaterToAirHeat
   {
     idfObject.setString(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedHeatingCapacity,"Autosize");
   }
-  else if(value = modelObject.ratedHeatingCapacity())
+  else if((value = modelObject.ratedHeatingCapacity()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedHeatingCapacity,value.get());
   }  
 
   // Heating Coefficient of Performance
-  if(value = modelObject.ratedHeatingCoefficientofPerformance())
+  if((value = modelObject.ratedHeatingCoefficientofPerformance()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::RatedHeatingCoefficientofPerformance,value.get());
   }
   
   //Heating Capacity Coefficient 1
-  if(value = modelObject.heatingCapacityCoefficient1())
+  if((value = modelObject.heatingCapacityCoefficient1()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingCapacityCoefficient1,value.get());
   }
   
   //Heating Capacity Coefficient 2
-  if(value = modelObject.heatingCapacityCoefficient2())
+  if((value = modelObject.heatingCapacityCoefficient2()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingCapacityCoefficient2,value.get());
   }
   
   //Heating Capacity Coefficient 3
-  if(value = modelObject.heatingCapacityCoefficient3())
+  if((value = modelObject.heatingCapacityCoefficient3()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingCapacityCoefficient3,value.get());
   }
 
   //Heating Capacity Coefficient 4
-  if(value = modelObject.heatingCapacityCoefficient4())
+  if((value = modelObject.heatingCapacityCoefficient4()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingCapacityCoefficient4,value.get());
   }
   
   //Heating Capacity Coefficient 5
-  if(value = modelObject.heatingCapacityCoefficient5())
+  if((value = modelObject.heatingCapacityCoefficient5()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingCapacityCoefficient5,value.get());
   }
 
   //Heating Power Consumption Coefficient 1
-  if(value = modelObject.heatingPowerConsumptionCoefficient1())
+  if((value = modelObject.heatingPowerConsumptionCoefficient1()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingPowerConsumptionCoefficient1,value.get());
   }
 
   //Heating Power Consumption Coefficient 2
-  if(value = modelObject.heatingPowerConsumptionCoefficient2())
+  if((value = modelObject.heatingPowerConsumptionCoefficient2()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingPowerConsumptionCoefficient2,value.get());
   }
 
   //Heating Power Consumption Coefficient 3
-  if(value = modelObject.heatingPowerConsumptionCoefficient3())
+  if((value = modelObject.heatingPowerConsumptionCoefficient3()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingPowerConsumptionCoefficient3,value.get());
   }
 
   //Heating Power Consumption Coefficient 4
-  if(value = modelObject.heatingPowerConsumptionCoefficient4())
+  if((value = modelObject.heatingPowerConsumptionCoefficient4()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingPowerConsumptionCoefficient4,value.get());
   }
 
   //Heating Power Consumption Coefficient 5
-  if(value = modelObject.heatingPowerConsumptionCoefficient5())
+  if((value = modelObject.heatingPowerConsumptionCoefficient5()))
   {
     idfObject.setDouble(Coil_Heating_WaterToAirHeatPump_EquationFitFields::HeatingPowerConsumptionCoefficient5,value.get());
   }

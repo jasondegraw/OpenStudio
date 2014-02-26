@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -107,12 +107,20 @@ namespace runmanager {
     public:
       RubyJobBuilder(bool t_userScriptJob = false);
 
+      /// Construct a RubyJobBuilder from a json file
+      RubyJobBuilder(const openstudio::path &t_json);
+
       /// Construct a RubyJobBuilder from an existing set of JobParams (useful when loading from
       /// the database).
       RubyJobBuilder(const JobParams &t_params);
 
       /// Create from the workflow WorkItem
       RubyJobBuilder(const WorkItem &t_workItem);
+
+      /// Create from the workflow WorkItem
+      RubyJobBuilder(const WorkItem &t_workItem,
+                     const openstudio::path& t_originalBasePath,
+                     const openstudio::path& t_newBasePath);
 
       /// Create from a BCLMeasure by:
       ///   Setting scriptFile to t_measure.primaryRubyScriptPath()
@@ -124,7 +132,15 @@ namespace runmanager {
                      const openstudio::path &t_relativeTo = openstudio::path(),
                      bool t_copyFileTrue = false);
 
+      /** \overload */
+      RubyJobBuilder(const openstudio::BCLMeasure &t_measure,
+                     const std::map<std::string,ruleset::OSArgument>& t_args,
+                     const openstudio::path &t_relativeTo = openstudio::path(),
+                     bool t_copyFileTrue = false);
+
       openstudio::path script() const;
+
+      bool userScriptJob() const;
 
       /// Sets the name of the ruby script file to execute
       void setScriptFile(const openstudio::path &t_script);
@@ -150,6 +166,9 @@ namespace runmanager {
 
       /// Adds an argument with no "--" prefix to the ruby script that is executed
       void addScriptArgument(const std::string &name);
+
+      /// Clears any -I parameters currently set to be sent to the ruby script interpreter
+      void clearIncludeDir();
 
       /// Sets the -I include dir that is passed to the ruby script interpreter during execution
       void setIncludeDir(const openstudio::path &value);
@@ -194,6 +213,11 @@ namespace runmanager {
       /// Returns the collection of required files to copy for this job
       std::vector<boost::tuple<std::string, std::string, std::string> > copyRequiredFiles() const;
 
+
+      const std::vector<RubyJobBuilder> &mergedJobs() const;
+
+      boost::optional<openstudio::UUID> originalUUID() const;
+
       static JobParams toJobParams(const std::vector<ruleset::OSArgument> &t_args,
           const openstudio::path &t_basePath=openstudio::path());
 
@@ -232,17 +256,28 @@ namespace runmanager {
       std::vector<std::string> m_params;
       std::vector<std::string> m_toolparams;
       openstudio::path m_script;
+      std::vector<RubyJobBuilder> m_mergedJobs;
+      boost::optional<openstudio::UUID> m_originalUUID;
+
       bool m_userScriptJob;
+      boost::optional<openstudio::UUID> m_bclMeasureUUID;
 
       static bool stringToBool(const std::string &t_val);
       static std::string boolToString(bool t_val);
-      void initializeFromParams(const JobParams &t_params);
+      void initializeFromParams(const JobParams &t_params,
+                                const openstudio::path& t_originalBasePath = openstudio::path(),
+                                const openstudio::path& t_newBasePath = openstudio::path());
 
       // used internally to initialize userScriptRuby jobs and RubyJobs created from BCLMeasures
       void setAsUserScriptRubyJob(const openstudio::path& t_userScriptPath,
           const std::vector<ruleset::OSArgument>& t_args,
           const openstudio::path &t_relativeTo,
           bool t_copyFileArguments);
+
+      void constructFromBCLMeasure(const openstudio::BCLMeasure &t_measure,
+                                   const std::vector<ruleset::OSArgument>& t_args,
+                                   const openstudio::path &t_relativeTo,
+                                   bool t_copyFileTrue);
   };
 
 } // runmanager

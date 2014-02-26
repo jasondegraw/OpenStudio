@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -152,7 +152,7 @@ void InspectorGadget::connectSignalsAndSlots()
 {
   bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)),
                              this, SLOT(toggleUnits(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 void InspectorGadget::rebuild(bool recursive)
@@ -820,22 +820,24 @@ void InspectorGadget::layoutComboBox( QVBoxLayout* layout,
 
     std::sort(names.begin(), names.end(), IstringCompare());
 
-    if (!prop.required){
+    combo->addItem("");
+    /*if (!prop.required){
       combo->addItem("");
     }else{
       combo->addItem("");
-    }
+    }*/
     BOOST_FOREACH(const std::string& name, names){
       combo->addItem(name.c_str());   
     }
   }
   else
   {
-    if (!prop.required){
+    combo->addItem("");
+    /*if (!prop.required){
       combo->addItem("");
     }else{
       combo->addItem("");
-    }
+    }*/
     BOOST_FOREACH(IddKey key, field.keys()){
       combo->addItem(key.name().c_str());
     }
@@ -970,7 +972,7 @@ void InspectorGadget::IGdefaultRemoved(const QString&)
 
 void InspectorGadget::IGvalueChanged( const QString& value )
 {
-  BOOST_ASSERT(m_workspaceObj);
+  OS_ASSERT(m_workspaceObj);
 
   QString qval=value;
   QObject* source = sender();
@@ -1081,7 +1083,7 @@ void InspectorGadget::commentConfig(bool showComments)
 void InspectorGadget::setPrec()
 { 
   IGPrecisionDialog* source = dynamic_cast<IGPrecisionDialog*>(sender());
-  Q_ASSERT(source);
+  OS_ASSERT(source);
 
   if( source->sciBtn->isChecked() )
   {
@@ -1118,7 +1120,7 @@ void InspectorGadget::addExtensible()
   connectWorkspaceObjectSignals();
 
   QPushButton* source = dynamic_cast<QPushButton*>(sender());
-  Q_ASSERT(source);
+  OS_ASSERT(source);
   checkRemoveBtn( source );
   emit dirty();
   rebuild(false);
@@ -1131,7 +1133,7 @@ void InspectorGadget::removeExtensible()
   connectWorkspaceObjectSignals();
 
   QPushButton* source = dynamic_cast<QPushButton*>(sender());
-  Q_ASSERT(source);
+  OS_ASSERT(source);
   checkRemoveBtn( source );
   emit dirty();
   rebuild(false);
@@ -1145,7 +1147,7 @@ void InspectorGadget::createAllFields()
     disconnectWorkspaceObjectSignals();
     bool result = m_workspaceObj->setString(max-1,"");
     connectWorkspaceObjectSignals();
-    Q_ASSERT(result);
+    OS_ASSERT(result);
     rebuild(false);
   }
 
@@ -1214,10 +1216,10 @@ void InspectorGadget::connectWorkspaceObjectSignals() const
     QObject* impl = m_workspaceObj->getImpl<openstudio::detail::WorkspaceObject_Impl>().get();
     if (impl){
       bool connected = this->connect(impl, SIGNAL(onChange()), SLOT(onWorkspaceObjectChanged()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
 
       connected = this->connect(impl, SIGNAL(onRemoveFromWorkspace(Handle)), SLOT(onWorkspaceObjectRemoved()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
     }
   }
 }

@@ -25,9 +25,9 @@
 
 #include <analysisdriver/CurrentAnalysis.hpp>
 
-#include <analysis/DiscretePerturbation.hpp>
-#include <analysis/DiscreteVariable.hpp>
-#include <analysis/DiscreteVariable_Impl.hpp>
+#include <analysis/Measure.hpp>
+#include <analysis/MeasureGroup.hpp>
+#include <analysis/MeasureGroup_Impl.hpp>
 #include <analysis/InputVariable.hpp>
 #include <analysis/Problem.hpp>
 #include <analysis/Analysis.hpp>
@@ -35,6 +35,10 @@
 #include <analysis/AnalysisObject_Impl.hpp>
 
 #include <runmanager/lib/RunManager.hpp>
+
+#include <ruleset/OSArgument.hpp>
+
+#include <model/Model.hpp>
 
 #include <utilities/core/ApplicationPathHelpers.hpp>
 #include <utilities/core/Assert.hpp>
@@ -60,8 +64,6 @@
 #include "MeasureManager.hpp"
 #include "BCLMeasureDialog.hpp"
 #include "ProcessEventsProgressBar.hpp"
-
-#include <boost/foreach.hpp>
 
 namespace openstudio {
 
@@ -102,7 +104,7 @@ std::pair<bool,std::string> MeasureManager::updateMeasure(analysisdriver::Simple
 BCLMeasure MeasureManager::insertReplaceMeasure(analysisdriver::SimpleProject &t_project, const UUID &t_id)
 {
   boost::optional<BCLMeasure> measure = getMeasure(t_id);
-  Q_ASSERT(measure);
+  OS_ASSERT(measure);
   bool isMyMeasure = (m_myMeasures.find(t_id) != m_myMeasures.end());
   if (isMyMeasure) {
     bool updated = measure->checkForUpdates();
@@ -140,10 +142,10 @@ BCLMeasure MeasureManager::insertReplaceMeasure(analysisdriver::SimpleProject &t
     buttons->addWidget(apply);
 
     bool connected = connect(cancel, SIGNAL(pressed()), &dialog, SLOT(reject()));
-    Q_ASSERT(connected);
+    OS_ASSERT(connected);
 
     connected = connect(apply, SIGNAL(pressed()), &dialog, SLOT(accept()));
-    Q_ASSERT(connected);
+    OS_ASSERT(connected);
 
     mainContentVLayout->addLayout(buttons);
 
@@ -156,7 +158,7 @@ BCLMeasure MeasureManager::insertReplaceMeasure(analysisdriver::SimpleProject &t
         if (updateResult.first)
         {
           boost::optional<BCLMeasure> updatedMeasure = getMeasure(t_id);
-          Q_ASSERT(updatedMeasure);
+          OS_ASSERT(updatedMeasure);
           return *updatedMeasure;
         } else {
           QMessageBox::critical(m_app->mainWidget(), QString("Error Updating Measure"), QString::fromStdString(updateResult.second));
@@ -217,7 +219,7 @@ std::string MeasureManager::suggestMeasureGroupName(const BCLMeasure &t_measure)
   if( boost::optional<analysisdriver::SimpleProject> project = m_app->project() ){
     analysis::Analysis analysis = project->analysis();
     analysis::Problem problem = analysis.problem();
-    BOOST_FOREACH(const analysis::InputVariable& variable, problem.variables()){
+    Q_FOREACH(const analysis::InputVariable& variable, problem.variables()){
       allNames.insert(variable.name());
       allNames.insert(variable.displayName());
     }
@@ -246,12 +248,12 @@ std::string MeasureManager::suggestMeasureName(const BCLMeasure &t_measure, bool
   if( boost::optional<analysisdriver::SimpleProject> project = m_app->project() ){
     analysis::Analysis analysis = project->analysis();
     analysis::Problem problem = analysis.problem();
-    BOOST_FOREACH(const analysis::InputVariable& variable, problem.variables()){
-      boost::optional<analysis::DiscreteVariable> discreteVariable = variable.optionalCast<analysis::DiscreteVariable>();
+    Q_FOREACH(const analysis::InputVariable& variable, problem.variables()){
+      boost::optional<analysis::MeasureGroup> discreteVariable = variable.optionalCast<analysis::MeasureGroup>();
       if (discreteVariable){
-        BOOST_FOREACH(const analysis::DiscretePerturbation& perturbation, discreteVariable->perturbations(false)){
-          allNames.insert(perturbation.name());
-          allNames.insert(perturbation.displayName());
+        Q_FOREACH(const analysis::Measure& measure, discreteVariable->measures(false)){
+          allNames.insert(measure.name());
+          allNames.insert(measure.displayName());
         }
       }
     }
@@ -311,7 +313,7 @@ void MeasureManager::updateMeasures(analysisdriver::SimpleProject &t_project,
       }
       ss << " failed";
       QString errors;
-      BOOST_FOREACH(const std::string& failMessage,failMessages) {
+      Q_FOREACH(const std::string& failMessage,failMessages) {
         errors.append(QString::fromStdString(failMessage));
         errors.append("\n\n");
       }
@@ -326,7 +328,7 @@ void MeasureManager::updateMeasures(analysisdriver::SimpleProject &t_project,
       // DLM: there is a bug in QMessageBox where setMinimumWidth is not used
       // http://www.qtcentre.org/threads/22298-QMessageBox-Controlling-the-width?p=113348#post113348
       QSpacerItem* horizontalSpacer = new QSpacerItem(330, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-      QGridLayout* layout = (QGridLayout*)messageBox->layout();
+      QGridLayout* layout = static_cast<QGridLayout*>(messageBox->layout());
       layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
       
       messageBox->exec();  
@@ -350,6 +352,7 @@ void MeasureManager::updateBCLMeasures(analysisdriver::SimpleProject &t_project)
       itr != measures.end();
       ++itr)
   {
+    // DLM: this should not happen for BCL measures but ok to check anyway
     bool isNewVersion = itr->checkForUpdates();
     if (isNewVersion) {
       itr->save();
@@ -409,6 +412,7 @@ void MeasureManager::updateMyMeasures(analysisdriver::SimpleProject &t_project)
       itr != measures.end();
       ++itr)
   {
+    // DLM: this happens if user updates measure but does not update checksums, ok to save it for them
     bool isNewVersion = itr->checkForUpdates();
     if (isNewVersion) {
       itr->save();
@@ -437,7 +441,7 @@ std::vector<BCLMeasure> MeasureManager::bclMeasures()
 
   for(std::map<UUID,BCLMeasure>::const_iterator it = m_bclMeasures.begin();
       it != m_bclMeasures.end();
-      it++ )
+      ++it )
   {
     result.push_back(it->second);
   }
@@ -451,18 +455,22 @@ void MeasureManager::updateMeasuresLists()
   m_bclMeasures.clear();
   m_myMeasures.clear();
 
-  std::vector<BCLMeasure> patAppMeasures = BCLMeasure::patApplicationMeasures();
-  for( std::vector<BCLMeasure>::const_iterator it = patAppMeasures.begin();
-       it != patAppMeasures.end();
-       it++ )
-  {
-    m_bclMeasures.insert(std::make_pair<UUID,BCLMeasure>(it->uuid(),*it));
-  }
+  // DLM: initially these were here to provide a "starter" set of measures
+  // these are now internal measures that are not meant to be seen by the user.
+  // If want to provide a starter set of measures we should do that somewhere
+  // other than patApplicationMeasures.
+  //std::vector<BCLMeasure> patAppMeasures = BCLMeasure::patApplicationMeasures();
+  //for( std::vector<BCLMeasure>::const_iterator it = patAppMeasures.begin();
+  //     it != patAppMeasures.end();
+  //     it++ )
+  //{
+  //  m_bclMeasures.insert(std::make_pair<UUID,BCLMeasure>(it->uuid(),*it));
+  //}
 
   std::vector<BCLMeasure> localBCLMeasures = BCLMeasure::localBCLMeasures();
   for( std::vector<BCLMeasure>::const_iterator it = localBCLMeasures.begin();
        it != localBCLMeasures.end();
-       it++ )
+       ++it )
   {
     m_bclMeasures.insert(std::make_pair<UUID,BCLMeasure>(it->uuid(),*it));
   }
@@ -470,7 +478,7 @@ void MeasureManager::updateMeasuresLists()
   std::vector<BCLMeasure> userMeasures = BCLMeasure::userMeasures();
   for( std::vector<BCLMeasure>::const_iterator it = userMeasures.begin();
        it != userMeasures.end();
-       it++ )
+       ++it )
   {
     m_myMeasures.insert(std::make_pair<UUID,BCLMeasure>(it->uuid(),*it));
   }
@@ -487,7 +495,7 @@ std::vector<BCLMeasure> MeasureManager::myMeasures()
 
   for(std::map<UUID,BCLMeasure>::const_iterator it = m_myMeasures.begin();
       it != m_myMeasures.end();
-      it++ )
+      ++it )
   {
     result.push_back(it->second);
   }
@@ -526,7 +534,7 @@ void MeasureManager::addMeasure()
 
 void MeasureManager::duplicateSelectedMeasure()
 {
-  Q_ASSERT(m_libraryController);
+  OS_ASSERT(m_libraryController);
   QPointer<LibraryItem> item = m_libraryController->selectedItem();
 
   if( !item.isNull() )

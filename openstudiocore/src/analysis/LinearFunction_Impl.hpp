@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,7 +33,6 @@ namespace detail {
 
   /** LinearFunction_Impl is a Function_Impl that is the implementation class for LinearFunction.*/
   class ANALYSIS_API LinearFunction_Impl : public Function_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -72,6 +71,14 @@ namespace detail {
     //@{
 
     bool setCoefficients(const std::vector<double>& coefficients);
+
+    //@}
+    /** @name Protected in Public Class */
+    //@{
+
+    virtual QVariant toVariant() const;
+
+    static LinearFunction fromVariant(const QVariant& variant, const VersionString& version);
 
     //@}
    protected:

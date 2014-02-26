@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -114,14 +114,14 @@ namespace detail {
       try {
         m_idf = t_files.getLastByExtension("idf");
 
-        try {
-          m_idf->getRequiredFile(toPath("Energy+.idd"));
-        } catch (const std::runtime_error &) {
-          // We did not have an idd set, so we should find one
+
+        if (!m_idf->hasRequiredFile(toPath("Energy+.idd")))
+        {
           m_idf->addRequiredFile( toPath("Energy+.idd"), toPath("Energy+.idd"));
         }
 
-      } catch (const std::exception &) {
+      } catch (const std::runtime_error &) {
+        // no idf set
       }
     }
   }

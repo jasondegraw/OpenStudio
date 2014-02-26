@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -240,6 +240,16 @@ boost::optional<IdfObject> ForwardTranslator::translateCoilHeatingGas( CoilHeati
   ///////////////////////////////////////////////////////////////////////////
 
   m_idfObjects.push_back(idfObject);
+
+  // Part Load Fraction Correlation Curve 
+  if( boost::optional<model::Curve> curve = modelObject.partLoadFractionCorrelationCurve() )
+  {
+    if( boost::optional<IdfObject> _curve = translateAndMapModelObject(curve.get()) )
+    {
+      idfObject.setString(Coil_Heating_GasFields::PartLoadFractionCorrelationCurveName,_curve->name().get()); 
+    }
+  }
+
   return boost::optional<IdfObject>(idfObject);
 }
 

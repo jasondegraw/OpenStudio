@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -106,6 +106,14 @@ namespace detail {
     bool setSamplesAndSymbolsForOrthogonalArray(int symbols, int multiplier);
   
     //@}  
+    /** @name Absent or Protected in Public Class */
+    //@{
+
+    virtual QVariant toVariant() const;
+
+    static DDACEAlgorithmOptions fromVariant(const QVariant& variant, const VersionString& version);
+
+    //@}
    protected:
     DDACEAlgorithmType m_algorithmType;
    private:

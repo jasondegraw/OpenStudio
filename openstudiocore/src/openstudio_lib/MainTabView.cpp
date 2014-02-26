@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -18,6 +18,9 @@
  **********************************************************************/
 
 #include <openstudio_lib/MainTabView.hpp>
+
+#include <utilities/core/Assert.hpp>
+
 #include <QStackedWidget>
 #include <QPixmap>
 #include <QHBoxLayout>
@@ -120,7 +123,7 @@ MainTabView::MainTabView(const QString & tabLabel, bool hasSubTab, QWidget * par
 bool MainTabView::addTabWidget(QWidget * widget)
 {
   // This method should only be called in cases where the tab will not have sub tabs
-  BOOST_ASSERT(!m_hasSubTab);
+  OS_ASSERT(!m_hasSubTab);
   if(m_hasSubTab) return false;
 
   m_stackedWidget->addWidget(widget);
@@ -130,7 +133,7 @@ bool MainTabView::addTabWidget(QWidget * widget)
 bool MainTabView::addSubTab(const QString & subTablabel, QWidget * widget, int id)
 {
   // This method should only be called in cases where the tab will have sub tabs
-  BOOST_ASSERT(m_hasSubTab);
+  OS_ASSERT(m_hasSubTab);
   if(!m_hasSubTab) return false;
 
   QPushButton * button = new QPushButton(this);
@@ -155,7 +158,7 @@ void MainTabView::select()
 
   for( std::vector<QPushButton*>::iterator  it = m_tabButtons.begin();
        it < m_tabButtons.end();
-       it++ ){
+       ++it ){
     if( *it == button ){
       break;
     }

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -60,7 +60,6 @@ OptionalModelObject ReverseTranslator::translateAirLoopHVAC( const WorkspaceObje
   }
 
   OptionalModelObject result;
-  std::string s;
   boost::optional<double> val;
   boost::optional<std::string> optionalString;
   Workspace _workspace = workspaceObject.workspace();
@@ -93,7 +92,7 @@ OptionalModelObject ReverseTranslator::translateAirLoopHVAC( const WorkspaceObje
   {
     airLoopHVAC.autosizeDesignSupplyAirFlowRate();
   }
-  else if( val = workspaceObject.getDouble(AirLoopHVACFields::DesignSupplyAirFlowRate) )
+  else if( (val = workspaceObject.getDouble(AirLoopHVACFields::DesignSupplyAirFlowRate)) )
   {
     airLoopHVAC.setDesignSupplyAirFlowRate(val.get());
   }
@@ -198,7 +197,7 @@ OptionalModelObject ReverseTranslator::translateAirLoopHVAC( const WorkspaceObje
     boost::optional<WorkspaceObject> _airLoopHVACZoneMixer;
     for( std::vector<WorkspaceObject>::iterator it = _airLoopHVACZoneMixers.begin();
          it < _airLoopHVACZoneMixers.end();
-         it++ )
+         ++it )
     {
       boost::optional<std::string> mixerOutletNodeName;
       mixerOutletNodeName = it->getString(AirLoopHVAC_ZoneMixerFields::OutletNodeName);
@@ -264,7 +263,7 @@ OptionalModelObject ReverseTranslator::translateAirLoopHVAC( const WorkspaceObje
               break;
             }
 
-            for( int j = 1; optionalString = _zoneEquipmentList->getString(j); j = j + 4 )
+            for( int j = 1; (optionalString = _zoneEquipmentList->getString(j)); j = j + 4 )
             {
               boost::optional<std::string> zoneEquipmentName = _zoneEquipmentList->getString(j+1) ;
               // Possible Zone Equipment

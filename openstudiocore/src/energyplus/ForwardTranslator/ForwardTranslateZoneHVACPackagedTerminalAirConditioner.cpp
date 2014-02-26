@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,6 +31,7 @@
 #include <model/CoilCoolingDXSingleSpeed_Impl.hpp>
 #include <utilities/idd/ZoneHVAC_PackagedTerminalAirConditioner_FieldEnums.hxx>
 #include <utilities/idd/Fan_ConstantVolume_FieldEnums.hxx>
+#include <utilities/idd/Fan_OnOff_FieldEnums.hxx>
 #include <utilities/idd/Coil_Heating_DX_SingleSpeed_FieldEnums.hxx>
 #include <utilities/idd/Coil_Heating_Gas_FieldEnums.hxx>
 #include <utilities/idd/Coil_Heating_Electric_FieldEnums.hxx>
@@ -88,7 +89,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
 
   if( boost::optional<Node> node = modelObject.inletNode() )
   {
-    if( s = node->name() )
+    if( (s = node->name()) )
     {
       airInletNodeName = s;
 
@@ -102,7 +103,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
 
   if( boost::optional<Node> node = modelObject.outletNode() )
   {
-    if( s = node->name() )
+    if( (s = node->name()) )
     {
       airOutletNodeName = s;
 
@@ -145,7 +146,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
   {
     idfObject.setString(ZoneHVAC_PackagedTerminalAirConditionerFields::SupplyAirFlowRateDuringCoolingOperation,"Autosize");
   }
-  else if( value = modelObject.supplyAirFlowRateDuringCoolingOperation() )
+  else if( (value = modelObject.supplyAirFlowRateDuringCoolingOperation()) )
   {
     idfObject.setDouble(ZoneHVAC_PackagedTerminalAirConditionerFields::SupplyAirFlowRateDuringCoolingOperation,value.get());
   }
@@ -156,7 +157,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
   {
     idfObject.setString(ZoneHVAC_PackagedTerminalAirConditionerFields::SupplyAirFlowRateDuringHeatingOperation,"Autosize");
   }
-  else if( value = modelObject.supplyAirFlowRateDuringHeatingOperation() )
+  else if( (value = modelObject.supplyAirFlowRateDuringHeatingOperation()) )
   {
     idfObject.setDouble(ZoneHVAC_PackagedTerminalAirConditionerFields::SupplyAirFlowRateDuringHeatingOperation,value.get());
   }
@@ -167,7 +168,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
   {
     idfObject.setString(ZoneHVAC_PackagedTerminalAirConditionerFields::SupplyAirFlowRateWhenNoCoolingorHeatingisNeeded,"Autosize");
   } 
-  else if( value = modelObject.supplyAirFlowRateWhenNoCoolingorHeatingisNeeded() )
+  else if( (value = modelObject.supplyAirFlowRateWhenNoCoolingorHeatingisNeeded()) )
   {
     idfObject.setDouble(ZoneHVAC_PackagedTerminalAirConditionerFields::SupplyAirFlowRateWhenNoCoolingorHeatingisNeeded,value.get());
   }
@@ -178,7 +179,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
   {
     idfObject.setString(ZoneHVAC_PackagedTerminalAirConditionerFields::OutdoorAirFlowRateDuringCoolingOperation,"Autosize");
   }
-  else if( value = modelObject.outdoorAirFlowRateDuringCoolingOperation() )
+  else if( (value = modelObject.outdoorAirFlowRateDuringCoolingOperation()) )
   {
     idfObject.setDouble(ZoneHVAC_PackagedTerminalAirConditionerFields::OutdoorAirFlowRateDuringCoolingOperation,value.get());
   }
@@ -189,7 +190,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
   {
     idfObject.setString(ZoneHVAC_PackagedTerminalAirConditionerFields::OutdoorAirFlowRateDuringHeatingOperation,"Autosize");
   }
-  else if( value = modelObject.outdoorAirFlowRateDuringHeatingOperation() )
+  else if( (value = modelObject.outdoorAirFlowRateDuringHeatingOperation()) )
   {
     idfObject.setDouble(ZoneHVAC_PackagedTerminalAirConditionerFields::OutdoorAirFlowRateDuringHeatingOperation,value.get());
   }
@@ -200,7 +201,7 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
   {
     idfObject.setString(ZoneHVAC_PackagedTerminalAirConditionerFields::OutdoorAirFlowRateWhenNoCoolingorHeatingisNeeded,"Autosize");
   }
-  else if( value = modelObject.outdoorAirFlowRateWhenNoCoolingorHeatingisNeeded() )
+  else if( (value = modelObject.outdoorAirFlowRateWhenNoCoolingorHeatingisNeeded()) )
   {
     idfObject.setDouble(ZoneHVAC_PackagedTerminalAirConditionerFields::OutdoorAirFlowRateWhenNoCoolingorHeatingisNeeded,value.get());
   }
@@ -220,8 +221,12 @@ boost::optional<IdfObject> ForwardTranslator::translateZoneHVACPackagedTerminalA
       if( _supplyAirFan->iddObject().type() == IddObjectType::Fan_ConstantVolume )
       {
         _supplyAirFan->setString(Fan_ConstantVolumeFields::AirInletNodeName,heatingCoilOutletNodeName);
-
         _supplyAirFan->setString(Fan_ConstantVolumeFields::AirOutletNodeName,airOutletNodeName.get());
+      }
+      else if( _supplyAirFan->iddObject().type() == IddObjectType::Fan_OnOff )
+      {
+        _supplyAirFan->setString(Fan_OnOffFields::AirInletNodeName,heatingCoilOutletNodeName);
+        _supplyAirFan->setString(Fan_OnOffFields::AirOutletNodeName,airOutletNodeName.get());
       }
     }
   }

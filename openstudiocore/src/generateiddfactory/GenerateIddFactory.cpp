@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -42,8 +42,6 @@ IddFileFactoryDataVector constructIddFileObjects(const std::vector<std::string>&
 void initializeOutFiles(GenerateIddFactoryOutFiles& outFiles,
                         const std::vector<IddFileFactoryData>& iddFiles) 
 {
-  std::stringstream ss;
-
   // start IddEnums.hxx
   outFiles.iddEnumsHxx.tempFile
     << "#ifndef UTILITIES_IDD_IDDENUMS_HXX" << std::endl
@@ -265,7 +263,7 @@ void initializeOutFiles(GenerateIddFactoryOutFiles& outFiles,
     << "  static IddObject object;" << std::endl
     << std::endl
     << "  // Catchall is the type of IddObject returned by the default constructor." << std::endl
-    << "  BOOST_ASSERT(object.type() == IddObjectType::Catchall);" << std::endl
+    << "  OS_ASSERT(object.type() == IddObjectType::Catchall);" << std::endl
     << "  return object;" << std::endl
     << "}" << std::endl;
 
@@ -419,7 +417,7 @@ void completeOutFiles(const IddFileFactoryDataVector& iddFiles,
     << "                                             \"\"," << std::endl
     << "                                             ss.str()," << std::endl
     << "                                             objType);" << std::endl
-    << "    BOOST_ASSERT(oObj);" << std::endl
+    << "    OS_ASSERT(oObj);" << std::endl
     << "    object = *oObj;" << std::endl
     << "  }" << std::endl
     << std::endl
@@ -719,7 +717,7 @@ void completeOutFiles(const IddFileFactoryDataVector& iddFiles,
       << "    result = lookupPair->second(); " << std::endl
       << "  }" << std::endl
       << "  else { " << std::endl
-      << "    BOOST_ASSERT(objectType == IddObjectType::UserCustom); " << std::endl
+      << "    OS_ASSERT(objectType == IddObjectType::UserCustom); " << std::endl
       << "    LOG(Info,\"UserCustom objects are not available through the IddFactory. Please query your IddFile by IddObject.name().\");" << std::endl
       << "  }" << std::endl
       << std::endl
@@ -847,7 +845,7 @@ void completeOutFiles(const IddFileFactoryDataVector& iddFiles,
     << "  }" << std::endl
     << std::endl
     << "  VersionString currentVersion(openStudioVersion());" << std::endl
-    << "  BOOST_ASSERT(fileType == IddFileType::OpenStudio);" << std::endl
+    << "  OS_ASSERT(fileType == IddFileType::OpenStudio);" << std::endl
     << "  if (version == currentVersion) {" << std::endl
     << "    return getIddFile(fileType);" << std::endl
     << "  }" << std::endl

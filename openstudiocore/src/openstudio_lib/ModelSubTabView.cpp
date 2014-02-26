@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -62,13 +62,15 @@ ModelSubTabView::ModelSubTabView(OSItemSelector* itemSelector,
                   SIGNAL(dropZoneItemClicked(OSItem*)),
                   this, 
                   SLOT(dropZoneItemClicked(OSItem*)));
-  BOOST_ASSERT(bingo);
+  OS_ASSERT(bingo);
 
+  // DLM: can we remove this?
   bingo = connect(itemSelector,SIGNAL(itemSelected(OSItem*)),
                   this,SLOT(onItemSelected()));
-  BOOST_ASSERT(bingo);
+  OS_ASSERT(bingo);
 }
 
+// DLM: what purpose does this serve?
 void ModelSubTabView::onItemSelected()
 {
   boost::optional<model::ModelObject> mo;

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -27,15 +27,20 @@
 #include "JobOutputCleanup.hpp"
 #include "RunManager_Util.hpp"
 
-#include <utilities/time/DateTime.hpp>
 #include <model/Model.hpp>
 #include <model/Model_Impl.hpp>
 #include <model/WeatherFile.hpp>
 #include <model/WeatherFile_Impl.hpp>
+
 #include <energyplus/ReverseTranslator.hpp>
+
 #include <utilities/idf/IdfFile.hpp>
 #include <utilities/idf/Workspace.hpp>
 #include <utilities/idd/OS_WeatherFile_FieldEnums.hxx>
+
+#include <utilities/core/Assert.hpp>
+#include <utilities/time/DateTime.hpp>
+
 
 #include <QDir>
 #include <QDateTime>
@@ -57,7 +62,7 @@ namespace detail {
     try {
       m_idf = files.getLastByExtension("idf");
       resetFiles(m_files, m_idf);
-    } catch (const std::exception &) {
+    } catch (const std::runtime_error &) {
     }
 
     m_description = buildDescription("idf");
@@ -139,7 +144,7 @@ namespace detail {
         model = rt.translateWorkspace(*workspace);
       }
 
-      BOOST_ASSERT(model);
+      OS_ASSERT(model);
 
       openstudio::path outfile = outpath / openstudio::toPath("out.osm");
 
@@ -163,8 +168,8 @@ namespace detail {
       errors.addError(ErrorType::Warning, itr->logMessage());
     }
 
-    for (std::vector<openstudio::LogMessage>::const_iterator itr = logwarnings.begin();
-        itr != logwarnings.end();
+    for (std::vector<openstudio::LogMessage>::const_iterator itr = logerrors.begin();
+        itr != logerrors.end();
         ++itr)
     {
       errors.addError(ErrorType::Error, itr->logMessage());

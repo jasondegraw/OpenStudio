@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -162,6 +162,21 @@ TEST(DateTime, normalization2)
   testDateTime -= Time(1,23,59,59);
   EXPECT_TRUE(testDateTime.date() == Date(MonthOfYear::Dec,30,2008));
 };
+
+TEST(DateTime,EpochConversions) {
+  DateTime dateTime = DateTime::now();
+  std::time_t asEpoch = dateTime.toEpoch();
+  DateTime copy = DateTime::fromEpoch(asEpoch);
+  EXPECT_EQ(dateTime,copy);
+}
+
+TEST(DateTime,ISO8601Conversions) {
+  DateTime dateTime = DateTime::now();
+  std::string asIso = dateTime.toISO8601();
+  OptionalDateTime copy = DateTime::fromISO8601(asIso);
+  ASSERT_TRUE(copy);
+  EXPECT_EQ(dateTime,copy.get());
+}
 
 
 /////////////////////////////////////////////////////////////

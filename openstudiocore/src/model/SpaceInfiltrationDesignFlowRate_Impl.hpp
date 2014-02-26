@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ namespace detail {
     Q_PROPERTY(boost::optional<double> designFlowRate READ designFlowRate WRITE setDesignFlowRate);
     Q_PROPERTY(boost::optional<double> flowperSpaceFloorArea READ flowperSpaceFloorArea WRITE setFlowperSpaceFloorArea);
     Q_PROPERTY(boost::optional<double> flowperExteriorSurfaceArea READ flowperExteriorSurfaceArea WRITE setFlowperExteriorSurfaceArea);
+    Q_PROPERTY(boost::optional<double> flowperExteriorWallArea READ flowperExteriorWallArea WRITE setFlowperExteriorWallArea);
     Q_PROPERTY(boost::optional<double> airChangesperHour READ airChangesperHour WRITE setAirChangesperHour);
     Q_PROPERTY(double constantTermCoefficient READ constantTermCoefficient WRITE setConstantTermCoefficient RESET resetConstantTermCoefficient);
     Q_PROPERTY(bool isConstantTermCoefficientDefaulted READ isConstantTermCoefficientDefaulted);
@@ -98,6 +99,8 @@ namespace detail {
 
     boost::optional<double> flowperExteriorSurfaceArea() const;
 
+    boost::optional<double> flowperExteriorWallArea() const;
+
     boost::optional<double> airChangesperHour() const;
 
     double constantTermCoefficient() const;
@@ -132,6 +135,8 @@ namespace detail {
 
     bool setFlowperExteriorSurfaceArea(boost::optional<double> flowperExteriorSurfaceArea);
 
+    bool setFlowperExteriorWallArea(boost::optional<double> flowperExteriorWallArea);
+
     bool setAirChangesperHour(boost::optional<double> airChangesperHour);
 
     bool setConstantTermCoefficient(double constantTermCoefficient);
@@ -149,6 +154,48 @@ namespace detail {
     bool setVelocitySquaredTermCoefficient(double velocitySquaredTermCoefficient);
 
     void resetVelocitySquaredTermCoefficient();
+
+    //@}
+    /** @name Other */
+    //@{
+
+    /** Returns the design flow rate (m^3/s) based on the floorArea (m^2),
+     *  exteriorSurfaceArea (m^2), exteriorWallArea (m^2), and airVolume (m^3). */
+    double getDesignFlowRate(double floorArea,
+                             double exteriorSurfaceArea,
+                             double exteriorWallArea,
+                             double airVolume) const;
+
+    /** Returns the design flow per space floor area (m^3/m^2*s) based on the
+     *  floorArea (m^2), exteriorSurfaceArea (m^2), exteriorWallArea (m^2), and
+     *  airVolume (m^3). */
+    double getFlowPerSpaceFloorArea(double floorArea,
+                                    double exteriorSurfaceArea,
+                                    double exteriorWallArea,
+                                    double airVolume) const;
+
+    /** Returns the design flow per exterior surface area (m^3/m^2*s) based on the
+     *  floorArea (m^2), exteriorSurfaceArea (m^2), exteriorWallArea (m^2), and
+     *  airVolume (m^3). */
+    double getFlowPerExteriorSurfaceArea(double floorArea,
+                                         double exteriorSurfaceArea,
+                                         double exteriorWallArea,
+                                         double airVolume) const;
+
+    /** Returns the design flow per exterior wall area (m^3/m^2*s) based on the
+     *  floorArea (m^2), exteriorSurfaceArea (m^2), exteriorWallArea (m^2), and
+     *  airVolume (m^3). */
+    double getFlowPerExteriorWallArea(double floorArea,
+                                      double exteriorSurfaceArea,
+                                      double exteriorWallArea,
+                                      double airVolume) const;
+
+    /** Returns the design air changes per hour (1/h) based on the floorArea (m^2),
+     *  exteriorSurfaceArea (m^2), exteriorWallArea (m^2), and airVolume (m^3). */
+    double getAirChangesPerHour(double floorArea,
+                                double exteriorSurfaceArea,
+                                double exteriorWallArea,
+                                double airVolume) const;
 
     //@}
    protected:

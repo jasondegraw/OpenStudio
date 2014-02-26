@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -102,7 +102,7 @@ YearSettingsWidget::YearSettingsWidget(const model::Model & model, QWidget * par
   std::vector<std::string> dayOfWeekValues = model::YearDescription::validDayofWeekforStartDayValues();
   for( std::vector<std::string>::iterator it = dayOfWeekValues.begin();
        it < dayOfWeekValues.end();
-       it++ )
+       ++it )
   {
     m_firstDayOfYearEdit->addItem(QString::fromStdString(*it));
   }
@@ -215,7 +215,7 @@ YearSettingsWidget::YearSettingsWidget(const model::Model & model, QWidget * par
 
   for( std::vector<std::string>::iterator it = weeks.begin();
        it < weeks.end();
-       it++ )
+       ++it )
   {
     m_startWeekBox->addItem(QString::fromStdString(*it));
     m_endWeekBox->addItem(QString::fromStdString(*it));
@@ -223,7 +223,7 @@ YearSettingsWidget::YearSettingsWidget(const model::Model & model, QWidget * par
 
   for( std::vector<std::string>::iterator it = days.begin();
        it < days.end();
-       it++ )
+       ++it )
   {
     m_startDayBox->addItem(QString::fromStdString(*it));
     m_endDayBox->addItem(QString::fromStdString(*it));
@@ -231,7 +231,7 @@ YearSettingsWidget::YearSettingsWidget(const model::Model & model, QWidget * par
 
   for( std::vector<std::string>::iterator it = months.begin();
        it < months.end();
-       it++ )
+       ++it )
   {
     m_startMonthBox->addItem(QString::fromStdString(*it));
     m_endMonthBox->addItem(QString::fromStdString(*it));
@@ -328,6 +328,13 @@ void YearSettingsWidget::refresh()
     {
       m_calendarYearButton->setChecked(true);
 
+      int index = m_calendarYearEdit->findText(QString::number(m_yearDescription->calendarYear().get()));
+      if (index != -1){
+        m_calendarYearEdit->blockSignals(true);
+        m_calendarYearEdit->setCurrentIndex(index);
+        m_calendarYearEdit->blockSignals(false);
+      }
+
       m_calendarYearEdit->setEnabled(true);
 
       m_firstDayOfYearEdit->setEnabled(false);
@@ -352,7 +359,9 @@ void YearSettingsWidget::refresh()
         }
       }
 
+      m_firstDayOfYearEdit->blockSignals(true);
       m_firstDayOfYearEdit->setCurrentIndex(dayOfWeekIndex);
+      m_firstDayOfYearEdit->blockSignals(false);
 
       m_firstDayOfYearEdit->setEnabled(true);
     }
@@ -367,9 +376,6 @@ void YearSettingsWidget::refresh()
       boost::shared_ptr<OSDocument> doc = OSAppBase::instance()->currentDocument();
       openstudio::path resourcesPath = openstudio::toPath(doc->modelTempDir()) / openstudio::toPath("resources");
       epwFile = weatherFile->file(resourcesPath);
-      if (epwFile){
-        DayOfWeek epwStartDayOfWeek = epwFile->startDayOfWeek();
-      }
     }
 
     // Refresh Daylight Savings Time
@@ -561,7 +567,7 @@ std::vector<std::string> YearSettingsWidget::daysOfWeek()
 
   for( std::map<int, std::string>::iterator it = nameMap.begin();
        it != nameMap.end();
-       it++ )
+       ++it )
   {
     result.push_back(it->second);
   }
@@ -577,7 +583,7 @@ std::vector<std::string> YearSettingsWidget::months()
 
   for( std::map<int, std::string>::iterator it = nameMap.begin();
        it != nameMap.end();
-       it++ )
+       ++it )
   {
     if (it->first == boost::date_time::NumMonths){
       // do nothing

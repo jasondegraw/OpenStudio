@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -93,7 +93,7 @@ OptionalModelObject ReverseTranslator::translateSetpointManagerSingleZoneReheat(
 
     if( modelObject )
     {
-      if( space = modelObject->optionalCast<Space>() )
+      if( (space = modelObject->optionalCast<Space>()) )
       {
         if( boost::optional<ThermalZone> thermalZone = space->thermalZone() )
         {

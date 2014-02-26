@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -23,6 +23,8 @@
 #include <QHBoxLayout>
 #include <QStyleOption>
 #include <QPainter>
+
+#include <utilities/bcl/BCLMeasure.hpp>
 
 namespace openstudio{
   
@@ -112,6 +114,11 @@ LightGradientHeader::LightGradientHeader(QWidget * parent)
 
   mainHLayout->addWidget(toggleButton);
 
+  m_measureTypeBadge = new QLabel();
+  m_measureTypeBadge->setFixedSize(25,25);
+  m_measureTypeBadge->setVisible(false);
+  mainHLayout->addWidget(m_measureTypeBadge);
+
   label = new QLabel();
   style.clear();
   style.append("QLabel { ");
@@ -119,6 +126,24 @@ LightGradientHeader::LightGradientHeader(QWidget * parent)
   style.append("} ");
   label->setStyleSheet(style);
   mainHLayout->addWidget(label);
+}
+
+void LightGradientHeader::setMeasureType(MeasureType measureType)
+{
+  bool found = false;
+
+  if (measureType == MeasureType::ModelMeasure){
+    m_measureTypeBadge->setPixmap(QPixmap(":/shared_gui_components/images/openstudio_measure_icon.png").scaled(25,25,Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
+    found = true;
+  }else if (measureType == MeasureType::EnergyPlusMeasure){
+    m_measureTypeBadge->setPixmap(QPixmap(":/shared_gui_components/images/energyplus_measure_icon.png").scaled(25,25,Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
+    found = true;
+  }else if (measureType == MeasureType::ReportingMeasure){
+    m_measureTypeBadge->setPixmap(QPixmap(":/shared_gui_components/images/report_measure_icon.png").scaled(25,25,Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
+    found = true;
+  }
+
+  m_measureTypeBadge->setVisible(found);
 }
 
 LightHeader::LightHeader(QWidget * parent)

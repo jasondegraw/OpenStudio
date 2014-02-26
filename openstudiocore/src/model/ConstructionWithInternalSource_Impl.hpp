@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -69,6 +69,12 @@ namespace detail {
 
     virtual int renderingColorIndex() const;
 
+    virtual bool eraseLayer(unsigned layerIndex);
+
+    virtual bool setLayers(const std::vector<Material>& materials);
+
+    virtual bool setLayer(const ModelPartitionMaterial& modelPartitionMaterial);
+
     /// Returns sourcePresentAfterLayerNumber.
     int sourcePresentAfterLayerNumber() const;
     bool setSourcePresentAfterLayerNumber(int sourcePresentAfterLayerNumber);
@@ -87,12 +93,16 @@ namespace detail {
     bool setTubeSpacing(double tubeSpacing);
     bool setTubeSpacing(const Quantity& tubeSpacing);
 
+    ConstructionWithInternalSource reverseConstructionWithInternalSource() const;
+
   private:
 
+    REGISTER_LOGGER("openstudio.model.ConstructionWithInternalSource");
+    
     openstudio::Quantity tubeSpacing_SI() const;
     openstudio::Quantity tubeSpacing_IP() const;
 
-    REGISTER_LOGGER("openstudio.model.ConstructionWithInternalSource");
+    void onNumLayersChanged();
   };
 
 } // detail

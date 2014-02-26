@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ namespace detail {
   ElectricEquipment_Impl::ElectricEquipment_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : SpaceLoadInstance_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == ElectricEquipment::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == ElectricEquipment::iddObjectType());
   }
 
   ElectricEquipment_Impl::ElectricEquipment_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -52,7 +52,7 @@ namespace detail {
                                                  bool keepHandle)
     : SpaceLoadInstance_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == ElectricEquipment::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == ElectricEquipment::iddObjectType());
   }
 
   ElectricEquipment_Impl::ElectricEquipment_Impl(const ElectricEquipment_Impl& other,
@@ -94,8 +94,6 @@ namespace detail {
 
     this->makeUnique();
 
-    double floorArea = space->floorArea();
-
     ElectricEquipmentDefinition electricEquipmentDefinition = this->electricEquipmentDefinition();
     BOOST_FOREACH(LifeCycleCost cost, electricEquipmentDefinition.lifeCycleCosts()){
       cost.convertToCostPerEach();
@@ -131,7 +129,7 @@ namespace detail {
 
   double ElectricEquipment_Impl::multiplier() const {
     boost::optional<double> value = getDouble(OS_ElectricEquipmentFields::Multiplier,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -141,7 +139,7 @@ namespace detail {
 
   std::string ElectricEquipment_Impl::endUseSubcategory() const {
     boost::optional<std::string> value = getString(OS_ElectricEquipmentFields::EndUseSubcategory,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -150,25 +148,23 @@ namespace detail {
   }
 
   bool ElectricEquipment_Impl::setMultiplier(double multiplier) {
-    bool result = false;
-    result = setDouble(OS_ElectricEquipmentFields::Multiplier, multiplier);
+    bool result = setDouble(OS_ElectricEquipmentFields::Multiplier, multiplier);
     return result;
   }
 
   void ElectricEquipment_Impl::resetMultiplier() {
     bool result = setString(OS_ElectricEquipmentFields::Multiplier, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ElectricEquipment_Impl::setEndUseSubcategory(std::string endUseSubcategory) {
-    bool result = false;
-    result = setString(OS_ElectricEquipmentFields::EndUseSubcategory, endUseSubcategory);
-    BOOST_ASSERT(result);
+    bool result = setString(OS_ElectricEquipmentFields::EndUseSubcategory, endUseSubcategory);
+    OS_ASSERT(result);
   }
 
   void ElectricEquipment_Impl::resetEndUseSubcategory() {
     bool result = setString(OS_ElectricEquipmentFields::EndUseSubcategory, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   int ElectricEquipment_Impl::spaceIndex() const {
@@ -331,7 +327,7 @@ namespace detail {
 ElectricEquipment::ElectricEquipment(const ElectricEquipmentDefinition& electricEquipmentDefinition)
   : SpaceLoadInstance(ElectricEquipment::iddObjectType(),electricEquipmentDefinition)
 {
-  BOOST_ASSERT(getImpl<detail::ElectricEquipment_Impl>());
+  OS_ASSERT(getImpl<detail::ElectricEquipment_Impl>());
 }
 
 IddObjectType ElectricEquipment::iddObjectType() {

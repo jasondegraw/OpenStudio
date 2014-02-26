@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -255,7 +255,7 @@ namespace gbxml {
     // space type
     boost::optional<model::SpaceType> spaceType = building.spaceType();
     if (spaceType){
-      std::string spaceTypeName = spaceType->name().get();
+      //std::string spaceTypeName = spaceType->name().get();
       // todo: map to gbXML types
       //result.setAttribute("buildingType", escapeName(spaceTypeName));
     }
@@ -300,7 +300,7 @@ namespace gbxml {
     // space type
     boost::optional<model::SpaceType> spaceType = space.spaceType();
     if (spaceType){
-      std::string spaceTypeName = spaceType->name().get();
+      //std::string spaceTypeName = spaceType->name().get();
       // todo: map to gbXML types
       //result.setAttribute("spaceType", escapeName(spaceTypeName));
     }
@@ -369,7 +369,7 @@ namespace gbxml {
     // construction
     boost::optional<model::ConstructionBase> construction = surface.construction();
     if (construction){
-      std::string constructionName = construction->name().get();
+      //std::string constructionName = construction->name().get();
       // todo:: translate construction
       //result.setAttribute("constructionIdRef", "constructionName");
     }
@@ -438,7 +438,7 @@ namespace gbxml {
       unsigned llcIndex = 0;
       unsigned N = vertices.size();
       for(unsigned i = 0; i < N; ++i){
-        BOOST_ASSERT(std::abs(faceVertices[i].z()) < 0.001);
+        OS_ASSERT(std::abs(faceVertices[i].z()) < 0.001);
         if ((minY > faceVertices[i].y()) || ((minY > faceVertices[i].y() - 0.00001) && (minX > faceVertices[i].x()))){
           llcIndex = i;
           minY = faceVertices[i].y();
@@ -534,7 +534,7 @@ namespace gbxml {
     // construction
     boost::optional<model::ConstructionBase> construction = subSurface.construction();
     if (construction){
-      std::string constructionName = construction->name().get();
+      //std::string constructionName = construction->name().get();
       // todo: translate construction
       // result.setAttribute("constructionIdRef", "constructionName");
     }
@@ -597,7 +597,7 @@ namespace gbxml {
       unsigned llcIndex = 0;
       unsigned N = vertices.size();
       for(unsigned i = 0; i < N; ++i){
-        BOOST_ASSERT(std::abs(faceVertices[i].z()) < 0.001);
+        OS_ASSERT(std::abs(faceVertices[i].z()) < 0.001);
         if ((minY > faceVertices[i].y()) || ((minY > faceVertices[i].y() - 0.00001) && (minX > faceVertices[i].x()))){
           llcIndex = i;
           minY = faceVertices[i].y();

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ ZoneHVACEquipmentList_Impl::ZoneHVACEquipmentList_Impl(const IdfObject& idfObjec
                                                        bool keepHandle)
   : ModelObject_Impl(idfObject,model,keepHandle)
 {
-  BOOST_ASSERT(idfObject.iddObject().type() == ZoneHVACEquipmentList::iddObjectType());
+  OS_ASSERT(idfObject.iddObject().type() == ZoneHVACEquipmentList::iddObjectType());
 }
 
 ZoneHVACEquipmentList_Impl::ZoneHVACEquipmentList_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -46,7 +46,7 @@ ZoneHVACEquipmentList_Impl::ZoneHVACEquipmentList_Impl(const openstudio::detail:
                                                        bool keepHandle)
   : ModelObject_Impl(other,model,keepHandle)
 {
-  BOOST_ASSERT(other.iddObject().type() == ZoneHVACEquipmentList::iddObjectType());
+  OS_ASSERT(other.iddObject().type() == ZoneHVACEquipmentList::iddObjectType());
 }
 
 ZoneHVACEquipmentList_Impl::ZoneHVACEquipmentList_Impl(const ZoneHVACEquipmentList_Impl& other,
@@ -90,7 +90,7 @@ void ZoneHVACEquipmentList_Impl::setCoolingPriority(const ModelObject & equipmen
 {
   std::vector<ModelObject> equipmentVector = equipmentInCoolingOrder();
 
-  BOOST_ASSERT( std::find(equipmentVector.begin(),equipmentVector.end(),equipment) != equipmentVector.end() );
+  OS_ASSERT( std::find(equipmentVector.begin(),equipmentVector.end(),equipment) != equipmentVector.end() );
 
   if( priority > equipmentVector.size() ) priority = equipmentVector.size();
   if( priority < 1 ) priority = 1;
@@ -103,7 +103,7 @@ void ZoneHVACEquipmentList_Impl::setCoolingPriority(const ModelObject & equipmen
 
   for( std::vector<ModelObject>::iterator it = equipmentVector.begin();
        it != equipmentVector.end();
-       it++ )
+       ++it )
   {
     WorkspaceExtensibleGroup eg = getGroupForModelObject(*it);
 
@@ -117,7 +117,7 @@ void ZoneHVACEquipmentList_Impl::setHeatingPriority(const ModelObject & equipmen
 {
   std::vector<ModelObject> equipmentVector = equipmentInHeatingOrder();
 
-  BOOST_ASSERT( std::find(equipmentVector.begin(),equipmentVector.end(),equipment) != equipmentVector.end() );
+  OS_ASSERT( std::find(equipmentVector.begin(),equipmentVector.end(),equipment) != equipmentVector.end() );
 
   if( priority > equipmentVector.size() ) priority = equipmentVector.size();
   if( priority < 1 ) priority = 1;
@@ -130,7 +130,7 @@ void ZoneHVACEquipmentList_Impl::setHeatingPriority(const ModelObject & equipmen
 
   for( std::vector<ModelObject>::iterator it = equipmentVector.begin();
        it != equipmentVector.end();
-       it++ )
+       ++it )
   {
     WorkspaceExtensibleGroup eg = getGroupForModelObject(*it);
 
@@ -148,11 +148,11 @@ WorkspaceExtensibleGroup ZoneHVACEquipmentList_Impl::getGroupForModelObject(cons
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
-    BOOST_ASSERT(wo);
+    OS_ASSERT(wo);
 
     if( wo->handle() == modelObject.handle() )
     {
@@ -162,7 +162,7 @@ WorkspaceExtensibleGroup ZoneHVACEquipmentList_Impl::getGroupForModelObject(cons
     }
   }
 
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 
   return result.get();
 }
@@ -175,7 +175,7 @@ std::vector<ModelObject> ZoneHVACEquipmentList_Impl::equipment()
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
@@ -196,13 +196,13 @@ std::vector<ModelObject> ZoneHVACEquipmentList_Impl::equipmentInHeatingOrder()
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     unsigned heatingPriority = it->getUnsigned(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipmentHeatingorNoLoadSequence).get();
 
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
-    BOOST_ASSERT(wo);
+    OS_ASSERT(wo);
 
     ModelObject mo = wo->cast<ModelObject>();
 
@@ -229,13 +229,13 @@ std::vector<ModelObject> ZoneHVACEquipmentList_Impl::equipmentInCoolingOrder()
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     unsigned coolingPriority = it->getUnsigned(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipmentCoolingSequence).get();
 
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
-    BOOST_ASSERT(wo);
+    OS_ASSERT(wo);
 
     ModelObject mo = wo->cast<ModelObject>();
 
@@ -258,7 +258,7 @@ ThermalZone ZoneHVACEquipmentList_Impl::thermalZone() const
 {
   boost::optional<WorkspaceObject> wo = getTarget(OS_ZoneHVAC_EquipmentListFields::ThermalZone);
 
-  BOOST_ASSERT(wo);
+  OS_ASSERT(wo);
 
   return wo->cast<ThermalZone>();
 }
@@ -272,11 +272,11 @@ void ZoneHVACEquipmentList_Impl::removeEquipment(const ModelObject & equipment)
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
-    BOOST_ASSERT(wo);
+    OS_ASSERT(wo);
 
     if( wo->handle() == equipment.handle() )
     {
@@ -293,7 +293,7 @@ void ZoneHVACEquipmentList_Impl::removeEquipment(const ModelObject & equipment)
 
   for( std::vector<ModelObject>::iterator it = coolingVector.begin();
        it != coolingVector.end();
-       it++ )
+       ++it )
   {
     WorkspaceExtensibleGroup eg = getGroupForModelObject(*it);
 
@@ -306,7 +306,7 @@ void ZoneHVACEquipmentList_Impl::removeEquipment(const ModelObject & equipment)
 
   for( std::vector<ModelObject>::iterator it = heatingVector.begin();
        it != heatingVector.end();
-       it++ )
+       ++it )
   {
     WorkspaceExtensibleGroup eg = getGroupForModelObject(*it);
 
@@ -325,11 +325,11 @@ unsigned ZoneHVACEquipmentList_Impl::heatingPriority(const ModelObject & equipme
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
-    BOOST_ASSERT(wo);
+    OS_ASSERT(wo);
 
     if( wo->handle() == equipment.handle() )
     {
@@ -339,7 +339,7 @@ unsigned ZoneHVACEquipmentList_Impl::heatingPriority(const ModelObject & equipme
     }
   }
 
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 
   return result.get();
 }
@@ -352,11 +352,11 @@ unsigned ZoneHVACEquipmentList_Impl::coolingPriority(const ModelObject & equipme
 
   for( std::vector<IdfExtensibleGroup>::iterator it = groups.begin();
        it != groups.end();
-       it++ )
+       ++it )
   {
     boost::optional<WorkspaceObject> wo = it->cast<WorkspaceExtensibleGroup>().getTarget(OS_ZoneHVAC_EquipmentListExtensibleFields::ZoneEquipment);
 
-    BOOST_ASSERT(wo);
+    OS_ASSERT(wo);
 
     if( wo->handle() == equipment.handle() )
     {
@@ -366,7 +366,7 @@ unsigned ZoneHVACEquipmentList_Impl::coolingPriority(const ModelObject & equipme
     }
   }
 
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 
   return result.get();
 }
@@ -376,7 +376,7 @@ unsigned ZoneHVACEquipmentList_Impl::coolingPriority(const ModelObject & equipme
 ZoneHVACEquipmentList::ZoneHVACEquipmentList(const ThermalZone & thermalZone)
   : ModelObject(ZoneHVACEquipmentList::iddObjectType(),thermalZone.model())
 {
-  BOOST_ASSERT(getImpl<detail::ZoneHVACEquipmentList_Impl>());
+  OS_ASSERT(getImpl<detail::ZoneHVACEquipmentList_Impl>());
 
   setPointer(OS_ZoneHVAC_EquipmentListFields::ThermalZone,thermalZone.handle());
 }

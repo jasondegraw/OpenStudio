@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -65,7 +65,7 @@ LuminaireDefinitionInspectorView::LuminaireDefinitionInspectorView(bool isIP, co
 
   m_lightingPowerEdit = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_lightingPowerEdit, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_lightingPowerEdit,3,0);
 
   // Fraction Radiant
@@ -76,7 +76,7 @@ LuminaireDefinitionInspectorView::LuminaireDefinitionInspectorView(bool isIP, co
 
   m_fractionRadiantEdit = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_fractionRadiantEdit, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_fractionRadiantEdit,5,0);
 
   // Fraction Visible
@@ -87,7 +87,7 @@ LuminaireDefinitionInspectorView::LuminaireDefinitionInspectorView(bool isIP, co
 
   m_fractionVisibleEdit = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_fractionVisibleEdit, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_fractionVisibleEdit,5,1);
 
   // Return Air Fraction 
@@ -98,7 +98,7 @@ LuminaireDefinitionInspectorView::LuminaireDefinitionInspectorView(bool isIP, co
 
   m_returnAirFractionEdit = new OSQuantityEdit(m_isIP);
   isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_returnAirFractionEdit, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_returnAirFractionEdit,7,0);
 
   // Stretch

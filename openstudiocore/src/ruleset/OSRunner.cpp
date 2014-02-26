@@ -27,6 +27,8 @@
 #include <utilities/units/Quantity.hpp>
 #include <utilities/math/FloatCompare.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 #include <boost/foreach.hpp>
 
 namespace openstudio {
@@ -42,9 +44,72 @@ OSResult OSRunner::result() const {
   return m_result;
 }
 
+boost::optional<openstudio::model::Model> OSRunner::lastOpenStudioModel() const
+{
+  if (m_lastOpenStudioModel){
+    return m_lastOpenStudioModel;
+  }
+
+  if (m_lastOpenStudioModelPath){
+    m_lastOpenStudioModel = model::Model::load(*m_lastOpenStudioModelPath);
+  }
+
+  return m_lastOpenStudioModel;
+}
+
+boost::optional<openstudio::Workspace> OSRunner::lastEnergyPlusWorkspace() const
+{
+  if (m_lastEnergyPlusWorkspace){
+    return m_lastEnergyPlusWorkspace;
+  }
+
+  if (m_lastEnergyPlusWorkspacePath){
+    m_lastEnergyPlusWorkspace = Workspace::load(*m_lastEnergyPlusWorkspacePath);
+  }
+
+  return m_lastEnergyPlusWorkspace;
+}
+
+boost::optional<openstudio::SqlFile> OSRunner::lastEnergyPlusSqlFile() const
+{
+  if (m_lastEnergyPlusSqlFile){
+    return m_lastEnergyPlusSqlFile;
+  }
+
+  if (m_lastEnergyPlusSqlFilePath){
+    try {
+      m_lastEnergyPlusSqlFile = SqlFile(*m_lastEnergyPlusSqlFilePath);
+    }catch(const std::exception&){
+    }
+  }
+
+  return m_lastEnergyPlusSqlFile;
+}
+
+boost::optional<openstudio::EpwFile> OSRunner::lastEpwFile() const
+{
+  if (m_lastEpwFile){
+    return m_lastEpwFile;
+  }
+
+  if (m_lastEpwFilePath){
+    try {
+      m_lastEpwFile = EpwFile(*m_lastEpwFilePath);
+    }catch(const std::exception&){
+    }
+  }
+
+  return m_lastEpwFile;
+}
+
+boost::optional<openstudio::path> OSRunner::lastEpwFilePath() const
+{
+  return m_lastEpwFilePath;
+}
+
 bool OSRunner::inSelection(const openstudio::model::ModelObject& modelObject) const {
   return true;
-}
+}  
 
 std::map<std::string, OSArgument> OSRunner::getUserInput(std::vector<OSArgument>& arguments) const
 {
@@ -86,6 +151,90 @@ void OSRunner::registerFinalCondition(const std::string& message) {
   m_result.setFinalCondition(m_channel, message);
 }
 
+void OSRunner::registerAttribute(const Attribute& attribute) {
+  m_result.appendAttribute(attribute);
+}
+
+void OSRunner::registerValue(const std::string& name, bool value) {
+  registerAttribute(Attribute(name,value));
+}
+
+void OSRunner::registerValue(const std::string& name,
+                             const std::string& displayName,
+                             bool value)
+{
+  Attribute attribute = Attribute(name,value);
+  attribute.setDisplayName(displayName);
+  registerAttribute(attribute);
+}
+
+void OSRunner::registerValue(const std::string& name, double value) {
+  registerAttribute(Attribute(name,value));
+}
+
+void OSRunner::registerValue(const std::string& name, double value, const std::string& units) {
+  registerAttribute(Attribute(name,value,units));
+}
+
+void OSRunner::registerValue(const std::string& name,
+                             const std::string& displayName,
+                             double value)
+{
+  Attribute attribute = Attribute(name,value);
+  attribute.setDisplayName(displayName);
+  registerAttribute(attribute);
+}
+
+void OSRunner::registerValue(const std::string& name,
+                             const std::string& displayName,
+                             double value,
+                             const std::string& units)
+{
+  Attribute attribute = Attribute(name,value,units);
+  attribute.setDisplayName(displayName);
+  registerAttribute(attribute);
+}
+
+void OSRunner::registerValue(const std::string& name, int value) {
+  registerAttribute(Attribute(name,value));
+}
+
+void OSRunner::registerValue(const std::string& name, int value, const std::string& units) {
+  registerAttribute(Attribute(name,value,units));
+}
+
+void OSRunner::registerValue(const std::string& name,
+                             const std::string& displayName,
+                             int value)
+{
+  Attribute attribute = Attribute(name,value);
+  attribute.setDisplayName(displayName);
+  registerAttribute(attribute);
+}
+
+void OSRunner::registerValue(const std::string& name,
+                             const std::string& displayName,
+                             int value,
+                             const std::string& units)
+{
+  Attribute attribute = Attribute(name,value,units);
+  attribute.setDisplayName(displayName);
+  registerAttribute(attribute);
+}
+
+void OSRunner::registerValue(const std::string& name, const std::string& value) {
+  registerAttribute(Attribute(name,value));
+}
+
+void OSRunner::registerValue(const std::string& name,
+                             const std::string& displayName,
+                             const std::string& value)
+{
+  Attribute attribute = Attribute(name,value);
+  attribute.setDisplayName(displayName);
+  registerAttribute(attribute);
+}
+
 void OSRunner::createProgressBar(const std::string& text) const {
 }
 
@@ -100,6 +249,7 @@ bool OSRunner::validateUserArguments(const std::vector<OSArgument>& script_argum
 {
   bool result(true);
   std::stringstream ss;
+  AttributeVector argumentValueAttributes;
   BOOST_FOREACH(const OSArgument& script_argument,script_arguments) {
     OSArgumentMap::const_iterator it = user_arguments.find(script_argument.name());
     if (it == user_arguments.end()) {
@@ -178,10 +328,66 @@ bool OSRunner::validateUserArguments(const std::vector<OSArgument>& script_argum
             }
             break;
           default :
-            BOOST_ASSERT(false);
+            OS_ASSERT(false);
         }
         ss.str("");
       }
+      if (result) {
+        Quantity q;
+        switch(user_argument.type().value()) {
+          case OSArgumentType::Boolean :
+            if (user_argument.hasValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.valueAsBool()));
+            }
+            else if (user_argument.hasDefaultValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.defaultValueAsBool()));
+            }
+           break;
+          case OSArgumentType::Double :
+            if (user_argument.hasValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.valueAsDouble()));
+            }
+            else if (user_argument.hasDefaultValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.defaultValueAsDouble()));
+            }
+           break;
+          case OSArgumentType::Quantity :
+            if (user_argument.hasValue()) {
+              q = user_argument.valueAsQuantity();
+            }
+            else if (user_argument.hasDefaultValue()) {
+              q = user_argument.defaultValueAsQuantity();
+            }
+            argumentValueAttributes.push_back(Attribute(user_argument.name(),q.value(),q.units().print()));
+           break;
+          case OSArgumentType::Integer :
+            if (user_argument.hasValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.valueAsInteger()));
+            }
+            else if (user_argument.hasDefaultValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.defaultValueAsInteger()));
+            }
+           break;
+          case OSArgumentType::String :
+          case OSArgumentType::Choice :
+          case OSArgumentType::Path :
+            if (user_argument.hasValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.valueAsString()));
+            }
+            else if (user_argument.hasDefaultValue()) {
+              argumentValueAttributes.push_back(Attribute(user_argument.name(),user_argument.defaultValueAsString()));
+            }
+           break;
+          default:
+            OS_ASSERT(false);
+        }
+      }
+    }
+  }
+
+  if (result) {
+    BOOST_FOREACH(const Attribute& attribute,argumentValueAttributes) {
+      registerAttribute(attribute);
     }
   }
 
@@ -240,8 +446,6 @@ boost::optional<double> OSRunner::getOptionalDoubleArgumentValue(
     const std::string& argument_name,
     const std::map<std::string,OSArgument>& user_arguments)
 {
-  std::stringstream ss;
-
   OSArgumentMap::const_iterator it = user_arguments.find(argument_name);
   if (it != user_arguments.end()) {
     if (it->second.hasValue()) {
@@ -283,8 +487,6 @@ boost::optional<Quantity> OSRunner::getOptionalQuantityArgumentValue(
     const std::string& argument_name,
     const std::map<std::string,OSArgument>& user_arguments)
 {
-  std::stringstream ss;
-
   OSArgumentMap::const_iterator it = user_arguments.find(argument_name);
   if (it != user_arguments.end()) {
     if (it->second.hasValue()) {
@@ -326,8 +528,6 @@ boost::optional<int> OSRunner::getOptionalIntegerArgumentValue(
     const std::string& argument_name,
     const std::map<std::string,OSArgument>& user_arguments)
 {
-  std::stringstream ss;
-
   OSArgumentMap::const_iterator it = user_arguments.find(argument_name);
   if (it != user_arguments.end()) {
     if (it->second.hasValue()) {
@@ -369,8 +569,6 @@ boost::optional<std::string> OSRunner::getOptionalStringArgumentValue(
     const std::string& argument_name,
     const std::map<std::string,OSArgument>& user_arguments)
 {
-  std::stringstream ss;
-
   OSArgumentMap::const_iterator it = user_arguments.find(argument_name);
   if (it != user_arguments.end()) {
     if (it->second.hasValue()) {
@@ -412,8 +610,6 @@ boost::optional<openstudio::path> OSRunner::getOptionalPathArgumentValue(
     const std::string& argument_name,
     const std::map<std::string,OSArgument>& user_arguments)
 {
-  std::stringstream ss;
-
   OSArgumentMap::const_iterator it = user_arguments.find(argument_name);
   if (it != user_arguments.end()) {
     if (it->second.hasValue()) {
@@ -448,6 +644,78 @@ boost::optional<openstudio::WorkspaceObject> OSRunner::getOptionalWorkspaceObjec
   boost::optional<WorkspaceObject> result = workspace.getObject(handle);
 
   return result;
+}
+
+void OSRunner::setLastOpenStudioModel(const openstudio::model::Model& lastOpenStudioModel)
+{
+  m_lastOpenStudioModel = lastOpenStudioModel;
+  m_lastOpenStudioModelPath.reset();
+}
+
+void OSRunner::resetLastOpenStudioModel()
+{
+  m_lastOpenStudioModel.reset();
+  m_lastOpenStudioModelPath.reset();
+}
+
+void OSRunner::setLastOpenStudioModelPath(const openstudio::path& lastOpenStudioModelPath)
+{
+  m_lastOpenStudioModelPath = lastOpenStudioModelPath;
+  m_lastOpenStudioModel.reset();
+}
+
+void OSRunner::resetLastOpenStudioModelPath()
+{
+  m_lastOpenStudioModel.reset();
+  m_lastOpenStudioModelPath.reset();
+}
+
+void OSRunner::setLastEnergyPlusWorkspace(const openstudio::Workspace& lastEnergyPlusWorkspace)
+{
+  m_lastEnergyPlusWorkspace = lastEnergyPlusWorkspace;
+  m_lastEnergyPlusWorkspacePath.reset();
+}
+
+void OSRunner::resetLastEnergyPlusWorkspace()
+{
+  m_lastEnergyPlusWorkspace.reset();
+  m_lastEnergyPlusWorkspacePath.reset();
+}
+
+void OSRunner::setLastEnergyPlusWorkspacePath(const openstudio::path& lastEnergyPlusWorkspacePath)
+{
+  m_lastEnergyPlusWorkspacePath = lastEnergyPlusWorkspacePath;
+  m_lastEnergyPlusWorkspace.reset();
+}
+
+void OSRunner::resetLastEnergyPlusWorkspacePath()
+{
+  m_lastEnergyPlusWorkspace.reset();
+  m_lastEnergyPlusWorkspacePath.reset();
+}
+
+void OSRunner::setLastEnergyPlusSqlFilePath(const openstudio::path& lastEnergyPlusSqlFilePath)
+{
+  m_lastEnergyPlusSqlFilePath = lastEnergyPlusSqlFilePath;
+  m_lastEnergyPlusSqlFile.reset();
+}
+
+void OSRunner::resetLastEnergyPlusSqlFilePath()
+{
+  m_lastEnergyPlusSqlFilePath.reset();
+  m_lastEnergyPlusSqlFile.reset();
+}
+
+void OSRunner::setLastEpwFilePath(const openstudio::path& lastEpwFilePath)
+{
+  m_lastEpwFilePath = lastEpwFilePath;
+  m_lastEpwFile.reset();
+}
+
+void OSRunner::resetLastEpwFilePath()
+{
+  m_lastEpwFilePath.reset();
+  m_lastEpwFile.reset();
 }
 
 } // ruleset

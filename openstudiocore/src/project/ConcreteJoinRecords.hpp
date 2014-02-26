@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -20,17 +20,8 @@
 #ifndef PROJECT_CONCRETEJOINRECORDS_HPP
 #define PROJECT_CONCRETEJOINRECORDS_HPP
 
-// ruleset
-#include <project/Rule_Clause_JoinRecord.hpp>
-#include <project/Ruleset_Rule_JoinRecord.hpp>
-
 // analysis
 #include <project/DataPoint_DiscretePerturbation_JoinRecord.hpp>
-
-
-// ruleset
-#include <project/Rule_Clause_JoinRecord_Impl.hpp>
-#include <project/Ruleset_Rule_JoinRecord_Impl.hpp>
 
 // analysis
 #include <project/DataPoint_DiscretePerturbation_JoinRecord_Impl.hpp>

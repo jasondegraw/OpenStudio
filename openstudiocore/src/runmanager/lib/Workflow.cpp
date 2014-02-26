@@ -1,17 +1,17 @@
 /**********************************************************************
-* Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
-*
+*  
 *  This library is free software; you can redistribute it and/or
 *  modify it under the terms of the GNU Lesser General Public
 *  License as published by the Free Software Foundation; either
 *  version 2.1 of the License, or (at your option) any later version.
-*
+*  
 *  This library is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 *  Lesser General Public License for more details.
-*
+*  
 *  You should have received a copy of the GNU Lesser General Public
 *  License along with this library; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -657,15 +657,9 @@ namespace runmanager {
       throw std::runtime_error("Unable to create workflow: no child jobs");
     }
 
-    try {
-      m_job->params.remove("workflowkey");
-    } catch (const std::exception &) {
-    }
+    m_job->params.remove("workflowkey");
 
-    try {
-      m_job->params.remove("workflowname");
-    } catch (const std::exception &) {
-    }
+    m_job->params.remove("workflowname");
 
     openstudio::runmanager::JobParams params;
     std::string k = key();
@@ -789,6 +783,7 @@ namespace runmanager {
     openstudio::path scriptsPath = openstudio::getOpenStudioRubyScriptsPath() / openstudio::toPath("openstudio/radiance/");
     rjb.addRequiredFile(scriptsPath / openstudio::toPath("ModelToRad.rb"), openstudio::toPath("ModelToRad.rb"));
     rjb.addRequiredFile(scriptsPath / openstudio::toPath("DaylightSim.rb"), openstudio::toPath("DaylightSim.rb"));
+    rjb.addRequiredFile(scriptsPath / openstudio::toPath("DaylightSim-Simple.rb"), openstudio::toPath("DaylightSim-Simple.rb"));
     rjb.addRequiredFile(scriptsPath / openstudio::toPath("MakeSchedules.rb"), openstudio::toPath("MakeSchedules.rb"));
     rjb.addRequiredFile(scriptsPath / openstudio::toPath("DaylightMetrics.rb"), openstudio::toPath("DaylightMetrics.rb"));
     rjb.copyRequiredFiles("osm", "osm", "in.epw");
@@ -896,12 +891,16 @@ namespace runmanager {
       JobParams p = wfi->params;
       std::string jobkeyname;
 
-      try {
-        jobkeyname = p.get("workflowjobkey").children.at(0).value;
+      if (p.has("workflowjobkey"))
+      {
+        // capture and erase the jobkey if it exists
+        if (!p.get("workflowjobkey").children.empty())
+        {
+          jobkeyname = p.get("workflowjobkey").children[0].value;
+        }
         p.remove("workflowjobkey");
-      } catch (const std::exception &) {
-        // seems there wasn't a jobkeyname set
       }
+      
 
       retval.push_back(WorkItem(wfi->type, wfi->tools, wfi->params, wfi->files, jobkeyname));
 

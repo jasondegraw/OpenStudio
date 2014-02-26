@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -30,6 +30,8 @@
 
 #include <utilities/idd/ZoneInfiltration_DesignFlowRate_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>
+
+#include <utilities/core/Assert.hpp>
 
 using namespace openstudio::model;
 
@@ -75,7 +77,7 @@ OptionalModelObject ReverseTranslator::translateZoneInfiltrationDesignFlowRate( 
   }
 
   s = workspaceObject.getString(openstudio::ZoneInfiltration_DesignFlowRateFields::DesignFlowRateCalculationMethod, true);
-  BOOST_ASSERT(s);
+  OS_ASSERT(s);
 
   OptionalDouble d;
   if (istringEqual("Flow/Zone", *s)){
@@ -102,7 +104,7 @@ OptionalModelObject ReverseTranslator::translateZoneInfiltrationDesignFlowRate( 
   }else if(istringEqual("Flow/ExteriorWallArea", *s)){
     d = workspaceObject.getDouble(openstudio::ZoneInfiltration_DesignFlowRateFields::FlowperExteriorSurfaceArea);
     if (d){
-      infiltration.setFlowperExteriorSurfaceArea(*d);
+      infiltration.setFlowperExteriorWallArea(*d);
     }else{
       LOG(Error, "Flow/ExteriorWallArea value not found for workspace object " << workspaceObject);
     }

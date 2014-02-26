@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <utilities/units/Misc1Unit.hpp>
 #include <utilities/units/Misc1Unit_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace detail {
@@ -60,7 +62,7 @@ namespace detail {
   }
 
   Unit Misc1Unit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::Misc1);
+    OS_ASSERT(system() == UnitSystem::Misc1);
     boost::shared_ptr<Misc1Unit_Impl> impl(new Misc1Unit_Impl(*this));
     return Misc1Unit(impl).cast<Unit>();
   }

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,11 @@
 
 #include <analysis/SequentialSearchOptions.hpp>
 #include <analysis/SequentialSearchOptions_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
+#include <utilities/core/Json.hpp>
+
+#include <boost/bind.hpp>
 
 namespace openstudio {
 namespace analysis {
@@ -42,8 +47,18 @@ namespace detail {
 
   int SequentialSearchOptions_Impl::objectiveToMinimizeFirst() const {
     OptionalAttribute option = getOption("objectiveToMinimizeFirst");
-    BOOST_ASSERT(option);
+    OS_ASSERT(option);
     return option->valueAsInteger();
+  }
+
+  SequentialSearchOptions SequentialSearchOptions_Impl::fromVariant(const QVariant& variant,
+                                                                const VersionString& version)
+  {
+    QVariantMap map = variant.toMap();
+    AttributeVector attributes = deserializeUnorderedVector(
+          map["attributes"].toList(),
+          boost::function<Attribute (const QVariant&)>(boost::bind(openstudio::detail::toAttribute,_1,version)));
+    return SequentialSearchOptions(attributes);
   }
 
 } // detail

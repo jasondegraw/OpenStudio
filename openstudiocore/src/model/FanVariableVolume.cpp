@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ namespace detail {
   FanVariableVolume_Impl::FanVariableVolume_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : StraightComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == FanVariableVolume::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == FanVariableVolume::iddObjectType());
   }
 
   FanVariableVolume_Impl::FanVariableVolume_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -53,7 +53,7 @@ namespace detail {
                                                  bool keepHandle)
                                                    : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == FanVariableVolume::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == FanVariableVolume::iddObjectType());
   }
 
   FanVariableVolume_Impl::FanVariableVolume_Impl(const FanVariableVolume_Impl& other,
@@ -93,24 +93,24 @@ namespace detail {
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<FanVariableVolume_Impl*>(this)->setAvailabilitySchedule(*value);
       value = getObject<ModelObject>().getModelObjectTarget<Schedule>(OS_Fan_VariableVolumeFields::AvailabilityScheduleName);
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double FanVariableVolume_Impl::fanEfficiency() const {
     boost::optional<double> value = getDouble(OS_Fan_VariableVolumeFields::FanEfficiency,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity FanVariableVolume_Impl::getFanEfficiency(bool returnIP) const {
     OptionalDouble value = fanEfficiency();
     OSOptionalQuantity result = getQuantityFromDouble(OS_Fan_VariableVolumeFields::FanEfficiency, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -120,14 +120,14 @@ namespace detail {
 
   double FanVariableVolume_Impl::pressureRise() const {
     boost::optional<double> value = getDouble(OS_Fan_VariableVolumeFields::PressureRise,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity FanVariableVolume_Impl::getPressureRise(bool returnIP) const {
     OptionalDouble value = pressureRise();
     OSOptionalQuantity result = getQuantityFromDouble(OS_Fan_VariableVolumeFields::PressureRise, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -151,7 +151,7 @@ namespace detail {
 
   std::string FanVariableVolume_Impl::fanPowerMinimumFlowRateInputMethod() const {
     boost::optional<std::string> value = getString(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowRateInputMethod,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -161,14 +161,14 @@ namespace detail {
 
   double FanVariableVolume_Impl::fanPowerMinimumFlowFraction() const {
     boost::optional<double> value = getDouble(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowFraction,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity FanVariableVolume_Impl::getFanPowerMinimumFlowFraction(bool returnIP) const {
     OptionalDouble value = fanPowerMinimumFlowFraction();
     OSOptionalQuantity result = getQuantityFromDouble(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowFraction, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -187,14 +187,14 @@ namespace detail {
 
   double FanVariableVolume_Impl::motorEfficiency() const {
     boost::optional<double> value = getDouble(OS_Fan_VariableVolumeFields::MotorEfficiency,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity FanVariableVolume_Impl::getMotorEfficiency(bool returnIP) const {
     OptionalDouble value = motorEfficiency();
     OSOptionalQuantity result = getQuantityFromDouble(OS_Fan_VariableVolumeFields::MotorEfficiency, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -204,14 +204,14 @@ namespace detail {
 
   double FanVariableVolume_Impl::motorInAirstreamFraction() const {
     boost::optional<double> value = getDouble(OS_Fan_VariableVolumeFields::MotorInAirstreamFraction,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity FanVariableVolume_Impl::getMotorInAirstreamFraction(bool returnIP) const {
     OptionalDouble value = motorInAirstreamFraction();
     OSOptionalQuantity result = getQuantityFromDouble(OS_Fan_VariableVolumeFields::MotorInAirstreamFraction, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -266,7 +266,7 @@ namespace detail {
 
   std::string FanVariableVolume_Impl::endUseSubcategory() const {
     boost::optional<std::string> value = getString(OS_Fan_VariableVolumeFields::EndUseSubcategory,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -283,8 +283,7 @@ namespace detail {
   }
 
   bool FanVariableVolume_Impl::setFanEfficiency(double fanEfficiency) {
-    bool result = false;
-    result = setDouble(OS_Fan_VariableVolumeFields::FanEfficiency, fanEfficiency);
+    bool result = setDouble(OS_Fan_VariableVolumeFields::FanEfficiency, fanEfficiency);
     return result;
   }
 
@@ -298,13 +297,12 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanEfficiency() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanEfficiency, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setPressureRise(double pressureRise) {
-    bool result = false;
-    result = setDouble(OS_Fan_VariableVolumeFields::PressureRise, pressureRise);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_Fan_VariableVolumeFields::PressureRise, pressureRise);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setPressureRise(const Quantity& pressureRise) {
@@ -343,28 +341,26 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetMaximumFlowRate() {
     bool result = setString(OS_Fan_VariableVolumeFields::MaximumFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::autosizeMaximumFlowRate() {
     bool result = setString(OS_Fan_VariableVolumeFields::MaximumFlowRate, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerMinimumFlowRateInputMethod(std::string fanPowerMinimumFlowRateInputMethod) {
-    bool result = false;
-    result = setString(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowRateInputMethod, fanPowerMinimumFlowRateInputMethod);
+    bool result = setString(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowRateInputMethod, fanPowerMinimumFlowRateInputMethod);
     return result;
   }
 
   void FanVariableVolume_Impl::resetFanPowerMinimumFlowRateInputMethod() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowRateInputMethod, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerMinimumFlowFraction(double fanPowerMinimumFlowFraction) {
-    bool result = false;
-    result = setDouble(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowFraction, fanPowerMinimumFlowFraction);
+    bool result = setDouble(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowFraction, fanPowerMinimumFlowFraction);
     return result;
   }
 
@@ -378,7 +374,7 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerMinimumFlowFraction() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerMinimumFlowFraction, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerMinimumAirFlowRate(boost::optional<double> fanPowerMinimumAirFlowRate) {
@@ -410,12 +406,11 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerMinimumAirFlowRate() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerMinimumAirFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setMotorEfficiency(double motorEfficiency) {
-    bool result = false;
-    result = setDouble(OS_Fan_VariableVolumeFields::MotorEfficiency, motorEfficiency);
+    bool result = setDouble(OS_Fan_VariableVolumeFields::MotorEfficiency, motorEfficiency);
     return result;
   }
 
@@ -429,12 +424,11 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetMotorEfficiency() {
     bool result = setString(OS_Fan_VariableVolumeFields::MotorEfficiency, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setMotorInAirstreamFraction(double motorInAirstreamFraction) {
-    bool result = false;
-    result = setDouble(OS_Fan_VariableVolumeFields::MotorInAirstreamFraction, motorInAirstreamFraction);
+    bool result = setDouble(OS_Fan_VariableVolumeFields::MotorInAirstreamFraction, motorInAirstreamFraction);
     return result;
   }
 
@@ -448,7 +442,7 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetMotorInAirstreamFraction() {
     bool result = setString(OS_Fan_VariableVolumeFields::MotorInAirstreamFraction, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setFanPowerCoefficient1(boost::optional<double> fanPowerCoefficient1) {
@@ -460,7 +454,7 @@ namespace detail {
       resetFanPowerCoefficient1();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerCoefficient1(const OSOptionalQuantity& fanPowerCoefficient1) {
@@ -482,7 +476,7 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerCoefficient1() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerCoefficient1, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setFanPowerCoefficient2(boost::optional<double> fanPowerCoefficient2) {
@@ -494,7 +488,7 @@ namespace detail {
       resetFanPowerCoefficient2();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerCoefficient2(const OSOptionalQuantity& fanPowerCoefficient2) {
@@ -516,7 +510,7 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerCoefficient2() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerCoefficient2, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setFanPowerCoefficient3(boost::optional<double> fanPowerCoefficient3) {
@@ -528,7 +522,7 @@ namespace detail {
       resetFanPowerCoefficient3();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerCoefficient3(const OSOptionalQuantity& fanPowerCoefficient3) {
@@ -550,7 +544,7 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerCoefficient3() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerCoefficient3, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setFanPowerCoefficient4(boost::optional<double> fanPowerCoefficient4) {
@@ -562,7 +556,7 @@ namespace detail {
       resetFanPowerCoefficient4();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerCoefficient4(const OSOptionalQuantity& fanPowerCoefficient4) {
@@ -584,7 +578,7 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerCoefficient4() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerCoefficient4, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setFanPowerCoefficient5(boost::optional<double> fanPowerCoefficient5) {
@@ -596,7 +590,7 @@ namespace detail {
       resetFanPowerCoefficient5();
       result = true;
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool FanVariableVolume_Impl::setFanPowerCoefficient5(const OSOptionalQuantity& fanPowerCoefficient5) {
@@ -618,18 +612,17 @@ namespace detail {
 
   void FanVariableVolume_Impl::resetFanPowerCoefficient5() {
     bool result = setString(OS_Fan_VariableVolumeFields::FanPowerCoefficient5, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::setEndUseSubcategory(std::string endUseSubcategory) {
-    bool result = false;
-    result = setString(OS_Fan_VariableVolumeFields::EndUseSubcategory, endUseSubcategory);
-    BOOST_ASSERT(result);
+    bool result = setString(OS_Fan_VariableVolumeFields::EndUseSubcategory, endUseSubcategory);
+    OS_ASSERT(result);
   }
 
   void FanVariableVolume_Impl::resetEndUseSubcategory() {
     bool result = setString(OS_Fan_VariableVolumeFields::EndUseSubcategory, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   unsigned FanVariableVolume_Impl::inletPort()
@@ -804,7 +797,7 @@ namespace detail {
 
   boost::optional<ZoneHVACComponent> FanVariableVolume_Impl::containingZoneHVACComponent() const
   {
-	// ZoneHVACFourPipeFanCoil
+    // ZoneHVACFourPipeFanCoil
 
     std::vector<ZoneHVACFourPipeFanCoil> zoneHVACFourPipeFanCoils;
 
@@ -812,7 +805,7 @@ namespace detail {
 
     for( std::vector<ZoneHVACFourPipeFanCoil>::iterator it = zoneHVACFourPipeFanCoils.begin();
     it < zoneHVACFourPipeFanCoils.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->supplyAirFan() )
       {
@@ -821,9 +814,9 @@ namespace detail {
           return *it;
         }
       }
-    }	
+    }
 
-	// ZoneHVACUnitHeater
+    // ZoneHVACUnitHeater
 
     std::vector<ZoneHVACUnitHeater> zoneHVACUnitHeater;
 
@@ -831,7 +824,7 @@ namespace detail {
 
     for( std::vector<ZoneHVACUnitHeater>::iterator it = zoneHVACUnitHeater.begin();
     it < zoneHVACUnitHeater.end();
-    it++ )
+    ++it )
     {
       if( boost::optional<HVACComponent> coil = it->supplyAirFan() )
       {
@@ -840,7 +833,7 @@ namespace detail {
           return *it;
         }
       }
-    }	
+    }
 
     return boost::none;
   }
@@ -850,7 +843,7 @@ namespace detail {
 FanVariableVolume::FanVariableVolume(const Model& model, Schedule & schedule)
   : StraightComponent(FanVariableVolume::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::FanVariableVolume_Impl>());
+  OS_ASSERT(getImpl<detail::FanVariableVolume_Impl>());
 
   bool ok = setAvailabilitySchedule(schedule);
   if (!ok) {

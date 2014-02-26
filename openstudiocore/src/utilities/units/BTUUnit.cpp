@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <utilities/units/BTUUnit.hpp>
 #include <utilities/units/BTUUnit_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 
@@ -61,7 +63,7 @@ namespace detail {
   }
 
   Unit BTUUnit_Impl::clone() const {
-    BOOST_ASSERT(system() == UnitSystem::BTU);
+    OS_ASSERT(system() == UnitSystem::BTU);
     boost::shared_ptr<BTUUnit_Impl> impl(new BTUUnit_Impl(*this));
     return BTUUnit(impl).cast<Unit>();
   }

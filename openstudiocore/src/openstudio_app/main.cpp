@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -52,6 +52,16 @@ static const char *logfilepath = "/var/log/openstudio.log";
 
 int main(int argc, char *argv[])
 {
+
+#if RUBY_API_VERSION_MAJOR && RUBY_API_VERSION_MAJOR==2
+  ruby_sysinit(&argc, &argv);
+  {
+    RUBY_INIT_STACK;
+    ruby_init();
+  }
+#endif
+
+
 #if _DEBUG || (__GNUC__ && !NDEBUG)
   openstudio::Logger::instance().standardOutLogger().setLogLevel(Debug);
   openstudio::FileLogSink fileLog(openstudio::toPath(logfilepath));
@@ -91,8 +101,6 @@ int main(int argc, char *argv[])
     // Initialize the argument getter
     QSharedPointer<openstudio::ruleset::RubyUserScriptArgumentGetter> argumentGetter(
         new openstudio::ruleset::detail::RubyUserScriptArgumentGetter_Impl<openstudio::detail::RubyInterpreter>(rubyInterpreter));
-
-
 
     openstudio::OpenStudioApp app(argc, argv, argumentGetter);
     openstudio::Application::instance().setApplication(&app);

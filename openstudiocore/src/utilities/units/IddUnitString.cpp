@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -52,6 +52,7 @@ IddUnitString::IddUnitString (const std::string &s)
   m_converted = boost::regex_replace(m_converted,boost::regex("VA"),"V*A");
   m_converted = boost::regex_replace(m_converted,boost::regex("deltaJ"),"J");
   m_converted = boost::regex_replace(m_converted,boost::regex("rev"),"cycle");
+  m_converted = boost::regex_replace(m_converted,boost::regex("Ah"),"A*h");
 
   // relative temperatures
   if (!boost::regex_match(m_converted,boost::regex("C|F"))) {

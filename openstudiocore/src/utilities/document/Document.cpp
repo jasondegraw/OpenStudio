@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -35,7 +35,6 @@
 #include <boost/foreach.hpp>
 #include <boost/archive/archive_exception.hpp>
 
-#ifndef __APPLE__
 BOOST_CLASS_EXPORT(openstudio::SectionHeading);
 BOOST_CLASS_EXPORT(openstudio::Section);
 BOOST_CLASS_EXPORT(openstudio::Text);
@@ -44,7 +43,6 @@ BOOST_CLASS_EXPORT(openstudio::detail::SectionHeading_Impl);
 BOOST_CLASS_EXPORT(openstudio::detail::Section_Impl);
 BOOST_CLASS_EXPORT(openstudio::detail::Text_Impl);
 BOOST_CLASS_EXPORT(openstudio::detail::Table_Impl);
-#endif
 
 namespace openstudio {
 
@@ -294,7 +292,7 @@ bool Document::save(const openstudio::path& p, bool overwrite) const {
           outFile.close();
           return true;
         }
-        catch (boost::archive::archive_exception e) {
+        catch (boost::archive::archive_exception& e) {
           LOG(Error,"Boost archive exception while writing Document out to boost serialization "
               << "text format (.osd). Code " << e.code << ". Message: " << e.what());
           return false;
@@ -335,7 +333,7 @@ boost::optional<Document> Document::load(const openstudio::path& p) {
     in >> boost::serialization::make_nvp("document",tmp);
     result = tmp;
   }
-  catch (boost::archive::archive_exception e) {
+  catch (boost::archive::archive_exception& e) {
     LOG_FREE(Error,"openstudio.Document","Boost archive exception while loading Document from boost serialization text "
         << "format (.osd). Code " << e.code << ". Message: " << e.what());
   }

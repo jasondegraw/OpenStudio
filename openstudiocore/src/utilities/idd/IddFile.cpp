@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -230,7 +230,7 @@ namespace detail {
                                                           currentGroup, 
                                                           iddRegex::commentOnlyObjectText(), 
                                                           IddObjectType::CommentOnly);
-    BOOST_ASSERT(commentOnlyObject);
+    OS_ASSERT(commentOnlyObject);
     m_objects.push_back(*commentOnlyObject);
 
     // temp string to read file

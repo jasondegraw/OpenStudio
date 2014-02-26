@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include <analysis/AnalysisAPI.hpp>
 #include <analysis/AnalysisObject.hpp>
 
-#include <analysis/DiscretePerturbation.hpp>
+#include <analysis/Measure.hpp>
 #include <analysis/WorkflowStep.hpp>
 
 #include <runmanager/lib/Job.hpp>
@@ -77,35 +77,46 @@ namespace detail {
  *  WorkflowStepJobs\endlink are constructed by Problem, through the interpretation of 
  *  DataPoint::topLevelJob in the context of the Problem::workflow. */
 struct ANALYSIS_API WorkflowStepJob {
-  boost::optional<runmanager::Job> job; // initialized unless step evaluates to a null job
-                                        // or to the preliminary part of a compound measure
-                                        // (multiple variables per WorkItem/Job)
+  boost::optional<runmanager::Job> job; // initialized unless step evaluates to a null job or
+                                        // the preliminary part of a compound measure
+  boost::optional<unsigned> mergedJobIndex;
   WorkflowStep step;
-  boost::optional<DiscretePerturbation> discretePerturbation;
+  boost::optional<Measure> measure;
   boost::optional<QVariant> value; // for variables with explicitly set values (all continuous
                                    // variables and discrete variables where an integer value
-                                   // is set, rather than mapped to a perturbation)
+                                   // is set, rather than mapped to a measure)
+
+  /** Returns errors from job if not job->hasMergedJobs(). Returns errors from MergeJobResults
+   *  otherwise. */
+  boost::optional<runmanager::JobErrors> errors() const;
+
+  /** Returns ouptputFiles from job if not job->hasMergedJobs(). Returns outputFiles from 
+   *  MergeJobResults otherwise. */
+  boost::optional<runmanager::Files> outputFiles() const;
 
   /** Constructor for bare runmanager::WorkItem. */
   WorkflowStepJob(const runmanager::Job& t_job,
-                  const WorkflowStep& t_step);
+                  const WorkflowStep& t_step,
+                  boost::optional<unsigned> t_mergedJobIndex=boost::none);
 
   /** Constructor for bare, null runmanager::WorkItem. */
   WorkflowStepJob(const WorkflowStep& t_step);
 
-  /** Constructor for non-null discrete perturbation. */
+  /** Constructor for non-null measure. */
   WorkflowStepJob(const runmanager::Job& t_job,
                   const WorkflowStep& t_step,
-                  const DiscretePerturbation& t_discretePerturbation);
+                  const Measure& t_measure,
+                  boost::optional<unsigned> t_mergedJobIndex=boost::none);
 
-  /** Constructor for null discrete perturbation. */
+  /** Constructor for null measure. */
   WorkflowStepJob(const WorkflowStep& t_step,
-                  const DiscretePerturbation& t_discretePerturbation);
+                  const Measure& t_measure);
 
   /** Constructor for explicitly set variable. */
   WorkflowStepJob(const runmanager::Job& t_job,
                   const WorkflowStep &t_step,
-                  const QVariant& t_value);
+                  const QVariant& t_value,
+                  boost::optional<unsigned> t_mergedJobIndex=boost::none);
 
   /** Constructor for explicitly set variable in preliminary part of compound measure. */
   WorkflowStepJob(const WorkflowStep &t_step,
@@ -214,7 +225,7 @@ class ANALYSIS_API Problem : public AnalysisObject {
    *  DiscreteVariable */
   int numDiscreteVariables() const;
 
-  /** Returns the number of discrete variables that have 0-1 perturbations selected. Such variables
+  /** Returns the number of discrete variables that have 0-1 measures selected. Such variables
    *  can be thought of as static model tranformations, rather than as true variables, since they
    *  have the same effect every time. */
   int numStaticTransformations() const;
@@ -222,7 +233,7 @@ class ANALYSIS_API Problem : public AnalysisObject {
   /** Returns true if numContinuousVariables() == numVariables(). */
   bool allVariablesAreContinuous() const;
 
-  /** Returns true if all DiscreteVariables have either zero or one perturbation selected. Such
+  /** Returns true if all DiscreteVariables have either zero or one measure selected. Such
    *  discrete variables can be thought of as model transformations, rather than variables,
    *  and can be hidden from \link DakotaAlgorithm DakotaAlgorithms\endlink. */
   bool allVariablesAreContinuousOrStaticTransformations() const;
@@ -265,28 +276,31 @@ class ANALYSIS_API Problem : public AnalysisObject {
   /** @name Getters and Queries for Discrete Problems */
   //@{
 
-  /** Converts perturbations to a vector of variable values stored in QVariant format. (In this
+  /** Converts measures to a vector of variable values stored in QVariant format. (In this
    *  case, all of the QVariants will be of type int.) */
-  std::vector<QVariant> getVariableValues(
-      const std::vector<DiscretePerturbation>& perturbations) const;
+  std::vector<QVariant> getVariableValues(const std::vector<Measure>& measures) const;
 
-  /** Converts perturbations to a vector of variable values stored in QVariant format, including
+  /** Converts measures to a vector of variable values stored in QVariant format, including
    *  null QVariant values (of the correct type, int or double) as necessary. */
   std::vector<QVariant> getVariableValues(
-    const std::vector< boost::optional<DiscretePerturbation> >& perturbations) const;
+    const std::vector< boost::optional<Measure> >& measures) const;
 
-  /** Converts variableValues to a vector of \link DiscretePerturbation 
-   *  DiscretePerturbations\endlink, leaving gaps for continuous variables by inserting 
+  /** Converts variableValues to a vector of \link Measure
+   *  Measures\endlink, leaving gaps for continuous variables by inserting
    *  boost::nones in the appropriate locations. */
-  std::vector<boost::optional<DiscretePerturbation> > getDiscretePerturbations(
+  std::vector<boost::optional<Measure> > getMeasures(
+      const std::vector<QVariant>& variableValues) const;
+
+  /** \deprecated Forwards to re-named method getMeasures. */
+  std::vector<boost::optional<Measure> > getDiscretePerturbations(
       const std::vector<QVariant>& variableValues) const;
 
   /** If allVariablesAreDiscrete(), returns the number of \link DataPoint DataPoints\endlink that
    *  would have to be simulated to populate the full mesh for this problem. If
-   *  selectedPerturbationsOnly, the returned value represents the computational effort necessary
-   *  to run DesignOfExperiments. If not selectedPerturbationsOnly, the returned value represents
-   *  the maximum size of the problem the problem, if all perturbations were to be turned on. */
-  boost::optional<int> combinatorialSize(bool selectedPerturbationsOnly) const;
+   *  selectedOnly, the returned value represents the computational effort necessary
+   *  to run DesignOfExperiments. If not selectedOnly, the returned value represents
+   *  the maximum size of the problem, if all discrete possibilities were to be turned on. */
+  boost::optional<int> combinatorialSize(bool selectedOnly) const;
 
   //@}
   /** @name Setters */
@@ -337,10 +351,10 @@ class ANALYSIS_API Problem : public AnalysisObject {
    *  this operation to be successful. */
   boost::optional<DataPoint> createDataPoint(const std::vector<QVariant>& variableValues) const;
 
-  /** Returns a DataPoint if perturbations can be transformed into a valid set of variableValues.
+  /** Returns a DataPoint if measures can be transformed into a valid set of variableValues.
    *  Only works if allVariablesAreDiscrete(). */
   boost::optional<DataPoint> createDataPoint(
-      const std::vector<DiscretePerturbation>& perturbations) const;
+      const std::vector<Measure>& measures) const;
 
   /** Attempts to create a new DataPoint from params. Returns that DataPoint if possible; returns
    *  boost::none otherwise. Not for general use. AnalysisDriver uses this method to translate

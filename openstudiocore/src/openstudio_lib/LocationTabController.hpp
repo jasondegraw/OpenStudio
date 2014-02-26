@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -26,6 +26,8 @@
 #include <QDir>
 #include <QObject>
 
+class QStackedWidget;
+
 namespace openstudio {
 
 namespace model {
@@ -33,6 +35,7 @@ namespace model {
 }
 
 class LocationTabView;
+class UtilityBillsController;
 
 class LocationTabController : public MainTabController
 {
@@ -48,13 +51,21 @@ public:
   {
     WEATHER_FILE,
     LIFE_CYCLE_COSTS,
+    UTILITY_BILLS,
     UTILITY_RATES,
     GROUND_TEMPERATURE,
     WATER_MAINS_TEMPERATURE 
   };
 
 private:
+  boost::shared_ptr<UtilityBillsController> m_utilityBillsController;
+  QStackedWidget * m_utilityBillsStackedWidget;
+  int m_warningWidgetIndex;
+  int m_visibleWidgetIndex;
 
+private slots:
+  void showSubTabView(bool showSubTabView);
+ 
 };
 
 } // openstudio

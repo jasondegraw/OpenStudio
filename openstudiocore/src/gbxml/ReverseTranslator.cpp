@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -26,6 +26,8 @@
 #include <model/Facility_Impl.hpp>
 #include <model/Building.hpp>
 #include <model/Building_Impl.hpp>
+#include <model/BuildingStory.hpp>
+#include <model/BuildingStory_Impl.hpp>
 #include <model/ThermalZone.hpp>
 #include <model/ThermalZone_Impl.hpp>
 #include <model/Space.hpp>
@@ -213,7 +215,7 @@ namespace gbxml {
     for (int i = 0; i < materialElements.count(); i++){
       QDomElement materialElement = materialElements.at(i).toElement();
       boost::optional<model::ModelObject> material = translateMaterial(materialElement, doc, model);
-      BOOST_ASSERT(material); // Krishnan, what type of error handling do you want?
+      OS_ASSERT(material); // Krishnan, what type of error handling do you want?
       
       if (m_progressBar){
         m_progressBar->setValue(m_progressBar->value() + 1);
@@ -233,7 +235,7 @@ namespace gbxml {
     for (int i = 0; i < constructionElements.count(); i++){
       QDomElement constructionElement = constructionElements.at(i).toElement();
       boost::optional<model::ModelObject> construction = translateConstruction(constructionElement, layerElements, doc, model);
-      BOOST_ASSERT(construction); // Krishnan, what type of error handling do you want?
+      OS_ASSERT(construction); // Krishnan, what type of error handling do you want?
       
       if (m_progressBar){
         m_progressBar->setValue(m_progressBar->value() + 1);
@@ -252,7 +254,26 @@ namespace gbxml {
     for (int i = 0; i < scheduleElements.count(); i++){
       QDomElement scheduleElement = scheduleElements.at(i).toElement();
       boost::optional<model::ModelObject> schedule = translateSchedule(scheduleElement, doc, model);
-      BOOST_ASSERT(schedule); // Krishnan, what type of error handling do you want?
+      OS_ASSERT(schedule); // Krishnan, what type of error handling do you want?
+      
+      if (m_progressBar){
+        m_progressBar->setValue(m_progressBar->value() + 1);
+      }
+    }
+
+    // do thermal zones before spaces
+    QDomNodeList zoneElements = element.elementsByTagName("Zone");
+    if (m_progressBar){
+      m_progressBar->setWindowTitle(toString("Translating Zones"));
+      m_progressBar->setMinimum(0);
+      m_progressBar->setMaximum(zoneElements.count()); 
+      m_progressBar->setValue(0);
+    }
+
+    for (int i = 0; i < zoneElements.count(); i++){
+      QDomElement zoneElement = zoneElements.at(i).toElement();
+      boost::optional<model::ModelObject> zone = translateThermalZone(zoneElement, doc, model);
+      OS_ASSERT(zone); // Krishnan, what type of error handling do you want?
       
       if (m_progressBar){
         m_progressBar->setValue(m_progressBar->value() + 1);
@@ -260,10 +281,10 @@ namespace gbxml {
     }
 
     QDomNodeList campusElements = element.elementsByTagName("Campus");
-    BOOST_ASSERT(campusElements.count() == 1);
+    OS_ASSERT(campusElements.count() == 1);
     QDomElement campusElement = campusElements.at(0).toElement();
     boost::optional<model::ModelObject> facility = translateCampus(campusElement, doc, model);
-    BOOST_ASSERT(facility); // Krishnan, what type of error handling do you want?
+    OS_ASSERT(facility); // Krishnan, what type of error handling do you want?
 
     model.setFastNaming(false);
 
@@ -275,10 +296,10 @@ namespace gbxml {
     openstudio::model::Facility facility = model.getUniqueModelObject<openstudio::model::Facility>();
 
     QDomNodeList buildingElements = element.elementsByTagName("Building");
-    BOOST_ASSERT(buildingElements.count() == 1);
+    OS_ASSERT(buildingElements.count() == 1);
 
     boost::optional<model::ModelObject> building = translateBuilding(buildingElements.at(0).toElement(), doc, model);
-    BOOST_ASSERT(building);
+    OS_ASSERT(building);
 
     QDomNodeList surfaceElements = element.elementsByTagName("Surface");
     if (m_progressBar){
@@ -311,6 +332,23 @@ namespace gbxml {
     QString id = element.attribute("id");
     building.setName(escapeName(id));
 
+    QDomNodeList storyElements = element.elementsByTagName("BuildingStorey");
+    if (m_progressBar){
+      m_progressBar->setWindowTitle(toString("Translating Building Stories"));
+      m_progressBar->setMinimum(0);
+      m_progressBar->setMaximum(storyElements.count()); 
+      m_progressBar->setValue(0);
+    }
+
+    for (int i = 0; i < storyElements.count(); ++i){
+      boost::optional<model::ModelObject> story = translateBuildingStory(storyElements.at(i).toElement(), doc, model);
+      OS_ASSERT(story);
+
+      if (m_progressBar){
+        m_progressBar->setValue(m_progressBar->value() + 1);
+      }
+    }
+
     QDomNodeList spaceElements = element.elementsByTagName("Space");
     if (m_progressBar){
       m_progressBar->setWindowTitle(toString("Translating Spaces"));
@@ -321,7 +359,7 @@ namespace gbxml {
 
     for (int i = 0; i < spaceElements.count(); ++i){
       boost::optional<model::ModelObject> space = translateSpace(spaceElements.at(i).toElement(), doc, model);
-      BOOST_ASSERT(space);
+      OS_ASSERT(space);
 
       if (m_progressBar){
         m_progressBar->setValue(m_progressBar->value() + 1);
@@ -330,7 +368,34 @@ namespace gbxml {
 
     return building;
   }
+ 
+  boost::optional<model::ModelObject> ReverseTranslator::translateBuildingStory(const QDomElement& element, const QDomDocument& doc, openstudio::model::Model& model)
+  {
+    openstudio::model::BuildingStory story(model);
 
+    QString id = element.attribute("id");
+    story.setName(escapeName(id));
+
+    // DLM: we need to better support separate name from id in this translator
+
+    // DLM: todo, translate Level
+
+    return story;
+  }
+
+  boost::optional<model::ModelObject> ReverseTranslator::translateThermalZone(const QDomElement& element, const QDomDocument& doc, openstudio::model::Model& model)
+  {
+    openstudio::model::ThermalZone zone(model);
+
+    QString id = element.attribute("id");
+    zone.setName(escapeName(id));
+
+    // DLM: we need to better support separate name from id in this translator
+
+    // DLM: todo, translate setpoints
+
+    return zone;
+  }
   boost::optional<model::ModelObject> ReverseTranslator::translateSpace(const QDomElement& element, const QDomDocument& doc, openstudio::model::Model& model)
   {
     openstudio::model::Space space(model);
@@ -338,9 +403,32 @@ namespace gbxml {
     QString id = element.attribute("id");
     space.setName(escapeName(id));
 
-    openstudio::model::ThermalZone thermalZone(model);
-    thermalZone.setName(escapeName(id) + " ThermalZone");
-    space.setThermalZone(thermalZone);
+    //DLM: we should be using a map of id to model object to get this, not relying on name
+    QString storyId = element.attribute("buildingStoreyIdRef");
+    boost::optional<WorkspaceObject> story = model.getObjectByTypeAndName(openstudio::model::BuildingStory::iddObjectType(), escapeName(storyId));
+    if (story){
+      if (story->optionalCast<openstudio::model::BuildingStory>()){
+        space.setBuildingStory(story->cast<openstudio::model::BuildingStory>());
+      }
+    }
+
+    // if space doesn't have story assigned should we warn the user?
+
+    QString zoneId = element.attribute("zoneIdRef");
+    boost::optional<WorkspaceObject> zone = model.getObjectByTypeAndName(openstudio::model::ThermalZone::iddObjectType(), escapeName(zoneId));
+    if (zone){
+      if (boost::optional<openstudio::model::ThermalZone> thermalZone = zone->optionalCast<openstudio::model::ThermalZone>()){
+        space.setThermalZone(thermalZone.get());
+      }
+    }
+
+    if (!space.thermalZone()){
+      // DLM: may want to revisit this
+      // create a new thermal zone if none assigned
+      openstudio::model::ThermalZone thermalZone(model);
+      thermalZone.setName(escapeName(id) + " ThermalZone");
+      space.setThermalZone(thermalZone);
+    }
 
     return space;
   }
@@ -373,7 +461,7 @@ namespace gbxml {
 
     for (int i = 0; i < cartesianPointElements.count(); i++){
       QDomNodeList coordinateElements = cartesianPointElements.at(i).toElement().elementsByTagName("Coordinate");
-      BOOST_ASSERT(coordinateElements.size() == 3);
+      OS_ASSERT(coordinateElements.size() == 3);
 
       /* Calling these conversions every time is uneccesarily slow
 
@@ -511,7 +599,7 @@ namespace gbxml {
 
     for (int i = 0; i < cartesianPointElements.count(); i++){
       QDomNodeList coordinateElements = cartesianPointElements.at(i).toElement().elementsByTagName("Coordinate");
-      BOOST_ASSERT(coordinateElements.size() == 3);
+      OS_ASSERT(coordinateElements.size() == 3);
 
       /* Calling these conversions every time is uneccesarily slow
 

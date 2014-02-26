@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -75,7 +75,7 @@ OptionalModelObject ReverseTranslator::translateZoneVentilationDesignFlowRate( c
   }
 
   s = workspaceObject.getString(openstudio::ZoneVentilation_DesignFlowRateFields::DesignFlowRateCalculationMethod, true);
-  BOOST_ASSERT(s);
+  OS_ASSERT(s);
 
   OptionalDouble d;
   if (istringEqual("Flow/Zone", *s)){

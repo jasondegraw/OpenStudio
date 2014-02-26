@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -22,8 +22,6 @@
 
 #include <model/Model.hpp>
 #include <model/Model_Impl.hpp>
-#include <model/BuildingStandardsInformation.hpp>
-#include <model/BuildingStandardsInformation_Impl.hpp>
 #include <model/BuildingStory.hpp>
 #include <model/BuildingStory_Impl.hpp>
 #include <model/Facility.hpp>
@@ -57,6 +55,7 @@
 #include <utilities/geometry/Transformation.hpp>
 #include <utilities/core/Compare.hpp>
 #include <utilities/core/Assert.hpp>
+#include <utilities/units/QuantityConverter.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
@@ -70,7 +69,7 @@ namespace detail {
   Building_Impl::Building_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ParentObject_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == Building::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == Building::iddObjectType());
   }
 
   Building_Impl::Building_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -78,7 +77,7 @@ namespace detail {
                                bool keepHandle)
     : ParentObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == Building::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == Building::iddObjectType());
   }
 
   Building_Impl::Building_Impl(const Building_Impl& other,
@@ -95,11 +94,6 @@ namespace detail {
   std::vector<ModelObject> Building_Impl::children() const
   {
     std::vector<ModelObject> result;
-
-    OptionalBuildingStandardsInformation stdsInfo = model().getOptionalUniqueModelObject<BuildingStandardsInformation>();
-    if (stdsInfo) {
-      result.push_back(*stdsInfo);
-    }
 
     // meters
     MeterVector meters = this->meters();
@@ -153,23 +147,9 @@ namespace detail {
     return Building::iddObjectType();
   }
 
-  std::string Building_Impl::buildingType() const {
-    boost::optional<std::string> result = getString(OS_BuildingFields::BuildingType,true);
-    BOOST_ASSERT(result);
-    return *result;
-  }
-
-  bool Building_Impl::isBuildingTypeDefaulted() const {
-    return isEmpty(OS_BuildingFields::BuildingType);
-  }
-
-  std::vector<std::string> Building_Impl::buildingTypeValues() const {
-    return Building::validBuildingTypeValues();
-  }
-
   double Building_Impl::northAxis() const {
     boost::optional<double> value = getDouble(OS_BuildingFields::NorthAxis,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -179,7 +159,7 @@ namespace detail {
 
   double Building_Impl::nominalFloortoFloorHeight() const {
     boost::optional<double> value = getDouble(OS_BuildingFields::NominalFloortoFloorHeight,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -187,37 +167,123 @@ namespace detail {
     return isEmpty(OS_BuildingFields::NominalFloortoFloorHeight);
   }
 
-  bool Building_Impl::setBuildingType(const std::string& buildingType) {
-    bool result = false;
-    result = setString(OS_BuildingFields::BuildingType, buildingType);
+  boost::optional<int> Building_Impl::standardsNumberOfStories() const
+  {
+    boost::optional<int> value = getInt(OS_BuildingFields::StandardsNumberofStories, false);
+    return value;
+  }
+
+  boost::optional<int> Building_Impl::standardsNumberOfAboveGroundStories() const
+  {
+    boost::optional<int> value = getInt(OS_BuildingFields::StandardsNumberofAboveGroundStories, false);
+    return value;
+  }
+
+  boost::optional<std::string> Building_Impl::standardsBuildingType() const
+  {
+    return getString(OS_BuildingFields::StandardsBuildingType, false, true);
+  }
+
+  std::vector<std::string> Building_Impl::suggestedStandardsBuildingTypes() const
+  {
+    std::vector<std::string> result;
+  
+    boost::optional<std::string> standardsBuildingType = this->standardsBuildingType();
+
+    // DLM: temp code, eventually get from StandardsLibrary
+    Model tempModel;
+    SpaceType tempSpaceType(tempModel);
+    std::vector<std::string> tempSuggestions = tempSpaceType.suggestedStandardsBuildingTypes();
+    BOOST_FOREACH(const std::string& suggestion, tempSuggestions){
+      result.push_back(suggestion);
+    }
+
+    // include values from model
+    BOOST_FOREACH(const SpaceType& other, this->model().getConcreteModelObjects<SpaceType>()){
+      boost::optional<std::string> otherBuildingType = other.standardsBuildingType();
+      if (otherBuildingType){
+        result.push_back(*otherBuildingType);
+      }
+    }
+
+    // remove standardsBuildingType
+    IstringFind finder;
+    if (standardsBuildingType){
+      finder.addTarget(*standardsBuildingType);
+    }
+    std::vector<std::string>::iterator it = std::remove_if(result.begin(), result.end(), finder); 
+    result.resize( std::distance(result.begin(),it) ); 
+
+    // make unique
+    it = std::unique(result.begin(), result.end(), IstringEqual()); 
+    result.resize( std::distance(result.begin(),it) ); 
+
+    // sort
+    std::sort(result.begin(), result.end(), IstringCompare());
+
+    // add current to front
+    if (standardsBuildingType){
+      result.insert(result.begin(), *standardsBuildingType);
+    }
+
     return result;
   }
 
-  void Building_Impl::resetBuildingType() {
-    bool result = setString(OS_BuildingFields::BuildingType, "");
-    BOOST_ASSERT(result);
-  }
-
   void Building_Impl::setNorthAxis(double northAxis) {
-    bool result = false;
-    result = setDouble(OS_BuildingFields::NorthAxis, northAxis);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_BuildingFields::NorthAxis, northAxis);
+    OS_ASSERT(result);
   }
 
   void Building_Impl::resetNorthAxis() {
     bool result = setString(OS_BuildingFields::NorthAxis, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool Building_Impl::setNominalFloortoFloorHeight(double nominalFloortoFloorHeight) {
-    bool result = false;
-    result = setDouble(OS_BuildingFields::NominalFloortoFloorHeight, nominalFloortoFloorHeight);
+    bool result = setDouble(OS_BuildingFields::NominalFloortoFloorHeight, nominalFloortoFloorHeight);
     return result;
   }
 
   void Building_Impl::resetNominalFloortoFloorHeight() {
     bool result = setString(OS_BuildingFields::NominalFloortoFloorHeight, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
+  }
+
+  bool Building_Impl::setStandardsNumberOfStories(int value)
+  {
+    bool test = setInt(OS_BuildingFields::StandardsNumberofStories, value);
+    return test;
+  }
+
+  void Building_Impl::resetStandardsNumberOfStories()
+  {
+    bool test = setString(OS_BuildingFields::StandardsNumberofStories, "");
+    OS_ASSERT(test);
+  }
+
+  bool Building_Impl::setStandardsNumberOfAboveGroundStories(int value)
+  {
+    bool test = setInt(OS_BuildingFields::StandardsNumberofAboveGroundStories, value);
+    return test;
+  }
+
+  void Building_Impl::resetStandardsNumberOfAboveGroundStories()
+  {
+    bool test = setString(OS_BuildingFields::StandardsNumberofAboveGroundStories, "");
+    OS_ASSERT(test);
+  }
+
+  bool Building_Impl::setStandardsBuildingType(const std::string& standardsBuildingType)
+  {
+    bool result = setString(OS_BuildingFields::StandardsBuildingType, standardsBuildingType);
+    OS_ASSERT(result);
+    return result;
+  }
+
+  void Building_Impl::resetStandardsBuildingType()
+  {
+    bool test = setString(OS_BuildingFields::StandardsBuildingType, "");
+    OS_ASSERT(test);
   }
 
   boost::optional<SpaceType> Building_Impl::spaceType() const
@@ -233,7 +299,7 @@ namespace detail {
   void Building_Impl::resetSpaceType()
   {
     bool test = setString(OS_BuildingFields::SpaceTypeName, "");
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
   }
 
   boost::optional<DefaultConstructionSet> Building_Impl::defaultConstructionSet() const
@@ -324,15 +390,12 @@ namespace detail {
     SurfaceVector candidates = model().getModelObjects<Surface>();
     BOOST_FOREACH(const Surface& candidate,candidates) {
       std::string surfaceType = candidate.surfaceType();
-      if (openstudio::istringEqual(surfaceType, "Roof")) {
+      std::string outsideBoundaryCondition = candidate.outsideBoundaryCondition();
+      if (openstudio::istringEqual(surfaceType, "RoofCeiling") && openstudio::istringEqual(outsideBoundaryCondition, "Outdoors")) {
         result.push_back(candidate);
       }
     }
     return result;
-  }
-
-  BuildingStandardsInformation Building_Impl::standardsInformation() const {
-    return model().getUniqueModelObject<BuildingStandardsInformation>();
   }
 
   double Building_Impl::floorArea() const
@@ -371,6 +434,36 @@ namespace detail {
       }
     }
 
+    return result;
+  }
+
+  double Building_Impl::exteriorSurfaceArea() const {
+    double result(0.0);
+    BOOST_FOREACH(const Surface& surface,model().getModelObjects<Surface>()) {
+      OptionalSpace space = surface.space();
+      std::string outsideBoundaryCondition = surface.outsideBoundaryCondition();
+      if (space && openstudio::istringEqual(outsideBoundaryCondition, "Outdoors")) {
+        result += surface.grossArea() * space->multiplier();
+      }
+    }
+    return result;
+  }
+
+  double Building_Impl::exteriorWallArea() const {
+    double result(0.0);
+    BOOST_FOREACH(const Surface& exteriorWall,exteriorWalls()) {
+      if (OptionalSpace space = exteriorWall.space()) {
+        result += exteriorWall.grossArea() * space->multiplier();
+      }
+    }
+    return result;
+  }
+
+  double Building_Impl::airVolume() const {
+    double result(0.0);
+    BOOST_FOREACH(const Space& space, spaces()) {
+      result += space.volume() * space.multiplier();
+    }
     return result;
   }
 
@@ -520,30 +613,72 @@ namespace detail {
     return ep / np;
   }
 
-  boost::optional<int> Building_Impl::numberOfStories() const {
-    OptionalBuildingStandardsInformation standardsInformation = this->standardsInformation();
-    if (standardsInformation) {
-      return standardsInformation->numberOfStories();
+  double Building_Impl::infiltrationDesignFlowRate() const {
+    double result(0.0);
+    BOOST_FOREACH(const Space& space, spaces()){
+      result += space.multiplier() * space.infiltrationDesignFlowRate();
     }
-    return boost::none;
+    return result;
   }
 
-  boost::optional<int> Building_Impl::numberOfAboveGroundStories() const {
-    OptionalBuildingStandardsInformation standardsInformation = this->standardsInformation();
-    if (standardsInformation) {
-      return standardsInformation->numberOfAboveGroundStories();
+  double Building_Impl::infiltrationDesignFlowPerSpaceFloorArea() const {
+    double area = floorArea();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(area,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignFlowPerSpaceFloorArea();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
     }
-    return boost::none;
+    return idfr/area;
   }
 
-  bool Building_Impl::setNumberOfStories(boost::optional<int> value) {
-    BuildingStandardsInformation standardsInformation = model().getUniqueModelObject<BuildingStandardsInformation>();
-    return standardsInformation.setNumberOfStories(value);
+  double Building_Impl::infiltrationDesignFlowPerExteriorSurfaceArea() const {
+    double area = exteriorSurfaceArea();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(area,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignFlowPerExteriorSurfaceArea();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return idfr/area;
   }
 
-  bool Building_Impl::setNumberOfAboveGroundStories(boost::optional<int> value) {
-    BuildingStandardsInformation standardsInformation = model().getUniqueModelObject<BuildingStandardsInformation>();
-    return standardsInformation.setNumberOfAboveGroundStories(value);
+  double Building_Impl::infiltrationDesignFlowPerExteriorWallArea() const {
+    double area = exteriorWallArea();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(area,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignFlowPerExteriorWallArea();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return idfr/area;
+  }
+
+  double Building_Impl::infiltrationDesignAirChangesPerHour() const {
+    double volume = airVolume();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(volume,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignAirChangesPerHour();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return convert(idfr/volume,"1/s","1/h").get();
   }
 
   Transformation Building_Impl::transformation() const
@@ -555,42 +690,40 @@ namespace detail {
   openstudio::Quantity Building_Impl::northAxis_SI() const
   {
     OSOptionalQuantity value = getQuantity(OS_BuildingFields::NorthAxis,true,false);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
   openstudio::Quantity Building_Impl::northAxis_IP() const
   {
     OSOptionalQuantity value = getQuantity(OS_BuildingFields::NorthAxis,true,true);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
   bool Building_Impl::setNorthAxis(const Quantity& northAxis)
   {
-    bool result = false;
-    result = setQuantity(OS_BuildingFields::NorthAxis, northAxis);
+    bool result = setQuantity(OS_BuildingFields::NorthAxis, northAxis);
     return result;
   }
 
   openstudio::Quantity Building_Impl::nominalFloortoFloorHeight_SI() const
   {
     OSOptionalQuantity value = getQuantity(OS_BuildingFields::NominalFloortoFloorHeight,true,false);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
   openstudio::Quantity Building_Impl::nominalFloortoFloorHeight_IP() const
   {
     OSOptionalQuantity value = getQuantity(OS_BuildingFields::NominalFloortoFloorHeight,true,true);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
   bool Building_Impl::setNominalFloortoFloorHeight(const Quantity& nominalFloortoFloorHeight)
   {
-    bool result = false;
-    result = setQuantity(OS_BuildingFields::NominalFloortoFloorHeight, nominalFloortoFloorHeight);
+    bool result = setQuantity(OS_BuildingFields::NominalFloortoFloorHeight, nominalFloortoFloorHeight);
     return result;
   }
 
@@ -660,11 +793,6 @@ namespace detail {
     return result;
   }
 
-  boost::optional<ModelObject> Building_Impl::standardsInformationAsModelObject() const {
-    OptionalModelObject result = standardsInformation();
-    return result;
-  }
-
   bool Building_Impl::setSpaceTypeAsModelObject(const boost::optional<ModelObject>& modelObject) {
     if (modelObject) {
       OptionalSpaceType intermediate = modelObject->optionalCast<SpaceType>();
@@ -720,19 +848,6 @@ IddObjectType Building::iddObjectType() {
   return result;
 }
 
-std::vector<std::string> Building::validBuildingTypeValues() {
-  return getIddKeyNames(IddFactory::instance().getObject(iddObjectType()).get(),
-                        OS_BuildingFields::BuildingType);
-}
-
-std::string Building::buildingType() const {
-  return getImpl<detail::Building_Impl>()->buildingType();
-}
-
-bool Building::isBuildingTypeDefaulted() const {
-  return getImpl<detail::Building_Impl>()->isBuildingTypeDefaulted();
-}
-
 double Building::northAxis() const {
   return getImpl<detail::Building_Impl>()->northAxis();
 }
@@ -749,12 +864,20 @@ bool Building::isNominalFloortoFloorHeightDefaulted() const {
   return getImpl<detail::Building_Impl>()->isNominalFloortoFloorHeightDefaulted();
 }
 
-bool Building::setBuildingType(const std::string& buildingType) {
-  return getImpl<detail::Building_Impl>()->setBuildingType(buildingType);
+boost::optional<int> Building::standardsNumberOfStories() const{
+  return getImpl<detail::Building_Impl>()->standardsNumberOfStories();
 }
 
-void Building::resetBuildingType() {
-  getImpl<detail::Building_Impl>()->resetBuildingType();
+boost::optional<int> Building::standardsNumberOfAboveGroundStories() const{
+  return getImpl<detail::Building_Impl>()->standardsNumberOfAboveGroundStories();
+}
+
+boost::optional<std::string> Building::standardsBuildingType() const{
+  return getImpl<detail::Building_Impl>()->standardsBuildingType();
+}
+
+std::vector<std::string> Building::suggestedStandardsBuildingTypes() const{
+  return getImpl<detail::Building_Impl>()->suggestedStandardsBuildingTypes();
 }
 
 void Building::setNorthAxis(double northAxis) {
@@ -771,6 +894,30 @@ bool Building::setNominalFloortoFloorHeight(double nominalFloortoFloorHeight) {
 
 void Building::resetNominalFloortoFloorHeight() {
   getImpl<detail::Building_Impl>()->resetNominalFloortoFloorHeight();
+}
+
+bool Building::setStandardsNumberOfStories(int value){
+  return getImpl<detail::Building_Impl>()->setStandardsNumberOfStories(value);
+}
+
+void Building::resetStandardsNumberOfStories(){
+  getImpl<detail::Building_Impl>()->resetStandardsNumberOfStories();
+}
+
+bool Building::setStandardsNumberOfAboveGroundStories(int value){
+  return getImpl<detail::Building_Impl>()->setStandardsNumberOfAboveGroundStories(value);
+}
+
+void Building::resetStandardsNumberOfAboveGroundStories(){
+  getImpl<detail::Building_Impl>()->resetStandardsNumberOfAboveGroundStories();
+}
+
+bool Building::setStandardsBuildingType(const std::string& standardsBuildingType){
+  return getImpl<detail::Building_Impl>()->setStandardsBuildingType(standardsBuildingType);
+}
+
+void Building::resetStandardsBuildingType(){
+  getImpl<detail::Building_Impl>()->resetStandardsBuildingType();
 }
 
 boost::optional<SpaceType> Building::spaceType() const
@@ -851,10 +998,6 @@ std::vector<Surface> Building::roofs() const {
   return getImpl<detail::Building_Impl>()->roofs();
 }
 
-BuildingStandardsInformation Building::standardsInformation() const {
-  return getImpl<detail::Building_Impl>()->standardsInformation();
-}
-
 double Building::floorArea() const
 {
   return getImpl<detail::Building_Impl>()->floorArea();
@@ -863,6 +1006,18 @@ double Building::floorArea() const
 boost::optional<double> Building::conditionedFloorArea() const
 {
   return getImpl<detail::Building_Impl>()->conditionedFloorArea();
+}
+
+double Building::exteriorSurfaceArea() const {
+  return getImpl<detail::Building_Impl>()->exteriorSurfaceArea();
+}
+
+double Building::exteriorWallArea() const {
+  return getImpl<detail::Building_Impl>()->exteriorWallArea();
+}
+
+double Building::airVolume() const {
+  return getImpl<detail::Building_Impl>()->airVolume();
 }
 
 double Building::numberOfPeople() const {
@@ -913,20 +1068,24 @@ double Building::gasEquipmentPowerPerPerson() const {
   return getImpl<detail::Building_Impl>()->gasEquipmentPowerPerPerson();
 }
 
-boost::optional<int> Building::numberOfStories() const {
-  return getImpl<detail::Building_Impl>()->numberOfStories();
+double Building::infiltrationDesignFlowRate() const {
+  return getImpl<detail::Building_Impl>()->infiltrationDesignFlowRate();
 }
 
-boost::optional<int> Building::numberOfAboveGroundStories() const {
-  return getImpl<detail::Building_Impl>()->numberOfAboveGroundStories();
+double Building::infiltrationDesignFlowPerSpaceFloorArea() const {
+  return getImpl<detail::Building_Impl>()->infiltrationDesignFlowPerSpaceFloorArea();
 }
 
-bool Building::setNumberOfStories(boost::optional<int> value) {
-  return getImpl<detail::Building_Impl>()->setNumberOfStories(value);
+double Building::infiltrationDesignFlowPerExteriorSurfaceArea() const {
+  return getImpl<detail::Building_Impl>()->infiltrationDesignFlowPerExteriorSurfaceArea();
 }
 
-bool Building::setNumberOfAboveGroundStories(boost::optional<int> value) {
-  return getImpl<detail::Building_Impl>()->setNumberOfAboveGroundStories(value);
+double Building::infiltrationDesignFlowPerExteriorWallArea() const {
+  return getImpl<detail::Building_Impl>()->infiltrationDesignFlowPerExteriorWallArea();
+}
+
+double Building::infiltrationDesignAirChangesPerHour() const {
+  return getImpl<detail::Building_Impl>()->infiltrationDesignAirChangesPerHour();
 }
 
 Transformation Building::transformation() const

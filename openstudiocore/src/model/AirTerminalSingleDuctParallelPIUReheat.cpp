@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@ namespace detail {
       bool keepHandle)
     : StraightComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == AirTerminalSingleDuctParallelPIUReheat::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == AirTerminalSingleDuctParallelPIUReheat::iddObjectType());
   }
 
   AirTerminalSingleDuctParallelPIUReheat_Impl::AirTerminalSingleDuctParallelPIUReheat_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -56,7 +56,7 @@ namespace detail {
                                                                                            bool keepHandle)
     : StraightComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == AirTerminalSingleDuctParallelPIUReheat::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == AirTerminalSingleDuctParallelPIUReheat::iddObjectType());
   }
 
   AirTerminalSingleDuctParallelPIUReheat_Impl::AirTerminalSingleDuctParallelPIUReheat_Impl(const AirTerminalSingleDuctParallelPIUReheat_Impl& other,
@@ -156,7 +156,7 @@ namespace detail {
 
   double AirTerminalSingleDuctParallelPIUReheat_Impl::minimumHotWaterorSteamFlowRate() const {
     boost::optional<double> value = getDouble(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MinimumHotWaterorSteamFlowRate,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -166,7 +166,7 @@ namespace detail {
 
   double AirTerminalSingleDuctParallelPIUReheat_Impl::convergenceTolerance() const {
     boost::optional<double> value = getDouble(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::ConvergenceTolerance,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -181,12 +181,12 @@ namespace detail {
     } else {
       result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumPrimaryAirFlowRate, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::autosizeMaximumPrimaryAirFlowRate() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumPrimaryAirFlowRate, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::setMaximumSecondaryAirFlowRate(boost::optional<double> maximumSecondaryAirFlowRate) {
@@ -196,12 +196,12 @@ namespace detail {
     } else {
       result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumSecondaryAirFlowRate, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::autosizeMaximumSecondaryAirFlowRate() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumSecondaryAirFlowRate, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::setMinimumPrimaryAirFlowFraction(boost::optional<double> minimumPrimaryAirFlowFraction) {
@@ -211,12 +211,12 @@ namespace detail {
     } else {
       result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MinimumPrimaryAirFlowFraction, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::autosizeMinimumPrimaryAirFlowFraction() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MinimumPrimaryAirFlowFraction, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::setFanOnFlowFraction(boost::optional<double> fanOnFlowFraction) {
@@ -226,12 +226,12 @@ namespace detail {
     } else {
       result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::FanOnFlowFraction, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::autosizeFanOnFlowFraction() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::FanOnFlowFraction, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::setMaximumHotWaterorSteamFlowRate(boost::optional<double> maximumHotWaterorSteamFlowRate) {
@@ -241,39 +241,37 @@ namespace detail {
     } else {
       result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumHotWaterorSteamFlowRate, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::resetMaximumHotWaterorSteamFlowRate() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumHotWaterorSteamFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::autosizeMaximumHotWaterorSteamFlowRate() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MaximumHotWaterorSteamFlowRate, "Autosize");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirTerminalSingleDuctParallelPIUReheat_Impl::setMinimumHotWaterorSteamFlowRate(double minimumHotWaterorSteamFlowRate) {
-    bool result = false;
-    result = setDouble(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MinimumHotWaterorSteamFlowRate, minimumHotWaterorSteamFlowRate);
+    bool result = setDouble(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MinimumHotWaterorSteamFlowRate, minimumHotWaterorSteamFlowRate);
     return result;
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::resetMinimumHotWaterorSteamFlowRate() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::MinimumHotWaterorSteamFlowRate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool AirTerminalSingleDuctParallelPIUReheat_Impl::setConvergenceTolerance(double convergenceTolerance) {
-    bool result = false;
-    result = setDouble(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::ConvergenceTolerance, convergenceTolerance);
+    bool result = setDouble(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::ConvergenceTolerance, convergenceTolerance);
     return result;
   }
 
   void AirTerminalSingleDuctParallelPIUReheat_Impl::resetConvergenceTolerance() {
     bool result = setString(OS_AirTerminal_SingleDuct_ParallelPIU_ReheatFields::ConvergenceTolerance, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   unsigned AirTerminalSingleDuctParallelPIUReheat_Impl::inletPort() 
@@ -289,14 +287,14 @@ namespace detail {
   HVACComponent AirTerminalSingleDuctParallelPIUReheat_Impl::reheatCoil() const
   {
     boost::optional<HVACComponent> hvacComponent = optionalReheatCoil();
-    BOOST_ASSERT(hvacComponent);
+    OS_ASSERT(hvacComponent);
     return hvacComponent.get();
   }
 
   HVACComponent AirTerminalSingleDuctParallelPIUReheat_Impl::fan() const
   {
     boost::optional<HVACComponent> hvacComponent = optionalFan();
-    BOOST_ASSERT(hvacComponent);
+    OS_ASSERT(hvacComponent);
     return hvacComponent.get();
   }
 
@@ -308,11 +306,11 @@ namespace detail {
       // so we hook up to global always on schedule
       LOG(Error, "Required availability schedule not set, using 'Always On' schedule");
       value = this->model().alwaysOnDiscreteSchedule();
-      BOOST_ASSERT(value);
+      OS_ASSERT(value);
       const_cast<AirTerminalSingleDuctParallelPIUReheat_Impl*>(this)->setAvailabilitySchedule(*value);
       value = optionalAvailabilitySchedule();
     }
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -479,8 +477,6 @@ namespace detail {
     Model _model = this->model();
     ModelObject thisObject = this->getObject<ModelObject>();
 
-    std::vector<IdfObject> result;
-
     HVACComponent _reheatCoil = reheatCoil();
 
     boost::optional<ModelObject> sourceModelObject = this->inletModelObject();
@@ -492,7 +488,7 @@ namespace detail {
     std::vector<ThermalZone> thermalZones = _model.getModelObjects<ThermalZone>();
     for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
          it != thermalZones.end();
-         it++ )
+         ++it )
     {
       std::vector<ModelObject> equipment = it->equipment();
 
@@ -604,7 +600,7 @@ AirTerminalSingleDuctParallelPIUReheat::AirTerminalSingleDuctParallelPIUReheat( 
                                                                                 HVACComponent & reheatCoil )
   : StraightComponent(AirTerminalSingleDuctParallelPIUReheat::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::AirTerminalSingleDuctParallelPIUReheat_Impl>());
+  OS_ASSERT(getImpl<detail::AirTerminalSingleDuctParallelPIUReheat_Impl>());
 
   bool test = setAvailabilitySchedule(schedule);
   if (!test) {

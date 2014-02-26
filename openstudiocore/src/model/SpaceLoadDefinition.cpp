@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -93,7 +93,7 @@ namespace detail {
 SpaceLoadDefinition::SpaceLoadDefinition(IddObjectType type,const Model& model)
   : ResourceObject(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::SpaceLoadDefinition_Impl>());
+  OS_ASSERT(getImpl<detail::SpaceLoadDefinition_Impl>());
 }
 
 SpaceLoadDefinition::SpaceLoadDefinition(boost::shared_ptr<detail::SpaceLoadDefinition_Impl> impl)

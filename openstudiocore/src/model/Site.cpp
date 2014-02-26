@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@ namespace detail {
   Site_Impl::Site_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ParentObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == Site::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == Site::iddObjectType());
   }
 
   Site_Impl::Site_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -78,7 +78,7 @@ namespace detail {
                        bool keepHandle)
     : ParentObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == Site::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == Site::iddObjectType());
   }
 
   Site_Impl::Site_Impl(const Site_Impl& other,
@@ -174,7 +174,7 @@ namespace detail {
 
   double Site_Impl::latitude() const {
     boost::optional<double> value = getDouble(OS_SiteFields::Latitude,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -184,7 +184,7 @@ namespace detail {
 
   double Site_Impl::longitude() const {
     boost::optional<double> value = getDouble(OS_SiteFields::Longitude,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -194,7 +194,7 @@ namespace detail {
 
   double Site_Impl::timeZone() const {
     boost::optional<double> value = getDouble(OS_SiteFields::TimeZone,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -204,7 +204,7 @@ namespace detail {
 
   double Site_Impl::elevation() const {
     boost::optional<double> value = getDouble(OS_SiteFields::Elevation,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -214,7 +214,7 @@ namespace detail {
 
   std::string Site_Impl::terrain() const {
     boost::optional<std::string> value = getString(OS_SiteFields::Terrain,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -223,58 +223,53 @@ namespace detail {
   }
 
   bool Site_Impl::setLatitude(double latitude) {
-    bool result = false;
-    result = setDouble(OS_SiteFields::Latitude, latitude);
+    bool result = setDouble(OS_SiteFields::Latitude, latitude);
     return result;
   }
 
   void Site_Impl::resetLatitude() {
     bool result = setString(OS_SiteFields::Latitude, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool Site_Impl::setLongitude(double longitude) {
-    bool result = false;
-    result = setDouble(OS_SiteFields::Longitude, longitude);
+    bool result = setDouble(OS_SiteFields::Longitude, longitude);
     return result;
   }
 
   void Site_Impl::resetLongitude() {
     bool result = setString(OS_SiteFields::Longitude, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool Site_Impl::setTimeZone(double timeZone) {
-    bool result = false;
-    result = setDouble(OS_SiteFields::TimeZone, timeZone);
+    bool result = setDouble(OS_SiteFields::TimeZone, timeZone);
     return result;
   }
 
   void Site_Impl::resetTimeZone() {
     bool result = setString(OS_SiteFields::TimeZone, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool Site_Impl::setElevation(double elevation) {
-    bool result = false;
-    result = setDouble(OS_SiteFields::Elevation, elevation);
+    bool result = setDouble(OS_SiteFields::Elevation, elevation);
     return result;
   }
 
   void Site_Impl::resetElevation() {
     bool result = setString(OS_SiteFields::Elevation, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool Site_Impl::setTerrain(std::string terrain) {
-    bool result = false;
-    result = setString(OS_SiteFields::Terrain, terrain);
+    bool result = setString(OS_SiteFields::Terrain, terrain);
     return result;
   }
 
   void Site_Impl::resetTerrain() {
     bool result = setString(OS_SiteFields::Terrain, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   boost::optional<WeatherFile> Site_Impl::weatherFile() const
@@ -315,7 +310,7 @@ namespace detail {
     }
     return result;
   }
-
+/*
   std::string Site_Impl::activeClimateZoneValue() const {
     std::string result;
     OptionalClimateZones oClimateZones = climateZones();
@@ -348,7 +343,7 @@ namespace detail {
     ClimateZones climateZones = this->model().getUniqueModelObject<ClimateZones>();
     return !climateZones.setActiveClimateZone(institution).empty();
   }
-
+*/
 } // detail
 
 IddObjectType Site::iddObjectType() {
@@ -473,7 +468,7 @@ ShadingSurfaceGroupVector Site::shadingSurfaceGroups() const
 {
   return getImpl<detail::Site_Impl>()->shadingSurfaceGroups();
 }
-
+/*
 std::string Site::activeClimateZoneValue() const {
   return getImpl<detail::Site_Impl>()->activeClimateZoneValue();
 }
@@ -489,7 +484,7 @@ bool Site::setActiveClimateZoneValue(const std::string& value) {
 bool Site::setActiveClimateZoneInstitution(const std::string& institution) {
   return getImpl<detail::Site_Impl>()->setActiveClimateZoneInstitution(institution);
 }
-
+*/
 /// @cond
 Site::Site(boost::shared_ptr<detail::Site_Impl> impl)
   : ParentObject(impl)

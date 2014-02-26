@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -21,6 +21,8 @@
 #include <utilities/core/System.hpp>
 #include "Job.hpp"
 #include "Job_Impl.hpp"
+#include "JSON.hpp"
+#include "MergedJobResults.hpp"
 
 namespace openstudio {
 namespace runmanager {
@@ -47,6 +49,15 @@ namespace runmanager {
     m_impl->setIndex(index);
   }
 
+  JobParams Job::allParams() const
+  {
+    return m_impl->allParams();
+  }
+
+  Files Job::relativeOutputFiles() const
+  {
+    return m_impl->relativeOutputFiles();
+  }
 
   UUID Job::uuid() const 
   {
@@ -421,6 +432,11 @@ namespace runmanager {
     m_impl->setBasePath(t_basePath);
   }
 
+  void Job::setBasePathRecursive(const openstudio::path &t_basePath)
+  {
+    m_impl->setBasePathRecursive(t_basePath);
+  }
+
   bool Job::operator==(const Job &rhs) const
   {
     return m_impl->uuid() == rhs.m_impl->uuid();
@@ -463,6 +479,52 @@ namespace runmanager {
     return m_impl->history();
   }
 
+
+  Job Job::fromJSON(const std::string &t_json)
+  {
+    return detail::JSON::toJob(t_json, false);
+  }
+
+  std::string Job::toJSON() const
+  {
+    return detail::JSON::toJSON(*this);
+  }
+
+  void Job::updateJob(const Job &t_other, bool t_allowUUIDUpdate)
+  {
+    m_impl->updateJob(t_other.m_impl, t_allowUUIDUpdate);
+  }
+
+  bool Job::externallyManaged() const
+  {
+    return m_impl->externallyManaged();
+  }
+
+  void Job::sendSignals()
+  {
+    return m_impl->sendSignals();
+  }
+
+
+  void Job::makeExternallyManaged()
+  {
+    m_impl->makeExternallyManaged();
+  }
+
+  void Job::setStatus(const AdvancedStatus &t_status)
+  {
+    m_impl->setStatus(t_status);
+  }
+
+  bool Job::hasMergedJobs() const
+  {
+    return m_impl->hasMergedJobs();
+  }
+
+  std::vector<MergedJobResults> Job::mergedJobResults() const
+  {
+    return m_impl->mergedJobResults();
+  }
 
 
 }

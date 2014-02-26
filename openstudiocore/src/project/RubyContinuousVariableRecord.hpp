@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@ class RubyContinuousVariable;
 namespace project {
 
 class OSArgumentRecord;
-class RubyPerturbationRecord;
+class RubyMeasureRecord;
 
 namespace detail {
 
@@ -85,7 +85,7 @@ class PROJECT_API RubyContinuousVariableRecord : public ContinuousVariableRecord
 
   OSArgumentRecord osArgumentRecord() const;
 
-  RubyPerturbationRecord rubyPerturbationRecord() const;
+  RubyMeasureRecord rubyMeasureRecord() const;
 
   analysis::RubyContinuousVariable rubyContinuousVariable() const;
 

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -26,14 +26,20 @@
 #include <model/DesignDay.hpp>
 #include <model/DesignDay_Impl.hpp>
 #include <model/Model_Impl.hpp>
+#include <model/RunPeriod.hpp>
+#include <model/RunPeriod_Impl.hpp>
 #include <model/Site.hpp>
 #include <model/Site_Impl.hpp>
 #include <model/SizingPeriod.hpp>
 #include <model/SizingPeriod_Impl.hpp>
 #include <model/WeatherFile.hpp>
 #include <model/WeatherFile_Impl.hpp>
+#include <model/ClimateZones.hpp>
+#include <model/ClimateZones_Impl.hpp>
 #include <model/WeatherFileDays.hpp>
 #include <model/WeatherFileConditionType.hpp>
+#include <model/YearDescription.hpp>
+#include <model/YearDescription_Impl.hpp>
 
 #include <energyplus/ReverseTranslator.hpp>
 
@@ -41,6 +47,7 @@
 
 #include <utilities/filetypes/EpwFile.hpp>
 #include <utilities/idf/IdfFile.hpp>
+#include <utilities/core/Assert.hpp>
 
 #include <boost/smart_ptr.hpp>
 
@@ -50,6 +57,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QSizePolicy>
+#include <QMessageBox>
+#include <QComboBox>
 
 #define NAME "Name: "
 #define LATITUDE "Latitude: "
@@ -80,11 +89,89 @@ LocationView::LocationView(const model::Model & model,
   QVBoxLayout * vLayout = 0;
   QFont boldFont;
 
+  model::ClimateZones climateZones = m_model.getUniqueModelObject<model::ClimateZones>();
+
   // ***** Main Layout *****
   QVBoxLayout * mainVLayout = new QVBoxLayout();
   mainVLayout->setContentsMargins(10,10,10,10);
   mainVLayout->setSpacing(10);
   setLayout(mainVLayout);
+
+  // ***** Climate Zones *****
+  label = new QLabel("Climate Zone:");
+  label->setObjectName("H2");
+  mainVLayout->addWidget(label);
+
+  hLayout = new QHBoxLayout();
+  hLayout->setContentsMargins(0,5,0,5);
+  hLayout->setSpacing(5);
+
+  vLayout = new QVBoxLayout();
+  vLayout->setContentsMargins(10,0,10,0);
+  vLayout->setSpacing(5);
+  hLayout->addLayout(vLayout);
+
+  label = new QLabel("ASHRAE Climate Zone");
+  vLayout->addWidget(label);
+
+  m_ashraeClimateZone = new QComboBox();
+  m_ashraeClimateZone->setFixedWidth(200);
+  vLayout->addWidget(m_ashraeClimateZone);
+
+  m_ashraeClimateZone->addItem("");
+  std::vector<std::string> ashraeClimateZoneValues = model::ClimateZones::validClimateZoneValues(model::ClimateZones::ashraeInstitutionName(), model::ClimateZones::ashraeDefaultYear());
+  BOOST_FOREACH(const std::string& climateZone, ashraeClimateZoneValues){
+    m_ashraeClimateZone->addItem(toQString(climateZone));
+  }
+
+  model::ClimateZone ashraeClimateZone = climateZones.getClimateZone(model::ClimateZones::ashraeInstitutionName(), model::ClimateZones::ashraeDefaultYear());
+  if (ashraeClimateZone.empty()){
+    ashraeClimateZone = climateZones.appendClimateZone(model::ClimateZones::ashraeInstitutionName(), model::ClimateZones::ashraeDefaultYear(), "");
+  }
+  ashraeClimateZone.setType(model::ClimateZones::ashraeInstitutionName(), model::ClimateZones::ashraeDocumentName(), model::ClimateZones::ashraeDefaultYear());
+  
+  std::string ashraeClimateZoneValue = ashraeClimateZone.value();
+  int i = m_ashraeClimateZone->findText(toQString(ashraeClimateZoneValue));
+  OS_ASSERT(i != -1);
+  m_ashraeClimateZone->setCurrentIndex(i);
+
+  isConnected = connect(m_ashraeClimateZone, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onASHRAEClimateZoneChanged(const QString&)));
+  OS_ASSERT(isConnected);
+
+  vLayout = new QVBoxLayout();
+  vLayout->setContentsMargins(10,0,10,0);
+  vLayout->setSpacing(5);
+  hLayout->addLayout(vLayout);
+
+  label = new QLabel("CEC Climate Zone");
+  vLayout->addWidget(label);
+
+  m_cecClimateZone = new QComboBox();
+  m_cecClimateZone->setFixedWidth(200);
+  vLayout->addWidget(m_cecClimateZone);
+
+  m_cecClimateZone->addItem("");
+  std::vector<std::string> cecClimateZoneValues = model::ClimateZones::validClimateZoneValues(model::ClimateZones::cecInstitutionName(), model::ClimateZones::cecDefaultYear());
+  BOOST_FOREACH(const std::string& climateZone, cecClimateZoneValues){
+    m_cecClimateZone->addItem(toQString(climateZone));
+  }
+
+  model::ClimateZone cecClimateZone = climateZones.getClimateZone(model::ClimateZones::cecInstitutionName(), model::ClimateZones::cecDefaultYear());
+   if (cecClimateZone.empty()){
+    cecClimateZone = climateZones.appendClimateZone(model::ClimateZones::cecInstitutionName(), model::ClimateZones::cecDefaultYear(), "");
+  }
+  cecClimateZone.setType(model::ClimateZones::cecInstitutionName(), model::ClimateZones::cecDocumentName(), model::ClimateZones::cecDefaultYear());
+
+  std::string cecClimateZoneValue = cecClimateZone.value();
+  i = m_cecClimateZone->findText(toQString(cecClimateZoneValue));
+  OS_ASSERT(i != -1);
+  m_cecClimateZone->setCurrentIndex(i);
+
+  isConnected = connect(m_cecClimateZone, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onCECClimateZoneChanged(const QString&)));
+  OS_ASSERT(isConnected);
+
+  hLayout->addStretch();
+  mainVLayout->addLayout(hLayout);
 
   // ***** Weather File *****
   label = new QLabel("Weather File");
@@ -99,7 +186,7 @@ LocationView::LocationView(const model::Model & model,
   btn->setFlat(true);
   btn->setObjectName("StandardGrayButton");
   isConnected = connect(btn,SIGNAL(clicked()),this,SLOT(onWeatherFileBtnClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   hLayout = new QHBoxLayout();
   hLayout->setContentsMargins(0,5,0,5);
@@ -138,7 +225,7 @@ LocationView::LocationView(const model::Model & model,
   btn->setFlat(true);
   btn->setObjectName("StandardGrayButton");
   isConnected = connect(btn,SIGNAL(clicked()),this,SLOT(onDesignDayBtnClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   hLayout = new QHBoxLayout();
   hLayout->setContentsMargins(0,5,0,5);
@@ -215,7 +302,10 @@ void LocationView::update()
     site.setLongitude(weatherFile->longitude());
     site.setElevation(weatherFile->elevation());
     site.setTimeZone(weatherFile->timeZone());
-  }
+  } else {
+    m_nameLbl->setText("");
+    m_weatherFileLbl->setText("");
+  } 
 
   boost::optional<model::Site> site = m_model.getOptionalUniqueModelObject<model::Site>();
   if (site){
@@ -239,7 +329,12 @@ void LocationView::update()
     temp.setNum(site->timeZone());
     info += temp;
     m_timeZoneLbl->setText(info);
-  }
+  } else {
+    m_latitudeLbl->setText("");
+    m_longitudeLbl->setText("");
+    m_elevationLbl->setText("");
+    m_timeZoneLbl->setText("");
+  } 
 
   m_designDaysLbl->setText(m_lastDdyPathOpened);
 
@@ -269,16 +364,21 @@ void LocationView::onWeatherFileBtnClicked()
     
     openstudio::path epwPath = toPath(fileName);
     openstudio::path newPath = toPath(m_modelTempDir) / toPath("resources/files") / toPath(epwPath.filename());
+    openstudio::path previousEPWPath;
+
+    StringStreamLogSink ss;
+    ss.setChannelRegex(boost::regex(".*EpwFile.*"));
+    ss.setLogLevel(Error);
 
     try{
       
       boost::optional<openstudio::model::WeatherFile> weatherFile = m_model.getOptionalUniqueModelObject<model::WeatherFile>();
-      openstudio::path previousEPWPath;
+      
       if (weatherFile){
         boost::optional<openstudio::path> temp = weatherFile->path();
         if (temp){
           openstudio::path previousEPWName = temp->filename();
-          std::string ex = toString(previousEPWName.extension());
+          //std::string ex = toString(previousEPWName.extension());
           if (!previousEPWName.empty() && previousEPWName.extension() == toPath(".epw")){
             previousEPWPath = toPath(m_modelTempDir) / toPath("resources/files") / previousEPWName;
           }
@@ -290,8 +390,14 @@ void LocationView::onWeatherFileBtnClicked()
       // this can throw
       EpwFile epwFile(newPath);
 
+      double totalDays = (epwFile.endDate() - epwFile.startDate()).totalDays() + 1;
+      if (totalDays > 366){
+        LOG_FREE(Error, "openstudio.EpwFile", "Cannot accept weather file with more than 366 days of data");
+        throw openstudio::Exception("Cannot accept weather file with more than 366 days of data");
+      }
+
       weatherFile = openstudio::model::WeatherFile::setWeatherFile(m_model, epwFile);
-      BOOST_ASSERT(weatherFile);
+      OS_ASSERT(weatherFile);
       weatherFile->makeUrlRelative(toPath(m_modelTempDir) / toPath("resources"));
 
       if (!previousEPWPath.empty()){
@@ -302,6 +408,24 @@ void LocationView::onWeatherFileBtnClicked()
         }
       }
 
+      // set run period based on weather file
+      openstudio::model::RunPeriod runPeriod = m_model.getUniqueModelObject<openstudio::model::RunPeriod>();
+      runPeriod.setBeginMonth(epwFile.startDate().monthOfYear().value());
+      runPeriod.setBeginDayOfMonth(epwFile.startDate().dayOfMonth());
+      runPeriod.setEndMonth(epwFile.endDate().monthOfYear().value());
+      runPeriod.setEndDayOfMonth(epwFile.endDate().dayOfMonth());
+
+      // set the calendar year or start day of week
+      openstudio::model::YearDescription yearDescription = m_model.getUniqueModelObject<openstudio::model::YearDescription>();
+      boost::optional<int> startDateActualYear = epwFile.startDateActualYear();
+      if (startDateActualYear){
+        yearDescription.resetDayofWeekforStartDay();
+        yearDescription.setCalendarYear(*startDateActualYear);
+      }else{
+        yearDescription.resetCalendarYear();
+        yearDescription.setDayofWeekforStartDay(epwFile.startDayOfWeek().valueName());
+      }
+
       m_lastEpwPathOpened = QFileInfo(fileName).absoluteFilePath();
 
       update();
@@ -309,6 +433,26 @@ void LocationView::onWeatherFileBtnClicked()
     }catch(...){
 
       boost::filesystem::remove_all(newPath);
+
+      QMessageBox box(QMessageBox::Warning, "Failed To Set Weather File", QString("Failed To Set Weather File To ") + fileName, QMessageBox::Ok);
+      box.setDetailedText(toQString(ss.string())); 
+      box.exec();
+
+      boost::optional<model::WeatherFile> weatherFile = m_model.weatherFile();
+      if (weatherFile){
+        boost::optional<openstudio::path> weatherFilePath = weatherFile->path();
+        if (weatherFilePath){
+          if (!previousEPWPath.empty()){
+            if (previousEPWPath.filename() != weatherFilePath->filename()){
+              weatherFile->remove();
+            }else if (!boost::filesystem::exists(previousEPWPath)){
+              weatherFile->remove();
+            }
+          }
+        }
+      }
+
+      update();
     }
   }
 }
@@ -433,6 +577,21 @@ void LocationView::onDesignDayBtnClicked()
       }
     }
   }
+}
+
+void LocationView::onASHRAEClimateZoneChanged(const QString& climateZone)
+{
+  model::ClimateZones climateZones = m_model.getUniqueModelObject<model::ClimateZones>();
+    
+  model::ClimateZone ashraeClimateZone = climateZones.getClimateZone(model::ClimateZones::ashraeInstitutionName(), model::ClimateZones::ashraeDefaultYear());
+  ashraeClimateZone.setValue(toString(climateZone));
+}
+
+void LocationView::onCECClimateZoneChanged(const QString& climateZone)
+{
+  model::ClimateZones climateZones = m_model.getUniqueModelObject<model::ClimateZones>();
+  model::ClimateZone cecClimateZone = climateZones.getClimateZone(model::ClimateZones::cecInstitutionName(), model::ClimateZones::cecDefaultYear());
+  cecClimateZone.setValue(toString(climateZone));
 }
 
 } // openstudio

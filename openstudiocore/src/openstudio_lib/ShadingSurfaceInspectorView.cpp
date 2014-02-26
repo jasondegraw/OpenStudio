@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -177,7 +177,7 @@ ShadingSurfaceInspectorView::ShadingSurfaceInspectorView(bool isIP, const openst
   // planar surface widget
   m_planarSurfaceWidget = new PlanarSurfaceWidget(m_isIP);
   bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_planarSurfaceWidget, SLOT(toggleUnits(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   mainGridLayout->addWidget(m_planarSurfaceWidget,3,0,1,2);
 

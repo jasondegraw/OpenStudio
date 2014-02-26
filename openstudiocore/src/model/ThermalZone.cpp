@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -83,6 +83,7 @@
 #include <utilities/geometry/Vector3d.hpp>
 
 #include <utilities/units/Unit.hpp>
+#include <utilities/units/QuantityConverter.hpp>
 
 #include <utilities/math/FloatCompare.hpp>
 
@@ -98,7 +99,7 @@ namespace detail {
   ThermalZone_Impl::ThermalZone_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : HVACComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == ThermalZone::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == ThermalZone::iddObjectType());
   }
 
 
@@ -107,7 +108,7 @@ namespace detail {
                                      bool keepHandle)
     : HVACComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == ThermalZone::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == ThermalZone::iddObjectType());
   }
 
   ThermalZone_Impl::ThermalZone_Impl(const ThermalZone_Impl& other,
@@ -152,113 +153,112 @@ namespace detail {
   {
     static std::vector<std::string> result;
     if (result.empty()){
-      result.push_back("Zone Outdoor Dry Bulb");
-      result.push_back("Zone Outdoor Wet Bulb");
-      result.push_back("Zone Outdoor Wind Speed");
-      result.push_back("Zone Total Internal Radiant Heat Gain");
-      result.push_back("Zone Total Internal Visible Heat Gain");
-      result.push_back("Zone Total Internal Convective Heat Gain");
-      result.push_back("Zone Total Internal Latent Gain");
-      result.push_back("Zone Total Internal Total Heat Gain");
-      result.push_back("Zone People Number Of Occupants");
-      result.push_back("Zone People Radiant Heat Gain");
-      result.push_back("Zone People Convective Heat Gain");
-      result.push_back("Zone People Sensible Heat Gain");
-      result.push_back("Zone People Latent Heat Gain");
-      result.push_back("Zone People Total Heat Gain");
+      result.push_back("Zone Outdoor Air Drybulb Temperature");
+      result.push_back("Zone Outdoor Air Wetbulb Temperature");
+      result.push_back("Zone Outdoor Air Wind Speed");
+      result.push_back("Zone Total Internal Radiant Heating Energy");
+      result.push_back("Zone Total Internal Visible Radiation Heating Energy");
+      result.push_back("Zone Total Internal Convective Heating Energy");
+      result.push_back("Zone Total Internal Latent Gain Energy");
+      result.push_back("Zone Total Internal Total Heating Energy");
+      result.push_back("Zone People Occupant Count");
+      result.push_back("Zone People Radiant Heating Energy");
+      result.push_back("Zone People Convective Heating Energy");
+      result.push_back("Zone People Sensible Heating Energy");
+      result.push_back("Zone People Latent Gain Energy");
+      result.push_back("Zone People Total Heating Energy");
       result.push_back("Zone Lights Electric Power");
-      result.push_back("Zone Lights Radiant Heat Gain");
-      result.push_back("Zone Lights Visible Heat Gain");
-      result.push_back("Zone Lights Convective Heat Gain");
-      result.push_back("Zone Lights Return Air Heat Gain");
-      result.push_back("Zone Lights Total Heat Gain");
-      result.push_back("Zone Lights Electric Consumption");
-      result.push_back("Zone Electric Equipment Radiant Heat Gain");
-      result.push_back("Zone Electric Equipment Convective Heat Gain");
-      result.push_back("Zone Electric Equipment Latent Heat Gain");
-      result.push_back("Zone Electric Equipment Lost Heat Gain");
-      result.push_back("Zone Electric Equipment Total Heat Gain");
-      result.push_back("Zone Electric Equipment Electric Consumption");
+      result.push_back("Zone Lights Radiant Heating Energy");
+      result.push_back("Zone Lights Visible Radiation Heating Energy");
+      result.push_back("Zone Lights Convective Heating Energy");
+      result.push_back("Zone Lights Return Air Heating Energy");
+      result.push_back("Zone Lights Total Heating Energy");
+      result.push_back("Zone Lights Electric Energy");
+      result.push_back("Zone Electric Equipment Radiant Heating Energy");
+      result.push_back("Zone Electric Equipment Convective Heating Energy");
+      result.push_back("Zone Electric Equipment Latent Gain Energy");
+      result.push_back("Zone Electric Equipment Lost Heat Energy");
+      result.push_back("Zone Electric Equipment Total Heating Energy");
+      result.push_back("Zone Electric Equipment Electric Energy");
       result.push_back("Zone Electric Equipment Electric Power");
-      result.push_back("Zone Electric Equipment Radiant Heat Gain");
-      result.push_back("Zone Electric Equipment Convective Heat Gain");
-      result.push_back("Zone Electric Equipment Latent Heat Gain");
-      result.push_back("Zone Electric Equipment Lost Heat Gain");
-      result.push_back("Zone Electric Equipment Total Heat Gain");
-      result.push_back("Zone Electric Equipment Electric Consumption");
-      result.push_back("Zone Transmitted Solar");
-      result.push_back("Zone Beam Solar from Exterior Windows");
-      result.push_back("Zone Beam Solar from Interior Windows");
-      result.push_back("Zone Diff Solar from Exterior Windows");
-      result.push_back("Zone Diff Solar from Interior Windows");
-      result.push_back("Zone Window Heat Gain");
-      result.push_back("Zone Window Heat Loss");
-      result.push_back("Zone Transmitted Solar Energy");
-      result.push_back("Zone Beam Solar from Exterior Windows Energy");
-      result.push_back("Zone Beam Solar from Interior Windows Energy");
-      result.push_back("Zone Diff Solar from Exterior Windows Energy");
-      result.push_back("Zone Diff Solar from Interior Windows Energy");
-      result.push_back("Zone Window Heat Gain Energy");
-      result.push_back("Zone Window Heat Loss Energy");
+      result.push_back("Zone Electric Equipment Radiant Heating Energy");
+      result.push_back("Zone Electric Equipment Latent Gain Energy");
+      result.push_back("Zone Electric Equipment Lost Heat Energy");
+      result.push_back("Zone Electric Equipment Total Heating Energy");
+      result.push_back("Zone Electric Equipment Electric Energy");
+      result.push_back("Zone Windows Total Transmitted Solar Radiation Rate");
+      result.push_back("Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate");
+      result.push_back("Zone Interior Windows Total Transmitted Beam Solar Radiation Rate");
+      result.push_back("Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate");
+      result.push_back("Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate");
+      result.push_back("Zone Windows Total Heat Gain Rate");
+      result.push_back("Zone Windows Total Heat Loss Rate");
+      result.push_back("Zone Windows Total Transmitted Solar Radiation Energy");
+      result.push_back("Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy");
+      result.push_back("Zone Interior Windows Total Transmitted Beam Solar Radiation Energy");
+      result.push_back("Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate");
+      result.push_back("Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate");
+      result.push_back("Zone Windows Total Heat Gain Energy");
+      result.push_back("Zone Windows Total Heat Loss Energy");
       result.push_back("Zone Mean Radiant Temperature");
       result.push_back("Zone Mean Air Temperature");
       result.push_back("Zone Operative Temperature");
       result.push_back("Zone Mean Air Humidity Ratio");
-      result.push_back("Zone Air Balance Internal Convective Gains Rate");
-      result.push_back("Zone Air Balance Surface Convection Rate");
-      result.push_back("Zone Air Balance Interzone Air Transfer Rate");
-      result.push_back("Zone Air Balance Outdoor Air Transfer Rate");
-      result.push_back("Zone Air Balance System Air Transfer Rate");
-      result.push_back("Zone Air Balance Air Energy Storage Rate");
-      result.push_back("Zone Infiltration Sensible Heat Loss");
-      result.push_back("Zone Infiltration Sensible Heat Gain");
-      result.push_back("Zone Infiltration Latent Heat Loss");
-      result.push_back("Zone Infiltration Latent Heat Gain");
-      result.push_back("Zone Infiltration Total Heat Loss");
-      result.push_back("Zone Infiltration Total Heat Gain");
-      result.push_back("Zone Infiltration Volume Flow Rate Current Density");
-      result.push_back("Zone Infiltration Volume Flow Rate Standard Density");
-      result.push_back("Zone Infiltration Volume Current Density");
-      result.push_back("Zone Infiltration Volume Standard Density");
+      result.push_back("Zone Air Heat Balance Internal Convective Heat Gain Rate");
+      result.push_back("Zone Air Heat Balance Surface Convection Rate");
+      result.push_back("Zone Air Heat Balance Interzone Air Transfer Rate");
+      result.push_back("Zone Air Heat Balance Outdoor Air Transfer Rate");
+      result.push_back("Zone Air Heat Balance System Air Transfer Rate");
+      result.push_back("Zone Air Heat Balance Air Energy Storage Rate");
+      result.push_back("Zone Infiltration Sensible Heat Loss Energy");
+      result.push_back("Zone Infiltration Sensible Heat Gain Energy");
+      result.push_back("Zone Infiltration Sensible Heat Gain Energy");
+      result.push_back("Zone Infiltration Latent Heat Gain Energy");
+      result.push_back("Zone Infiltration Total Heat Loss Energy");
+      result.push_back("Zone Infiltration Total Heat Gain Energy");
+      result.push_back("Zone Infiltration Current Density Volume Flow Rate");
+      result.push_back("Zone Infiltration Standard Density Volume Flow Rate");
+      result.push_back("Zone Infiltration Current Density Volume");
+      result.push_back("Zone Infiltration Standard Density Volume");
       result.push_back("Zone Infiltration Mass");
       result.push_back("Zone Infiltration Air Change Rate");
-      result.push_back("Zone/Sys Sensible Heating Energy");
-      result.push_back("Zone/Sys Sensible Cooling Energy");
-      result.push_back("Zone/Sys Sensible Heating Rate");
-      result.push_back("Zone/Sys Sensible Cooling Rate");
-      result.push_back("Zone/Sys Air Temperature");
-      result.push_back("Zone/Sys Air Temperature at Thermostat");
+      result.push_back("Zone Air System Sensible Heating Energy");
+      result.push_back("Zone Air System Sensible Cooling Energy");
+      result.push_back("Zone Air System Sensible Heating Rate");
+      result.push_back("Zone Air System Sensible Cooling Rate");
+      result.push_back("Zone Air Temperature");
+      result.push_back("Zone Thermostat Air Temperature");
       result.push_back("Zone Air Humidity Ratio");
       result.push_back("Zone Air Relative Humidity");
-      result.push_back("Zone/Sys Sensible Load Predicted");
-      result.push_back("Zone/Sys Sensible Load to Heating Setpoint Predicted");
-      result.push_back("Zone/Sys Sensible Load to Cooling Setpoint Predicted");
-      result.push_back("Zone/Sys Moisture Load Rate Predicted");
-      result.push_back("Zone/Sys Moisture Load Rate Predicted to humidifying setpoint");
-      result.push_back("Zone/Sys Moisture Load Rate Predicted to dehumidifying setpoint");
-      result.push_back("Zone/Sys Thermostat Heating Setpoint");
-      result.push_back("Zone/Sys Thermostat Cooling Setpoint");
-      result.push_back("Zone Mechanical Ventilation No Load Heat Removal");
-      result.push_back("Zone Mechanical Ventilation Cooling Load Increase");
-      result.push_back("Zone Mech Ventilation Cooling Load Increase: OverHeating");
-      result.push_back("Zone Mechanical Ventilation Cooling Load Decrease");
-      result.push_back("Zone Mechanical Ventilation No Load Heat Addition");
-      result.push_back("Zone Mechanical Ventilation No Load Heat Removal");
-      result.push_back("Zone Mechanical Ventilation Cooling Load Increase");
-      result.push_back("Zone Mech Ventilation Cooling Load Increase: OverHeating");
-      result.push_back("Zone Mechanical Ventilation Cooling Load Decrease");
-      result.push_back("Zone Mechanical Ventilation No Load Heat Addition");
-      result.push_back("Zone Mechanical Ventilation Heating Load Increase");
-      result.push_back("Zone Mech Ventilation Heating Load Increase: OverCooling");
-      result.push_back("Zone Mechanical Ventilation Heating Load Decrease");
+      result.push_back("Zone Predicted Sensible Load to Setpoint Heat Transfer Rate");
+      result.push_back("Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate");
+      result.push_back("Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate");
+      result.push_back("Zone Predicted Moisture Load Moisture Transfer Rate");
+      result.push_back("Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate");
+      result.push_back("Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate");
+      result.push_back("Zone Thermostat Heating Setpoint Temperature");
+      result.push_back("Zone Thermostat Cooling Setpoint Temperature");
+      result.push_back("Zone Mechanical Ventilation No Load Heat Removal Energy");
+      result.push_back("Zone Mechanical Ventilation Cooling Load Increase Energy");
+      result.push_back("Zone Mechanical Ventilation Cooling Load Increase Energy Due to Overheating Energy");
+      result.push_back("Zone Mechanical Ventilation Cooling Load Decrease Energy");
+      result.push_back("Zone Mechanical Ventilation No Load Heat Addition Energy");
+      result.push_back("Zone Mechanical Ventilation No Load Heat Removal Energy");
+      result.push_back("Zone Mechanical Ventilation Cooling Load Increase Energy");
+      result.push_back("Zone Mechanical Ventilation Cooling Load Increase Energy Due to Overheating Energy");
+      result.push_back("Zone Mechanical Ventilation Cooling Load Decrease Energy");
+      result.push_back("Zone Mechanical Ventilation No Load Heat Addition Energy");
+      result.push_back("Zone Mechanical Ventilation Heating Load Increase Energy");
+      result.push_back("Zone Mechanical Ventilation Heating Load Increase Energy Due to Overcooling Energy");
+      result.push_back("Zone Mechanical Ventilation Heating Load Decrease Energy");
       result.push_back("Zone Mechanical Ventilation Mass Flow Rate");
       result.push_back("Zone Mechanical Ventilation Mass");
-      result.push_back("Zone Mechanical Ventilation Volume Flow Rate Standard Density");
-      result.push_back("Zone Mechanical Ventilation Volume Standard Density");
-      result.push_back("Zone Mechanical Ventilation Volume Flow Rate Current Density");
-      result.push_back("Zone Mechanical Ventilation Volume Current Density");
-      result.push_back("Zone Mechanical Ventilation Air Change Rate");
-      result.push_back("Zone/Sys Thermostat Control Type");
+      result.push_back("Zone Mechanical Ventilation Standard Density Volume Flow Rate");
+      result.push_back("Zone Mechanical Ventilation Standard Density Volume");
+      result.push_back("Zone Mechanical Ventilation Current Density Volume Flow Rate");
+      result.push_back("Zone Mechanical Ventilation Current Density Volume");
+      result.push_back("Zone Mechanical Ventilation Air Changes per Hour");
+      result.push_back("Zone Thermostat Control Type");
     }
     return result;
   }
@@ -269,7 +269,7 @@ namespace detail {
 
   int ThermalZone_Impl::multiplier() const {
     boost::optional<int> value = getInt(OS_ThermalZoneFields::Multiplier,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -331,19 +331,19 @@ namespace detail {
 
   std::string ThermalZone_Impl::zoneConditioningEquipmentListName() const {
     boost::optional<std::string> value = getString(OS_ThermalZoneFields::ZoneConditioningEquipmentListName,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   double ThermalZone_Impl::fractionofZoneControlledbyPrimaryDaylightingControl() const {
     boost::optional<double> value = getDouble(OS_ThermalZoneFields::FractionofZoneControlledbyPrimaryDaylightingControl,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
   
   Quantity ThermalZone_Impl::getFractionofZoneControlledbyPrimaryDaylightingControl(bool returnIP) const {
     OSOptionalQuantity value = getQuantity(OS_ThermalZoneFields::FractionofZoneControlledbyPrimaryDaylightingControl,true,returnIP);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
@@ -353,13 +353,13 @@ namespace detail {
 
   double ThermalZone_Impl::fractionofZoneControlledbySecondaryDaylightingControl() const {
     boost::optional<double> value = getDouble(OS_ThermalZoneFields::FractionofZoneControlledbySecondaryDaylightingControl,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
   
   Quantity ThermalZone_Impl::getFractionofZoneControlledbySecondaryDaylightingControl(bool returnIP) const {
     OSOptionalQuantity value = getQuantity(OS_ThermalZoneFields::FractionofZoneControlledbySecondaryDaylightingControl,true,returnIP);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
@@ -368,14 +368,13 @@ namespace detail {
   }
 
   bool ThermalZone_Impl::setMultiplier(int multiplier) {
-    bool result = false;
-    result = setInt(OS_ThermalZoneFields::Multiplier, multiplier);
+    bool result = setInt(OS_ThermalZoneFields::Multiplier, multiplier);
     return result;
   }
 
   void ThermalZone_Impl::resetMultiplier() {
     bool result = setString(OS_ThermalZoneFields::Multiplier, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::setCeilingHeight(boost::optional<double> ceilingHeight) {
@@ -385,13 +384,12 @@ namespace detail {
     } else {
       result = setString(OS_ThermalZoneFields::CeilingHeight, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::setCeilingHeight(double ceilingHeight) {
-    bool result = false;
-    result = setDouble(OS_ThermalZoneFields::CeilingHeight, ceilingHeight);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_ThermalZoneFields::CeilingHeight, ceilingHeight);
+    OS_ASSERT(result);
   }
   
   bool ThermalZone_Impl::setCeilingHeight(const OSOptionalQuantity& ceilingHeight) {
@@ -406,12 +404,12 @@ namespace detail {
 
   void ThermalZone_Impl::resetCeilingHeight() {
     bool result = setString(OS_ThermalZoneFields::CeilingHeight, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::autocalculateCeilingHeight() {
     bool result = setString(OS_ThermalZoneFields::CeilingHeight, "autocalculate");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::setVolume(boost::optional<double> volume) {
@@ -421,13 +419,12 @@ namespace detail {
     } else {
       result = setString(OS_ThermalZoneFields::Volume, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::setVolume(double volume) {
-    bool result = false;
-    result = setDouble(OS_ThermalZoneFields::Volume, volume);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_ThermalZoneFields::Volume, volume);
+    OS_ASSERT(result);
   }
   
   bool ThermalZone_Impl::setVolume(const OSOptionalQuantity& volume) {
@@ -442,12 +439,12 @@ namespace detail {
 
   void ThermalZone_Impl::resetVolume() {
     bool result = setString(OS_ThermalZoneFields::Volume, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::autocalculateVolume() {
     bool result = setString(OS_ThermalZoneFields::Volume, "autocalculate");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool ThermalZone_Impl::setZoneInsideConvectionAlgorithm(boost::optional<std::string> zoneInsideConvectionAlgorithm) {
@@ -461,14 +458,13 @@ namespace detail {
   }
 
   bool ThermalZone_Impl::setZoneInsideConvectionAlgorithm(std::string zoneInsideConvectionAlgorithm) {
-    bool result = false;
-    result = setString(OS_ThermalZoneFields::ZoneInsideConvectionAlgorithm, zoneInsideConvectionAlgorithm);
+    bool result = setString(OS_ThermalZoneFields::ZoneInsideConvectionAlgorithm, zoneInsideConvectionAlgorithm);
     return result;
   }
 
   void ThermalZone_Impl::resetZoneInsideConvectionAlgorithm() {
     bool result = setString(OS_ThermalZoneFields::ZoneInsideConvectionAlgorithm, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool ThermalZone_Impl::setZoneOutsideConvectionAlgorithm(boost::optional<std::string> zoneOutsideConvectionAlgorithm) {
@@ -482,25 +478,22 @@ namespace detail {
   }
 
   bool ThermalZone_Impl::setZoneOutsideConvectionAlgorithm(std::string zoneOutsideConvectionAlgorithm) {
-    bool result = false;
-    result = setString(OS_ThermalZoneFields::ZoneOutsideConvectionAlgorithm, zoneOutsideConvectionAlgorithm);
+    bool result = setString(OS_ThermalZoneFields::ZoneOutsideConvectionAlgorithm, zoneOutsideConvectionAlgorithm);
     return result;
   }
 
   void ThermalZone_Impl::resetZoneOutsideConvectionAlgorithm() {
     bool result = setString(OS_ThermalZoneFields::ZoneOutsideConvectionAlgorithm, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ThermalZone_Impl::setZoneConditioningEquipmentListName(std::string zoneConditioningEquipmentListName) {
-    bool result = false;
-    result = setString(OS_ThermalZoneFields::ZoneConditioningEquipmentListName, zoneConditioningEquipmentListName);
-    BOOST_ASSERT(result);
+    bool result = setString(OS_ThermalZoneFields::ZoneConditioningEquipmentListName, zoneConditioningEquipmentListName);
+    OS_ASSERT(result);
   }
 
   bool ThermalZone_Impl::setFractionofZoneControlledbyPrimaryDaylightingControl(double fractionofZoneControlledbyPrimaryDaylightingControl) {
-    bool result = false;
-    result = setDouble(OS_ThermalZoneFields::FractionofZoneControlledbyPrimaryDaylightingControl, fractionofZoneControlledbyPrimaryDaylightingControl);
+    bool result = setDouble(OS_ThermalZoneFields::FractionofZoneControlledbyPrimaryDaylightingControl, fractionofZoneControlledbyPrimaryDaylightingControl);
     return result;
   }
   
@@ -510,12 +503,11 @@ namespace detail {
 
   void ThermalZone_Impl::resetFractionofZoneControlledbyPrimaryDaylightingControl() {
     bool result = setString(OS_ThermalZoneFields::FractionofZoneControlledbyPrimaryDaylightingControl, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool ThermalZone_Impl::setFractionofZoneControlledbySecondaryDaylightingControl(double fractionofZoneControlledbySecondaryDaylightingControl) {
-    bool result = false;
-    result = setDouble(OS_ThermalZoneFields::FractionofZoneControlledbySecondaryDaylightingControl, fractionofZoneControlledbySecondaryDaylightingControl);
+    bool result = setDouble(OS_ThermalZoneFields::FractionofZoneControlledbySecondaryDaylightingControl, fractionofZoneControlledbySecondaryDaylightingControl);
     return result;
   }
   
@@ -525,7 +517,7 @@ namespace detail {
 
   void ThermalZone_Impl::resetFractionofZoneControlledbySecondaryDaylightingControl() {
     bool result = setString(OS_ThermalZoneFields::FractionofZoneControlledbySecondaryDaylightingControl, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   unsigned ThermalZone_Impl::returnAirPort()
@@ -561,7 +553,7 @@ namespace detail {
   void ThermalZone_Impl::resetPrimaryDaylightingControl()
   {
     bool test = setString(OS_ThermalZoneFields::PrimaryDaylightingControlName, "");
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
     resetSecondaryDaylightingControl();
   }
 
@@ -578,7 +570,7 @@ namespace detail {
   void ThermalZone_Impl::resetSecondaryDaylightingControl()
   {
     bool test = setString(OS_ThermalZoneFields::SecondaryDaylightingControlName, "");
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
   }
 
   boost::optional<IlluminanceMap> ThermalZone_Impl::illuminanceMap() const
@@ -594,7 +586,7 @@ namespace detail {
   void ThermalZone_Impl::resetIlluminanceMap()
   {
     bool test = setString(OS_ThermalZoneFields::IlluminanceMapName, "");
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
   }
 
   bool ThermalZone_Impl::setDaylightingControlsAndIlluminanceMaps(const boost::optional<DaylightingControl>& primaryDaylightingControl, 
@@ -652,7 +644,7 @@ namespace detail {
   void ThermalZone_Impl::resetRenderingColor()
   {
     bool test = setString(OS_ThermalZoneFields::GroupRenderingName, "");
-    BOOST_ASSERT(test);
+    OS_ASSERT(test);
   }
 
   std::vector<Space> ThermalZone_Impl::spaces() const
@@ -665,6 +657,30 @@ namespace detail {
     double result(0.0);
     BOOST_FOREACH(const Space& space,spaces()) {
       result += space.floorArea();
+    }
+    return result;
+  }
+
+  double ThermalZone_Impl::exteriorSurfaceArea() const {
+    double result(0.0);
+    BOOST_FOREACH(const Space& space,spaces()) {
+      result += space.exteriorArea();
+    }
+    return result;
+  }
+
+  double ThermalZone_Impl::exteriorWallArea() const {
+    double result(0.0);
+    BOOST_FOREACH(const Space& space,spaces()) {
+      result += space.exteriorWallArea();
+    }
+    return result;
+  }
+
+  double ThermalZone_Impl::airVolume() const {
+    double result(0.0);
+    BOOST_FOREACH(const Space& space, spaces()) {
+      result += space.volume();
     }
     return result;
   }
@@ -818,6 +834,73 @@ namespace detail {
     return ep / np;
   }
 
+  double ThermalZone_Impl::infiltrationDesignFlowRate() const {
+    double result(0.0);
+    BOOST_FOREACH(const Space& space, spaces()) {
+      result += space.infiltrationDesignFlowRate();
+    }
+    return result;
+  }
+
+  double ThermalZone_Impl::infiltrationDesignFlowPerSpaceFloorArea() const {
+    double area = floorArea();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(area,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignFlowPerSpaceFloorArea();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return idfr/area;
+  }
+
+  double ThermalZone_Impl::infiltrationDesignFlowPerExteriorSurfaceArea() const {
+    double area = exteriorSurfaceArea();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(area,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignFlowPerExteriorSurfaceArea();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return idfr/area;
+  }
+
+  double ThermalZone_Impl::infiltrationDesignFlowPerExteriorWallArea() const {
+    double area = exteriorWallArea();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(area,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignFlowPerExteriorWallArea();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return idfr/area;
+  }
+
+  double ThermalZone_Impl::infiltrationDesignAirChangesPerHour() const {
+    double volume = airVolume();
+    double idfr = infiltrationDesignFlowRate();
+    if (equal(volume,0.0)) {
+      if (equal(idfr,0.0)) {
+        return 0.0;
+      }
+      if (spaces().size() == 1u) {
+        return spaces()[0].infiltrationDesignAirChangesPerHour();
+      }
+      LOG_AND_THROW("Calculation would require division by 0.");
+    }
+    return convert(idfr/volume,"1/s","1/h").get();
+  }
 
   boost::optional<std::string> ThermalZone_Impl::isConditioned() const {
     boost::optional<std::string> result;
@@ -892,6 +975,9 @@ namespace detail {
       return spaces[0];
     }
 
+    // sort by space name 
+    std::sort(spaces.begin(), spaces.end(), WorkspaceObjectNameLess());
+
     // if these variables are set, then they are not defaulted and are common to all spaces
     boost::optional<BuildingStory> buildingStory = spaces[0].buildingStory();
     boost::optional<SpaceType> spaceType = spaces[0].spaceType();
@@ -914,10 +1000,23 @@ namespace detail {
     boost::optional<DesignSpecificationOutdoorAir> designSpecificationOutdoorAir = spaces[0].designSpecificationOutdoorAir();
     bool allDesignSpecificationOutdoorAirDefaulted = spaces[0].isDesignSpecificationOutdoorAirDefaulted();
     bool anyDesignSpecificationOutdoorAirSchedules = false;
+    bool anyMaxOutdoorAirMethod = false;
+    bool anySumOutdoorAirMethod = false;
     double sumOutdoorAirForPeople = 0.0;
     double sumOutdoorAirForFloorArea = 0.0;
     double sumOutdoorAirRate = 0.0;
     double sumOutdoorAirForVolume = 0.0;
+
+    // Quick check to see what kind of ventilation methods are used
+    BOOST_FOREACH(Space space, spaces){
+      if (boost::optional<DesignSpecificationOutdoorAir> designSpecificationOutdoorAir = space.designSpecificationOutdoorAir()) {
+        if (istringEqual("Maximum", designSpecificationOutdoorAir->outdoorAirMethod())){
+          anyMaxOutdoorAirMethod = true;
+        } else if(istringEqual("Sum", designSpecificationOutdoorAir->outdoorAirMethod())) {
+          anySumOutdoorAirMethod = true;
+        }
+      }
+    }
 
     // find common variables for the new space
     BOOST_FOREACH(Space space, spaces){
@@ -1008,9 +1107,13 @@ namespace detail {
         double outdoorAirRate = thisDesignSpecificationOutdoorAir->outdoorAirFlowRate();
         double outdoorAirForVolume = volume*thisDesignSpecificationOutdoorAir->outdoorAirFlowAirChangesperHour();
 
-        if (istringEqual("Max", thisDesignSpecificationOutdoorAir->outdoorAirMethod())){
-          sumOutdoorAirRate += std::max(outdoorAirForPeople, std::max(outdoorAirForFloorArea, std::max(outdoorAirRate, outdoorAirForVolume)));
-        }else{
+        // First check if this space uses the Maximum method and other spaces do not
+        if (istringEqual("Maximum", thisDesignSpecificationOutdoorAir->outdoorAirMethod()) && anySumOutdoorAirMethod ){
+          sumOutdoorAirRate += std::max(outdoorAirForPeople, 
+                                        std::max(outdoorAirForFloorArea, 
+                                        std::max(outdoorAirRate, 
+                                        outdoorAirForVolume)));
+        }else{ 
           sumOutdoorAirForPeople += outdoorAirForPeople;
           sumOutdoorAirForFloorArea += outdoorAirForFloorArea;
           sumOutdoorAirRate += outdoorAirRate;
@@ -1121,7 +1224,12 @@ namespace detail {
     // merge surfaces
     boost::optional<InteriorPartitionSurfaceGroup> interiorPartitionSurfaceGroup;
     std::set<Surface> mergedSurfaces;
-    BOOST_FOREACH(Surface surface, newSpace.surfaces()){
+
+    // sort by surface name 
+    std::vector<Surface> surfaces = newSpace.surfaces();
+    std::sort(surfaces.begin(), surfaces.end(), WorkspaceObjectNameLess());
+
+    BOOST_FOREACH(Surface surface, surfaces){
 
       std::set<Surface>::iterator it = mergedSurfaces.find(surface);
       if (it != mergedSurfaces.end()){
@@ -1137,7 +1245,9 @@ namespace detail {
             interiorPartitionSurfaceGroup->setSpace(newSpace);
           }
 
+          // DLM: is there a better way to pick which vertices to keep based on outward normal?
           InteriorPartitionSurface interiorPartitionSurface(surface.vertices(), model);
+          interiorPartitionSurface.setName("Merged " + surface.name().get() + " - " + adjacentSurface->name().get());
           interiorPartitionSurface.setInteriorPartitionSurfaceGroup(*interiorPartitionSurfaceGroup);
     
           boost::optional<ConstructionBase> construction = surface.construction();
@@ -1194,7 +1304,13 @@ namespace detail {
 
       // make a new designSpecificationOutdoorAir
       designSpecificationOutdoorAir = DesignSpecificationOutdoorAir(model);
-      designSpecificationOutdoorAir->setOutdoorAirMethod("Sum");
+      if( anySumOutdoorAirMethod && anyMaxOutdoorAirMethod ) {
+        designSpecificationOutdoorAir->setOutdoorAirMethod("Sum");
+      }else if( anyMaxOutdoorAirMethod ) {
+        designSpecificationOutdoorAir->setOutdoorAirMethod("Maximum");
+      }else{
+        designSpecificationOutdoorAir->setOutdoorAirMethod("Sum");
+      }
       designSpecificationOutdoorAir->setOutdoorAirFlowperPerson(outdoorAirForPeople);
       designSpecificationOutdoorAir->setOutdoorAirFlowperFloorArea(outdoorAirForFloorArea);
       designSpecificationOutdoorAir->setOutdoorAirFlowRate(sumOutdoorAirRate);
@@ -1229,7 +1345,7 @@ namespace detail {
 
     for( std::vector<ModelObject>::iterator it = comps.begin();
          it < comps.end();
-         it++ )
+         ++it )
     {
       it->remove();
     }
@@ -1272,7 +1388,7 @@ namespace detail {
   bool ThermalZone_Impl::useIdealAirLoads() const
   {
     boost::optional<std::string> value = getString(OS_ThermalZoneFields::UseIdealAirLoads);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
   
@@ -1286,7 +1402,7 @@ namespace detail {
 
       for( std::vector<ModelObject>::iterator it = comps.begin();
            it < comps.end();
-           it++ )
+           ++it )
       {
         it->remove();
       }
@@ -1482,7 +1598,7 @@ namespace detail {
 
     for( std::vector<SizingZone>::iterator it = sizingObjects.begin();
          it < sizingObjects.end();
-         it++ )
+         ++it )
     {
       if( it->thermalZone().handle() == this->handle() )
       {
@@ -1557,13 +1673,18 @@ namespace detail {
           // If there is a single zone reheat spm, see if the control zone is set.
           // If not set, then set it to this zone.
 
-          Node supplyOutletNode = airLoop->supplyOutletNode();
+          std::vector<ModelObject> supplyNodes = airLoop->supplyComponents(Node::iddObjectType());
 
-          if( boost::optional<SetpointManagerSingleZoneReheat> spm = supplyOutletNode.getSetpointManagerSingleZoneReheat() )
+          for( std::vector<ModelObject>::iterator it = supplyNodes.begin();
+               it != supplyNodes.end();
+               it++ )
           {
-            if( ! spm->controlZone() )
+            if( boost::optional<SetpointManagerSingleZoneReheat> spm = it->cast<Node>().getSetpointManagerSingleZoneReheat() )
             {
-              spm->setControlZone(thisobj);
+              if( ! spm->controlZone() )
+              {
+                spm->setControlZone(thisobj);
+              }
             }
           }
 
@@ -1579,7 +1700,7 @@ namespace detail {
   {
     boost::optional<PortList> pl = getObject<ModelObject>().getModelObjectTarget<PortList>(OS_ThermalZoneFields::ZoneAirInletPortList);
 
-    BOOST_ASSERT(pl);
+    OS_ASSERT(pl);
 
     return pl.get();
   }
@@ -1588,7 +1709,7 @@ namespace detail {
   {
     boost::optional<PortList> pl = getObject<ModelObject>().getModelObjectTarget<PortList>(OS_ThermalZoneFields::ZoneAirExhaustPortList);
 
-    BOOST_ASSERT(pl);
+    OS_ASSERT(pl);
 
     return pl.get();
   }
@@ -1601,7 +1722,7 @@ namespace detail {
 
     for( std::vector<ZoneHVACEquipmentList>::iterator it = list.begin();
          it != list.end();
-         it++ )
+         ++it )
     {
       if( it->thermalZone().handle() == handle() )
       {
@@ -1609,7 +1730,7 @@ namespace detail {
       }
     }
 
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     return result.get();
   }
@@ -1676,7 +1797,7 @@ namespace detail {
 ThermalZone::ThermalZone(const Model& model)
   : HVACComponent(ThermalZone::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::ThermalZone_Impl>());
+  OS_ASSERT(getImpl<detail::ThermalZone_Impl>());
 
   Node node(model);
   model.connect(*this,this->zoneAirPort(),node,node.inletPort());
@@ -1978,6 +2099,18 @@ double ThermalZone::floorArea() const {
   return getImpl<detail::ThermalZone_Impl>()->floorArea();
 }
 
+double ThermalZone::exteriorSurfaceArea() const {
+  return getImpl<detail::ThermalZone_Impl>()->exteriorSurfaceArea();
+}
+
+double ThermalZone::exteriorWallArea() const {
+  return getImpl<detail::ThermalZone_Impl>()->exteriorWallArea();
+}
+
+double ThermalZone::airVolume() const {
+  return getImpl<detail::ThermalZone_Impl>()->airVolume();
+}
+
 double ThermalZone::numberOfPeople() const {
   return getImpl<detail::ThermalZone_Impl>()->numberOfPeople();
 }
@@ -2024,6 +2157,26 @@ double ThermalZone::gasEquipmentPowerPerFloorArea() const {
 
 double ThermalZone::gasEquipmentPowerPerPerson() const {
   return getImpl<detail::ThermalZone_Impl>()->gasEquipmentPowerPerPerson();
+}
+
+double ThermalZone::infiltrationDesignFlowRate() const {
+  return getImpl<detail::ThermalZone_Impl>()->infiltrationDesignFlowRate();
+}
+
+double ThermalZone::infiltrationDesignFlowPerSpaceFloorArea() const {
+  return getImpl<detail::ThermalZone_Impl>()->infiltrationDesignFlowPerSpaceFloorArea();
+}
+
+double ThermalZone::infiltrationDesignFlowPerExteriorSurfaceArea() const {
+  return getImpl<detail::ThermalZone_Impl>()->infiltrationDesignFlowPerExteriorSurfaceArea();
+}
+
+double ThermalZone::infiltrationDesignFlowPerExteriorWallArea() const {
+  return getImpl<detail::ThermalZone_Impl>()->infiltrationDesignFlowPerExteriorWallArea();
+}
+
+double ThermalZone::infiltrationDesignAirChangesPerHour() const {
+  return getImpl<detail::ThermalZone_Impl>()->infiltrationDesignAirChangesPerHour();
 }
 
 boost::optional<std::string> ThermalZone::isConditioned() const {

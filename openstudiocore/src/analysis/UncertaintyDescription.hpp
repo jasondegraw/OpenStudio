@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -122,6 +122,15 @@ class ANALYSIS_API UncertaintyDescription {
 
 /** \relates UncertaintyDescription */
 typedef boost::optional<UncertaintyDescription> OptionalUncertaintyDescription;
+
+namespace detail {
+
+  QVariant toVariant(const UncertaintyDescription& udesc);
+
+  UncertaintyDescription toUncertaintyDescription(const QVariant& variant,
+                                                  const VersionString& version);
+
+}
 
 } // analysis
 } // openstudio

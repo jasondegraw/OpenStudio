@@ -1,5 +1,5 @@
 ######################################################################
-#  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+#  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 #  All rights reserved.
 #  
 #  This library is free software; you can redistribute it and/or
@@ -44,6 +44,7 @@ require 'openstudioutilitiesplot'
 require 'openstudioutilitiesgeometry'
 require 'openstudioutilitiessql'
 require 'openstudioutilitiesbcl'
+require 'openstudioutilitiescloud'
 require 'openstudioutilitiesunits'
 require 'openstudioutilitiesdocument'
 require 'openstudioutilitiesidd'
@@ -53,12 +54,14 @@ require 'openstudioutilities'
 require 'openstudioenergyplus'
 require 'openstudioradiance'
 require 'openstudiogbxml'
+require 'openstudiocontam'
 require 'openstudiomodel'
 require 'openstudiomodelcore'
 require 'openstudiomodelsimulation'
 require 'openstudiomodelresources'
 require 'openstudiomodelgeometry'
 require 'openstudiomodelhvac'
+require 'openstudiomodelrefrigeration'
 require 'openstudioosversion'
 require 'openstudioruleset'
 require 'openstudiorunmanager'
@@ -67,20 +70,21 @@ require 'openstudioanalysisdriver'
 require 'openstudiomodeleditor'
 require 'openstudioanalysis'
 require 'openstudiolib'
-require 'openstudioplugin'
 require 'openstudioosversion'
-
-# optional extensions
-if ($OpenStudio_SimXML)
-  require 'openstudiosimxml'
-end
-
-if ($OpenStudio_SDD)
-  require 'openstudiosdd'
-end
+require 'openstudioisomodel'
+require 'openstudiosdd'
 
 # restore original path
 ENV['PATH'] = original_path
+
+if OpenStudio::RemoteBCL::initializeSSL(OpenStudio::Path.new("#{$OpenStudio_RubyBinaryDir}"))
+  puts "OpenSSL loaded"
+elsif OpenStudio::RemoteBCL::initializeSSL()
+  puts "OpenSSL loaded"
+else
+  raise "Unable to initialize OpenSSL: Verify that ruby can assess the OpenSSL libraries"
+end  
+
 
 # Find current ruby path, we may need this for launching ruby jobs later
 begin
@@ -88,7 +92,7 @@ begin
   # may not be defined, e.g for SketchUp plug-in
   require 'rbconfig'  
   
-  $OpenStudio_RubyExe = OpenStudio::Path.new(File.join(Config::CONFIG['bindir'], Config::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"'))
+  $OpenStudio_RubyExe = OpenStudio::Path.new(File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']).sub(/.*\s.*/m, '"\&"'))
   $OpenStudio_RubyExeDir = $OpenStudio_RubyExe.parent_path()
 
 rescue Exception=>e
@@ -100,6 +104,11 @@ rescue Exception=>e
       #path_string = `where ruby`
       #$OpenStudio_RubyExe = OpenStudio::Path.new(path_string.strip)
       #$OpenStudio_RubyExeDir = $OpenStudio_RubyExe.parent_path()
+      
+      # only do this for dev for running unit tests
+      $OpenStudio_RubyExe = OpenStudio::Path.new($OpenStudio_RubyExe)
+      $OpenStudio_RubyExeDir = $OpenStudio_RubyExe.parent_path()
+  
     rescue Exception=>e
     end
   else
@@ -107,6 +116,11 @@ rescue Exception=>e
       #path_string = `which ruby`
       #$OpenStudio_RubyExe = OpenStudio::Path.new(path_string.strip)
       #$OpenStudio_RubyExeDir = $OpenStudio_RubyExe.parent_path()
+      
+      # only do this for dev for running unit tests
+      $OpenStudio_RubyExe = OpenStudio::Path.new($OpenStudio_RubyExe)
+      $OpenStudio_RubyExeDir = $OpenStudio_RubyExe.parent_path()
+      
     rescue Exception=>e
     end
   end
@@ -147,6 +161,42 @@ end
 
 # support for name deprecated as of 0.10.5
 class OutputAttributeContinuousVariableVector < OutputAttributeVariableVector
+end
+
+# support for name deprecated as of 1.0.3
+class DiscretePerturbation < Measure
+end
+
+# support for name deprecated as of 1.0.3
+class OptionalDiscretePerturbation < OptionalMeasure
+end
+
+# support for name deprecated as of 1.0.3
+class DiscretePerturbationVector < MeasureVector
+end
+
+# support for name deprecated as of 1.0.3
+class NullPerturbation < NullMeasure
+end
+
+# support for name deprecated as of 1.0.3
+class OptionalNullPerturbation < OptionalNullMeasure
+end
+
+# support for name deprecated as of 1.0.3
+class NullPerturbationVector < NullMeasureVector
+end
+
+# support for name deprecated as of 1.0.3
+class RubyPerturbation < RubyMeasure
+end
+
+# support for name deprecated as of 1.0.3
+class OptionalRubyPerturbation < OptionalRubyMeasure
+end
+
+# support for name deprecated as of 1.0.3
+class RubyPerturbationVector < RubyMeasureVector
 end
 
 end # module Analysis

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -26,6 +26,8 @@
 #include <model_editor/ListWidget.hpp>
 
 #include <model_editor/ObjectExplorer.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace modeleditor
 {
@@ -70,19 +72,19 @@ void ObjectExplorer::connectSignalsAndSlots()
   bool connected;
   connected = connect(mGroupEdit, SIGNAL(textEdited(const QString&)),
     this, SLOT(on_groupTextEdited(const QString&)));
-  Q_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(mObjectEdit, SIGNAL(textEdited(const QString&)),
     this, SLOT(on_objectTextEdited(const QString&)));
-  Q_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(mGroupList, SIGNAL(itemSelectionChanged()),
     this, SLOT(on_groupItemSelectionChanged()));
-  Q_ASSERT(connected);
+  OS_ASSERT(connected);
 
   connected = connect(mObjectList, SIGNAL(itemSelectionChanged()),
     this, SLOT(on_objectItemSelectionChanged()));
-  Q_ASSERT(connected);
+  OS_ASSERT(connected);
 }
 
 void ObjectExplorer::createLayout()
@@ -158,9 +160,8 @@ void ObjectExplorer::updateIddFile()
 
 void ObjectExplorer::groupTextEdited(const QString& text)
 {
-  QListWidgetItem * item = NULL;
   for(int i=0; i<mGroupList->count(); i++){
-    item = mGroupList->item(i);
+    QListWidgetItem * item = mGroupList->item(i);
     item->setHidden(!item->text().contains(text, Qt::CaseInsensitive));
   }
 }

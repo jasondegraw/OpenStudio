@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@
 #include <shared_gui_components/BusyWidget.hpp>
 #include <shared_gui_components/Component.hpp>
 #include <shared_gui_components/TIDItemModel.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 #include <QBoxLayout>
 #include <QButtonGroup>
@@ -94,7 +96,7 @@ void BuildingComponentDialog::createLayout(bool isBclDlg)
 
   isConnected = connect(searchButton,SIGNAL(clicked()),
                         this,SLOT(on_searchButton()));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   QHBoxLayout * searchlayout = new QHBoxLayout();
   searchlayout->addWidget(searchButton);
@@ -141,7 +143,7 @@ void BuildingComponentDialog::createLayout(bool isBclDlg)
 
   isConnected = connect(m_tidTreeView, SIGNAL(clicked(const QModelIndex &)),
                         this, SLOT(on_tidClicked(const QModelIndex &)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   leftPanelayout->addWidget(m_tidTreeView,10);
 
@@ -153,47 +155,47 @@ void BuildingComponentDialog::createLayout(bool isBclDlg)
 
   isConnected = connect(m_centralWidget, SIGNAL(headerClicked(bool)),
                         this, SIGNAL(headerClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(headerClicked(bool)),
                         this, SLOT(on_headerClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(componentClicked(bool)),
                         this, SIGNAL(componentClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(componentClicked(bool)),
                         this, SLOT(on_componentClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(collapsibleComponentClicked(bool)),
                         this, SIGNAL(collapsibleComponentClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(collapsibleComponentClicked(bool)),
                         this, SLOT(on_collapsibleComponentClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(getComponentsByPage(int)),
                         this, SIGNAL(getComponentsByPage(int)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(getComponentsByPage(int)),
                         this, SLOT(on_getComponentsByPage(int)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(componentsReady()),
                         this, SLOT(on_componentsReady()));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(requestComponents(const std::string&,int,int,const QString &)),
                         this, SLOT(on_requestComponents(const std::string&,int,int,const QString &)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(m_centralWidget, SIGNAL(noComponents()),
                         this, SLOT(on_noComponents()));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   QScrollArea * centralScrollArea = new QScrollArea(this);
   centralScrollArea->setFrameStyle(QFrame::NoFrame);

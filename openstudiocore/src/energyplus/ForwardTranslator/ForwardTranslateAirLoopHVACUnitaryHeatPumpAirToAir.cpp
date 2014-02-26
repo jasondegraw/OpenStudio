@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@
 #include <model/CoilHeatingDXSingleSpeed_Impl.hpp>
 #include <utilities/idd/AirLoopHVAC_UnitaryHeatPump_AirToAir_FieldEnums.hxx>
 #include <utilities/idd/Fan_ConstantVolume_FieldEnums.hxx>
+#include <utilities/idd/Fan_OnOff_FieldEnums.hxx>
 #include <utilities/idd/Coil_Heating_DX_SingleSpeed_FieldEnums.hxx>
 #include <utilities/idd/Coil_Heating_Gas_FieldEnums.hxx>
 #include <utilities/idd/Coil_Heating_Electric_FieldEnums.hxx>
@@ -81,7 +82,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     if( boost::optional<Node> node = mo->optionalCast<Node>() )
     {
-      if( s = node->name() )
+      if( (s = node->name()) )
       {
         airInletNodeName = s;
 
@@ -98,7 +99,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     if( boost::optional<Node> node = mo->optionalCast<Node>() )
     {
-      if( s = node->name() )
+      if( (s = node->name()) )
       {
         airOutletNodeName = s;
 
@@ -113,7 +114,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     idfObject.setString(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateDuringCoolingOperation,"Autosize");
   }
-  else if( value = modelObject.supplyAirFlowRateDuringCoolingOperation() )
+  else if( (value = modelObject.supplyAirFlowRateDuringCoolingOperation()) )
   {
     idfObject.setDouble(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateDuringCoolingOperation,value.get());
   }
@@ -124,7 +125,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     idfObject.setString(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateDuringHeatingOperation,"Autosize");
   }
-  else if( value = modelObject.supplyAirFlowRateDuringHeatingOperation() )
+  else if( (value = modelObject.supplyAirFlowRateDuringHeatingOperation()) )
   {
     idfObject.setDouble(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateDuringHeatingOperation,value.get());
   }
@@ -135,7 +136,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     idfObject.setString(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateWhenNoCoolingorHeatingisNeeded,"Autosize");
   }
-  else if( value = modelObject.supplyAirFlowRateWhenNoCoolingorHeatingisNeeded() )
+  else if( (value = modelObject.supplyAirFlowRateWhenNoCoolingorHeatingisNeeded()) )
   {
     idfObject.setDouble(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::SupplyAirFlowRateWhenNoCoolingorHeatingisNeeded,value.get());
   }
@@ -223,21 +224,21 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     idfObject.setString(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumSupplyAirTemperaturefromSupplementalHeater,"Autosize");
   }
-  else if( value = modelObject.maximumSupplyAirTemperaturefromSupplementalHeater() )
+  else if( (value = modelObject.maximumSupplyAirTemperaturefromSupplementalHeater()) )
   {
     idfObject.setDouble(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumSupplyAirTemperaturefromSupplementalHeater,value.get());
   }
 
   // MaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation
 
-  if( value = modelObject.maximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation() )
+  if( (value = modelObject.maximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation()) )
   {
     idfObject.setDouble(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::MaximumOutdoorDryBulbTemperatureforSupplementalHeaterOperation,value.get());
   }
 
   // FanPlacement
 
-  if( s = modelObject.fanPlacement() )
+  if( (s = modelObject.fanPlacement()) )
   {
     idfObject.setString(AirLoopHVAC_UnitaryHeatPump_AirToAirFields::FanPlacement,s.get());
   }
@@ -264,7 +265,14 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
 
   if( airInletNodeName && _fan )
   {
-    _fan->setString(Fan_ConstantVolumeFields::AirInletNodeName,airInletNodeName.get());
+    if( _fan->iddObject().type() == IddObjectType::Fan_ConstantVolume )
+    {
+      _fan->setString(Fan_ConstantVolumeFields::AirInletNodeName,airInletNodeName.get());
+    }
+    else if( _fan->iddObject().type() == IddObjectType::Fan_OnOff )
+    {
+      _fan->setString(Fan_OnOffFields::AirInletNodeName,airInletNodeName.get());
+    }
   }
 
   //if( airOutletNodeName && _heatingCoil )
@@ -276,7 +284,14 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
   {
     std::string nodeName = modelObject.name().get() + " Fan - Cooling Coil Node";
 
-    _fan->setString(Fan_ConstantVolumeFields::AirOutletNodeName,nodeName);
+    if( _fan->iddObject().type() == IddObjectType::Fan_ConstantVolume )
+    {
+      _fan->setString(Fan_ConstantVolumeFields::AirOutletNodeName,nodeName);
+    }
+    else if( _fan->iddObject().type() == IddObjectType::Fan_OnOff )
+    {
+      _fan->setString(Fan_OnOffFields::AirOutletNodeName,nodeName);
+    }
 
     _coolingCoil->setString(Coil_Cooling_DX_SingleSpeedFields::AirInletNodeName,nodeName);
   }

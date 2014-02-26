@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -46,18 +46,18 @@ namespace openstudio {
       }
 
       bool connected = this->connect(m_impl.get(), SIGNAL(directoryChanged(const QString&)), SLOT(directoryChanged(const QString&)));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
       m_impl->addPath(openstudio::toQString(p));
 
     }else{
       m_timer = boost::shared_ptr<QTimer>(new QTimer());
       bool connected = this->connect(m_timer.get(), SIGNAL(timeout()), SLOT(checkFile()));
-      BOOST_ASSERT(connected);
+      OS_ASSERT(connected);
       m_timer->start(m_msec);
 
       // DLM: do not use QFileSystemWatcher to watch individual files, was acting glitchy
       //connected = this->connect(m_impl.get(), SIGNAL(fileChanged(const QString&)), SLOT(fileChanged(const QString&)));
-      //BOOST_ASSERT(connected);
+      //OS_ASSERT(connected);
       //m_impl->addPath(openstudio::toQString(p));
     }
 

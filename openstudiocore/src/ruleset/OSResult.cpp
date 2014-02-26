@@ -19,6 +19,8 @@
 
 #include <ruleset/OSResult.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 
@@ -48,6 +50,7 @@ OSResult::OSResult(const QDomElement& element) {
   QDomElement infoElement = element.firstChildElement(QString::fromStdString("Info"));
   QDomElement initialConditionElement = element.firstChildElement(QString::fromStdString("InitialCondition"));
   QDomElement finalConditionElement = element.firstChildElement(QString::fromStdString("FinalCondition"));
+  QDomElement attributesElement = element.firstChildElement(QString::fromStdString("Attributes"));
 
   if (valueElement.isNull()) {
     LOG_AND_THROW("valueElement is null.");
@@ -82,7 +85,7 @@ OSResult::OSResult(const QDomElement& element) {
   if (!initialConditionElement.isNull()) {
     QDomNodeList childNodes = initialConditionElement.childNodes();
     int n = childNodes.count();
-    BOOST_ASSERT(n < 2);
+    OS_ASSERT(n < 2);
     if (n > 0) {
       QDomElement childElement = childNodes.at(0).toElement();
       m_initialCondition = logMessageFromXML(Info,childElement);
@@ -92,13 +95,20 @@ OSResult::OSResult(const QDomElement& element) {
   if (!finalConditionElement.isNull()) {
     QDomNodeList childNodes = finalConditionElement.childNodes();
     int n = childNodes.count();
-    BOOST_ASSERT(n < 2);
+    OS_ASSERT(n < 2);
     if (n > 0) {
       QDomElement childElement = childNodes.at(0).toElement();
       m_finalCondition = logMessageFromXML(Info,childElement);
     }
   }
 
+  if (!attributesElement.isNull()) {
+    QDomNodeList childNodes = attributesElement.childNodes();
+    for (int i = 0; i < childNodes.count(); ++i) {
+      QDomElement childElement = childNodes.at(i).toElement();
+      m_attributes.push_back(Attribute(childElement));
+    }
+  }
 }
 
 OSResultValue OSResult::value() const {
@@ -125,6 +135,10 @@ boost::optional<LogMessage> OSResult::finalCondition() const {
   return m_finalCondition;
 }
 
+std::vector<Attribute> OSResult::attributes() const {
+  return m_attributes;
+}
+
 void OSResult::setValue(const OSResultValue& value) {
   m_value = value;
 }
@@ -147,6 +161,10 @@ void OSResult::setInitialCondition(const std::string& channel, const std::string
 
 void OSResult::setFinalCondition(const std::string& channel, const std::string& message) {
   m_finalCondition = LogMessage(Info,channel,message);
+}
+
+void OSResult::appendAttribute(const Attribute& attribute) {
+  m_attributes.push_back(attribute);
 }
 
 boost::optional<OSResult> OSResult::load(const openstudio::path& p) {
@@ -270,6 +288,14 @@ QDomDocument OSResult::toXml() const {
   if (m_finalCondition) {
     childElement = doc.createElement(QString("FinalCondition"));
     logMessagesToXml(doc,childElement,std::vector<LogMessage>(1u,*m_finalCondition));
+    element.appendChild(childElement);
+  }
+
+  if (!m_attributes.empty()) {
+    childElement = doc.createElement(QString("Attributes"));
+    BOOST_FOREACH(const Attribute& attribute,m_attributes) {
+      childElement.appendChild(attribute.toXml().documentElement());
+    }
     element.appendChild(childElement);
   }
 

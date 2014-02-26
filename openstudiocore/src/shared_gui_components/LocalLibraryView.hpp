@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -110,7 +110,7 @@ class LibraryItemView : public OSDragableView
   virtual ~LibraryItemView() {}
 
   QLabel * label;
-
+  QLabel * m_measureTypeBadge;
   QLabel * m_bclBadge;
 
   public slots:

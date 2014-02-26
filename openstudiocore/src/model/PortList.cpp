@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ PortList_Impl::PortList_Impl(const IdfObject& idfObject,
                              bool keepHandle)
   : ModelObject_Impl(idfObject,model,keepHandle)
 {
-  BOOST_ASSERT(idfObject.iddObject().type() == PortList::iddObjectType());
+  OS_ASSERT(idfObject.iddObject().type() == PortList::iddObjectType());
 }
 
 PortList_Impl::PortList_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -51,7 +51,7 @@ PortList_Impl::PortList_Impl(const openstudio::detail::WorkspaceObject_Impl& oth
                              bool keepHandle)
   : ModelObject_Impl(other,model,keepHandle)
 {
-  BOOST_ASSERT(other.iddObject().type() == PortList::iddObjectType());
+  OS_ASSERT(other.iddObject().type() == PortList::iddObjectType());
 }
 
 PortList_Impl::PortList_Impl(const PortList_Impl& other,
@@ -105,7 +105,7 @@ ThermalZone PortList_Impl::thermalZone() const
 
   result = hvacComponent().optionalCast<ThermalZone>();
 
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 
   return result.get();
 }
@@ -168,7 +168,7 @@ std::vector<ModelObject> PortList_Impl::modelObjects()
 
 unsigned PortList_Impl::newPortAfterIndex(unsigned portIndex)
 {
-  std::vector<ModelObject> modelObjects = this->modelObjects();
+  //std::vector<ModelObject> modelObjects = this->modelObjects();
   for(int i = portIndex; i < int(nextPortIndex()) - 1; i++ )
   {
     ModelObject mo = modelObject(i).get();
@@ -213,7 +213,7 @@ void PortList_Impl::removePortForIndex(unsigned portIndex)
 {
   int _nextPortIndex = nextPortIndex();
   model().disconnect(getObject<ModelObject>(),this->port(portIndex));
-  std::vector<ModelObject> modelObjects = this->modelObjects();
+  //std::vector<ModelObject> modelObjects = this->modelObjects();
   for(int i = portIndex + 1; i < _nextPortIndex; i++ )
   {
     ModelObject mo = modelObject(i).get();
@@ -229,7 +229,7 @@ unsigned PortList_Impl::airLoopHVACPort()
 
   for( std::vector<ModelObject>::iterator it = objects.begin();
        it != objects.end();
-       it++ )
+       ++it )
   {
     if( boost::optional<HVACComponent> hvacComponent = it->optionalCast<HVACComponent>() )
     {
@@ -251,7 +251,7 @@ boost::optional<ModelObject> PortList_Impl::airLoopHVACModelObject()
 
   for( std::vector<ModelObject>::iterator it = objects.begin();
        it != objects.end();
-       it++ )
+       ++it )
   {
     if( boost::optional<HVACComponent> hvacComponent = it->optionalCast<HVACComponent>() )
     {
@@ -271,7 +271,7 @@ HVACComponent PortList_Impl::hvacComponent() const
 
   result = getObject<ModelObject>().getModelObjectTarget<HVACComponent>(OS_PortListFields::HVACComponent);
 
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 
   return result.get();
 }
@@ -286,7 +286,7 @@ bool PortList_Impl::setHVACComponent(const HVACComponent & hvacComponent)
 PortList::PortList(const HVACComponent& comp)
   : ModelObject(PortList::iddObjectType(),comp.model())
 {
-  BOOST_ASSERT(getImpl<detail::PortList_Impl>());
+  OS_ASSERT(getImpl<detail::PortList_Impl>());
 
   getImpl<detail::PortList_Impl>()->setHVACComponent(comp);
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,7 +33,6 @@ namespace detail {
 
   /** LinearFunctionRecord_Impl is a FunctionRecord_Impl that is the implementation class for LinearFunctionRecord.*/
   class PROJECT_API LinearFunctionRecord_Impl : public FunctionRecord_Impl {
-    Q_OBJECT;
    public:
 
     /** @name Constructors and Destructors */

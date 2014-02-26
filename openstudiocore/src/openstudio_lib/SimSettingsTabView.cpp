@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -21,6 +21,8 @@
 
 #include <openstudio_lib/SimSettingsView.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 #include <QScrollArea>
 
 namespace openstudio {
@@ -41,7 +43,7 @@ SimSettingsTabView::SimSettingsTabView(bool isIP,
 
   bool isConnected = connect(this,SIGNAL(toggleUnitsClicked(bool)),
                              m_simSettingsView,SIGNAL(toggleUnitsClicked(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 void SimSettingsTabView::toggleUnits(bool displayIP)

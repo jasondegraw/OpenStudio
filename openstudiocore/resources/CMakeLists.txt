@@ -25,6 +25,10 @@ SET(utilities_resources_src
   utilities/BCL/Measures/TestMissingARequiredArgWithNoDefault/measure.rb
   utilities/BCL/Measures/TestMissingARequiredArgWithNoDefault/measure.xml
   utilities/Checksum/Checksum.txt
+  utilities/Filetypes/USA_CO_Golden-NREL.724666_TMY3.epw
+  utilities/Filetypes/USA_CO_Golden-NREL.wrap.epw
+  utilities/Filetypes/USA_CO_Golden-NREL.amy
+  utilities/Filetypes/USA_CO_Golden-NREL.wrap.amy
   utilities/Filetypes/TDV_2008_kBtu_CZ13.csv
   utilities/Table/HeightWeight.csv
   utilities/Table/EUI.csv
@@ -211,6 +215,51 @@ SET(osversion_resources_src
   osversion/1_0_0/OpenStudio.idd
   osversion/1_0_0/example.osm
   osversion/1_0_0/example.osc
+  osversion/1_0_1/OpenStudio.idd
+  osversion/1_0_1/example.osm
+  osversion/1_0_1/example.osc
+  osversion/1_0_2/OpenStudio.idd
+  osversion/1_0_2/example.osm
+  osversion/1_0_2/example.osc
+  osversion/1_0_3/OpenStudio.idd
+  osversion/1_0_3/example.osm
+  osversion/1_0_3/example.osc
+  osversion/1_0_4/OpenStudio.idd
+  osversion/1_0_4/example.osm
+  osversion/1_0_4/example.osc
+  osversion/1_0_5/OpenStudio.idd
+  osversion/1_0_5/example.osm
+  osversion/1_0_5/example.osc
+  osversion/1_0_6/OpenStudio.idd
+  osversion/1_0_6/example.osm
+  osversion/1_0_6/example.osc
+  osversion/1_0_7/OpenStudio.idd
+  osversion/1_0_7/example.osm
+  osversion/1_0_7/example.osc
+  osversion/1_1_0/OpenStudio.idd
+  osversion/1_1_0/example.osm
+  osversion/1_1_0/example.osc
+  osversion/1_1_1/OpenStudio.idd
+  osversion/1_1_1/example.osm
+  osversion/1_1_1/example.osc
+  osversion/1_1_2/OpenStudio.idd
+  osversion/1_1_2/example.osm
+  osversion/1_1_2/example.osc
+  osversion/1_1_3/OpenStudio.idd
+  osversion/1_1_3/example.osm
+  osversion/1_1_3/example.osc
+  osversion/1_2_0/OpenStudio.idd
+  osversion/1_2_0/example.osm
+  osversion/1_2_0/example.osc
+  osversion/1_2_1/OpenStudio.idd
+  osversion/1_2_1/example.osm
+  osversion/1_2_1/example.osc
+  osversion/1_2_2/OpenStudio.idd
+  osversion/1_2_2/example.osm
+  osversion/1_2_2/example.osc
+  osversion/1_2_3/OpenStudio.idd
+  osversion/1_2_3/example.osm
+  osversion/1_2_3/example.osc
   osversion/unknown.osc
 )
 
@@ -230,12 +279,16 @@ CREATE_SRC_GROUPS( "${osversion_resources_src}" )
 if (APPLE)
   install( DIRECTORY ${CMAKE_SOURCE_DIR}/resources/osversion
            DESTINATION sharedresources
-           PATTERN ".svn" EXCLUDE
+         )
+  install( DIRECTORY ${CMAKE_SOURCE_DIR}/resources/web_assets
+           DESTINATION sharedresources
          )
 else()
   install( DIRECTORY ${CMAKE_SOURCE_DIR}/resources/osversion
            DESTINATION share/openstudio
-           PATTERN ".svn" EXCLUDE
+         )
+  install( DIRECTORY ${CMAKE_SOURCE_DIR}/resources/web_assets
+           DESTINATION share/openstudio
          )
 endif()
 
@@ -302,6 +355,14 @@ SET(project_resources_src
   project/version/project_0_10_4.db
   project/version/project_0_11_5.osp
   project/version/project_0_11_5.db
+  project/version/project_1_0_2.osp
+  project/version/project_1_0_2.db
+  project/version/project_1_0_3.osp
+  project/version/project_1_0_3.db  
+  project/version/project_1_0_4.osp
+  project/version/project_1_0_4.db  
+  project/version/project_1_0_6.osp
+  project/version/project_1_0_6.db  
 )
 
 # update the resources
@@ -321,7 +382,7 @@ CREATE_SRC_GROUPS( "${project_resources_src}" )
 SET(ENERGYPLUS_OUTPUTS "")
 
 SET(analysisdriver_resources_src
-  analysisdriver/PostProcessAppendToReportXML.rb
+  analysisdriver/PostProcessSecondXML.rb
 )
 
 # update the resources
@@ -439,27 +500,6 @@ ADD_CUSTOM_TARGET( openstudio_radiance_resources
 CREATE_SRC_GROUPS( "${radiance_resources_src}" )
 
 ########################################################
-# eefg resources
-# clear runs, calls to RUN_ENERGYPLUS will populate this
-SET(ENERGYPLUS_OUTPUTS "")
-
-SET(eefg_resources_src
-  eefg/dummy.idd
-  eefg/dummy.idf
-)
-
-# update the resources
-UPDATE_RESOURCES("${eefg_resources_src}")
-
-# add target
-ADD_CUSTOM_TARGET( openstudio_eefg_resources
-  DEPENDS ${eefg_resources_src} ${ENERGYPLUS_OUTPUTS}
-  SOURCES ${eefg_resources_src}
-)
-
-CREATE_SRC_GROUPS( "${eefg_resources_src}" )
-
-########################################################
 # resultsviewer resources
 
 # clear runs, calls to RUN_ENERGYPLUS will populate this
@@ -513,51 +553,23 @@ ADD_CUSTOM_TARGET( openstudio_gbxml_resources
 CREATE_SRC_GROUPS( "${gbxml_resources_src}" )
 
 ########################################################
-# simxml resources
-# clear runs, calls to RUN_ENERGYPLUS will populate this
-IF(BUILD_SIMXML)
-
-  SET(ENERGYPLUS_OUTPUTS "")
-
-  SET(simxml_resources_src
-    simxml/ClassLevel_Test-3.xml
-  )
-
-  # update the resources
-  UPDATE_RESOURCES("${simxml_resources_src}")
-
-  # add target
-  ADD_CUSTOM_TARGET( openstudio_simxml_resources
-    DEPENDS ${simxml_resources_src} ${ENERGYPLUS_OUTPUTS}
-    SOURCES ${simxml_resources_src}
-  )
-
-  CREATE_SRC_GROUPS( "${simxml_resources_src}" )
-
-ENDIF(BUILD_SIMXML)
-
-########################################################
 # sdd resources
 # clear runs, calls to RUN_ENERGYPLUS will populate this
-IF(BUILD_SDD)
+SET(ENERGYPLUS_OUTPUTS "")
 
-  SET(ENERGYPLUS_OUTPUTS "")
+SET(sdd_resources_src
+)
 
-  SET(sdd_resources_src
-  )
+# update the resources
+UPDATE_RESOURCES("${sdd_resources_src}")
 
-  # update the resources
-  UPDATE_RESOURCES("${sdd_resources_src}")
+# add target
+ADD_CUSTOM_TARGET( openstudio_sdd_resources
+  DEPENDS ${sdd_resources_src} ${ENERGYPLUS_OUTPUTS}
+  SOURCES ${sdd_resources_src}
+)
 
-  # add target
-  ADD_CUSTOM_TARGET( openstudio_sdd_resources
-    DEPENDS ${sdd_resources_src} ${ENERGYPLUS_OUTPUTS}
-    SOURCES ${sdd_resources_src}
-  )
-
-  CREATE_SRC_GROUPS( "${sdd_resources_src}" )
-
-ENDIF(BUILD_SDD)
+CREATE_SRC_GROUPS( "${sdd_resources_src}" )
 
 ########################################################
 # analysis resources
@@ -565,6 +577,12 @@ ENDIF(BUILD_SDD)
 SET(ENERGYPLUS_OUTPUTS "")
 
 SET(analysis_resources_src
+  analysis/version/analysis_1-0-3.json
+  analysis/version/data_point_1-0-3.json
+  analysis/version/analysis_1-0-4.json
+  analysis/version/data_point_1-0-4.json
+  analysis/version/analysis_1-1-1.json
+  analysis/version/data_point_1-1-1.json  
 )
 
 # update the resources
@@ -577,3 +595,44 @@ ADD_CUSTOM_TARGET( openstudio_analysis_resources
 )
 
 CREATE_SRC_GROUPS( "${analysis_resources_src}" )
+
+
+########################################################
+# isomodel resources
+# clear runs, calls to RUN_ENERGYPLUS will populate this
+SET(ENERGYPLUS_OUTPUTS "")
+
+SET(isomodel_resources_src
+  isomodel/exampleModel.ISO
+  isomodel/weather.epw
+)
+
+# update the resources
+UPDATE_RESOURCES("${isomodel_resources_src}")
+
+# add target
+ADD_CUSTOM_TARGET( openstudio_isomodel_resources
+  DEPENDS ${isomodel_resources_src} ${ENERGYPLUS_OUTPUTS}
+  SOURCES ${isomodel_resources_src}
+)
+
+CREATE_SRC_GROUPS( "${isomodel_resources_src}" )
+########################################################
+# CONTAM resources
+# clear runs, calls to RUN_ENERGYPLUS will populate this
+SET(ENERGYPLUS_OUTPUTS "")
+
+SET(contam_resources_src
+  contam/CONTAMTemplate.osm
+)
+
+# update the resources
+UPDATE_RESOURCES("${contam_resources_src}")
+
+# add target
+ADD_CUSTOM_TARGET( openstudio_contam_resources
+  DEPENDS ${contam_resources_src} ${ENERGYPLUS_OUTPUTS}
+  SOURCES ${contam_resources_src}
+)
+
+CREATE_SRC_GROUPS( "${contam_resources_src}" )

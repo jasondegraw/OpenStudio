@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ namespace detail {
   BuildingStory_Impl::BuildingStory_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ModelObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == BuildingStory::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == BuildingStory::iddObjectType());
   }
 
   BuildingStory_Impl::BuildingStory_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -53,7 +53,7 @@ namespace detail {
                                          bool keepHandle)
     : ModelObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == BuildingStory::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == BuildingStory::iddObjectType());
   }
 
   BuildingStory_Impl::BuildingStory_Impl(const BuildingStory_Impl& other,
@@ -85,13 +85,13 @@ namespace detail {
 
   double BuildingStory_Impl::nominalFloortoFloorHeight() const {
     boost::optional<double> value = getDouble(OS_BuildingStoryFields::NominalFloortoFloorHeight,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
   
   Quantity BuildingStory_Impl::getNominalFloortoFloorHeight(bool returnIP) const {
     OSOptionalQuantity value = getQuantity(OS_BuildingStoryFields::NominalFloortoFloorHeight,true,returnIP);
-    BOOST_ASSERT(value.isSet());
+    OS_ASSERT(value.isSet());
     return value.get();
   }
 
@@ -106,13 +106,12 @@ namespace detail {
     } else {
       result = setString(OS_BuildingStoryFields::NominalZCoordinate, "");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void BuildingStory_Impl::setNominalZCoordinate(double nominalZCoordinate) {
-    bool result = false;
-    result = setDouble(OS_BuildingStoryFields::NominalZCoordinate, nominalZCoordinate);
-    BOOST_ASSERT(result);
+    bool result = setDouble(OS_BuildingStoryFields::NominalZCoordinate, nominalZCoordinate);
+    OS_ASSERT(result);
   }
   
   bool BuildingStory_Impl::setNominalZCoordinate(const OSOptionalQuantity& nominalZCoordinate) {
@@ -127,12 +126,11 @@ namespace detail {
 
   void BuildingStory_Impl::resetNominalZCoordinate() {
     bool result = setString(OS_BuildingStoryFields::NominalZCoordinate, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool BuildingStory_Impl::setNominalFloortoFloorHeight(double nominalFloortoFloorHeight) {
-    bool result = false;
-    result = setDouble(OS_BuildingStoryFields::NominalFloortoFloorHeight, nominalFloortoFloorHeight);
+    bool result = setDouble(OS_BuildingStoryFields::NominalFloortoFloorHeight, nominalFloortoFloorHeight);
     return result;
   }
 
@@ -142,7 +140,7 @@ namespace detail {
 
   void BuildingStory_Impl::resetNominalFloortoFloorHeight() {
     bool result = setString(OS_BuildingStoryFields::NominalFloortoFloorHeight, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   boost::optional<DefaultConstructionSet> BuildingStory_Impl::defaultConstructionSet() const
@@ -291,7 +289,7 @@ namespace detail {
 BuildingStory::BuildingStory(const Model& model)
   : ModelObject(BuildingStory::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::BuildingStory_Impl>());
+  OS_ASSERT(getImpl<detail::BuildingStory_Impl>());
 }
 
 IddObjectType BuildingStory::iddObjectType() {

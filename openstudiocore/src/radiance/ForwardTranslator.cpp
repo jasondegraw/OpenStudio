@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -284,8 +284,8 @@ namespace radiance {
 
       //    std::string dcmatsString = dcmatsStringin.gsub(',', ' ');
 
-	    // get Radiance sim settings
-	    openstudio::model::RadianceParameters radianceParameters = m_model.getUniqueModelObject<openstudio::model::RadianceParameters>();
+      // get Radiance sim settings
+      openstudio::model::RadianceParameters radianceParameters = m_model.getUniqueModelObject<openstudio::model::RadianceParameters>();
 
       // write Radiance options to file(s)
       // view matrix options
@@ -316,21 +316,21 @@ namespace radiance {
                 << "-dc " << radianceParameters.directCertainty() << " "
                 << "-lw " << radianceParameters.limitWeightDMX() << " ";
 
-	// Tregenza/Klems resolution options
+      // Tregenza/Klems resolution options
 
-    openstudio::path tregoptpath = radDir / openstudio::toPath("options/treg.opt");
-    outfiles.push_back(tregoptpath);
-    std::ofstream tregopt(openstudio::toString(tregoptpath).c_str());
-    tregopt << "-c " << (int)radianceParameters.klemsSamplingDensity() << " ";			
-    
-    if (radianceParameters.skyDiscretizationResolution() == "146"){
-      tregopt << "-e MF:1 -f tregenza.cal -b tbin -bn Ntbins";
-    } else if (radianceParameters.skyDiscretizationResolution() == "581"){
-      tregopt << "-e MF:2 -f reinhart.cal -b rbin -bn Nrbins";
-    } else if (radianceParameters.skyDiscretizationResolution() == "2321"){
-      tregopt << "-e MF:4 -f reinhart.cal -b rbin -bn Nrbins";	
-	}
-	// TODO: make these values into a pulldown choice, add support for out of bounds
+      openstudio::path tregoptpath = radDir / openstudio::toPath("options/treg.opt");
+      outfiles.push_back(tregoptpath);
+      std::ofstream tregopt(openstudio::toString(tregoptpath).c_str());
+      tregopt << "-c " << (int)radianceParameters.klemsSamplingDensity() << " ";
+
+      if (radianceParameters.skyDiscretizationResolution() == "146"){
+        tregopt << "-e MF:1 -f tregenza.cal -b tbin -bn Ntbins";
+      } else if (radianceParameters.skyDiscretizationResolution() == "578"){
+        tregopt << "-e MF:2 -f reinhart.cal -b rbin -bn Nrbins";
+      } else if (radianceParameters.skyDiscretizationResolution() == "2306"){
+        tregopt << "-e MF:4 -f reinhart.cal -b rbin -bn Nrbins";
+      }
+      // TODO: make these values into a pulldown choice, add support for out of bounds
 
 
 
@@ -927,8 +927,7 @@ namespace radiance {
         double azi = surface->azimuth();
 
         // std::string aperture_heading = boost::lexical_cast<std::string>(azi);
-        std::string aperture_heading = boost::lexical_cast<std::string>(azi);
-          aperture_heading = formatString(azi, 4);
+        std::string aperture_heading = formatString(azi, 4);
 
         if (std::find(aperture_headings.begin(),aperture_headings.end(),aperture_heading) == aperture_headings.end())
         {

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -34,14 +34,14 @@ namespace detail {
                                                                bool keepHandle)
     : SizingPeriod_Impl(idfObject, model, keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == WeatherFileConditionType::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == WeatherFileConditionType::iddObjectType());
   }
 
   WeatherFileConditionType_Impl::WeatherFileConditionType_Impl(
       const openstudio::detail::WorkspaceObject_Impl& other,Model_Impl* model,bool keepHandle)
     : SizingPeriod_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == WeatherFileConditionType::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == WeatherFileConditionType::iddObjectType());
   }
 
   WeatherFileConditionType_Impl::WeatherFileConditionType_Impl(
@@ -63,13 +63,18 @@ namespace detail {
     return WeatherFileConditionType::iddObjectType();
   }
 
+  void WeatherFileConditionType_Impl::ensureNoLeapDays()
+  {
+    // nothing to do
+  }
+
 } // detail
 
 /// constructor
 WeatherFileConditionType::WeatherFileConditionType(const Model& model)
   : SizingPeriod(WeatherFileConditionType::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::WeatherFileConditionType_Impl>());
+  OS_ASSERT(getImpl<detail::WeatherFileConditionType_Impl>());
 }
 
 // constructor

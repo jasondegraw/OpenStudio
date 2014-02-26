@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -41,6 +41,23 @@ inline UTILITIES_API bool istringEqual(const std::string& x, const std::string& 
   return boost::iequals(x, y);
 };
 
+/** Small functor object for case insensitive std::string equality. */
+struct UTILITIES_API IstringEqual{
+  bool operator()(const std::string& x, const std::string& y) const{
+    return boost::iequals(x, y);;
+  };
+};
+
+/** Small functor object for case insensitive std::string equality. */
+struct UTILITIES_API IstringFind{
+  IstringFind();
+  IstringFind(const std::string& target);
+  void addTarget(const std::string& target);
+  bool operator()(const std::string& other) const;
+private:
+  std::vector<std::string> m_targets;
+};
+
 /** Compare two strings without regard to case. */
 inline UTILITIES_API bool istringLess(const std::string& x, const std::string& y) {
   return boost::lexicographical_compare(x, y, boost::is_iless());
@@ -55,7 +72,7 @@ struct UTILITIES_API IstringCompare{
 };
 
 /** Small functor object for case insensitive std::string compare in pairs of std::string,
-   *   tests first strings then seconds. Used in maps of type and name to objects. */
+ *   tests first strings then seconds. Used in maps of type and name to objects. */
 struct UTILITIES_API IstringPairCompare {
   bool operator()(const std::pair<std::string, std::string>& x,
                   const std::pair<std::string, std::string>& y) const;
@@ -64,6 +81,12 @@ struct UTILITIES_API IstringPairCompare {
 class UTILITIES_API VersionString {
  public:
   explicit VersionString(const std::string& version);
+
+  VersionString(int major,int minor);
+
+  VersionString(int major,int minor,int patch);
+
+  VersionString(int major,int minor,int patch,int build);
 
   std::string str() const;
 
@@ -89,6 +112,10 @@ class UTILITIES_API VersionString {
 
   bool fidelityEqual(const VersionString& other) const;
 
+  /** Returns true if it is plausible for nextVersionCandidate to be the
+   *  next version after this one. */
+  bool isNextVersion(const VersionString& nextVersionCandidate) const;
+
  private:
   std::string m_str;
   int m_major;
@@ -98,6 +125,8 @@ class UTILITIES_API VersionString {
 };
 
 UTILITIES_API std::ostream& operator<<(std::ostream& os,const VersionString& version);
+
+typedef boost::optional<VersionString> OptionalVersionString;
 
 // sorts WorkspaceObjects by name
 struct UTILITIES_API WorkspaceObjectNameLess {
@@ -174,6 +203,20 @@ template<class T>
 struct SecondOfPairLess {
   bool operator()(const T& left, const T& right) const {
     return (left.second < right.second);
+  }
+};
+
+template<class T, class U>
+struct GetFirstOfPair {
+  T operator()(const std::pair<T,U>& pair) const {
+    return pair.first;
+  }
+};
+
+template<class T, class U>
+struct GetSecondOfPair {
+  U operator()(const std::pair<T,U>& pair) const {
+    return pair.second;
   }
 };
 

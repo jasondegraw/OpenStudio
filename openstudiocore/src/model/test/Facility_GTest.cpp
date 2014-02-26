@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -536,7 +536,7 @@ TEST_F(ModelFixture, Facility_EconomicsTest_EmptyModel) {
     openstudio::Vector values = timeSeries->values();
     unsigned numValues = values.size();
     for (unsigned i = 0; i < numValues; ++i){
-      double value = values(i);
+      EXPECT_NO_THROW(values(i));
     }
   }
 

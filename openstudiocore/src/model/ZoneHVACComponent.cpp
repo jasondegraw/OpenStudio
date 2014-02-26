@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -29,6 +29,8 @@
 #include <model/AirLoopHVAC_Impl.hpp>
 #include <model/PortList.hpp>
 #include <model/PortList_Impl.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace model {
@@ -185,7 +187,7 @@ namespace detail {
     std::vector<ThermalZone> thermalZones = m.getModelObjects<ThermalZone>();
     for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
          it != thermalZones.end();
-         it++ )
+         ++it )
     {
       std::vector<ModelObject> equipment = it->equipment();
 
@@ -246,7 +248,7 @@ ZoneHVACComponent::ZoneHVACComponent(boost::shared_ptr<detail::ZoneHVACComponent
 ZoneHVACComponent::ZoneHVACComponent(IddObjectType type,const Model& model)
   : ParentObject(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::ZoneHVACComponent_Impl>());
+  OS_ASSERT(getImpl<detail::ZoneHVACComponent_Impl>());
 }     
 
 std::vector<ModelObject> ZoneHVACComponent::children() const

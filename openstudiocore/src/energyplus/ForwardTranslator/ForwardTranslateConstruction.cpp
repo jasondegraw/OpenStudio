@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
 #include <model/Material.hpp>
 #include <model/Material_Impl.hpp>
 #include <model/LifeCycleCost.hpp>
+#include <model/ShadingControl.hpp>
 
 #include <utilities/idd/Construction_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>

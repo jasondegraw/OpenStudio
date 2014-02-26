@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -221,7 +221,6 @@ WaterUseEquipmentDefinitionInspectorView::WaterUseEquipmentDefinitionInspectorVi
   : ModelObjectInspectorView(model, true, parent)
 {
   m_isIP = isIP;
-  bool isConnected = false;
 
   QWidget* visibleWidget = new QWidget();
   this->stackedWidget()->addWidget(visibleWidget);
@@ -256,8 +255,8 @@ WaterUseEquipmentDefinitionInspectorView::WaterUseEquipmentDefinitionInspectorVi
   mainGridLayout->addWidget(label,4,0);
 
   m_peakFlowRateEdit = new OSQuantityEdit(m_isIP);
-  isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_peakFlowRateEdit, SLOT(onUnitSystemChange(bool)));
-  BOOST_ASSERT(isConnected);
+  bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)), m_peakFlowRateEdit, SLOT(onUnitSystemChange(bool)));
+  OS_ASSERT(isConnected);
   mainGridLayout->addWidget(m_peakFlowRateEdit,5,0,1,3);
 
   // Target Temperature Schedule
@@ -323,7 +322,7 @@ void WaterUseEquipmentDefinitionInspectorView::attach(openstudio::model::WaterUs
 {
   m_nameEdit->bind(waterUseEquipmentDefinition,"name");
   m_endUseSubcategoryEdit->bind(waterUseEquipmentDefinition,"endUseSubcategory");
-  m_peakFlowRateEdit->bind(waterUseEquipmentDefinition,"peakFlowRate",false);
+  m_peakFlowRateEdit->bind(waterUseEquipmentDefinition,"peakFlowRate",m_isIP);
 
   m_targetTemperatureScheduleVC->attach(waterUseEquipmentDefinition);
   m_targetTemperatureScheduleVC->reportItems();

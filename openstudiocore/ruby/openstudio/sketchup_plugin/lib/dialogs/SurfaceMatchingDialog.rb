@@ -1,5 +1,5 @@
 ######################################################################
-#  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+#  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 #  All rights reserved.
 #  
 #  This library is free software; you can redistribute it and/or
@@ -232,6 +232,8 @@ This operation cannot be undone. Do you want to continue?", MB_OKCANCEL)
   
       # get all base surfaces
       surfaces = model_interface.surfaces.to_a
+      
+      inspector_dialog_enabled = Plugin.dialog_manager.inspector_dialog.disable
       
       begin
 
@@ -467,6 +469,8 @@ This operation cannot be undone. Do you want to continue?", MB_OKCANCEL)
       # switch render mode back to original
       proc = Proc.new { model_interface.materials_interface.rendering_mode = starting_rendermode }
       Plugin.add_event( proc )
+      
+      Plugin.dialog_manager.inspector_dialog.enable if inspector_dialog_enabled
       
       # resume event processing
       Plugin.start_event_processing if event_processing_stopped

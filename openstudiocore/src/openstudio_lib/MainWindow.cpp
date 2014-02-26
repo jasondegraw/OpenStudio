@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -23,6 +23,8 @@
 #include <openstudio_lib/LoopLibraryDialog.hpp>
 #include <openstudio_lib/MainMenu.hpp>
 #include <openstudio_lib/VerticalTabWidget.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 #include <QAction>
 #include <QApplication>
@@ -87,11 +89,11 @@ MainWindow::MainWindow(bool isPlugin, QWidget *parent) :
 
   MainMenu * mainMenu = new MainMenu(m_displayIP, m_isPlugin);
   bool isConnected = connect(mainMenu, SIGNAL(toggleUnitsClicked(bool)), this, SLOT(toggleUnits(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   isConnected = connect(mainMenu, SIGNAL(openBclDlgClicked()), this, SIGNAL(openBclDlgClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   isConnected = connect(mainMenu, SIGNAL(openLibDlgClicked()), this, SIGNAL(openLibDlgClicked()));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   this->setMenuBar(mainMenu);
 
@@ -140,7 +142,8 @@ void MainWindow::dragEnterEvent(QDragEnterEvent * event)
 {
   if(event->mimeData()->hasUrls())
   {
-    QUrl url = event->mimeData()->urls().first();
+    event->ignore();
+    /*QUrl url = event->mimeData()->urls().first();
     if (url.scheme().compare("file", Qt::CaseInsensitive) == 0 && url.toString().toLower().endsWith(".osm")) 
     {
       //event->accept();
@@ -149,7 +152,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent * event)
     else
     {
       event->ignore();
-    }
+    }*/
   }
 }
 

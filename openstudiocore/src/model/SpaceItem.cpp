@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -83,7 +83,7 @@ namespace detail {
 
   void SpaceItem_Impl::resetSpace() {
     bool ok = setString(this->spaceIndex(),"");
-    BOOST_ASSERT(ok);
+    OS_ASSERT(ok);
   }
 
   boost::optional<ModelObject> SpaceItem_Impl::spaceAsModelObject() const {
@@ -116,7 +116,7 @@ namespace detail {
 SpaceItem::SpaceItem(IddObjectType type,const Model& model)
   : ModelObject(type,model)
 {
-  BOOST_ASSERT(getImpl<detail::SpaceItem_Impl>());
+  OS_ASSERT(getImpl<detail::SpaceItem_Impl>());
 }
 
 SpaceItem::SpaceItem(boost::shared_ptr<detail::SpaceItem_Impl> impl)

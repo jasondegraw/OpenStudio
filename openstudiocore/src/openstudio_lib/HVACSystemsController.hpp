@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -62,6 +62,8 @@ class FollowOATempSPMView;
 class OAResetSPMView;
 class AirLoopHVACUnitaryHeatPumpAirToAirControlView;
 class NoControlsView;
+class RefrigerationController;
+class VRFController;
 
 class HVACSystemsController : public QObject
 {
@@ -86,9 +88,9 @@ class HVACSystemsController : public QObject
   // Indicates what object or system to display
   // This handle may correspond to a Loop, a ModelObject, such as a WaterUseConnection object,
   // or it may be NULL when displaying the service hot water overview.
-  Handle currentHandle() const;
+  QString currentHandle() const;
 
-  void setCurrentHandle(const Handle & handle);
+  void setCurrentHandle(const QString & handle);
 
   boost::optional<model::Loop> currentLoop() const;
 
@@ -126,13 +128,15 @@ class HVACSystemsController : public QObject
 
   QPointer<HVACSystemsView> m_hvacSystemsView;
 
-  QPointer<NoControlsView> m_noControlsView;
-
   boost::shared_ptr<HVACLayoutController> m_hvacLayoutController;
 
   boost::shared_ptr<HVACControlsController> m_hvacControlsController;
 
-  Handle m_currentHandle;
+  boost::shared_ptr<RefrigerationController> m_refrigerationController;
+
+  boost::shared_ptr<VRFController> m_vrfController;
+
+  QString m_currentHandle;
 
   bool m_dirty;
 
@@ -150,6 +154,8 @@ class HVACControlsController : public QObject
   virtual ~HVACControlsController();
 
   HVACControlsView * hvacControlsView() const;
+
+  NoControlsView * noControlsView() const;
 
   boost::optional<model::AirLoopHVAC> airLoopHVAC() const;
 
@@ -175,6 +181,8 @@ class HVACControlsController : public QObject
 
   QPointer<HVACControlsView> m_hvacControlsView;
 
+  QPointer<NoControlsView> m_noControlsView;
+
   QPointer<MechanicalVentilationView> m_mechanicalVentilationView;
 
   QPointer<SingleZoneReheatSPMView> m_singleZoneReheatSPMView;
@@ -195,8 +203,6 @@ class HVACControlsController : public QObject
 
   QPointer<AirLoopHVACUnitaryHeatPumpAirToAirControlView> m_airLoopHVACUnitaryHeatPumpAirToAirControlView;
 
-  QPointer<NoControlsView> m_noControlsView;
-
   QPointer<HVACSystemsController> m_hvacSystemsController;
 
   bool m_dirty;
@@ -211,6 +217,8 @@ class HVACLayoutController : public QObject
   HVACLayoutController(HVACSystemsController * hvacSystemsController);
 
   virtual ~HVACLayoutController();
+
+  //boost::shared_ptr<RefrigerationController> refrigerationController() const;
 
   HVACGraphicsView * hvacGraphicsView() const;
 
@@ -241,6 +249,8 @@ class HVACLayoutController : public QObject
   QPointer<HVACGraphicsView> m_hvacGraphicsView;
 
   QPointer<HVACSystemsController> m_hvacSystemsController;
+
+  //boost::shared_ptr<RefrigerationController> m_refrigerationController;
 
   bool m_dirty;
 };

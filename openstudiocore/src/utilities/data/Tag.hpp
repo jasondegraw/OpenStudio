@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -31,6 +31,8 @@
 
 namespace openstudio {
 
+class VersionString;
+
 class UTILITIES_API Tag {
  public:
   explicit Tag(const std::string& name);
@@ -54,6 +56,16 @@ typedef boost::optional<Tag> OptionalTag;
 
 /** \relates Tag */
 typedef std::vector<Tag> TagVector;
+
+namespace detail {
+
+  /** Places tag's data in a QVariant for JSON serialization. */
+  UTILITIES_API QVariant toVariant(const Tag& tag);
+
+  /** Deserializes json variant to Tag. */
+  UTILITIES_API Tag toTag(const QVariant& variant, const VersionString& version);
+
+}
 
 } // openstudio
 

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,8 @@
 
 #include <shared_gui_components/ComponentList.hpp>
 #include <shared_gui_components/Component.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 #include <QAbstractButton>
 #include <QBoxLayout>
@@ -106,7 +108,7 @@ std::vector<Component *> ComponentList::components()
 
 void ComponentList::addComponent(Component * component)
 {
-  Q_ASSERT(component);
+  OS_ASSERT(component);
 
   m_mainLayout->addWidget(component);
   m_componentGroup->addButton(component,m_componentGroup->buttons().size());
@@ -115,11 +117,11 @@ void ComponentList::addComponent(Component * component)
 
   isConnected = connect(component, SIGNAL(clicked(bool)),
                         this, SIGNAL(componentClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(component, SIGNAL(clicked(bool)),
                         this, SLOT(on_componentClicked(bool)));
-  Q_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 void ComponentList::paintEvent( QPaintEvent * event )

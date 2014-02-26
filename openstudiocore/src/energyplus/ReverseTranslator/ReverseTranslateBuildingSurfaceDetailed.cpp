@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -45,11 +45,17 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
 
   openstudio::Point3dVector vertices = getVertices(BuildingSurface_DetailedFields::NumberofVertices + 1, workspaceObject);
  
-  Surface surface(vertices, m_model);
+  boost::optional<Surface> surface;
+  try{
+    surface = Surface(vertices, m_model);
+  }catch(const std::exception&){
+    LOG(Error, "Cannot create Surface for object: " << workspaceObject);
+    return boost::none;
+  }
 
   OptionalString s = workspaceObject.name();
   if(s) {
-    surface.setName(*s);
+    surface->setName(*s);
   }
 
   OptionalWorkspaceObject target = workspaceObject.getTarget(openstudio::BuildingSurface_DetailedFields::ConstructionName);
@@ -57,7 +63,7 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
     OptionalModelObject modelObject = translateAndMapWorkspaceObject(*target);
     if (modelObject){
       if (modelObject->optionalCast<ConstructionBase>()){
-        surface.setConstruction(modelObject->cast<ConstructionBase>());
+        surface->setConstruction(modelObject->cast<ConstructionBase>());
       }
     }
   }
@@ -67,7 +73,7 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
     OptionalModelObject modelObject = translateAndMapWorkspaceObject(*target);
     if (modelObject){
       if (modelObject->optionalCast<Space>()){
-        surface.setSpace(modelObject->cast<Space>());
+        surface->setSpace(modelObject->cast<Space>());
       }
     }
   }
@@ -77,23 +83,23 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
     if (istringEqual("Roof", *s) || istringEqual("Ceiling", *s)){
       s = "RoofCeiling";
     }
-    surface.setSurfaceType(*s);
+    surface->setSurfaceType(*s);
   }
-  std::string surfaceType = surface.surfaceType();
+  //std::string surfaceType = surface->surfaceType();
 
   s = workspaceObject.getString(BuildingSurface_DetailedFields::SunExposure);
   if (s) {
-    surface.setSunExposure(*s);
+    surface->setSunExposure(*s);
   }
 
   s = workspaceObject.getString(BuildingSurface_DetailedFields::WindExposure);
   if (s) {
-    surface.setWindExposure(*s);
+    surface->setWindExposure(*s);
   }
 
   OptionalDouble d = workspaceObject.getDouble(BuildingSurface_DetailedFields::ViewFactortoGround);
   if (d) {
-    surface.setViewFactortoGround(*d);
+    surface->setViewFactortoGround(*d);
   }
 
   target = workspaceObject.getTarget(openstudio::BuildingSurface_DetailedFields::OutsideBoundaryConditionObject);
@@ -106,16 +112,18 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
       if(modelObject->optionalCast<Space>()){
         Space adjacentSpace = modelObject->cast<Space>();
 
-        if (surface.space()){
-          Transformation transformation = adjacentSpace.transformation().inverse()*surface.space()->transformation();
+        if (surface->space()){
+          // insert this surface in the map so subsurface translation can find it  
+          m_workspaceToModelMap.insert(std::make_pair(workspaceObject.handle(), surface.get()));
 
-          // duplicate surface in other space
-          Surface adjacentSurface = surface.clone(m_model).cast<Surface>();
-          std::reverse(vertices.begin(), vertices.end());
-          adjacentSurface.setVertices(transformation*vertices);
-          adjacentSurface.setSpace(adjacentSpace);
-          surface.setAdjacentSurface(adjacentSurface);
-          return surface;
+          // need to translate all sub surfaces here so they will be in adjacent space
+          BOOST_FOREACH(const WorkspaceObject& workspaceSubSurface, workspaceObject.getSources(IddObjectType::FenestrationSurface_Detailed)){
+            translateAndMapWorkspaceObject(workspaceSubSurface);
+          }
+
+          // create adjacent surface in other space
+          surface->createAdjacentSurface(adjacentSpace);
+          return surface.get();
         }
       }
 
@@ -125,15 +133,16 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
       // see if we have already mapped other surface, don't do it here because that is circular
       if (target->handle() == workspaceObject.handle() ){
         // these objects are the same, set boundary condition to adiabatic
-        surface.setOutsideBoundaryCondition("Adiabatic");
+        surface->setOutsideBoundaryCondition("Adiabatic");
+        return surface.get();
       }else{
         std::map<Handle,ModelObject>::iterator it = m_workspaceToModelMap.find(target->handle());
         if( it !=  m_workspaceToModelMap.end()){
           if (it->second.optionalCast<Surface>()){
             // this will set other side boundary object on both surfaces
             Surface adjacentSurface = it->second.cast<Surface>();
-            surface.setAdjacentSurface(adjacentSurface);
-            return surface;
+            surface->setAdjacentSurface(adjacentSurface);
+            return surface.get();
           }
         }
       }
@@ -145,10 +154,10 @@ OptionalModelObject ReverseTranslator::translateBuildingSurfaceDetailed( const W
 
   s = workspaceObject.getString(BuildingSurface_DetailedFields::OutsideBoundaryCondition);
   if (s) {
-    surface.setOutsideBoundaryCondition(*s);
+    surface->setOutsideBoundaryCondition(*s);
   }
 
-  return surface;
+  return surface.get();
 }
 
 } // energyplus

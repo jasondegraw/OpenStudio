@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,9 @@
 #include "../shared_gui_components/Buttons.hpp"
 #include "../shared_gui_components/HeaderViews.hpp"
 #include "../shared_gui_components/OSListView.hpp"
+
+#include <utilities/core/Assert.hpp>
+
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -279,7 +282,7 @@ DesignAltContentView::DesignAltContentView(bool t_isBaseline)
 
   bool bingo = connect(descriptionTextEdit,SIGNAL(textChanged()),this,SLOT(onDescriptionTextChanged()));
 
-  Q_ASSERT(bingo);
+  OS_ASSERT(bingo);
 }
 
 void DesignAltContentView::onDescriptionTextChanged()

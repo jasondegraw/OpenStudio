@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -176,6 +176,24 @@ class UTILITIES_API IdfExtensibleGroup {
       result = T(impl,m_index);
     }
     return result;
+  }
+
+  /** Get the parent object. */
+  template<typename T>
+  T getObject() const { 
+    T result(boost::dynamic_pointer_cast<typename T::ImplType>(m_impl));
+    return result; 
+  }
+
+  /** Get the parent object. */
+  template<typename T>
+  boost::optional<T> getOptionalObject() const { 
+    boost::optional<T> result;
+    boost::shared_ptr<typename T::ImplType> p = boost::dynamic_pointer_cast<typename T::ImplType>(m_impl);
+    if (p){
+     result = T(p);
+    }
+    return result; 
   }
 
   //@}

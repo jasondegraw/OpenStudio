@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ namespace detail {
                                                                                bool keepHandle)
     : ZoneHVACComponent_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == ZoneHVACBaseboardConvectiveWater::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == ZoneHVACBaseboardConvectiveWater::iddObjectType());
   }
 
   ZoneHVACBaseboardConvectiveWater_Impl::ZoneHVACBaseboardConvectiveWater_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -57,7 +57,7 @@ namespace detail {
                                                                                bool keepHandle)
     : ZoneHVACComponent_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == ZoneHVACBaseboardConvectiveWater::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == ZoneHVACBaseboardConvectiveWater::iddObjectType());
   }
 
   ZoneHVACBaseboardConvectiveWater_Impl::ZoneHVACBaseboardConvectiveWater_Impl(const ZoneHVACBaseboardConvectiveWater_Impl& other,
@@ -202,19 +202,21 @@ std::vector<IdfObject> ZoneHVACBaseboardConvectiveWater_Impl::remove()
 
   boost::optional<ThermalZone> ZoneHVACBaseboardConvectiveWater_Impl::thermalZone()
   {
-    boost::optional<ThermalZone> result;
     Model m = this->model();
+    ModelObject thisObject = this->getObject<ModelObject>();
     std::vector<ThermalZone> thermalZones = m.getModelObjects<ThermalZone>();
-    BOOST_FOREACH(ThermalZone& thermalZone, thermalZones){
-      std::vector<ModelObject> equipments = thermalZone.equipment(); 
-      BOOST_FOREACH(ModelObject& equipment, equipments){
-        if (equipment.handle() == this->handle()){
-          result = thermalZone;
-        }
+    for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
+         it != thermalZones.end();
+         it++ )
+    {
+      std::vector<ModelObject> equipment = it->equipment();
+
+      if( std::find(equipment.begin(),equipment.end(),thisObject) != equipment.end() )
+      {
+        return *it;
       }
     }
-
-    return result;
+    return boost::none;
   }
 
   //reimplemented to override the base-class method in ZoneHVACComponent
@@ -242,22 +244,8 @@ std::vector<IdfObject> ZoneHVACBaseboardConvectiveWater_Impl::remove()
   //and therefore doesn't need to be removed from them when removed from the zone
   void ZoneHVACBaseboardConvectiveWater_Impl::removeFromThermalZone()
   {
-    boost::optional<ThermalZone> thermalZone = this->thermalZone();
-    Model m = this->model();
-    ModelObject thisObject = this->getObject<ModelObject>();
-    std::vector<ThermalZone> thermalZones = m.getModelObjects<ThermalZone>();
-    for( std::vector<ThermalZone>::iterator it = thermalZones.begin();
-         it != thermalZones.end();
-         it++ )
-    {
-      std::vector<ModelObject> equipment = it->equipment();
-
-      if( std::find(equipment.begin(),equipment.end(),thisObject) != equipment.end() )
-      {
-        it->removeEquipment(thisObject);
-
-        break;
-      }
+    if ( boost::optional<ThermalZone> thermalZone = this->thermalZone() ) {
+      thermalZone->removeEquipment(this->getObject<ZoneHVACComponent>());
     }
   }
 } // detail
@@ -265,7 +253,7 @@ std::vector<IdfObject> ZoneHVACBaseboardConvectiveWater_Impl::remove()
 ZoneHVACBaseboardConvectiveWater::ZoneHVACBaseboardConvectiveWater(const Model& model, Schedule& availabilitySchedule,StraightComponent& heatingCoilBaseboard)
   : ZoneHVACComponent(ZoneHVACBaseboardConvectiveWater::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::ZoneHVACBaseboardConvectiveWater_Impl>());
+  OS_ASSERT(getImpl<detail::ZoneHVACBaseboardConvectiveWater_Impl>());
 
   //     OS_ZoneHVAC_Baseboard_Convective_WaterFields::AvailabilityScheduleName
   //     OS_ZoneHVAC_Baseboard_Convective_WaterFields::HeatingCoilName
@@ -276,7 +264,7 @@ ZoneHVACBaseboardConvectiveWater::ZoneHVACBaseboardConvectiveWater(const Model& 
                   << availabilitySchedule.briefDescription() << ".");
   }
   ok = setHeatingCoil(heatingCoilBaseboard);
-  BOOST_ASSERT(ok);
+  OS_ASSERT(ok);
 }
 
 IddObjectType ZoneHVACBaseboardConvectiveWater::iddObjectType() {

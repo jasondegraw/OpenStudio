@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -100,7 +100,7 @@ double Curve::evaluate(double x, double y, double z) const {
 Curve::Curve(IddObjectType type, const Model& model)
   : ModelObject(type,model) 
 {
-  BOOST_ASSERT(getImpl<detail::Curve_Impl>());
+  OS_ASSERT(getImpl<detail::Curve_Impl>());
 }
 
 Curve::Curve(boost::shared_ptr<detail::Curve_Impl> impl)

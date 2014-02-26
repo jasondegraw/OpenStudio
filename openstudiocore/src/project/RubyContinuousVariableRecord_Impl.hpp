@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,13 +31,12 @@ namespace analysis {
 namespace project {
 
 class OSArgumentRecord;
-class RubyPerturbationRecord;
+class RubyMeasureRecord;
 
 namespace detail {
 
   /** RubyContinuousVariableRecord_Impl is a ContinuousVariableRecord_Impl that is the implementation class for RubyContinuousVariableRecord.*/
   class PROJECT_API RubyContinuousVariableRecord_Impl : public ContinuousVariableRecord_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -76,7 +75,7 @@ namespace detail {
 
     OSArgumentRecord osArgumentRecord() const;
 
-    RubyPerturbationRecord rubyPerturbationRecord() const;
+    RubyMeasureRecord rubyMeasureRecord() const;
 
     virtual analysis::Variable variable() const;
 
@@ -94,7 +93,7 @@ namespace detail {
      *   constructor so can access old related records for comparison and possible removal. */
     void revertToLastRecordIds();
 
-    void setRubyPerturbationRecordId(int id);
+    void setRubyMeasureRecordId(int id);
 
     //@}
    protected:
@@ -116,9 +115,9 @@ namespace detail {
    private:
     REGISTER_LOGGER("openstudio.project.RubyContinuousVariableRecord");
 
-    int m_rubyPerturbationRecordId;
+    int m_rubyMeasureRecordId;
 
-    int m_lastRubyPerturbationRecordId;
+    int m_lastRubyMeasureRecordId;
   };
 
 } // detail

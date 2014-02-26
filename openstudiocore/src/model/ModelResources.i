@@ -34,6 +34,15 @@
   
 #endif
 
+namespace openstudio {
+namespace model {
+
+// forward declarations
+class ShadingControl;
+
+}
+}
+
 MODELOBJECT_TEMPLATES(ScheduleInterval); 
 MODELOBJECT_TEMPLATES(ScheduleFixedInterval); 
 MODELOBJECT_TEMPLATES(ScheduleVariableInterval);
@@ -68,10 +77,11 @@ MODELOBJECT_TEMPLATES(Construction);
 MODELOBJECT_TEMPLATES(ConstructionWithInternalSource);
 MODELOBJECT_TEMPLATES(CFactorUndergroundWallConstruction);
 MODELOBJECT_TEMPLATES(FFactorGroundFloorConstruction);
-MODELOBJECT_TEMPLATES(ConstructionBaseStandardsInformation);
+MODELOBJECT_TEMPLATES(StandardsInformationConstruction);
 MODELOBJECT_TEMPLATES(WindowDataFile);
 MODELOBJECT_TEMPLATES(DefaultSubSurfaceConstructions); 
 MODELOBJECT_TEMPLATES(DefaultSurfaceConstructions); 
+MODELOBJECT_TEMPLATES(ShadingControl);
 MODELOBJECT_TEMPLATES(Curve);
 MODELOBJECT_TEMPLATES(CurveBicubic);
 MODELOBJECT_TEMPLATES(CurveBiquadratic);
@@ -138,10 +148,11 @@ SWIG_MODELOBJECT(Construction);
 SWIG_MODELOBJECT(ConstructionWithInternalSource);
 SWIG_MODELOBJECT(CFactorUndergroundWallConstruction);
 SWIG_MODELOBJECT(FFactorGroundFloorConstruction);
-SWIG_MODELOBJECT(ConstructionBaseStandardsInformation);
+SWIG_MODELOBJECT(StandardsInformationConstruction);
 SWIG_MODELOBJECT(WindowDataFile);
 SWIG_MODELOBJECT(DefaultSubSurfaceConstructions); 
 SWIG_MODELOBJECT(DefaultSurfaceConstructions); 
+SWIG_MODELOBJECT(ShadingControl);
 SWIG_MODELOBJECT(Curve);
 SWIG_MODELOBJECT(CurveBicubic);
 SWIG_MODELOBJECT(CurveBiquadratic);

@@ -1,5 +1,5 @@
 ######################################################################
-#  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+#  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 #  All rights reserved.
 #  
 #  This library is free software; you can redistribute it and/or
@@ -305,7 +305,7 @@ module OpenStudio
             # Save the dir so we can start here next time
             Plugin.write_pref("Last Idf Import Dir", File.dirname(path))
           else
-            UI.messagebox("Failed to import #{path}.  If this is an older EnergyPlus Idf please upgrade to version 7.2 using the EnergyPlus transition program.")
+            UI.messagebox("Failed to import #{path}.  If this is an older EnergyPlus Idf please upgrade to version 8.0 using the EnergyPlus transition program.")
           end
           
         end

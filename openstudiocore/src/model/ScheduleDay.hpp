@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -99,6 +99,10 @@ class MODEL_API ScheduleDay : public ScheduleBase {
    *  scheduleTypeLimits() set, or if value cannot be converted to the 'SI' units implied by 
    *  scheduleTypeLimits(). Otherwise, converts value appropriately and then sets the value. */
   bool addValue(const openstudio::Time& untilTime, const Quantity& value);
+
+  /** Remove a value added by addValue at the exact time.  Returns the removed
+   *  value if there was one. */
+  boost::optional<double> removeValue(const openstudio::Time& time);
 
   /// Clear all values from this schedule.
   void clearValues();

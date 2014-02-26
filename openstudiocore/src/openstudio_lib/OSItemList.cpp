@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ OSItemList::OSItemList(OSVectorController* vectorController,
     m_dirty(false)
 {
   // for now we will allow this item list to manage memory of 
-  BOOST_ASSERT(!m_vectorController->parent());
+  OS_ASSERT(!m_vectorController->parent());
   m_vectorController->setParent(this);
 
   this->setObjectName("GrayWidget"); 
@@ -87,22 +87,22 @@ OSItemList::OSItemList(OSVectorController* vectorController,
   bool isConnected = false;
   isConnected = connect(this, SIGNAL(itemsRequested()),
                         vectorController, SLOT(reportItems())); 
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   /* Vector controller does not handle removing items in list from model
   *
   isConnected = connect(this, SIGNAL(itemRemoveClicked(OSItem*)),
                         vectorController, SLOT(removeItem(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
   */
 
   isConnected = connect(vectorController, SIGNAL(itemIds(const std::vector<OSItemId>&)),
                         this, SLOT(setItemIds(const std::vector<OSItemId>&))); 
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(vectorController, SIGNAL(selectedItemId(const OSItemId&)),
                         this, SLOT(selectItemId(const OSItemId&))); 
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   // allow time for OSDocument to finish constructing
   QTimer::singleShot(0, vectorController, SLOT(reportItems()));
@@ -135,13 +135,10 @@ std::vector<OSItem *> OSItemList::items()
 {
   std::vector<OSItem *> result;
 
-  QLayoutItem * layoutItem = NULL;
-  QWidget * widget = NULL;
-  OSItem * item = NULL;
   for (int i = 0; i < m_vLayout->count(); ++i){
-    layoutItem = m_vLayout->itemAt(i);
-    widget = layoutItem->widget();
-    item = qobject_cast<OSItem*>(widget);
+    QLayoutItem * layoutItem = m_vLayout->itemAt(i);
+    QWidget * widget = layoutItem->widget();
+    OSItem * item = qobject_cast<OSItem*>(widget);
 
     if (item){
       result.push_back(item);
@@ -234,7 +231,7 @@ void OSItemList::refresh()
 
 void OSItemList::addItem(OSItem* item, bool selectItem)
 {
-  BOOST_ASSERT(item);
+  OS_ASSERT(item);
 
   item->setDraggable(m_itemsDraggable);
 
@@ -245,15 +242,15 @@ void OSItemList::addItem(OSItem* item, bool selectItem)
   bool isConnected = false;
   isConnected = connect(item, SIGNAL(itemClicked(OSItem*)),
                         this, SLOT(selectItem(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(item, SIGNAL(itemRemoveClicked(OSItem*)),
                         this, SIGNAL(itemRemoveClicked(OSItem*)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   isConnected = connect(item, SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)),
                         this, SIGNAL(itemReplacementDropped(OSItem*, const OSItemId&)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   m_vLayout->insertWidget(0, item);
 
@@ -277,14 +274,10 @@ void OSItemList::selectItem(OSItem* selectItem)
     return;
   }
 
-  QLayoutItem * layoutItem = NULL;
-  QWidget * widget = NULL;
-  OSItem * item = NULL;
-
   for (int i = 0; i < m_vLayout->count(); ++i){
-    layoutItem = m_vLayout->itemAt(i);
-    widget = layoutItem->widget();
-    item = qobject_cast<OSItem*>(widget);
+    QLayoutItem * layoutItem = m_vLayout->itemAt(i);
+    QWidget * widget = layoutItem->widget();
+    OSItem * item = qobject_cast<OSItem*>(widget);
 
     if (item){
       if (selectItem->equal(item)){
@@ -336,13 +329,10 @@ void OSItemList::clearSelection()
 {
   m_selectedItem = NULL;
 
-  QLayoutItem * layoutItem = NULL;
-  QWidget * widget = NULL;
-  OSItem * item = NULL;
   for (int i = 0; i < m_vLayout->count(); ++i){
-    layoutItem = m_vLayout->itemAt(i);
-    widget = layoutItem->widget();
-    item = qobject_cast<OSItem*>(widget);
+    QLayoutItem * layoutItem = m_vLayout->itemAt(i);
+    QWidget * widget = layoutItem->widget();
+    OSItem * item = qobject_cast<OSItem*>(widget);
     if (item){
       item->setSelected(false);
     }

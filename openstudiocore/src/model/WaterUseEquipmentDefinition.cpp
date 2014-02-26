@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ namespace detail {
                                                                      bool keepHandle)
     : SpaceLoadDefinition_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == WaterUseEquipmentDefinition::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == WaterUseEquipmentDefinition::iddObjectType());
   }
 
   WaterUseEquipmentDefinition_Impl::WaterUseEquipmentDefinition_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -45,7 +45,7 @@ namespace detail {
                                                                      bool keepHandle)
     : SpaceLoadDefinition_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == WaterUseEquipmentDefinition::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == WaterUseEquipmentDefinition::iddObjectType());
   }
 
   WaterUseEquipmentDefinition_Impl::WaterUseEquipmentDefinition_Impl(const WaterUseEquipmentDefinition_Impl& other,
@@ -68,7 +68,7 @@ namespace detail {
 
   std::string WaterUseEquipmentDefinition_Impl::endUseSubcategory() const {
     boost::optional<std::string> value = getString(OS_WaterUse_Equipment_DefinitionFields::EndUseSubcategory,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -78,14 +78,14 @@ namespace detail {
 
   double WaterUseEquipmentDefinition_Impl::peakFlowRate() const {
     boost::optional<double> value = getDouble(OS_WaterUse_Equipment_DefinitionFields::PeakFlowRate,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
   Quantity WaterUseEquipmentDefinition_Impl::getPeakFlowRate(bool returnIP) const {
     OptionalDouble value = peakFlowRate();
     OSOptionalQuantity result = getQuantityFromDouble(OS_WaterUse_Equipment_DefinitionFields::PeakFlowRate, value, returnIP);
-    BOOST_ASSERT(result.isSet());
+    OS_ASSERT(result.isSet());
     return result.get();
   }
 
@@ -102,19 +102,17 @@ namespace detail {
   }
 
   void WaterUseEquipmentDefinition_Impl::setEndUseSubcategory(std::string endUseSubcategory) {
-    bool result = false;
-    result = setString(OS_WaterUse_Equipment_DefinitionFields::EndUseSubcategory, endUseSubcategory);
-    BOOST_ASSERT(result);
+    bool result = setString(OS_WaterUse_Equipment_DefinitionFields::EndUseSubcategory, endUseSubcategory);
+    OS_ASSERT(result);
   }
 
   void WaterUseEquipmentDefinition_Impl::resetEndUseSubcategory() {
     bool result = setString(OS_WaterUse_Equipment_DefinitionFields::EndUseSubcategory, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool WaterUseEquipmentDefinition_Impl::setPeakFlowRate(double peakFlowRate) {
-    bool result = false;
-    result = setDouble(OS_WaterUse_Equipment_DefinitionFields::PeakFlowRate, peakFlowRate);
+    bool result = setDouble(OS_WaterUse_Equipment_DefinitionFields::PeakFlowRate, peakFlowRate);
     return result;
   }
 
@@ -138,7 +136,7 @@ namespace detail {
 
   void WaterUseEquipmentDefinition_Impl::resetTargetTemperatureSchedule() {
     bool result = setString(OS_WaterUse_Equipment_DefinitionFields::TargetTemperatureScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool WaterUseEquipmentDefinition_Impl::setSensibleFractionSchedule(const boost::optional<Schedule>& sensibleFractionSchedule) {
@@ -153,7 +151,7 @@ namespace detail {
 
   void WaterUseEquipmentDefinition_Impl::resetSensibleFractionSchedule() {
     bool result = setString(OS_WaterUse_Equipment_DefinitionFields::SensibleFractionScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool WaterUseEquipmentDefinition_Impl::setLatentFractionSchedule(const boost::optional<Schedule>& latentFractionSchedule) {
@@ -168,7 +166,7 @@ namespace detail {
 
   void WaterUseEquipmentDefinition_Impl::resetLatentFractionSchedule() {
     bool result = setString(OS_WaterUse_Equipment_DefinitionFields::LatentFractionScheduleName, "");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   openstudio::Quantity WaterUseEquipmentDefinition_Impl::peakFlowRate_SI() const {
@@ -259,7 +257,7 @@ namespace detail {
 WaterUseEquipmentDefinition::WaterUseEquipmentDefinition(const Model& model)
   : SpaceLoadDefinition(WaterUseEquipmentDefinition::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::WaterUseEquipmentDefinition_Impl>());
+  OS_ASSERT(getImpl<detail::WaterUseEquipmentDefinition_Impl>());
 
   setPeakFlowRate(0.0);
 }

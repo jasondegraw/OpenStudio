@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -53,7 +53,7 @@ void CollapsibleInspector::createLayout()
 
   bool isConnected = connect(m_header,SIGNAL(toggled(bool)),
                              this,SLOT(on_headerToggled(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 ///! SLOTS
@@ -106,7 +106,7 @@ void CollapsibleInspectorHeader::createLayout()
 
   bool isConnected = connect(this,SIGNAL(toggled(bool)),
                              this,SLOT(on_toggled(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 
   setChecked(false);
 }

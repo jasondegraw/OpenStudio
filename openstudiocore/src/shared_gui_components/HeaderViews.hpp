@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -26,7 +26,9 @@
 class QLabel;
 
 namespace openstudio{
-  
+
+class MeasureType;
+
 class LightHeaderToggleButton : public QPushButton
 {
   public:
@@ -53,10 +55,6 @@ class DarkGradientHeader : public OSHeader
 
   DarkGradientHeader(QWidget * parent = 0);
   virtual ~DarkGradientHeader() {}
-
-  private:
-
-  HeaderToggleButton * m_arrow;
 };
 
 class LightGradientHeader : public OSHeader
@@ -68,11 +66,12 @@ class LightGradientHeader : public OSHeader
   QLabel * label;
 
   LightGradientHeader(QWidget * parent = 0);
+  void setMeasureType(MeasureType measureType);
   virtual ~LightGradientHeader() {}
 
   private:
 
-  HeaderToggleButton * m_arrow;
+  QLabel * m_measureTypeBadge;
 };
 
 class LightHeader : public OSHeader
@@ -85,10 +84,6 @@ class LightHeader : public OSHeader
 
   LightHeader(QWidget * parent = 0);
   virtual ~LightHeader() {}
-
-  private:
-
-  HeaderToggleButton * m_arrow;
 };
 
 } // openstudio

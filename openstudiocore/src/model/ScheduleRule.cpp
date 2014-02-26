@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ namespace detail {
   ScheduleRule_Impl::ScheduleRule_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
     : ParentObject_Impl(idfObject,model,keepHandle)
   {
-    BOOST_ASSERT(idfObject.iddObject().type() == ScheduleRule::iddObjectType());
+    OS_ASSERT(idfObject.iddObject().type() == ScheduleRule::iddObjectType());
   }
 
   ScheduleRule_Impl::ScheduleRule_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
@@ -53,7 +53,7 @@ namespace detail {
                                        bool keepHandle)
     : ParentObject_Impl(other,model,keepHandle)
   {
-    BOOST_ASSERT(other.iddObject().type() == ScheduleRule::iddObjectType());
+    OS_ASSERT(other.iddObject().type() == ScheduleRule::iddObjectType());
   }
 
   ScheduleRule_Impl::ScheduleRule_Impl(const ScheduleRule_Impl& other,
@@ -128,13 +128,13 @@ namespace detail {
   ScheduleRuleset ScheduleRule_Impl::scheduleRuleset() const
   {
     OptionalScheduleRuleset result = getObject<ScheduleRule>().getModelObjectTarget<ScheduleRuleset>(OS_Schedule_RuleFields::ScheduleRulesetName);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     return *result;
   }
 
   int ScheduleRule_Impl::ruleIndex() const {
     boost::optional<int> value = getInt(OS_Schedule_RuleFields::RuleOrder,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -150,56 +150,56 @@ namespace detail {
 
   bool ScheduleRule_Impl::applySunday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplySunday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
   bool ScheduleRule_Impl::applyMonday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplyMonday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
   bool ScheduleRule_Impl::applyTuesday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplyTuesday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
   bool ScheduleRule_Impl::applyWednesday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplyWednesday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
   bool ScheduleRule_Impl::applyThursday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplyThursday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
   bool ScheduleRule_Impl::applyFriday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplyFriday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 
   bool ScheduleRule_Impl::applySaturday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplySaturday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 /*
   bool ScheduleRule_Impl::applyHoliday() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::ApplyHoliday,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return openstudio::istringEqual(value.get(), "Yes");
   }
 */
 
   std::string ScheduleRule_Impl::dateSpecificationType() const {
     boost::optional<std::string> value = getString(OS_Schedule_RuleFields::DateSpecificationType,true);
-    BOOST_ASSERT(value);
+    OS_ASSERT(value);
     return value.get();
   }
 
@@ -207,12 +207,12 @@ namespace detail {
   {
     boost::optional<openstudio::Date> result;
     boost::optional<std::string> dateSpecificationType = this->getString(OS_Schedule_RuleFields::DateSpecificationType, true);
-    BOOST_ASSERT(dateSpecificationType);
+    OS_ASSERT(dateSpecificationType);
     if (istringEqual("DateRange", *dateSpecificationType)){
       boost::optional<int> startMonth = this->getInt(OS_Schedule_RuleFields::StartMonth, true);
-      BOOST_ASSERT(startMonth);
+      OS_ASSERT(startMonth);
       boost::optional<int> startDay = this->getInt(OS_Schedule_RuleFields::StartDay, true);
-      BOOST_ASSERT(startDay);
+      OS_ASSERT(startDay);
       YearDescription yd = this->model().getUniqueModelObject<model::YearDescription>();
       result = yd.makeDate(MonthOfYear(*startMonth), *startDay);
     }
@@ -224,12 +224,12 @@ namespace detail {
   {
     boost::optional<openstudio::Date> result;
     boost::optional<std::string> dateSpecificationType = this->getString(OS_Schedule_RuleFields::DateSpecificationType, true);
-    BOOST_ASSERT(dateSpecificationType);
+    OS_ASSERT(dateSpecificationType);
     if (istringEqual("DateRange", *dateSpecificationType)){
       boost::optional<int> endMonth = this->getInt(OS_Schedule_RuleFields::EndMonth, true);
-      BOOST_ASSERT(endMonth);
+      OS_ASSERT(endMonth);
       boost::optional<int> endDay = this->getInt(OS_Schedule_RuleFields::EndDay, true);
-      BOOST_ASSERT(endDay);
+      OS_ASSERT(endDay);
       YearDescription yd = this->model().getUniqueModelObject<model::YearDescription>();
       result = yd.makeDate(MonthOfYear(*endMonth), *endDay);
     }
@@ -245,9 +245,9 @@ namespace detail {
     BOOST_FOREACH(const ModelExtensibleGroup& group,castVector<ModelExtensibleGroup>(extensibleGroups()))
     {
       OptionalInt month = group.getInt(0);
-      BOOST_ASSERT(month);
+      OS_ASSERT(month);
       OptionalInt day = group.getInt(1);
-      BOOST_ASSERT(day);
+      OS_ASSERT(day);
 
       result.push_back(yd.makeDate(MonthOfYear(*month), *day));
     }
@@ -256,8 +256,7 @@ namespace detail {
   }
 
   bool ScheduleRule_Impl::setRuleIndex(int index) {
-    bool result = false;
-    result = setInt(OS_Schedule_RuleFields::RuleOrder, index);
+    bool result = setInt(OS_Schedule_RuleFields::RuleOrder, index);
     return result;
   }
 
@@ -268,7 +267,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplySunday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ScheduleRule_Impl::setApplyMonday(bool applyMonday) {
@@ -278,7 +277,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplyMonday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ScheduleRule_Impl::setApplyTuesday(bool applyTuesday) {
@@ -288,7 +287,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplyTuesday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ScheduleRule_Impl::setApplyWednesday(bool applyWednesday) {
@@ -298,7 +297,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplyWednesday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ScheduleRule_Impl::setApplyThursday(bool applyThursday) {
@@ -308,7 +307,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplyThursday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ScheduleRule_Impl::setApplyFriday(bool applyFriday) {
@@ -318,7 +317,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplyFriday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   void ScheduleRule_Impl::setApplySaturday(bool applySaturday) {
@@ -328,7 +327,7 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplySaturday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 /*
   void ScheduleRule_Impl::setApplyHoliday(bool applyHoliday) {
@@ -338,23 +337,22 @@ namespace detail {
     } else {
       result = setString(OS_Schedule_RuleFields::ApplyHoliday, "No");
     }
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
   }
 
   bool ScheduleRule_Impl::setDateSpecificationType(std::string dateSpecificationType) {
-    bool result = false;
-    result = setString(OS_Schedule_RuleFields::DateSpecificationType, dateSpecificationType);
+    bool result = setString(OS_Schedule_RuleFields::DateSpecificationType, dateSpecificationType);
     return result;
   }
   */
 
   bool ScheduleRule_Impl::setStartDate(const openstudio::Date& date) {
     bool result = setString(OS_Schedule_RuleFields::DateSpecificationType, "DateRange");
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = this->setInt(OS_Schedule_RuleFields::StartMonth, date.monthOfYear().value());
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = this->setInt(OS_Schedule_RuleFields::StartDay, date.dayOfMonth());
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     // set end date if need to
     if (this->isEmpty(OS_Schedule_RuleFields::EndMonth) || this->isEmpty(OS_Schedule_RuleFields::EndDay)){
@@ -369,11 +367,11 @@ namespace detail {
 
   bool ScheduleRule_Impl::setEndDate(const openstudio::Date& date) {
     bool result = setString(OS_Schedule_RuleFields::DateSpecificationType, "DateRange", false);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = this->setInt(OS_Schedule_RuleFields::EndMonth, date.monthOfYear().value());
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = this->setInt(OS_Schedule_RuleFields::EndDay, date.dayOfMonth());
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     // set end date if need to
     if (this->isEmpty(OS_Schedule_RuleFields::StartMonth) || this->isEmpty(OS_Schedule_RuleFields::StartDay)){
@@ -389,27 +387,61 @@ namespace detail {
   bool ScheduleRule_Impl::addSpecificDate(const openstudio::Date& date) {
 
     bool result = setString(OS_Schedule_RuleFields::DateSpecificationType, "SpecificDates", false);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     result = setString(OS_Schedule_RuleFields::StartMonth, "", false);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = setString(OS_Schedule_RuleFields::StartDay, "", false);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = setString(OS_Schedule_RuleFields::EndMonth, "", false);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
     result = setString(OS_Schedule_RuleFields::EndDay, "", false);
-    BOOST_ASSERT(result);
+    OS_ASSERT(result);
 
     std::vector<std::string> values;
     values.push_back(boost::lexical_cast<std::string>(date.monthOfYear().value()));
     values.push_back(boost::lexical_cast<std::string>(date.dayOfMonth()));
 
     ModelExtensibleGroup group = pushExtensibleGroup(values, true).cast<ModelExtensibleGroup>();
-    BOOST_ASSERT(!group.empty());
+    OS_ASSERT(!group.empty());
 
     return true;
   }
 
+  void ScheduleRule_Impl::ensureNoLeapDays(){
+    boost::optional<int> month;
+    boost::optional<int> day;
+
+    month = getInt(OS_Schedule_RuleFields::StartMonth);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_Schedule_RuleFields::StartDay);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_Schedule_RuleFields::StartDay, 28);
+      }
+    }
+
+    month = getInt(OS_Schedule_RuleFields::EndMonth);
+    if (month && (month.get() == 2)){
+      day = this->getInt(OS_Schedule_RuleFields::EndDay);
+      if (day && (day.get() == 29)){
+        this->setInt(OS_Schedule_RuleFields::EndDay, 28);
+      }
+    }
+
+    BOOST_FOREACH(IdfExtensibleGroup group, this->extensibleGroups()){
+      boost::optional<int> month;
+      boost::optional<int> day;
+
+      month = group.getInt(OS_Schedule_RuleExtensibleFields::SpecificMonth);
+      if (month && (month.get() == 2)){
+        day = group.getInt(OS_Schedule_RuleExtensibleFields::SpecificDay);
+        if (day && (day.get() == 29)){
+          this->setInt(OS_Schedule_RuleExtensibleFields::SpecificDay, 28);
+        }
+      }
+    }
+
+  }
 
   bool ScheduleRule_Impl::containsDate(const openstudio::Date& date) {
     bool result = false;
@@ -417,12 +449,12 @@ namespace detail {
     // need to check or adjust assumed base year on input date?
 
     boost::optional<std::string> dateSpecificationType = this->getString(OS_Schedule_RuleFields::DateSpecificationType, true);
-    BOOST_ASSERT(dateSpecificationType);
+    OS_ASSERT(dateSpecificationType);
     if (istringEqual("DateRange", *dateSpecificationType)){
       boost::optional<openstudio::Date> startDate = this->startDate();
-      BOOST_ASSERT(startDate);
+      OS_ASSERT(startDate);
       boost::optional<openstudio::Date> endDate = this->endDate();
-      BOOST_ASSERT(endDate);
+      OS_ASSERT(endDate);
       if (*startDate <= *endDate){
         result = ((date >= *startDate) && (date <= *endDate));
       }else{
@@ -462,7 +494,7 @@ namespace detail {
           result = this->applySaturday();
           break;
         default:
-          BOOST_ASSERT(false);
+          OS_ASSERT(false);
       }
     }
 
@@ -476,12 +508,12 @@ namespace detail {
     // need to check or adjust assumed base year on input date?
 
     boost::optional<std::string> dateSpecificationType = this->getString(OS_Schedule_RuleFields::DateSpecificationType, true);
-    BOOST_ASSERT(dateSpecificationType);
+    OS_ASSERT(dateSpecificationType);
     if (istringEqual("DateRange", *dateSpecificationType)){
       boost::optional<openstudio::Date> startDate = this->startDate();
-      BOOST_ASSERT(startDate);
+      OS_ASSERT(startDate);
       boost::optional<openstudio::Date> endDate = this->endDate();
-      BOOST_ASSERT(endDate);
+      OS_ASSERT(endDate);
       if (*startDate <= *endDate){
         for (unsigned i = 0; i < N; ++i){
           result[i] = ((dates[i] >= *startDate) && (dates[i] <= *endDate));
@@ -536,7 +568,7 @@ namespace detail {
             result[i] = applySaturday;
             break;
           default:
-            BOOST_ASSERT(false);
+            OS_ASSERT(false);
         }
       }
     }
@@ -553,41 +585,41 @@ namespace detail {
 ScheduleRule::ScheduleRule(ScheduleRuleset& scheduleRuleset)
   : ParentObject(ScheduleRule::iddObjectType(), scheduleRuleset.model())
 {
-  BOOST_ASSERT(getImpl<detail::ScheduleRule_Impl>());
+  OS_ASSERT(getImpl<detail::ScheduleRule_Impl>());
 
   bool result = setPointer(OS_Schedule_RuleFields::ScheduleRulesetName, scheduleRuleset.handle());
-  BOOST_ASSERT(result); 
+  OS_ASSERT(result); 
 
   ScheduleDay daySchedule(scheduleRuleset.model());
   result = setPointer(OS_Schedule_RuleFields::DayScheduleName, daySchedule.handle());
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
   if (OptionalScheduleTypeLimits limits = scheduleRuleset.scheduleTypeLimits()) {
     daySchedule.setScheduleTypeLimits(*limits);
   }
 
   this->setRuleIndex(std::numeric_limits<int>::max());
   result = scheduleRuleset.setScheduleRuleIndex(*this, 0);
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 }
 
 ScheduleRule::ScheduleRule(ScheduleRuleset& scheduleRuleset, const ScheduleDay& daySchedule)
   : ParentObject(ScheduleRule::iddObjectType(), scheduleRuleset.model())
 {
-  BOOST_ASSERT(getImpl<detail::ScheduleRule_Impl>());
+  OS_ASSERT(getImpl<detail::ScheduleRule_Impl>());
 
   bool result = setPointer(OS_Schedule_RuleFields::ScheduleRulesetName, scheduleRuleset.handle());
-  BOOST_ASSERT(result); 
+  OS_ASSERT(result); 
 
   ModelObject clone = daySchedule.clone(scheduleRuleset.model());
   result = setPointer(OS_Schedule_RuleFields::DayScheduleName, clone.handle());
-  BOOST_ASSERT(result); 
+  OS_ASSERT(result); 
   if (OptionalScheduleTypeLimits limits = scheduleRuleset.scheduleTypeLimits()) {
     clone.cast<ScheduleDay>().setScheduleTypeLimits(*limits);
   }
 
   this->setRuleIndex(std::numeric_limits<int>::max());
   result = scheduleRuleset.setScheduleRuleIndex(*this, 0);
-  BOOST_ASSERT(result);
+  OS_ASSERT(result);
 }
 
 IddObjectType ScheduleRule::iddObjectType() {
@@ -716,6 +748,9 @@ bool ScheduleRule::addSpecificDate(const openstudio::Date& date) {
   return getImpl<detail::ScheduleRule_Impl>()->addSpecificDate(date);
 }
 
+void ScheduleRule::ensureNoLeapDays(){
+  return getImpl<detail::ScheduleRule_Impl>()->ensureNoLeapDays();
+}
 
 bool ScheduleRule::containsDate(const openstudio::Date& date) {
   return getImpl<detail::ScheduleRule_Impl>()->containsDate(date);

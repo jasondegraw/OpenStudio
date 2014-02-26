@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ IdfObjectWatcher::IdfObjectWatcher(const IdfObject& idfObject)
   connected = connected && this->connect(objectImpl.get(), SIGNAL(onDataChange()), SLOT(dataChange()));
   connected = connected && this->connect(objectImpl.get(), SIGNAL(onNameChange()), SLOT(nameChange()));
   
-  BOOST_ASSERT(connected);
+  OS_ASSERT(connected);
 }
 
 IdfObjectWatcher::~IdfObjectWatcher()

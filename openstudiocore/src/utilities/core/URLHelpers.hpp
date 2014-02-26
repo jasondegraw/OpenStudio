@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -22,20 +22,20 @@
 
 #include <utilities/UtilitiesAPI.hpp>
 #include <utilities/core/Path.hpp>
-#include <QUrl>
+#include <utilities/core/Url.hpp>
 #include <vector>
 
 namespace openstudio {
 
 /// Locates the given url (if relative) in one of the provided search paths and returns
 /// the completed url  
-UTILITIES_API QUrl completeURL(const QUrl &t_source, const std::vector<QUrl> &t_searchPaths);
+UTILITIES_API Url completeURL(const Url &t_source, const std::vector<Url> &t_searchPaths, bool throwOnFailure = true);
 
-UTILITIES_API QUrl toURL(const openstudio::path& p);
+UTILITIES_API Url toURL(const openstudio::path& p);
 
-UTILITIES_API std::string toString(const QUrl& url);
+UTILITIES_API Url toURL(const std::string& s);
 
-typedef std::vector<QUrl> QUrlVector;
+UTILITIES_API std::string toString(const Url& url);
 
 } // openstudio
 

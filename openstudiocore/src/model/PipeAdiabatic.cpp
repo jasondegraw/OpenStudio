@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,14 +38,14 @@ namespace detail {
 PipeAdiabatic_Impl::PipeAdiabatic_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle)
   : StraightComponent_Impl(idfObject, model, keepHandle)
 {
-  BOOST_ASSERT(idfObject.iddObject().type() == PipeAdiabatic::iddObjectType());
+  OS_ASSERT(idfObject.iddObject().type() == PipeAdiabatic::iddObjectType());
 }
 
 PipeAdiabatic_Impl::PipeAdiabatic_Impl(
   const openstudio::detail::WorkspaceObject_Impl& other,Model_Impl* model,bool keepHandle)
   : StraightComponent_Impl(other,model,keepHandle)
 {
-  BOOST_ASSERT(other.iddObject().type() == PipeAdiabatic::iddObjectType());
+  OS_ASSERT(other.iddObject().type() == PipeAdiabatic::iddObjectType());
 }
 
 PipeAdiabatic_Impl::PipeAdiabatic_Impl(const PipeAdiabatic_Impl& other,
@@ -94,7 +94,7 @@ bool PipeAdiabatic_Impl::addToNode(Node & node)
 PipeAdiabatic::PipeAdiabatic(const Model& model)
   : StraightComponent(PipeAdiabatic::iddObjectType(),model)
 {
-  BOOST_ASSERT(getImpl<detail::PipeAdiabatic_Impl>());
+  OS_ASSERT(getImpl<detail::PipeAdiabatic_Impl>());
 }
 
 unsigned PipeAdiabatic::inletPort()

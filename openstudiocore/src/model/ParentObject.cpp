@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -110,7 +110,7 @@ namespace detail {
 ParentObject::ParentObject(IddObjectType type,const Model& model)
   : ModelObject(type,model)
 { 
-  BOOST_ASSERT(getImpl<detail::ParentObject_Impl>());
+  OS_ASSERT(getImpl<detail::ParentObject_Impl>());
 }
 
 ParentObject::ParentObject(boost::shared_ptr<detail::ParentObject_Impl> p)

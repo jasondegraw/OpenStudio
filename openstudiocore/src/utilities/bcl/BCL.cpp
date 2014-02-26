@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -18,9 +18,14 @@
 **********************************************************************/
 
 #include <utilities/bcl/BCL.hpp>
-#include <utilities/data/Attribute.hpp>
+
+#include <utilities/bcl/LocalBCL.hpp>
+#include <utilities/bcl/RemoteBCL.hpp>
+#include <utilities/bcl/BCLComponent.hpp>
+#include <utilities/bcl/BCLMeasure.hpp>
 
 #include <utilities/core/Assert.hpp>
+#include <utilities/data/Attribute.hpp>
 
 #include <QDomElement>
 
@@ -34,9 +39,9 @@ namespace openstudio{
     QDomElement labelElement = facetElement.firstChildElement("label");
     QDomElement itemElement = facetElement.firstChildElement("item");
 
-    BOOST_ASSERT(!fieldElement.isNull());
-    BOOST_ASSERT(!labelElement.isNull());
-    BOOST_ASSERT(!itemElement.isNull());
+    OS_ASSERT(!fieldElement.isNull());
+    OS_ASSERT(!labelElement.isNull());
+    OS_ASSERT(!itemElement.isNull());
 
     m_field = fieldElement.firstChild().nodeValue().toStdString();
   
@@ -72,9 +77,9 @@ namespace openstudio{
     QDomElement tidElement = taxonomyElement.firstChildElement("tid");
     QDomElement numResultsElement = taxonomyElement.firstChildElement("count");
 
-    BOOST_ASSERT(!nameElement.isNull());
-    BOOST_ASSERT(!tidElement.isNull());
-    BOOST_ASSERT(!numResultsElement.isNull());
+    OS_ASSERT(!nameElement.isNull());
+    OS_ASSERT(!tidElement.isNull());
+    OS_ASSERT(!numResultsElement.isNull());
 
     m_name = nameElement.firstChild().nodeValue().toStdString();
   
@@ -102,7 +107,7 @@ namespace openstudio{
   {
     QDomElement numResultsElement = resultElement.firstChildElement("result_count");
 
-    BOOST_ASSERT(!numResultsElement.isNull());
+    OS_ASSERT(!numResultsElement.isNull());
 
     m_numResults = numResultsElement.firstChild().nodeValue().toUInt();
 
@@ -148,6 +153,7 @@ namespace openstudio{
     QDomElement softwareProgramElement = fileElement.firstChildElement("version").firstChildElement("software_program");
     QDomElement identifierElement = fileElement.firstChildElement("version").firstChildElement("identifier");
     QDomElement filenameElement = fileElement.firstChildElement("filename");
+    QDomElement urlElement = fileElement.firstChildElement("url");
     QDomElement filetypeElement = fileElement.firstChildElement("filetype");
     QDomElement usageTypeElement = fileElement.firstChildElement("usage_type");
     QDomElement checksumElement = fileElement.firstChildElement("checksum");
@@ -155,6 +161,7 @@ namespace openstudio{
     m_softwareProgram = softwareProgramElement.firstChild().nodeValue().toStdString();
     m_identifier = identifierElement.firstChild().nodeValue().toStdString();
     m_filename = filenameElement.firstChild().nodeValue().toStdString();
+    m_url = urlElement.firstChild().nodeValue().toStdString();
     m_filetype = filetypeElement.firstChild().nodeValue().toStdString();
     m_usageType = usageTypeElement.firstChild().nodeValue().toStdString();
     m_checksum = checksumElement.firstChild().nodeValue().toStdString();
@@ -173,6 +180,11 @@ namespace openstudio{
   std::string BCLFile::filename() const
   {
     return m_filename;
+  }
+
+  std::string BCLFile::url() const
+  {
+    return m_url;
   }
 
   std::string BCLFile::filetype() const
@@ -339,8 +351,8 @@ namespace openstudio{
   {
     m_componentType = componentElement.tagName().toStdString();
 
-    QDomElement uidElement = componentElement.firstChildElement("uid");
-    QDomElement versionIdElement = componentElement.firstChildElement("version_id");
+    QDomElement uidElement = componentElement.firstChildElement("uuid");
+    QDomElement versionIdElement = componentElement.firstChildElement("vuuid");
     QDomElement nameElement = componentElement.firstChildElement("name");
     QDomElement descriptionElement = componentElement.firstChildElement("description");
     QDomElement modelerDescriptionElement = componentElement.firstChildElement("modeler_description");
@@ -351,9 +363,9 @@ namespace openstudio{
     QDomElement filesElement = componentElement.firstChildElement("files");
     QDomElement costsElement = componentElement.firstChildElement("costs");
 
-    BOOST_ASSERT(!nameElement.isNull());
-    BOOST_ASSERT(!uidElement.isNull());
-    BOOST_ASSERT(!versionIdElement.isNull());
+    OS_ASSERT(!nameElement.isNull());
+    OS_ASSERT(!uidElement.isNull());
+    OS_ASSERT(!versionIdElement.isNull());
     
     QString name = nameElement.firstChild().nodeValue().replace('_', ' ');
     while (name.indexOf("  ") != -1) {
@@ -423,8 +435,8 @@ namespace openstudio{
           .nodeValue().toStdString();
         std::string value = attributeElement.firstChildElement("value").firstChild()
           .nodeValue().toStdString();
-        std::string datatype = attributeElement.firstChildElement("datatype").firstChild()
-          .nodeValue().toStdString();
+        //std::string datatype = attributeElement.firstChildElement("datatype").firstChild()
+        //  .nodeValue().toStdString();
 
         // Units are optional
         std::string units = attributeElement.firstChildElement("units").firstChild()
@@ -583,6 +595,53 @@ namespace openstudio{
 
   BCL::~BCL()
   {
+  }
+
+
+  boost::optional<BCLComponent> getComponent(const std::string& uid,
+                                             const std::string& versionId)
+  {
+    OptionalBCLComponent localComponent = LocalBCL::instance().getComponent(uid,versionId);
+
+    // if versionId specified, done if localComponent exists
+    if (!versionId.empty() && localComponent) {
+      return localComponent;
+    }
+
+    // versionId.empty() or !localComponent
+    RemoteBCL remoteBCL;
+    OptionalBCLComponent remoteComponent = remoteBCL.getComponent(uid,versionId);
+    if (remoteComponent) {
+      // RemoteBCL class handles updating the LocalBCL
+      localComponent = LocalBCL::instance().getComponent(uid,versionId);
+      OS_ASSERT(localComponent);
+      OS_ASSERT(localComponent.get() == remoteComponent.get());
+    }
+
+    return localComponent;
+  }
+
+  boost::optional<BCLMeasure> getMeasure(const std::string& uid,
+                                         const std::string& versionId)
+  {
+    OptionalBCLMeasure localMeasure = LocalBCL::instance().getMeasure(uid,versionId);
+
+    // if versionId specified, done if localMeasure exists
+    if (!versionId.empty() && localMeasure) {
+      return localMeasure;
+    }
+
+    // versionId.empty() or !localMeasure
+    RemoteBCL remoteBCL;
+    OptionalBCLMeasure remoteMeasure = remoteBCL.getMeasure(uid,versionId);
+    if (remoteMeasure) {
+      // RemoteBCL class handles updating the LocalBCL
+      localMeasure = LocalBCL::instance().getMeasure(uid,versionId);
+      OS_ASSERT(localMeasure);
+      OS_ASSERT(localMeasure.get() == remoteMeasure.get());
+    }
+
+    return localMeasure;
   }
 
 } // openstudio

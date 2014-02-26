@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -275,6 +275,8 @@ namespace resultsviewer{
     case RVD_FILEALREADYOPENED:
       QMessageBox::information(this, tr("File Open"), tr("File already opened."));
       break;
+    case RVD_UNSUPPORTEDVERSION:
+      QMessageBox::information(this, tr("File Open"), tr("Unsupported EnergyPlus version. Continuing, unknown errors may occur."));
     case RVD_SUCCESS:
       m_treeView->displayFile(alias,  m_data->sqlFile(filename), resultsviewer::TreeView::tvdtVariableName);
 
@@ -960,7 +962,7 @@ namespace resultsviewer{
     std::vector<int>::iterator rowIter;
     illuminanceMapItemCount = 0;
     timeseriesItemCount = 0;
-    for (rowIter = selectedRows.begin(); rowIter != selectedRows.end(); rowIter++)
+    for (rowIter = selectedRows.begin(); rowIter != selectedRows.end(); ++rowIter)
     {
       if (m_tableView->item(*rowIter, m_tableView->headerNames().indexOf("File"))->data(Qt::UserRole) == RVD_TIMESERIES) timeseriesItemCount++;
       if (m_tableView->item(*rowIter, m_tableView->headerNames().indexOf("File"))->data(Qt::UserRole) == RVD_ILLUMINANCEMAP) illuminanceMapItemCount++;
@@ -984,7 +986,7 @@ namespace resultsviewer{
     QList<QTreeWidgetItem *>::iterator treeIter;
     illuminanceMapItemCount = 0;
     timeseriesItemCount = 0;
-    for (treeIter = selectedTreeItems.begin(); treeIter != selectedTreeItems.end(); treeIter++)
+    for (treeIter = selectedTreeItems.begin(); treeIter != selectedTreeItems.end(); ++treeIter)
     {
       if ((*treeIter)->parent()->data(0,Qt::UserRole) == RVD_TIMESERIES) timeseriesItemCount++;
       if ((*treeIter)->parent()->data(0,Qt::UserRole) == RVD_ILLUMINANCEMAP) illuminanceMapItemCount++;

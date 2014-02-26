@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -51,6 +51,9 @@ namespace openstudio {
 
   /// create a unique name, prefix << " " << UUID.
   UTILITIES_API std::string createUniqueName(const std::string& prefix);
+
+  /// create a std::string without curly brackets from a UUID
+  UTILITIES_API std::string removeBraces(const UUID& uuid);
 
   UTILITIES_API std::ostream& operator<<(std::ostream& os,const UUID& uuid);
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,35 +37,35 @@ boost::optional<ModelObject> ReverseTranslator::translateCurveExponent(
   OptionalString s;
   OptionalDouble d;
   
-  if(s = workspaceObject.name()) {
+  if ((s = workspaceObject.name())) {
     curve.setName(*s);
   }
 
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::Coefficient1Constant)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::Coefficient1Constant))) {
     curve.setCoefficient1Constant(*d);
   }
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::Coefficient2Constant)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::Coefficient2Constant))) {
     curve.setCoefficient2Constant(*d);
   }
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::Coefficient3Constant)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::Coefficient3Constant))) {
     curve.setCoefficient3Constant(*d);
   }
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::MinimumValueofx)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::MinimumValueofx))) {
     curve.setMinimumValueofx(*d);
   }
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::MaximumValueofx)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::MaximumValueofx))) {
     curve.setMaximumValueofx(*d);
   }
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::MinimumCurveOutput)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::MinimumCurveOutput))) {
     curve.setMinimumCurveOutput(*d);
   }
-  if (d = workspaceObject.getDouble(Curve_ExponentFields::MaximumCurveOutput)) {
+  if ((d = workspaceObject.getDouble(Curve_ExponentFields::MaximumCurveOutput))) {
     curve.setMaximumCurveOutput(*d);
   }
-  if (s = workspaceObject.getString(Curve_ExponentFields::InputUnitTypeforX,false,true)) {
+  if ((s = workspaceObject.getString(Curve_ExponentFields::InputUnitTypeforX,false,true))) {
     curve.setInputUnitTypeforX(*s);
   }
-  if (s = workspaceObject.getString(Curve_ExponentFields::OutputUnitType,false,true)) {
+  if ((s = workspaceObject.getString(Curve_ExponentFields::OutputUnitType,false,true))) {
     curve.setOutputUnitType(*s);
   }
 

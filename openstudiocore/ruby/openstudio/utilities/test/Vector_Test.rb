@@ -1,5 +1,5 @@
 ######################################################################
-#  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+#  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 #  All rights reserved.
 #  
 #  This library is free software; you can redistribute it and/or
@@ -97,7 +97,7 @@ class Vector_Test < Test::Unit::TestCase
  
     vector = OpenStudio::linspace(1, 3, 3)
   
-    assert(3, vector.length())
+    assert_equal(3, vector.length())
     assert_in_delta(1, vector[0], 0.000001)
     assert_in_delta(2, vector[1], 0.000001)
     assert_in_delta(3, vector[2], 0.000001)
@@ -107,7 +107,7 @@ class Vector_Test < Test::Unit::TestCase
   
     vector = OpenStudio::logspace(0, 2, 11)
   
-    assert(11, vector.length())
+    assert_equal(11, vector.length())
     assert_in_delta(10.0**0.0, vector[0], 0.000001)
     assert_in_delta(10.0**0.2, vector[1], 0.000001)
     assert_in_delta(10.0**0.4, vector[2], 0.000001)

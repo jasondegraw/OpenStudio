@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,7 +38,6 @@ namespace detail {
   /** ProblemRecord_Impl is a ObjectRecord_Impl that is the implementation class for
    * ProblemRecord.*/
   class PROJECT_API ProblemRecord_Impl : public ObjectRecord_Impl {
-    Q_OBJECT;
    public:
 
     /** @name Constructors and Destructors */
@@ -91,7 +90,7 @@ namespace detail {
     virtual analysis::Problem problem() const;
 
     /** Returns the total number of discrete combinations, if all variables are discrete. */
-    boost::optional<int> combinatorialSize(bool selectedPerturbationsOnly) const;
+    boost::optional<int> combinatorialSize(bool selectedMeasuresOnly) const;
 
     //@}
    protected:

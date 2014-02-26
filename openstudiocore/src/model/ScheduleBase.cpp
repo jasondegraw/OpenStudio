@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -30,6 +30,8 @@
 #include <utilities/units/OSQuantityVector.hpp>
 #include <utilities/units/QuantityConverter.hpp>
 #include <utilities/units/ScaleFactory.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 namespace model {
@@ -62,7 +64,7 @@ namespace detail {
         result = OSQuantityVector(*siUnits,values());
         if (returnIP) {
           OptionalUnit ipUnits = ScheduleTypeLimits::units(scheduleTypeLimits->unitType(),returnIP);
-          BOOST_ASSERT(ipUnits);
+          OS_ASSERT(ipUnits);
           if (ipUnits.get() != siUnits.get()) {
             result = convert(result,*ipUnits);
           }
@@ -79,7 +81,7 @@ namespace detail {
         result = Quantity(value,*siUnits);
         if (returnIP) {
           OptionalUnit ipUnits = ScheduleTypeLimits::units(scheduleTypeLimits->unitType(),returnIP);
-          BOOST_ASSERT(ipUnits);
+          OS_ASSERT(ipUnits);
           if (ipUnits.get() != siUnits.get()) {
             result = convert(*result,*ipUnits);
           }
@@ -197,6 +199,11 @@ bool ScheduleBase::setScheduleTypeLimits(const ScheduleTypeLimits& scheduleTypeL
 
 bool ScheduleBase::resetScheduleTypeLimits() {
   return getImpl<detail::ScheduleBase_Impl>()->resetScheduleTypeLimits();
+}
+
+void ScheduleBase::ensureNoLeapDays()
+{
+  getImpl<detail::ScheduleBase_Impl>()->ensureNoLeapDays();
 }
 
 /// @cond

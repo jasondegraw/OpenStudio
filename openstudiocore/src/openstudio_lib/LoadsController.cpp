@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -42,6 +42,8 @@
 #include <model/PeopleDefinition.hpp>
 #include <model/PeopleDefinition_Impl.hpp>
 
+#include <utilities/core/Assert.hpp>
+
 #include <QMessageBox>
 
 #include <utilities/core/Logger.hpp>
@@ -53,7 +55,7 @@ LoadsController::LoadsController(bool isIP, const model::Model& model)
 {
   bool isConnected = connect(this,SIGNAL(toggleUnitsClicked(bool)),
                              subTabView(),SIGNAL(toggleUnitsClicked(bool)));
-  BOOST_ASSERT(isConnected);
+  OS_ASSERT(isConnected);
 }
 
 LoadsController::~LoadsController()

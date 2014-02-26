@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@
 #include <model/Model.hpp>
 #include <model/Model_Impl.hpp>
 #include <runmanager/lib/JobStatusWidget.hpp>
+
+#include <utilities/core/Assert.hpp>
 
 namespace openstudio {
 
@@ -47,7 +49,7 @@ RunTabController::RunTabController(const model::Model & model, const openstudio:
 openstudio::RunView * RunTabController::runView(){
 
   // make sure non-null pointer
-  Q_ASSERT(m_runView);
+  OS_ASSERT(m_runView);
 
   return m_runView;
 }

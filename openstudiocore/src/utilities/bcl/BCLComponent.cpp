@@ -1,5 +1,5 @@
 /**********************************************************************
-* Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -194,7 +194,11 @@ namespace openstudio{
   }
 
   bool BCLComponent::operator==(const BCLComponent& other) const {
-    return m_uid == other.m_uid;
+    return ((m_uid == other.m_uid) && (m_versionId == other.m_versionId));
+  }
+
+  bool BCLComponent::operator!=(const BCLComponent& other) const {
+    return !(operator==(other));
   }
 
 } // openstudio

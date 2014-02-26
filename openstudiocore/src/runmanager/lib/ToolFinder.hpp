@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2013, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -66,6 +66,7 @@ namespace runmanager {
       static void mergeTools(std::vector<std::pair<ToolVersion, ToolLocationInfo> > &t_tools,
         const std::vector<std::pair<ToolVersion, ToolLocationInfo> > &t_newtools);
 
+      static ToolVersion parseToolVersion(const openstudio::path &t_path);
 
     private:
       REGISTER_LOGGER("openstudio.runmanager.ToolFinder");
@@ -78,9 +79,8 @@ namespace runmanager {
       std::vector<openstudio::path> findExecutables(const std::vector<openstudio::path> &t_searchPaths, const std::vector<std::string> &t_names, bool t_showProgressDialog) const;
 
       // Returns true if any part of the path matches the given regular expression
-      bool subPathMatch(const openstudio::path &t_path, const boost::regex &t_regex) const;
+      static bool subPathMatch(const openstudio::path &t_path, const boost::regex &t_regex);
 
-      static ToolVersion parseToolVersion(const openstudio::path &t_path);
       static void mergeTool(std::vector<std::pair<ToolVersion, ToolLocationInfo> > &t_tools,
           const std::pair<ToolVersion, ToolLocationInfo> &t_tool);
       static std::vector<std::pair<ToolVersion, ToolLocationInfo> > filterTools(

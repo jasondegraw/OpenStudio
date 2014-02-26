@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2013, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@ namespace detail {
 ModelObjectActionClause::ModelObjectActionClause(boost::shared_ptr<detail::ModelObjectActionClause_Impl> impl)
   : ActionClause(impl)
 {
-  BOOST_ASSERT(getImpl<detail::ModelObjectActionClause_Impl>());
+  OS_ASSERT(getImpl<detail::ModelObjectActionClause_Impl>());
 }
 /// @endcond
 
