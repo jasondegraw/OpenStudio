@@ -98,7 +98,13 @@ LocationView::LocationView(const model::Model & model,
   setLayout(mainVLayout);
 
   // ***** Climate Zones *****
-  label = new QLabel("Climate Zone:");
+  QFrame * line;
+  line = new QFrame();
+  line->setFrameShape(QFrame::HLine);
+  line->setFrameShadow(QFrame::Sunken);
+  mainVLayout->addWidget(line);
+
+  label = new QLabel("Measure Tags (Optional):");
   label->setObjectName("H2");
   mainVLayout->addWidget(label);
 
@@ -112,6 +118,7 @@ LocationView::LocationView(const model::Model & model,
   hLayout->addLayout(vLayout);
 
   label = new QLabel("ASHRAE Climate Zone");
+  label->setObjectName("StandardsInfo");
   vLayout->addWidget(label);
 
   m_ashraeClimateZone = new QComboBox();
@@ -144,6 +151,7 @@ LocationView::LocationView(const model::Model & model,
   hLayout->addLayout(vLayout);
 
   label = new QLabel("CEC Climate Zone");
+  label->setObjectName("StandardsInfo");
   vLayout->addWidget(label);
 
   m_cecClimateZone = new QComboBox();
@@ -172,6 +180,11 @@ LocationView::LocationView(const model::Model & model,
 
   hLayout->addStretch();
   mainVLayout->addLayout(hLayout);
+
+  line = new QFrame();
+  line->setFrameShape(QFrame::HLine);
+  line->setFrameShadow(QFrame::Sunken);
+  mainVLayout->addWidget(line);
 
   // ***** Weather File *****
   label = new QLabel("Weather File");
@@ -502,7 +515,7 @@ void LocationView::onDesignDayBtnClicked()
 
         bool unknownDay = false;
 
-        BOOST_FOREACH(model::DesignDay designDay, ddyModel.getModelObjects<model::DesignDay>()) {
+        BOOST_FOREACH(model::DesignDay designDay, ddyModel.getConcreteModelObjects<model::DesignDay>()) {
           boost::optional<std::string> name;
           name = designDay.name();
 

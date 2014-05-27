@@ -231,7 +231,7 @@ void SpaceTypeDesignSpecificationOutdoorAirVectorController::onMakeNewItem()
 void SpaceTypeSpaceInfiltrationDesignFlowRateVectorController::attach(const model::ModelObject& modelObject)
 {
   ModelObjectVectorController::attach(modelObject);
-  BOOST_FOREACH(const model::SpaceInfiltrationDesignFlowRate& spaceInfiltrationDesignFlowRate, modelObject.model().getModelObjects<model::SpaceInfiltrationDesignFlowRate>()){
+  BOOST_FOREACH(const model::SpaceInfiltrationDesignFlowRate& spaceInfiltrationDesignFlowRate, modelObject.model().getConcreteModelObjects<model::SpaceInfiltrationDesignFlowRate>()){
     attachOtherModelObject(spaceInfiltrationDesignFlowRate);
   }
 }
@@ -313,7 +313,7 @@ void SpaceTypeSpaceInfiltrationDesignFlowRateVectorController::onMakeNewItem()
 void SpaceTypeSpaceInfiltrationEffectiveLeakageAreaVectorController::attach(const model::ModelObject& modelObject)
 {
   ModelObjectVectorController::attach(modelObject);
-  BOOST_FOREACH(const model::SpaceInfiltrationEffectiveLeakageArea& spaceInfiltrationEffectiveLeakageArea, modelObject.model().getModelObjects<model::SpaceInfiltrationEffectiveLeakageArea>()){
+  BOOST_FOREACH(const model::SpaceInfiltrationEffectiveLeakageArea& spaceInfiltrationEffectiveLeakageArea, modelObject.model().getConcreteModelObjects<model::SpaceInfiltrationEffectiveLeakageArea>()){
     attachOtherModelObject(spaceInfiltrationEffectiveLeakageArea);
   }
 }
@@ -395,7 +395,7 @@ void SpaceTypeSpaceInfiltrationEffectiveLeakageAreaVectorController::onMakeNewIt
 void SpaceTypeSpacesVectorController::attach(const model::ModelObject& modelObject)
 {
   ModelObjectVectorController::attach(modelObject);
-  BOOST_FOREACH(const model::Space& space, modelObject.model().getModelObjects<model::Space>()){
+  BOOST_FOREACH(const model::Space& space, modelObject.model().getConcreteModelObjects<model::Space>()){
     attachOtherModelObject(space);
   }
 }
@@ -474,7 +474,7 @@ void SpaceTypeSpacesVectorController::onDrop(const OSItemId& itemId)
 void SpaceTypeUnassignedSpacesVectorController::attachModel(const model::Model& model)
 {
   ModelObjectVectorController::attachModel(model);
-  BOOST_FOREACH(const model::Space& space, model.getModelObjects<model::Space>()){
+  BOOST_FOREACH(const model::Space& space, model.getConcreteModelObjects<model::Space>()){
     attachOtherModelObject(space);
   }
 }
@@ -491,7 +491,7 @@ void SpaceTypeUnassignedSpacesVectorController::onChangeRelationship(const model
 std::vector<OSItemId> SpaceTypeUnassignedSpacesVectorController::makeVector()
 {
   std::vector<OSItemId> result;
-  BOOST_FOREACH(const model::Space& space, m_model->getModelObjects<model::Space>()){
+  BOOST_FOREACH(const model::Space& space, m_model->getConcreteModelObjects<model::Space>()){
     if (!space.handle().isNull()){
       if (space.isSpaceTypeDefaulted()){
         result.push_back(modelObjectToItemId(space, false));
@@ -556,11 +556,26 @@ SpaceTypeInspectorView::SpaceTypeInspectorView(const openstudio::model::Model& m
   ++row;
 
   // standards info
+  QFrame * line;
+  line = new QFrame();
+  line->setFrameShape(QFrame::HLine);
+  line->setFrameShadow(QFrame::Sunken);
+  mainGridLayout->addWidget(line,row,0,1,2);
+
+  ++row;
+
+  label = new QLabel();
+  label->setText("Measure Tags (Optional):");
+  label->setObjectName("H2");
+  mainGridLayout->addWidget(label,row,0);
+
+  ++row;
+
   vLayout = new QVBoxLayout();
 
   label = new QLabel();
   label->setText("Standards Building Type: ");
-  label->setObjectName("H2");
+  label->setObjectName("StandardsInfo");
   vLayout->addWidget(label);
 
   m_standardsBuildingTypeComboBox = new QComboBox();
@@ -575,7 +590,7 @@ SpaceTypeInspectorView::SpaceTypeInspectorView(const openstudio::model::Model& m
 
   label = new QLabel();
   label->setText("Standards Space Type: ");
-  label->setObjectName("H2");
+  label->setObjectName("StandardsInfo");
   vLayout->addWidget(label);
 
   m_standardsSpaceTypeComboBox = new QComboBox();
@@ -585,6 +600,13 @@ SpaceTypeInspectorView::SpaceTypeInspectorView(const openstudio::model::Model& m
   vLayout->addWidget(m_standardsSpaceTypeComboBox);
 
   mainGridLayout->addLayout(vLayout,row,1);
+
+  ++row;
+
+  line = new QFrame();
+  line->setFrameShape(QFrame::HLine);
+  line->setFrameShadow(QFrame::Sunken);
+  mainGridLayout->addWidget(line,row,0,1,2);
 
   ++row;
 
@@ -931,7 +953,6 @@ void SpaceTypeInspectorView::populateStandardsSpaceTypes()
       m_standardsSpaceTypeComboBox->setCurrentIndex(0);
     }
   }
-  QCompleter* c = m_standardsSpaceTypeComboBox->completer();
 
   bool isConnected = false;
   isConnected = connect(m_standardsSpaceTypeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(standardsSpaceTypeChanged(const QString&)));

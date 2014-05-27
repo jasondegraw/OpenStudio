@@ -253,7 +253,7 @@ namespace detail {
         this->model().connect( supplyInletNode.get(), supplyInletNode->outletPort(), supplyOutletNode.get(), supplyOutletNode->inletPort() );
       }
       // If the component is at the very end of the supply path, but there is another component
-      // preceeding this one.
+      // preceding this one.
       else if( supplyOutletNode->handle() == targetModelObject->handle() )
       {
         sourceModelObject->remove();
@@ -370,7 +370,7 @@ namespace detail {
   {
     OptionalAirLoopHVAC result;
 
-    AirLoopHVACVector airLoops = this->model().getModelObjects<AirLoopHVAC>(); 
+    AirLoopHVACVector airLoops = this->model().getConcreteModelObjects<AirLoopHVAC>(); 
     AirLoopHVACVector::iterator it;
     
     for( it = airLoops.begin();

@@ -210,7 +210,7 @@ namespace detail {
     }
 
     // do not pre-create extensible groups, so user can directly call 
-    // .pushExtensibleGroup, without preceeding it with a .clearExtensibleGroups.
+    // .pushExtensibleGroup, without preceding it with a .clearExtensibleGroups.
     if (result > n) {
       result = n;
     }
@@ -253,16 +253,10 @@ namespace detail {
   }
 
   boost::optional<unsigned> IddObject_Impl::nameFieldIndex() const {
-    if (!m_nameFieldCache) {
-      hasNameField();
+    if (hasNameField()) {
+      return m_nameFieldCache->second;
     }
-    OS_ASSERT(m_nameFieldCache);
-
-    OptionalUnsigned result;
-    if (m_nameFieldCache->first) {
-      result = m_nameFieldCache->second;
-    }
-    return result;
+    return boost::none;
   }
 
   bool IddObject_Impl::isRequiredField(unsigned index) const {

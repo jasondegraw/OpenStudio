@@ -236,7 +236,7 @@ boost::optional<PlantLoop> WaterToWaterComponent_Impl::plantLoop() const
   }
   else
   {
-    std::vector<PlantLoop> plantLoops = this->model().getModelObjects<PlantLoop>();
+    std::vector<PlantLoop> plantLoops = this->model().getConcreteModelObjects<PlantLoop>();
 
     for( std::vector<PlantLoop>::iterator it = plantLoops.begin(),itEnd=plantLoops.end();
     it != itEnd;
@@ -266,7 +266,7 @@ boost::optional<PlantLoop> WaterToWaterComponent_Impl::secondaryPlantLoop() cons
   }
   else
   {
-    std::vector<PlantLoop> plantLoops = this->model().getModelObjects<PlantLoop>();
+    std::vector<PlantLoop> plantLoops = this->model().getConcreteModelObjects<PlantLoop>();
 
     for( std::vector<PlantLoop>::iterator it = plantLoops.begin(),itEnd=plantLoops.end();
     it != itEnd;
@@ -335,7 +335,7 @@ bool WaterToWaterComponent_Impl::removeFromPlantLoop()
 
       return true;
     }
-    // If the component is at the very end of the supply path, but there is another component preceeding this one.
+    // If the component is at the very end of the supply path, but there is another component preceding this one.
     else if( supplyOutletNode->handle() == supplyOutletModelObject()->handle() )
     {
       model().disconnect(thisObject,supplyOutletPort()); 
@@ -440,7 +440,7 @@ bool WaterToWaterComponent_Impl::removeFromSecondaryPlantLoop()
       
       return true;
     }
-    // If the component is at the very end of the supply path, but there is another component preceeding this one.
+    // If the component is at the very end of the supply path, but there is another component preceding this one.
     else if( demandOutletNode->handle() == demandOutletModelObject()->handle() )
     {
       model().disconnect(thisObject,demandOutletPort()); 

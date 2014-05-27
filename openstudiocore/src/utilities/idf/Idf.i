@@ -118,6 +118,18 @@
   %alias openstudio::IdfObject::operator== "eql?";
 #endif
 
+#if defined(SWIGCSHARP)
+  %typemap(csclassmodifiers) openstudio::Workspace "public partial class"
+  %typemap(csclassmodifiers) openstudio::WorkspaceObject "public partial class"
+  %typemap(csclassmodifiers) openstudio::WorkspaceExtensibleGroup "public partial class"
+  %typemap(csclassmodifiers) openstudio::IdfObject "public partial class"
+  %typemap(csclassmodifiers) openstudio::IdfExtensibleGroup "public partial class"
+#endif
+
+#if defined(SWIGJAVA)
+  %ignore openstudio::Workspace::load;
+#endif
+
 %include <utilities/idf/Handle.hpp>
 %include <utilities/idf/ValidityEnums.hpp>
 %include <utilities/idf/DataError.hpp>

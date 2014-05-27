@@ -17,9 +17,17 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ######################################################################
 
-$OpenStudio_Dir = "#{File.expand_path(File.dirname(__FILE__))}/"
+# no handling of symlinks but that should be ok for developer build
+require "#{File.dirname(__FILE__)}/config"
 
-require "#{$OpenStudio_Dir}config"
+if (defined? Sketchup) && (Sketchup.version_number <= 14000000)
+  require "#{$OpenStudio_LibPath}/openstudio/sketchup_plugin/stdruby/pathname"
+else
+  require 'pathname'
+end
+
+# follow symlinks so that we find the original path to the so's 
+$OpenStudio_Dir = "#{File.expand_path(File.dirname(Pathname.new(__FILE__).realpath()))}/"
 
 # add binary dir to system path
 original_path = ENV['PATH']
@@ -77,13 +85,11 @@ require 'openstudiosdd'
 # restore original path
 ENV['PATH'] = original_path
 
-if OpenStudio::RemoteBCL::initializeSSL(OpenStudio::Path.new("#{$OpenStudio_RubyBinaryDir}"))
-  puts "OpenSSL loaded"
-elsif OpenStudio::RemoteBCL::initializeSSL()
-  puts "OpenSSL loaded"
-else
-  raise "Unable to initialize OpenSSL: Verify that ruby can access the OpenSSL libraries"
-end  
+if (!OpenStudio::RemoteBCL::initializeSSL(OpenStudio::Path.new("#{$OpenStudio_RubyBinaryDir}")))
+  if (!OpenStudio::RemoteBCL::initializeSSL())
+    raise "Unable to initialize OpenSSL: Verify that ruby can access the OpenSSL libraries"
+  end
+end
 
 
 # Find current ruby path, we may need this for launching ruby jobs later

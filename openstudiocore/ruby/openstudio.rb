@@ -1,3 +1,6 @@
+######################################################################
+#  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+#  All rights reserved.
 #  
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -12,9 +15,16 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-#####################################################################
+######################################################################
 
-$OpenStudio_Dir = "#{File.expand_path(File.dirname(__FILE__))}/"
+if (defined? Sketchup) && (Sketchup.version_number <= 14000000)
+  require File.expand_path(File.dirname(__FILE__)) + '/openstudio/sketchup_plugin/stdruby/pathname'
+else
+  require 'pathname'
+end
+
+# follow symlinks so that we find the original path to the so's 
+$OpenStudio_Dir = "#{File.expand_path(File.dirname(Pathname.new(__FILE__).realpath()))}/"
 if not $:.include?($OpenStudio_Dir)
   $: << $OpenStudio_Dir
 end
@@ -83,13 +93,11 @@ require 'openstudiosdd'
 # restore original path
 ENV['PATH'] = original_path
 
-if OpenStudio::RemoteBCL::initializeSSL(OpenStudio::Path.new("#{$OpenStudio_Dir}OpenStudio"))
-  puts "OpenSSL loaded"
-elsif OpenStudio::RemoteBCL::initializeSSL()
-  puts "OpenSSL loaded"
-else
-  raise "Unable to initialize OpenSSL: Verify that ruby can access the OpenSSL libraries"
-end  
+if (!OpenStudio::RemoteBCL::initializeSSL(OpenStudio::Path.new("#{$OpenStudio_Dir}OpenStudio")))
+  if (!OpenStudio::RemoteBCL::initializeSSL())
+    raise "Unable to initialize OpenSSL: Verify that ruby can access the OpenSSL libraries"
+  end
+end
 
 
 if /mswin/.match(RUBY_PLATFORM) or /mingw/.match(RUBY_PLATFORM)
