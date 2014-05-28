@@ -17,22 +17,22 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <contam/Test/ContamFixture.hpp>
+#include <afn/Test/AfnFixture.hpp>
 
 #include <resources.hxx>
 
-void ContamFixture::SetUp() {}
+void AfnFixture::SetUp() {}
 
-void ContamFixture::TearDown() {}
+void AfnFixture::TearDown() {}
 
-void ContamFixture::SetUpTestCase() {
+void AfnFixture::SetUpTestCase() {
   // set up logging
   openstudio::Logger::instance().standardOutLogger().disable();
   logFile = boost::shared_ptr<openstudio::FileLogSink>(new openstudio::FileLogSink(openstudio::toPath("./ContamFixture.log")));
 }
 
-void ContamFixture::TearDownTestCase() {
+void AfnFixture::TearDownTestCase() {
   logFile->disable();
 }
 
-boost::shared_ptr<openstudio::FileLogSink> ContamFixture::logFile;
+boost::shared_ptr<openstudio::FileLogSink> AfnFixture::logFile;

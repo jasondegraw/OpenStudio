@@ -17,8 +17,8 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#ifndef CONTAM_TEST_CONTAMFIXTURE_HPP
-#define CONTAM_TEST_CONTAMFIXTURE_HPP
+#ifndef AFN_TEST_AFNFIXTURE_HPP
+#define AFN_TEST_AFNFIXTURE_HPP
 
 #include <gtest/gtest.h>
 
@@ -29,7 +29,7 @@
 #include <vector>
 #include <string>
 
-class ContamFixture : public ::testing::Test {
+class AfnFixture : public ::testing::Test {
  protected:
   /// initialize for each test
   virtual void SetUp();
@@ -45,7 +45,7 @@ class ContamFixture : public ::testing::Test {
 
   static boost::shared_ptr<openstudio::FileLogSink> logFile;
 
-  REGISTER_LOGGER("contam");
+  REGISTER_LOGGER("afn");
 };
 
-#endif // CONTAM_TEST_CONTAMFIXTURE_HPP
+#endif // AFN_TEST_AFNFIXTURE_HPP

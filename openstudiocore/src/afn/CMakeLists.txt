@@ -15,9 +15,9 @@ SET( ${target_name}_qrc
 qt4_add_resources(${target_name}_qrcs ${${target_name}_qrc} )
 
 SET( ${target_name}_test_src
-#  Test/AfnFixture.hpp
-#  Test/AfnFixture.cpp
-#  Test/ReverseTranslator_GTest.cpp
+  Test/AfnFixture.hpp
+  Test/AfnFixture.cpp
+  Test/ForwardTranslator_GTest.cpp
 )
 
 SET( ${target_name}_swig_src

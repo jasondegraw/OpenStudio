@@ -137,6 +137,7 @@ SET( project_directories
   radiance
   gbxml
   contam
+  afn
   isomodel
   osversion
   ruleset
@@ -153,10 +154,6 @@ SET( project_directories
   sdd
 )
 
-
-IF( BUILD_AFN )
-  LIST(APPEND project_directories afn)
-ENDIF( BUILD_AFN ) 
 
 ###############################################################################
 
