@@ -5,6 +5,8 @@ SET( target_name openstudio_airflow )
 SET( airflow_src
   WindPressure.hpp
   WindPressure.cpp
+  SpaceLinker.hpp
+  SpaceLinker.cpp
 )
 
 SET( afn_src
