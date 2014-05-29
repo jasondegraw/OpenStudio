@@ -2,6 +2,11 @@
 
 SET( target_name openstudio_airflow )
 
+SET( airflow_src
+  WindPressure.hpp
+  WindPressure.cpp
+)
+
 SET( afn_src
   afn/ForwardTranslator.hpp
   afn/ForwardTranslator.cpp
@@ -47,6 +52,7 @@ ADD_CUSTOM_COMMAND(
 SET( ${target_name}_src
   AirflowAPI.hpp
   "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx" # referenced here to make sure it is generated when and where we expect
+  ${airflow_src}
   ${afn_src}
 )
 

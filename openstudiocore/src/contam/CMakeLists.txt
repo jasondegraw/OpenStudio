@@ -8,8 +8,6 @@ SET( ${target_name}_src
   PrjReader.cpp
   SimFile.hpp
   SimFile.cpp
-  WindPressure.hpp
-  WindPressure.cpp
   PrjDefines.hpp
   PrjModel.hpp
   PrjModel.cpp
@@ -55,6 +53,7 @@ SET( ${target_name}_depends
   openstudio_utilities
   openstudio_model
   openstudio_osversion
+  openstudio_airflow # Add this until this all gets moved
   zkexpat
   boost_log
 )

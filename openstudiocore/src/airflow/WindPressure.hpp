@@ -19,11 +19,7 @@
 #ifndef WINDPRESSURE_HPP
 #define WINDPRESSURE_HPP
 
-#if _WIN32 || _MSC_VER
-#define WIND_API __declspec(dllexport)
-#else
-#define WIND_API
-#endif
+#include <airflow/AirflowAPI.hpp>
 
 #include <string>
 
@@ -35,7 +31,7 @@ namespace wind{
 enum ShelterClass { Default, Urban, Suburban, Airport, LargeObstruction15ft, 
 LargeObstruction40ft, LargeObstruction100ft, FlatTerrain };
 
-double WIND_API pressureModifier(ShelterClass shelter, double H, double Href=10.0);
+double AIRFLOW_API pressureModifier(ShelterClass shelter, double H, double Href=10.0);
 
 } // wind
 } // openstudio

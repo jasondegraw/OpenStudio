@@ -42,7 +42,7 @@ namespace openstudio {
 
   namespace afn {
 
-    class Airflow_API ForwardTranslator
+    class AIRFLOW_API ForwardTranslator
     {
     public:
 
