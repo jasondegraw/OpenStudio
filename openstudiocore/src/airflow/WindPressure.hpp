@@ -19,7 +19,7 @@
 #ifndef WINDPRESSURE_HPP
 #define WINDPRESSURE_HPP
 
-#include <airflow/AirflowAPI.hpp>
+#include "AirflowAPI.hpp"
 
 #include <string>
 
