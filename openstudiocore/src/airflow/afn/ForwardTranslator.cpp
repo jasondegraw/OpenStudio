@@ -17,7 +17,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <afn/ForwardTranslator.hpp>
+#include <airflow/afn/ForwardTranslator.hpp>
 
 // These can't all be needed - need to clean up
 #include <model/Model.hpp>

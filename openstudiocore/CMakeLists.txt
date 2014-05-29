@@ -137,7 +137,7 @@ SET( project_directories
   radiance
   gbxml
   contam
-  afn
+  airflow 
   isomodel
   osversion
   ruleset
@@ -884,7 +884,7 @@ SET(all_lib_targets
   openstudio_lib
   openstudio_sdd
   openstudio_contam
-  openstudio_afn
+  openstudio_airflow
   ${LIBSSH_EXPORT}
   ${QTWINMIGRATE_EXPORT}
   zkexpat

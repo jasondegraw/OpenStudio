@@ -21,7 +21,7 @@
 #ifndef AFN_FORWARDTRANSLATOR_HPP
 #define AFN_FORWARDTRANSLATOR_HPP
 
-#include "AfnAPI.hpp"
+#include <airflow/AirflowAPI.hpp>
 
 #include <utilities/idf/Handle.hpp>
 //#include <utilities/core/Path.hpp>
@@ -42,7 +42,7 @@ namespace openstudio {
 
   namespace afn {
 
-    class AFN_API ForwardTranslator
+    class Airflow_API ForwardTranslator
     {
     public:
 
