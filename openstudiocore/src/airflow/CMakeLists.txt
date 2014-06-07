@@ -5,8 +5,8 @@ SET( target_name openstudio_airflow )
 SET( airflow_src
   WindPressure.hpp
   WindPressure.cpp
-  SpaceLinker.hpp
-  SpaceLinker.cpp
+  NetworkBuilder.hpp
+  NetworkBuilder.cpp
 )
 
 SET( afn_src
@@ -21,6 +21,7 @@ SET( ${target_name}_depends
   openstudio_utilities
   openstudio_model
   openstudio_energyplus
+  openstudio_osversion
   boost_log
 )
 
@@ -59,6 +60,9 @@ SET( ${target_name}_src
 )
 
 SET( ${target_name}_test_src
+  test/AirflowFixture.hpp
+  test/AirflowFixture.cpp
+  test/NetworkBuilder_GTest.cpp
   afn/test/AfnFixture.hpp
   afn/test/AfnFixture.cpp
   afn/test/ForwardTranslator_GTest.cpp
