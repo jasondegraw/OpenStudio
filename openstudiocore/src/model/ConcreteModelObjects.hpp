@@ -21,6 +21,7 @@
 #define MODEL_CONCRETEMODELOBJECTS_HPP
 
 #include <model/AirConditionerVariableRefrigerantFlow.hpp>
+#include <model/AirflowNetworkSimulationControl.hpp>
 #include <model/AirGap.hpp>
 #include <model/AirLoopHVAC.hpp>
 #include <model/AirLoopHVACOutdoorAirSystem.hpp>
@@ -277,6 +278,7 @@
 
 // include all concrete ModelObject Impls too
 #include <model/AirConditionerVariableRefrigerantFlow_Impl.hpp>
+#include <model/AirflowNetworkSimulationControl_Impl.hpp>
 #include <model/AirGap_Impl.hpp>
 #include <model/AirLoopHVAC_Impl.hpp>
 #include <model/AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp>

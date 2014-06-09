@@ -35,6 +35,9 @@ SET( ${target_name}_src
   AirConditionerVariableRefrigerantFlow.hpp
   AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirConditionerVariableRefrigerantFlow.cpp
+  AirflowNetworkSimulationControl.hpp
+  AirflowNetworkSimulationControl_Impl.hpp
+  AirflowNetworkSimulationControl.cpp
   AirGap.hpp
   AirGap_Impl.hpp
   AirGap.cpp
@@ -902,6 +905,7 @@ SET( ${target_name}_moc
   ModelObject_Impl.hpp
 
   AirConditionerVariableRefrigerantFlow_Impl.hpp
+  AirflowNetworkSimulationControl_Impl.hpp
   AirGap_Impl.hpp
   AirLoopHVAC_Impl.hpp
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp

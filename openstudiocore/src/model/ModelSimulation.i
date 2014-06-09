@@ -29,6 +29,7 @@
 #endif
 
 UNIQUEMODELOBJECT_TEMPLATES(SimulationControl);
+UNIQUEMODELOBJECT_TEMPLATES(AirflowSimulationControl);
 UNIQUEMODELOBJECT_TEMPLATES(LightingSimulationControl);
 MODELOBJECT_TEMPLATES(SizingParameters);
 MODELOBJECT_TEMPLATES(SizingPeriod);
@@ -59,6 +60,7 @@ MODELOBJECT_TEMPLATES(SiteWaterMainsTemperature);
 UNIQUEMODELOBJECT_TEMPLATES(YearDescription);
 
 SWIG_UNIQUEMODELOBJECT(SimulationControl);
+SWIG_UNIQUEMODELOBJECT(AirflowNetworkSimulationControl);
 SWIG_UNIQUEMODELOBJECT(LightingSimulationControl);
 SWIG_MODELOBJECT(SizingParameters, 1);
 SWIG_MODELOBJECT(SizingPeriod, 0);
