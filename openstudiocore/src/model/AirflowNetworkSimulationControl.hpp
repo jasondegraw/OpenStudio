@@ -45,14 +45,13 @@ namespace detail {
   class AirflowNetworkSimulationControl_Impl;
 }
 
-/** AirflowNetworkSimulationControl derives from ParentObject and is an interface to the OpenStudio IDD object named "SimulationControl".
+/** AirflowNetworkSimulationControl derives from ParentObject and is an interface to the OpenStudio IDD object named "AirflowNetwork:SimulationControl".
  *
- *  SimulationControl defines what types of sizing simulations are performed for an EnergyPlus simulation,
- *  it also controls whether or not to report results from sizing and weather file simulations.
- *  SimulationControl parents several other ModelObject types that configure simulation parameters for EnergyPlus.
- *  SimulationControl does not have a public constructor because it is a unique ModelObject.  
- *  To get the SimulationControl object for a Model or create one if it does not yet exist use model.getUniqueObject<SimulationControl>().  
- *  To get the SimulationControl object for a Model but not create one if it does not yet exist use model.getOptionalUniqueObject<SimulationControl>().
+ *  AirflowNetworkSimulationControl defines what types of multizone airflow calculations are part of an EnergyPlus simulation.
+ *  AirflowNetworkSimulationControl parents several other ModelObject types that configure simulation parameters for EnergyPlus.
+ *  AirflowNetworkSimulationControl does not have a public constructor because it is a unique ModelObject.  
+ *  To get the AirflowNetworkSimulationControl object for a Model or create one if it does not yet exist use model.getUniqueObject<AirflowNetworkSimulationControl>().  
+ *  To get the AirflowNetworkSimulationControl object for a Model but not create one if it does not yet exist use model.getOptionalUniqueObject<AirflowNetworkSimulationControl>().
  */
 class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
  public:

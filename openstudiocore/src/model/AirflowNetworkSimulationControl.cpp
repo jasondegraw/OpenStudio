@@ -173,25 +173,25 @@ IddObjectType AirflowNetworkSimulationControl_Impl::iddObjectType() const {
   return AirflowNetworkSimulationControl::iddObjectType();
 }
 
-boost::optional<std::string> AirflowNetworkSimulationControl_Impl::airflowControl() const 
+boost::optional<std::string> AirflowNetworkSimulationControl_Impl::airflowNetworkControl() const 
 {
-  return getString(OS_AirflowNetworkSimulationControlFields::AirflowControl,true);
+  return getString(OS_AirflowNetworkSimulationControlFields::AirflowNetworkControl,true);
 }
 
-bool AirflowNetworkSimulationControl_Impl::setAirflowControl(boost::optional<std::string> control)
+bool AirflowNetworkSimulationControl_Impl::setAirflowNetworkControl(boost::optional<std::string> control)
 {
   bool result = false;
   if (control) {
-    result = setString(OS_AirflowNetworkSimulationControlFields::AirflowControl, control.get());
+    result = setString(OS_AirflowNetworkSimulationControlFields::AirflowNetworkControl, control.get());
   } else {
-    result = setString(OS_AirflowNetworkSimulationControlFields::AirflowControl, "");
+    result = setString(OS_AirflowNetworkSimulationControlFields::AirflowNetworkControl, "");
   }
   return result;
 }
 
-bool AirflowNetworkSimulationControl_Impl::setAirflowControl(std::string control)
+bool AirflowNetworkSimulationControl_Impl::setAirflowNetworkControl(std::string control)
 {
-  bool result = setString(OS_AirflowNetworkSimulationControlFields::AirflowControl, control);
+  bool result = setString(OS_AirflowNetworkSimulationControlFields::AirflowNetworkControl, control);
   return result;
 }
 
@@ -211,19 +211,19 @@ IddObjectType AirflowNetworkSimulationControl::iddObjectType() {
   return IddObjectType(IddObjectType::OS_AirflowNetworkSimulationControl);
 }
 
-boost::optional<std::string> AirflowNetworkSimulationControl::airflowControl() const 
+boost::optional<std::string> AirflowNetworkSimulationControl::airflowNetworkControl() const 
 {
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->airflowControl();
+  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->airflowNetworkControl();
 }
 
-bool AirflowNetworkSimulationControl::setAirflowControl(boost::optional<std::string> control)
+bool AirflowNetworkSimulationControl::setAirflowNetworkControl(boost::optional<std::string> control)
 {
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setAirflowControl(control);
+  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setAirflowNetworkControl(control);
 }
 
-bool AirflowNetworkSimulationControl::setAirflowControl(std::string control)
+bool AirflowNetworkSimulationControl::setAirflowNetworkControl(std::string control)
 {
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setAirflowControl(control);
+  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setAirflowNetworkControl(control);
 }
 
 } // model
