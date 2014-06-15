@@ -23,14 +23,14 @@
 
 #include "../AirflowAPI.hpp"
 
+#include "../NetworkBuilder.hpp"
+
 #include "../../utilities/idf/Handle.hpp"
 #include "../../utilities/core/Logger.hpp"
+#include "../../utilities/idf/Workspace.hpp"
 #include <QMap>
 
-//#include "PrjData.hpp"
-
 namespace openstudio {
-class Workspace;
 class ProgressBar;
 
 namespace model {
@@ -41,30 +41,43 @@ namespace model {
 
 namespace afn {
 
-class AIRFLOW_API ForwardTranslator
+class AIRFLOW_API ForwardTranslator : public airflow::NetworkBuilder
 {
 public:
 
-  ForwardTranslator();
+  explicit ForwardTranslator(ProgressBar *progressBar = 0);
 
   virtual ~ForwardTranslator();
 
   boost::optional<openstudio::Workspace> translateModel(openstudio::model::Model & model, ProgressBar* progressBar = NULL);
 
-private:
-  std::vector<openstudio::model::Surface> getInteriorZoneSurfaces(openstudio::model::Model & model);
-  std::vector<openstudio::model::Surface> getExteriorZoneSurfaces(openstudio::model::Model & model);
-  std::map<std::string,double> largestSurfaceAreas(openstudio::model::Model &model);
-  //bool translateZones(openstudio::model::Model &model, const prj::Data &data);
-  //bool translateSimpleAHS(openstudio::model::Model &model, const prj::Data &data);
+    /** Returns true if interior subsurfaces will be linked. */
+  virtual bool interiorSubSurfacesLinked()
+  {
+    return true;
+  }
 
-  //ProgressBar* m_progressBar;
-  //QMap<int,Handle> m_levelMap;
-  //QMap<int,Handle> m_zoneMap;
-  //QMap<int,Handle> m_ahsMap;
-  //QMap<int,int> m_connections;
+  /** Returns true if exterior subsurfaces will be linked. */
+  virtual bool exteriorSubSurfacesLinked()
+  {
+    return false;
+  }
+
+protected:
+  virtual void linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
+  virtual void linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
+  virtual void linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+    openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
+  virtual void linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
+    openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
+
+private:
+  std::map<std::string,double> largestSurfaceAreas(openstudio::model::Model &model);
 
   REGISTER_LOGGER("openstudio.afn.ForwardTranslator");
+
+  openstudio::Workspace m_workspace;
+  std::map<std::string,double> m_maxAreas;
 };
 
 } // afn

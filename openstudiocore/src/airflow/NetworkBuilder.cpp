@@ -62,7 +62,7 @@
 namespace openstudio {
 namespace airflow {
 
-NetworkBuilder::NetworkBuilder()
+NetworkBuilder::NetworkBuilder(ProgressBar *progressBar) : m_progressBar(progressBar)
 {
   m_logSink.setLogLevel(Info);
   m_logSink.setChannelRegex(boost::regex("openstudio\\.airflow\\.NetworkBuilder"));

@@ -59,7 +59,7 @@ public:
   /** @name Constructors and Destructors */
   //@{
   /** Construct a new object. */
-  NetworkBuilder();
+  explicit NetworkBuilder(ProgressBar *progressBar=0);
   /** Destroy the translator.*/
   ~NetworkBuilder(){}
 
