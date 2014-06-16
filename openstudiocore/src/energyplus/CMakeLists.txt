@@ -13,6 +13,7 @@ SET( ${target_name}_src
   ForwardTranslator.hpp
   ForwardTranslator.cpp
   ForwardTranslator/ForwardTranslateAirConditionerVariableRefrigerantFlow.cpp
+  ForwardTranslator/ForwardTranslateAirflowNetworkSimulationControl.cpp
   ForwardTranslator/ForwardTranslateAirGap.cpp
   ForwardTranslator/ForwardTranslateAirLoopHVAC.cpp
   ForwardTranslator/ForwardTranslateAirLoopHVACOutdoorAirSystem.cpp

@@ -36,6 +36,7 @@ class Transformation;
 namespace model{
 
 class AirConditionerVariableRefrigerantFlow;
+class AirflowNetworkSimulationControl;
 class AirGap;
 class AirLoopHVAC;
 class AirLoopHVACUnitaryHeatPumpAirToAir;
@@ -298,6 +299,8 @@ class ENERGYPLUS_API ForwardTranslator {
   boost::optional<IdfObject> translateAndMapModelObject( model::ModelObject & modelObject );
 
   boost::optional<IdfObject> translateAirConditionerVariableRefrigerantFlow( model::AirConditionerVariableRefrigerantFlow & modelObject );
+
+  boost::optional<IdfObject> translateAirflowNetworkSimulationControl( model::AirflowNetworkSimulationControl & modelObject );
 
   boost::optional<IdfObject> translateAirGap( model::AirGap & modelObject );
 
