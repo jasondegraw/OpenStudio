@@ -52,23 +52,23 @@ public:
   boost::optional<openstudio::Workspace> translateModel(openstudio::model::Model & model, ProgressBar* progressBar = NULL);
 
     /** Returns true if interior subsurfaces will be linked. */
-  virtual bool interiorSubSurfacesLinked()
+  virtual bool interiorSubSurfacesLinked() const
   {
-    return true;
+    return false;
   }
 
   /** Returns true if exterior subsurfaces will be linked. */
-  virtual bool exteriorSubSurfacesLinked()
+  virtual bool exteriorSubSurfacesLinked() const
   {
     return false;
   }
 
 protected:
-  virtual void linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
-  virtual void linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
-  virtual void linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+  virtual bool linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
+  virtual bool linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
+  virtual bool linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
     openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
-  virtual void linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
+  virtual bool linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
     openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
 
 private:

@@ -82,6 +82,12 @@ public:
   /** @name Getters and Setters */
   //@{
 
+  /** Returns the progress bar currently associated with the object. */
+  ProgressBar * progressBar() const;
+
+  /** Sets the progress bar to be updated by the object. */
+  void setProgressBar(ProgressBar *progressBar);
+
   //@}
   /** @name Miscellaneous Functions */
   //@{
@@ -92,13 +98,13 @@ public:
   }
 
   /** Returns true if interior subsurfaces will be linked. */
-  virtual bool interiorSubSurfacesLinked()
+  virtual bool interiorSubSurfacesLinked() const
   {
     return true;
   }
 
   /** Returns true if exterior subsurfaces will be linked. */
-  virtual bool exteriorSubSurfacesLinked()
+  virtual bool exteriorSubSurfacesLinked() const
   {
     return true;
   }
@@ -118,11 +124,11 @@ protected:
   void progress();
   void initProgress(int max, std::string label);
 
-  virtual void linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
-  virtual void linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
-  virtual void linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+  virtual bool linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
+  virtual bool linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
+  virtual bool linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
     openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
-  virtual void linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
+  virtual bool linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
     openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
 
 private:

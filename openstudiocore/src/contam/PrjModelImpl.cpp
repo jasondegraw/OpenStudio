@@ -65,6 +65,24 @@ void IndexModelImpl::setDefaults()
   m_u_a = 0;
 }
 
+void IndexModelImpl::clear()
+{
+  setDefaults();
+  m_rc = RunControl();
+  m_valid=false;
+  m_contaminants.clear();
+  m_species.clear();
+  m_levels.clear();
+  m_daySchedules.clear();
+  m_weekSchedules.clear();
+  m_windPressureProfiles.clear();
+  m_airflowElements.clear();
+  m_controlNodes.clear();
+  m_ahs.clear();
+  m_zones.clear();
+  m_paths.clear();
+}
+
 IndexModelImpl::IndexModelImpl()
 {
   setDefaults();

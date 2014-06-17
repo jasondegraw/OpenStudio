@@ -175,6 +175,8 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
     << "ReferenceCrackConditions"; // !- Reference Crack Conditions
   m_workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
 
+  build(model);
+
   /*
   idfStrings.clear();
   idfStrings << "AirflowNetwork:MultiZone:Surface:Crack"
@@ -305,13 +307,14 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
   return boost::optional<openstudio::Workspace>(m_workspace);
 }
 
-void ForwardTranslator::linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface)
+bool ForwardTranslator::linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface)
 {
+  // Args need to be surface name, external node name, crack factor
   QString idfFormat("AirflowNetwork:MultiZone:Surface,%1,ExteriorComponent,%2,%3;");
   boost::optional<std::string> name = surface.name();
   if(!name) {
     LOG(Warn, "Surface '" << surface.handle() << "' has no name, will not be present in airflow network.");
-    return;
+    return false;
   }
   double surfaceArea = surface.grossArea();
   if(interiorSubSurfacesLinked()) {
@@ -319,16 +322,17 @@ void ForwardTranslator::linkExteriorSurface(openstudio::model::ThermalZone zone,
   }
   QString idfString = idfFormat.arg(openstudio::toQString(*name)).arg("").arg(surfaceArea/m_maxAreas["Exterior"]);
   m_workspace.addObject(openstudio::IdfObject::load(idfString.toStdString()).get());
+  return true;
 }
 
-void ForwardTranslator::linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+bool ForwardTranslator::linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
   openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone)
 {
   QString idfFormat("AirflowNetwork:MultiZone:Surface,%1,InteriorComponent,%2,%3;");
   boost::optional<std::string> name = surface.name();
   if(!name){
     LOG(Warn, "Surface '" << surface.handle() << "' has no name, will not be present in airflow network.");
-    return;
+    return false;
   }
   double surfaceArea = surface.grossArea();
   if(interiorSubSurfacesLinked()) {
@@ -336,19 +340,22 @@ void ForwardTranslator::linkInteriorSurface(openstudio::model::ThermalZone zone,
   }
   QString idfString = idfFormat.arg(openstudio::toQString(*name)).arg("").arg(surfaceArea/m_maxAreas["Interior"]);
   m_workspace.addObject(openstudio::IdfObject::load(idfString.toStdString()).get());
+  return true;
 }
 
-void ForwardTranslator::linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface,
+bool ForwardTranslator::linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface,
   openstudio::model::SubSurface subSurface)
 {
   // Nothing to see here
+  return true;
 }
 
-void ForwardTranslator::linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+bool ForwardTranslator::linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
   openstudio::model::SubSurface subSurface,openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace,
   openstudio::model::ThermalZone adjacentZone)
 {
   // Nothing to see here
+  return true;
 }
 
 std::map<std::string,double> ForwardTranslator::largestSurfaceAreas(openstudio::model::Model & model)

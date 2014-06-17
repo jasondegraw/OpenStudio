@@ -258,29 +258,32 @@ void NetworkBuilder::initProgress(int max, std::string label)
   }
 }
 
-void NetworkBuilder::linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface)
+bool NetworkBuilder::linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface)
 {
   LOG(Info, "Surface '" << surface.name().get() << "' connects zone '" << zone.name().get() << "' to the ambient");
   std::cout << "Surface '" << surface.name().get() << "' connects zone '" << zone.name().get() << "' to the ambient" << std::endl;
+  return true;
 }
 
-void NetworkBuilder::linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+bool NetworkBuilder::linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
   openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone)
 {
   LOG(Info, "Surfaces '" << surface.name().get() << "' and '" << adjacentSurface.name().get() << "' connect zone '" 
     << zone.name().get() << "' to zone '" << adjacentZone.name().get() << "'");
   std::cout << "Surfaces '" << surface.name().get() << "' and '" << adjacentSurface.name().get() << "' connect zone '" 
     << zone.name().get() << "' to zone '" << adjacentZone.name().get() << "'" << std::endl;
+  return true;
 }
 
-void NetworkBuilder::linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface,
+bool NetworkBuilder::linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface,
   openstudio::model::SubSurface subSurface)
 {
   LOG(Info, "Subsurface '" << subSurface.name().get() << "' connects zone '" << zone.name().get() << "' to the ambient");
   std::cout << "Subsurface '" << subSurface.name().get() << "' connects zone '" << zone.name().get() << "' to the ambient" << std::endl;
+  return true;
 }
 
-void NetworkBuilder::linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+bool NetworkBuilder::linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
   openstudio::model::SubSurface subSurface,openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace,
   openstudio::model::ThermalZone adjacentZone)
 {
@@ -288,6 +291,7 @@ void NetworkBuilder::linkInteriorSubSurface(openstudio::model::ThermalZone zone,
     << zone.name().get() << "' to zone '" << adjacentZone.name().get() << "'");
   std::cout << "Subsurfaces '" << subSurface.name().get() << "' and '" << adjacentSubSurface.name().get() << "' connect zone '" 
     << zone.name().get() << "' to zone '" << adjacentZone.name().get() << "'"  << std::endl;
+  return true;
 }
 
 /*
@@ -506,6 +510,16 @@ std::vector<LogMessage> NetworkBuilder::errors() const
 std::vector<LogMessage> NetworkBuilder::logMessages() const
 {
   return m_logSink.logMessages();
+}
+
+ProgressBar * NetworkBuilder::progressBar() const
+{
+  return m_progressBar;
+}
+
+void NetworkBuilder::setProgressBar(ProgressBar *progressBar)
+{
+  m_progressBar = progressBar;
 }
 
 } // airflow
