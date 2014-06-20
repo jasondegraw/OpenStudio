@@ -64,9 +64,8 @@
 namespace openstudio {
 namespace afn {
 
-ForwardTranslator::ForwardTranslator()
+ForwardTranslator::ForwardTranslator(ProgressBar *progressBar) : NetworkBuilder(progressBar)
 {
-  // m_progressBar = 0;
 }
 
 ForwardTranslator::~ForwardTranslator()
@@ -77,22 +76,20 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
 {
   // Remove previous infiltration objects
   std::vector<openstudio::model::SpaceInfiltrationDesignFlowRate> dfrInf = model.getConcreteModelObjects<openstudio::model::SpaceInfiltrationDesignFlowRate>();
-  BOOST_FOREACH(openstudio::model::SpaceInfiltrationDesignFlowRate inf, dfrInf)
-  {
+  BOOST_FOREACH(openstudio::model::SpaceInfiltrationDesignFlowRate inf, dfrInf) {
     inf.remove();
   }
   std::vector<openstudio::model::SpaceInfiltrationEffectiveLeakageArea> elaInf = model.getConcreteModelObjects<openstudio::model::SpaceInfiltrationEffectiveLeakageArea>();
-  BOOST_FOREACH(openstudio::model::SpaceInfiltrationEffectiveLeakageArea inf, elaInf)
-  {
+  BOOST_FOREACH(openstudio::model::SpaceInfiltrationEffectiveLeakageArea inf, elaInf) {
     inf.remove();
   }
 
   // Get an E+ workspace
   energyplus::ForwardTranslator translator;
-  openstudio::Workspace workspace = translator.translateModel(model,progressBar);
+  m_workspace = translator.translateModel(model,progressBar);
 
   // Find the largest surface between zones
-  std::map<std::string,double> maxAreas = largestSurfaceAreas(model);
+  m_maxAreas = largestSurfaceAreas(model);
 
   QStringList idfStrings;
   // Create a simulation control object
@@ -110,7 +107,7 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
     << "-0.5"  // !- Convergence Acceleration Limit {dimensionless}
     << "0.0"  // !- Azimuth Angle of Long Axis of Building {deg}
     << "1.0";  // !- Ratio of Building Width Along Short Axis to Width Along Long Axis
-  workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
+  m_workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
   /*
   << Input,                   !- Wind Pressure Coefficient Type
   Every 30 Degrees,        !- AirflowNetwork Wind Pressure Coefficient Array Name
@@ -149,7 +146,7 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
       << ""  // !- Upper Value on Inside/Outside Enthalpy Difference for Modulating
       // !- the Venting Open Factor {J/kg}
       << ""; // !- Venting Availability Schedule Name
-    workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
+    m_workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
   }
   // Add some leakage components
   idfStrings.clear();
@@ -158,49 +155,27 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
     << "20.0"  // !- Reference Temperature for Crack Data {C}
     << "101325"  // !- Reference Barometric Pressure for Crack Data {Pa}
     << "0.0"; // !- Reference Humidity Ratio for Crack Data {kgWater/kgDryAir}
-  workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
+  m_workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
 
-  std::vector<openstudio::model::Surface> exteriorSurfaces = getExteriorZoneSurfaces(model);
-  double maxArea = 0.0;
-  BOOST_FOREACH(openstudio::model::Surface surface, exteriorSurfaces)
-  {
-    maxArea = qMax(maxArea, surface.grossArea()); // Will need to account for openings at some point
-  }
-  if(maxArea == 0.0) // Oops!
-  {
-    LOG(Error, "Unable to determine largest exterior surface area.");
-    return false;
-  }
-  maxAreas["Exterior"] = maxArea;
   // Generate exterior leakage element
   idfStrings.clear();
   idfStrings << "AirflowNetwork:MultiZone:Surface:Crack"
     << "ExteriorComponent"  // !- Name of Surface Crack Component
-    << QString().sprintf("%g",maxArea*4.99082e-4) // !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
+    << QString().sprintf("%g",m_maxAreas["Exterior"]*4.99082e-4) // !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     << "0.65"  // !- Air Mass Flow Exponent {dimensionless}
     << "ReferenceCrackConditions"; // !- Reference Crack Conditions
-  workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
+  m_workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
 
-  std::vector<openstudio::model::Surface> interiorSurfaces = getInteriorZoneSurfaces(model);
-  maxArea = 0.0;
-  BOOST_FOREACH(openstudio::model::Surface surface, interiorSurfaces)
-  {
-    maxArea = qMax(maxArea, surface.grossArea()); // Will need to account for openings at some point
-  }
-  if(maxArea == 0.0) // Oops!
-  {
-    LOG(Error, "Unable to determine largest interior surface area.");
-    return false;
-  }
-  maxAreas["Interior"] = maxArea;
   // Generate interior leakage element
   idfStrings.clear();
   idfStrings << "AirflowNetwork:MultiZone:Surface:Crack"
     << "InteriorComponent"  // !- Name of Surface Crack Component
-    << QString().sprintf("%g",maxArea*2.0*4.99082e-4) // !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
+    << QString().sprintf("%g",m_maxAreas["Interior"]*2.0*4.99082e-4) // !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     << "0.65"  // !- Air Mass Flow Exponent {dimensionless}
     << "ReferenceCrackConditions"; // !- Reference Crack Conditions
-  workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
+  m_workspace.addObject(openstudio::IdfObject::load((idfStrings.join(",")+";").toStdString()).get());
+
+  build(model);
 
   /*
   idfStrings.clear();
@@ -222,6 +197,7 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
 
   // Loop over surfaces and generate AFN surfaces
   // Args need to be surface name, external node name, crack factor
+  /*
   QString idfFormat("AirflowNetwork:MultiZone:Surface,%1,ExteriorComponent,%2,%3;");
   BOOST_FOREACH(openstudio::model::Surface surface, exteriorSurfaces)
   {
@@ -248,6 +224,7 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
     QString idfString = idfFormat.arg(openstudio::toQString(*name)).arg("").arg(surface.grossArea()/maxAreas["Interior"]);
     workspace.addObject(openstudio::IdfObject::load(idfString.toStdString()).get());
   }
+  */
 
   /*
   QList <openstudio::Handle>used;
@@ -327,85 +304,58 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
   }
   }
   */
-  return boost::optional<openstudio::Workspace>(workspace);
+  return boost::optional<openstudio::Workspace>(m_workspace);
 }
 
-std::vector<openstudio::model::Surface> ForwardTranslator::getInteriorZoneSurfaces(openstudio::model::Model & model)
+bool ForwardTranslator::linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface)
 {
-  QVector<openstudio::Handle> used;
-  std::vector<openstudio::model::Surface> found;
-  BOOST_FOREACH(openstudio::model::Surface surface, model.getConcreteModelObjects<openstudio::model::Surface>())
-  {
-    std::string bc = surface.outsideBoundaryCondition();
-    if(!used.contains(surface.handle()) && bc == "Surface")
-    {
-      // Get the associated thermal zone
-      boost::optional<openstudio::model::Space> space = surface.space();
-      if(!space)
-      {
-        LOG(Warn, "Unattached surface '" << surface.handle() << "'");
-        continue;
-      }
-      boost::optional<openstudio::model::ThermalZone> thermalZone = space->thermalZone();
-      if(!thermalZone)
-      {
-        LOG(Warn, "Unzoned space '" << space->handle() << "'");
-        continue;
-      }
-      boost::optional<openstudio::model::Surface> adjacentSurface = surface.adjacentSurface();
-      if(!adjacentSurface)
-      {
-        LOG(Error, "Unable to find adjacent surface for surface '" << surface.handle() << "'");
-        continue;
-      }
-      boost::optional<openstudio::model::Space> adjacentSpace = adjacentSurface->space();
-      if(!adjacentSpace)
-      {
-        LOG(Error, "Unattached adjacent surface '" << adjacentSurface->handle() << "'");
-        continue;
-      }
-      boost::optional<openstudio::model::ThermalZone> adjacentZone = adjacentSpace->thermalZone();
-      if(!thermalZone)
-      {
-        LOG(Warn, "Unzoned adjacent space '" << adjacentSpace->handle() << "'");
-        continue;
-      }
-      // Ok, now we a surface, a space, a zone, an adjacent surface, an adjacent space, and an adjacent zone. Finally.
-      used.push_back(adjacentSurface->handle());
-      if(thermalZone != adjacentZone)
-      {
-        found.push_back(surface);
-      }
-    }
+  // Args need to be surface name, external node name, crack factor
+  QString idfFormat("AirflowNetwork:MultiZone:Surface,%1,ExteriorComponent,%2,%3;");
+  boost::optional<std::string> name = surface.name();
+  if(!name) {
+    LOG(Warn, "Surface '" << surface.handle() << "' has no name, will not be present in airflow network.");
+    return false;
   }
-  return found;
+  double surfaceArea = surface.grossArea();
+  if(interiorSubSurfacesLinked()) {
+    surfaceArea = surface.netArea();
+  }
+  QString idfString = idfFormat.arg(openstudio::toQString(*name)).arg("").arg(surfaceArea/m_maxAreas["Exterior"]);
+  m_workspace.addObject(openstudio::IdfObject::load(idfString.toStdString()).get());
+  return true;
 }
 
-std::vector<openstudio::model::Surface> ForwardTranslator::getExteriorZoneSurfaces(openstudio::model::Model & model)
+bool ForwardTranslator::linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+  openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone)
 {
-  std::vector<openstudio::model::Surface> found;
-  BOOST_FOREACH(openstudio::model::Surface surface, model.getConcreteModelObjects<openstudio::model::Surface>())
-  {
-    std::string bc = surface.outsideBoundaryCondition();
-    if(bc == "Outdoors")
-    {
-      // Get the associated thermal zone
-      boost::optional<openstudio::model::Space> space = surface.space();
-      if(!space)
-      {
-        LOG(Warn, "Unattached surface '" << surface.handle() << "'");
-        continue;
-      }
-      boost::optional<openstudio::model::ThermalZone> thermalZone = space->thermalZone();
-      if(!thermalZone)
-      {
-        LOG(Warn, "Unzoned space '" << space->handle() << "'");
-        continue;
-      }
-      found.push_back(surface);
-    }
+  QString idfFormat("AirflowNetwork:MultiZone:Surface,%1,InteriorComponent,%2,%3;");
+  boost::optional<std::string> name = surface.name();
+  if(!name){
+    LOG(Warn, "Surface '" << surface.handle() << "' has no name, will not be present in airflow network.");
+    return false;
   }
-  return found;
+  double surfaceArea = surface.grossArea();
+  if(interiorSubSurfacesLinked()) {
+    surfaceArea = surface.netArea();
+  }
+  QString idfString = idfFormat.arg(openstudio::toQString(*name)).arg("").arg(surfaceArea/m_maxAreas["Interior"]);
+  m_workspace.addObject(openstudio::IdfObject::load(idfString.toStdString()).get());
+  return true;
+}
+
+bool ForwardTranslator::linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface,
+  openstudio::model::SubSurface subSurface)
+{
+  // Nothing to see here
+  return true;
+}
+
+bool ForwardTranslator::linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+  openstudio::model::SubSurface subSurface,openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace,
+  openstudio::model::ThermalZone adjacentZone)
+{
+  // Nothing to see here
+  return true;
 }
 
 std::map<std::string,double> ForwardTranslator::largestSurfaceAreas(openstudio::model::Model & model)

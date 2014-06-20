@@ -59,7 +59,7 @@ public:
   /** @name Constructors and Destructors */
   //@{
   /** Construct a new object. */
-  NetworkBuilder();
+  explicit NetworkBuilder(ProgressBar *progressBar=0);
   /** Destroy the translator.*/
   ~NetworkBuilder(){}
 
@@ -67,7 +67,7 @@ public:
   /** @name Network Construction Functions */
   //@{
 
-  bool NetworkBuilder::build(model::Model model);
+  bool NetworkBuilder::build(model::Model & model);
 
   //@}
   /** @name Surface-Finding Functions */
@@ -76,27 +76,35 @@ public:
   static std::vector<openstudio::model::Surface> getInteriorZoneSurfaces(openstudio::model::Model & model);
   static std::vector<openstudio::model::Surface> getExteriorZoneSurfaces(openstudio::model::Model & model);
 
-  virtual bool getSurfaces(openstudio::model::Model & model);
+  //virtual bool getSurfaces(openstudio::model::Model & model);
 
   //@}
   /** @name Getters and Setters */
   //@{
+
+  /** Returns the progress bar currently associated with the object. */
+  ProgressBar * progressBar() const;
+
+  /** Sets the progress bar to be updated by the object. */
+  void setProgressBar(ProgressBar *progressBar);
 
   //@}
   /** @name Miscellaneous Functions */
   //@{
 
   /** Clear any internally stored information in the builder object. */
-  void clear();
+  virtual void clear()
+  {
+  }
 
   /** Returns true if interior subsurfaces will be linked. */
-  virtual bool interiorSubSurfacesLinked()
+  virtual bool interiorSubSurfacesLinked() const
   {
     return true;
   }
 
   /** Returns true if exterior subsurfaces will be linked. */
-  virtual bool exteriorSubSurfacesLinked()
+  virtual bool exteriorSubSurfacesLinked() const
   {
     return true;
   }
@@ -116,15 +124,12 @@ protected:
   void progress();
   void initProgress(int max, std::string label);
 
-  virtual void linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
-  virtual void linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
-  virtual void linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
+  virtual bool linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface);
+  virtual bool linkExteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface);
+  virtual bool linkInteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, 
     openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
-  virtual void linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
+  virtual bool linkInteriorSubSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface, openstudio::model::SubSurface subSurface,
     openstudio::model::SubSurface adjacentSubSurface, openstudio::model::Surface adjacentSurface, openstudio::model::Space adjacentSpace, openstudio::model::ThermalZone adjacentZone);
-
-  std::vector<openstudio::model::Surface> interiorSurfaces;
-  std::vector<openstudio::model::Surface> exteriorSurfaces;
 
 private:
   ProgressBar* m_progressBar;
