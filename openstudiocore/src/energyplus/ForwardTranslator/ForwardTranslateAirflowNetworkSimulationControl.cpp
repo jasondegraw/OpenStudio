@@ -23,6 +23,7 @@
 #include <model/AirflowNetworkSimulationControl.hpp>
 #include <model/AirflowNetworkSimulationControl_Impl.hpp>
 
+/*
 #include <utilities/geometry/Geometry.hpp>
 #include <utilities/geometry/Point3d.hpp>
 #include <utilities/geometry/Vector3d.hpp>
@@ -60,8 +61,10 @@
 #include <utilities/idd/Schedule_Compact_FieldEnums.hxx>
 #include <utilities/idd/SetpointManager_MixedAir_FieldEnums.hxx>
 #include <utilities/idd/SetpointManager_SingleZone_Reheat_FieldEnums.hxx>
+*/
 
-//#include <utilities/idd/AirflowNetworkSimulationControl_FieldEnums.hxx>
+#include <utilities/idd/AirflowNetwork_SimulationControl_FieldEnums.hxx>
+//#include <utilities/idd/OS_AirflowNetworkSimulationControl_FieldEnums.hxx>
 
 #include <utilities/idd/IddEnums.hxx>
 #include <utilities/idd/IddFactory.hxx>
@@ -76,83 +79,93 @@ namespace energyplus {
 
 boost::optional<IdfObject> ForwardTranslator::translateAirflowNetworkSimulationControl( AirflowNetworkSimulationControl& modelObject )
 {
-  /*
-  IdfObject simCon( openstudio::IddObjectType::AirflowNetworkSimulationControl );
+  IdfObject idfObject( IddObjectType::AirflowNetwork_SimulationControl );
 
-  m_idfObjects.push_back(simCon);
+  m_idfObjects.push_back(idfObject);
 
   OptionalString s = modelObject.name();
   if( s ) {
-    simCon.setName(*s);
+    idfObject.setName(*s);
   }
-  */
 
+  boost::optional<std::string> optString;
+  boost::optional<int> optInt;
+  boost::optional<double> optDouble;
+
+  // A2 , \field AirflowNetwork Control
+  optString = modelObject.airflowNetworkControl();
+  if(optString) {
+    idfObject.setString(AirflowNetwork_SimulationControlFields::AirflowNetworkControl,optString.get());
+  }
+
+  // A3 , \field Wind Pressure Coefficient Type
+  optString = modelObject.windPressureCoefficientType();
+  if(optString) {
+    idfObject.setString(AirflowNetwork_SimulationControlFields::WindPressureCoefficientType,optString.get());
+  }
+  
+  // A4 , \field AirflowNetwork Wind Pressure Coefficient Array Name
   /*
-  unsigned numSizingPeriods = modelObject.model().getModelObjects<SizingPeriod>().size();
-
-  if( modelObject.doZoneSizingCalculation() )
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoZoneSizingCalculation,"Yes");
-  }
-  else if( (numSizingPeriods > 0) && (modelObject.model().getConcreteModelObjects<ThermalZone>().size() > 0) )
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoZoneSizingCalculation,"Yes");
-  }
-  else
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoZoneSizingCalculation,"No");
-  }
-
-  if( modelObject.doSystemSizingCalculation() )
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoSystemSizingCalculation,"Yes");
-  }
-  else if( (numSizingPeriods > 0) && (modelObject.model().getConcreteModelObjects<AirLoopHVAC>().size() > 0) )
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoSystemSizingCalculation,"Yes");
-  }
-  else
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoSystemSizingCalculation,"No");
-  }
-
-  if( modelObject.doPlantSizingCalculation() )
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoPlantSizingCalculation,"Yes");
-  }
-  else if( (numSizingPeriods > 0) && (modelObject.model().getConcreteModelObjects<PlantLoop>().size() > 0) )
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoPlantSizingCalculation,"Yes");
-  }
-  else
-  {
-    simCon.setString(openstudio::SimulationControlFields::DoPlantSizingCalculation,"No");
-  }
-
-  if( modelObject.runSimulationforSizingPeriods() )
-  {
-    simCon.setString(openstudio::SimulationControlFields::RunSimulationforSizingPeriods,"Yes");
-  }
-  else
-  {
-    simCon.setString(openstudio::SimulationControlFields::RunSimulationforSizingPeriods,"No");
-  }
-
-  // DLM: might want to check for weather file object?
-  if( modelObject.runSimulationforWeatherFileRunPeriods() )
-  {
-    simCon.setString(openstudio::SimulationControlFields::RunSimulationforWeatherFileRunPeriods,"Yes");
-  }
-  else
-  {
-    simCon.setString(openstudio::SimulationControlFields::RunSimulationforWeatherFileRunPeriods,"No");
-  }
+      \type object-list
+      \object-list WPCSetNames
+      \note Used only if Wind Pressure Coefficient Type = Input, otherwise this field may be left blank.
   */
 
-  // other fields mapped to Building
+  // A5 , \field Height Selection for Local Wind Pressure Calculation
+  optString = modelObject.heightSelectionforLocalWindPressureCalculation();
+  if(optString) {
+    idfObject.setString(AirflowNetwork_SimulationControlFields::HeightSelectionforLocalWindPressureCalculation,optString.get());
+  }
 
-  //return boost::optional<IdfObject>(simCon);
-  return boost::none;
+  // A6 , \field Building Type
+  optString = modelObject.buildingType();
+  if(optString) {
+    idfObject.setString(AirflowNetwork_SimulationControlFields::HeightSelectionforLocalWindPressureCalculation,optString.get());
+  }
+
+  // N1 , \field Maximum Number of Iterations
+  optInt = modelObject.maximumNumberofIterations();
+  if(optInt) {
+    idfObject.setInt(AirflowNetwork_SimulationControlFields::MaximumNumberofIterations,optInt.get());
+  }
+
+  // A7 , \field Initialization Type
+  optString = modelObject.initializationType();
+  if(optString) {
+    idfObject.setString(AirflowNetwork_SimulationControlFields::InitializationType,optString.get());
+  }
+  
+  // N2 , \field Relative Airflow Convergence Tolerance
+  optDouble = modelObject.relativeAirflowConvergenceTolerance();
+  if(optInt) {
+    idfObject.setDouble(AirflowNetwork_SimulationControlFields::RelativeAirflowConvergenceTolerance,optDouble.get());
+  }
+
+  // N3 , \field Absolute Airflow Convergence Tolerance
+  optDouble = modelObject.absoluteAirflowConvergenceTolerance();
+  if(optInt) {
+    idfObject.setDouble(AirflowNetwork_SimulationControlFields::AbsoluteAirflowConvergenceTolerance,optDouble.get());
+  }
+
+  // N4 , \field Convergence Acceleration Limit
+  optDouble = modelObject.convergenceAccelerationLimit();
+  if(optInt) {
+    idfObject.setDouble(AirflowNetwork_SimulationControlFields::ConvergenceAccelerationLimit,optDouble.get());
+  }
+
+  // N5 , \field Azimuth Angle of Long Axis of Building
+  optDouble = modelObject.azimuthAngleofLongAxisofBuilding();
+  if(optInt) {
+    idfObject.setDouble(AirflowNetwork_SimulationControlFields::AzimuthAngleofLongAxisofBuilding,optDouble.get());
+  }   
+
+  // N6 ; \field Ratio of Building Width Along Short Axis to Width Along Long Axis
+  optDouble = modelObject.ratioofBuildingWidthAlongShortAxistoWidthAlongLongAxis();
+  if(optInt) {
+    idfObject.setDouble(AirflowNetwork_SimulationControlFields::RatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis,optDouble.get());
+  }
+
+  return boost::optional<IdfObject>(idfObject);
 }
 
 } // energyplus
