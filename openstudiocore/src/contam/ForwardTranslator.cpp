@@ -543,7 +543,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     nr++;
     openstudio::contam::Zone zone;
     m_zoneMap[thermalZone.handle()] = nr;
-    //volumeMap[thermalZone.name().get()] = nr;
     zone.setNr(nr);
     zone.setName(QString("Zone_%1").arg(nr).toStdString());
     boost::optional<double> volume = thermalZone.volume();
@@ -551,8 +550,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     if(volume) {
       volString = QString("%1").arg(*volume);
     } else {
-      // Since it seems this is a pretty common thing, no warning unless we can't get a value
-      // LOG(Warn, "Zone '" << name.toStdString() << "' has zero volume, trying to sum space volumes");
+      // No warning unless we can't get a value
       double vol=0.0;
       BOOST_FOREACH(openstudio::model::Space space, thermalZone.spaces()) {
         vol += space.volume();
@@ -614,7 +612,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
       rz.setSystem(true);
       rz.setVariableContaminants(true);
       rz.setName(QString("AHS_%1(Rec)").arg(nr).toStdString());
-      //volumeMap[rz.name.toStdString()] = rz.nr;
       openstudio::contam::Zone sz;
       sz.setNr(rz.nr()+1);
       sz.setPl(1);
@@ -622,7 +619,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
       sz.setSystem(true);
       sz.setVariableContaminants(true);
       sz.setName(QString("AHS_%1(Sup)").arg(nr).toStdString());
-      //volumeMap[sz.name.toStdString()] = sz.nr;
       // Store the zone numbers in the ahs
       ahs.setZone_r(rz.nr());
       ahs.setZone_s(sz.nr());
@@ -706,10 +702,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     boost::optional<openstudio::SqlFile> sqlFile = model.sqlFile();
     if(sqlFile) {
       std::vector<std::string> available = sqlFile->availableTimeSeries();
-      //BOOST_FOREACH(std::string var, available)
-      //{
-      //  std::cout << '\t' << var << std::endl;
-      //}
       std::string envPeriod; 
       BOOST_FOREACH(std::string t, sqlFile->availableEnvPeriods()) {
         envPeriod = t; // should only ever be one
@@ -730,7 +722,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
             "Zone Mean Air Temperature", keyValue);
           if(timeSeries) {
             int nr =  m_zoneMap[thermalZone.handle()];
-            // std::cout << "Found time series for zone " << name.get() << ", CONTAM index " << nr << std::endl;
             // Create a control node
             std::string controlName = QString("ctrl_z_%1").arg(nr).toStdString();
             std::string valueName = QString("temp_%1").arg(nr).toStdString();
@@ -751,10 +742,8 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
       if(std::find(available.begin(), available.end(), "System Node MassFlowRate")!=available.end()) {
         LOG(Warn, "Zone equipment not yet accounted for.");
         // get sizing results, get flow rate schedules for each zone's inlet, return, and exhaust nodes
-        // This should be moved to inside the contam translator
         BOOST_FOREACH(model::ThermalZone thermalZone, model.getConcreteModelObjects<model::ThermalZone>()) {
           // todo: this does not include OA from zone equipment (PTAC, PTHP, etc) or exhaust fans
-
           boost::optional<model::Node> supplyAirNode;
           boost::optional<model::ModelObject> supplyAirModelObject = thermalZone.inletPortList().airLoopHVACModelObject();
           if (supplyAirModelObject) {
@@ -766,7 +755,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
             boost::optional<TimeSeries> timeSeries = sqlFile->timeSeries(envPeriod, "Hourly",
               "System Node MassFlowRate", keyValue);
             if (timeSeries) {
-              //std::cout << "Found time series for supply to zone " << thermalZone.name().get() << std::endl;
               nr = m_pathMap.value(thermalZone.name().get()+" supply",0);
               // There really should not be a case of missing number here, but it is better to be safe
               if(!nr) {
@@ -818,7 +806,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
               boost::optional<TimeSeries> timeSeries = sqlFile->timeSeries(envPeriod, "Hourly", 
                 "System Node MassFlowRate", keyValue);
               if (timeSeries) {
-                //std::cout << "Found time series for return from zone " << thermalZone.name().get() << std::endl;
                 nr = m_pathMap.value(thermalZone.name().get()+" return",0);
                 // There really should not be a case of missing number here, but it is better to be safe
                 if(!nr) {
@@ -879,9 +866,6 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
   //boost::optional<model::Node> exhaustAirNode = zone.exhaustAirNode();
   //boost::optional<model::Node> zoneAirNode = zone.zoneAirNode();
 
-  //ZoneData *afz = zoneList.at(i);
-  //double flowRate = afz->area*0.00508*1.2041;  // Assume 1 scfm/ft^2 as an approximation
-
 }
 
 static double laminarCoefficient(double Ct, double x)
@@ -930,16 +914,17 @@ int ForwardTranslator::addNewAirflowElement(contam::IndexModel model,std::string
   double Ct = F/(SRHO*std::pow(deltaP,n));
   double Cl = laminarCoefficient(Ct,n);
 
-  std::string lam = QString().sprintf("%g",Cl).toStdString();
-  std::string turb = QString().sprintf("%g",Ct).toStdString();
-  std::string expt = QString().sprintf("%g",n).toStdString();
-  std::string dP = QString().sprintf("%g",deltaP).toStdString();
-  std::string Flow = QString().sprintf("%g",F).toStdString();
+  //std::string lam = QString().sprintf("%g",Cl).toStdString();
+  //std::string turb = QString().sprintf("%g",Ct).toStdString();
+  //std::string expt = QString().sprintf("%g",n).toStdString();
+  //std::string dP = QString().sprintf("%g",deltaP).toStdString();
+  //std::string Flow = QString().sprintf("%g",F).toStdString();
   int u_P = 0;
   int u_F = 1; // Display units are m^3/h
 
   // Create a 1-point test element with display units of m^3/h
-  PlrTest1 afe(0, 0, name, " ", lam, turb, expt, dP, Flow, u_P, u_F);
+  //PlrTest1 afe(0, 0, name, " ", lam, turb, expt, dP, Flow, u_P, u_F);
+  PlrTest1 afe(0, 0, name, " ", Cl, Ct, n, deltaP, flow, u_P, u_F);
 
   model.addAirflowElement(afe);
 
