@@ -77,7 +77,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAirflowNetworkSimulationC
   // A6 , \field Building Type
   optString = modelObject.buildingType();
   if(optString) {
-    idfObject.setString(AirflowNetwork_SimulationControlFields::HeightSelectionforLocalWindPressureCalculation,optString.get());
+    idfObject.setString(AirflowNetwork_SimulationControlFields::BuildingType,optString.get());
   }
 
   // N1 , \field Maximum Number of Iterations
