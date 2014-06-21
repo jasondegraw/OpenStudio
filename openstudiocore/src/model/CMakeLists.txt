@@ -1122,6 +1122,7 @@ ENDIF(UNIX OR MINGW)
 
 SET( ${target_name}_test_src
   test/AirConditionerVariableRefrigerantFlow_GTest.cpp
+  test/AirflowNetworkSimulationControl_GTest.cpp
   test/AirGap_GTest.cpp
   test/AirLoopHVACOutdoorAirSystem_GTest.cpp
   test/AirLoopHVACUnitaryHeatPumpAirToAir_GTest.cpp

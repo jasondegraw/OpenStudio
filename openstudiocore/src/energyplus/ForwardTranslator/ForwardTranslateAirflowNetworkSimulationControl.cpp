@@ -23,55 +23,12 @@
 #include <model/AirflowNetworkSimulationControl.hpp>
 #include <model/AirflowNetworkSimulationControl_Impl.hpp>
 
-/*
-#include <utilities/geometry/Geometry.hpp>
-#include <utilities/geometry/Point3d.hpp>
-#include <utilities/geometry/Vector3d.hpp>
-#include <utilities/geometry/EulerAngles.hpp>
-#include <utilities/geometry/Transformation.hpp>
-#include <utilities/idd/AirLoopHVAC_FieldEnums.hxx>
-#include <utilities/idd/AirLoopHVAC_ControllerList_FieldEnums.hxx>
-#include <utilities/idd/AirLoopHVAC_OutdoorAirSystem_FieldEnums.hxx>
-#include <utilities/idd/AirLoopHVAC_SupplyPath_FieldEnums.hxx>
-#include <utilities/idd/AirLoopHVAC_ReturnPath_FieldEnums.hxx>
-#include <utilities/idd/AirLoopHVAC_ZoneMixer_FieldEnums.hxx>
-#include <utilities/idd/AirLoopHVAC_ZoneSplitter_FieldEnums.hxx>
-#include <utilities/idd/AirTerminal_SingleDuct_Uncontrolled_FieldEnums.hxx>
-#include <utilities/idd/AvailabilityManagerAssignmentList_FieldEnums.hxx>
-#include <utilities/idd/AvailabilityManager_Scheduled_FieldEnums.hxx>
-#include <utilities/idd/BranchList_FieldEnums.hxx>
-#include <utilities/idd/Branch_FieldEnums.hxx>
-#include <utilities/idd/Building_FieldEnums.hxx>
-#include <utilities/idd/Coil_Cooling_DX_SingleSpeed_FieldEnums.hxx>
-#include <utilities/idd/Coil_Heating_Gas_FieldEnums.hxx>
-#include <utilities/idd/Construction_FieldEnums.hxx>
-#include <utilities/idd/Controller_OutdoorAir_FieldEnums.hxx>
-#include <utilities/idd/Curve_Biquadratic_FieldEnums.hxx>
-#include <utilities/idd/Curve_Quadratic_FieldEnums.hxx>
-#include <utilities/idd/ElectricEquipment_FieldEnums.hxx>
-#include <utilities/idd/Fan_ConstantVolume_FieldEnums.hxx>
-#include <utilities/idd/Fan_VariableVolume_FieldEnums.hxx>
-#include <utilities/idd/GasEquipment_FieldEnums.hxx>
-#include <utilities/idd/Lights_FieldEnums.hxx>
-#include <utilities/idd/Material_NoMass_FieldEnums.hxx>
-#include <utilities/idd/Material_FieldEnums.hxx>
-#include <utilities/idd/OutdoorAir_Mixer_FieldEnums.hxx>
-#include <utilities/idd/People_FieldEnums.hxx>
-#include <utilities/idd/RunPeriod_FieldEnums.hxx>
-#include <utilities/idd/Schedule_Compact_FieldEnums.hxx>
-#include <utilities/idd/SetpointManager_MixedAir_FieldEnums.hxx>
-#include <utilities/idd/SetpointManager_SingleZone_Reheat_FieldEnums.hxx>
-*/
-
 #include <utilities/idd/AirflowNetwork_SimulationControl_FieldEnums.hxx>
-//#include <utilities/idd/OS_AirflowNetworkSimulationControl_FieldEnums.hxx>
 
 #include <utilities/idd/IddEnums.hxx>
 #include <utilities/idd/IddFactory.hxx>
 
 using namespace openstudio::model;
-
-using namespace std;
 
 namespace openstudio {
 

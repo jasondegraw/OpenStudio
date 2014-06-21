@@ -405,6 +405,12 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateAirConditionerVariableRefrigerantFlow(vrf);
       break;
     }
+  case openstudio::IddObjectType::OS_AirflowNetworkSimulationControl :
+    {
+      model::AirflowNetworkSimulationControl control = modelObject.cast<AirflowNetworkSimulationControl>();
+      retVal = translateAirflowNetworkSimulationControl(control);
+      break;
+    }
   case openstudio::IddObjectType::OS_AirLoopHVAC :
     {
       model::AirLoopHVAC airLoopHVAC = modelObject.cast<AirLoopHVAC>();
@@ -1746,6 +1752,7 @@ std::vector<IddObjectType> ForwardTranslator::iddObjectsToTranslateInitializer()
   result.push_back(IddObjectType::OS_LifeCycleCost_UsePriceEscalation);
 
   result.push_back(IddObjectType::OS_SimulationControl);
+  result.push_back(IddObjectType::OS_AirflowNetworkSimulationControl);
   result.push_back(IddObjectType::OS_ConvergenceLimits);
   result.push_back(IddObjectType::OS_HeatBalanceAlgorithm);
   result.push_back(IddObjectType::OS_RunPeriod);

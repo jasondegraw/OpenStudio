@@ -321,6 +321,7 @@ SET( ${target_name}_test_src
   Test/ForwardTranslator_GTest.cpp
   Test/ReverseTranslator_GTest.cpp
   
+  Test/AirflowNetwork_GTest.cpp
   Test/AirWallMaterial_GTest.cpp
   Test/Building_GTest.cpp
   Test/Construction_GTest.cpp
