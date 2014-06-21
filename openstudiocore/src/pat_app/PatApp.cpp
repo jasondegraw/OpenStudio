@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2012, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,26 +17,26 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <pat_app/PatApp.hpp>
+#include "PatApp.hpp"
 
 #include <pat_app/AboutBox.hpp>
-#include <pat_app/CloudMonitor.hpp>
-#include <pat_app/DesignAlternativesTabController.hpp>
-#include <pat_app/DesignAlternativesView.hpp>
-#include <pat_app/ExportXML.hpp>
-#include <pat_app/ExportSpreadsheet.hpp>
-#include <pat_app/HorizontalTabWidget.hpp>
-#include <pat_app/MainRightColumnController.hpp>
-#include <pat_app/MeasuresTabController.hpp>
-#include <pat_app/MeasuresView.hpp>
-#include <pat_app/PatMainMenu.hpp>
-#include <pat_app/PatMainWindow.hpp>
-#include <pat_app/PatVerticalTabWidget.hpp>
-#include <pat_app/ResultsTabController.hpp>
-#include <pat_app/ResultsView.hpp>
-#include <pat_app/RunTabController.hpp>
-#include <pat_app/RunView.hpp>
-#include <pat_app/StartupView.hpp>
+#include "CloudMonitor.hpp"
+#include "DesignAlternativesTabController.hpp"
+#include "DesignAlternativesView.hpp"
+#include "ExportXML.hpp"
+#include "ExportSpreadsheet.hpp"
+#include "HorizontalTabWidget.hpp"
+#include "MainRightColumnController.hpp"
+#include "MeasuresTabController.hpp"
+#include "MeasuresView.hpp"
+#include "PatMainMenu.hpp"
+#include "PatMainWindow.hpp"
+#include "PatVerticalTabWidget.hpp"
+#include "ResultsTabController.hpp"
+#include "ResultsView.hpp"
+#include "RunTabController.hpp"
+#include "RunView.hpp"
+#include "StartupView.hpp"
 #include <pat_app/VagrantConfiguration.hxx>
 
 #include "../shared_gui_components/BCLMeasureDialog.hpp"
@@ -48,29 +48,38 @@
 #include "../shared_gui_components/ProcessEventsProgressBar.hpp"
 #include "../shared_gui_components/WorkflowTools.hpp"
 
-#include <analysis/Analysis.hpp>
-#include <analysis/AnalysisObject.hpp>
-#include <analysis/AnalysisObject_Impl.hpp>
-#include <analysisdriver/CurrentAnalysis.hpp>
-#include <analysisdriver/SimpleProject_Impl.hpp>
+#include "../analysis/Analysis.hpp"
+#include "../analysis/AnalysisObject.hpp"
+#include "../analysis/AnalysisObject_Impl.hpp"
+#include "../analysis/MeasureGroup.hpp"
+#include "../analysis/MeasureGroup_Impl.hpp"
+#include "../analysis/RubyMeasure.hpp"
+#include "../analysis/RubyMeasure_Impl.hpp"
+#include "../analysisdriver/CurrentAnalysis.hpp"
+#include "../analysisdriver/SimpleProject_Impl.hpp"
 
-#include <runmanager/lib/RubyJobUtils.hpp>
-#include <runmanager/lib/RunManager.hpp>
+#include "../project/ProjectDatabase.hpp"
 
-#include <utilities/bcl/BCLMeasure.hpp>
-#include <utilities/bcl/LocalBCL.hpp>
-#include <utilities/cloud/AWSProvider.hpp>
-#include <utilities/cloud/AWSProvider_Impl.hpp>
-#include <utilities/cloud/CloudProvider.hpp>
-#include <utilities/cloud/CloudProvider_Impl.hpp>
-#include <utilities/cloud/VagrantProvider.hpp>
-#include <utilities/cloud/VagrantProvider_Impl.hpp>
-#include <utilities/core/Application.hpp>
-#include <utilities/core/ApplicationPathHelpers.hpp>
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/PathHelpers.hpp>
-#include <utilities/core/System.hpp>
-#include <utilities/core/ZipFile.hpp>
+#include "../runmanager/lib/RubyJobUtils.hpp"
+#include "../runmanager/lib/RunManager.hpp"
+
+#include "../utilities/bcl/BCLMeasure.hpp"
+#include "../utilities/bcl/LocalBCL.hpp"
+#include "../utilities/cloud/AWSProvider.hpp"
+#include "../utilities/cloud/AWSProvider_Impl.hpp"
+#include "../utilities/cloud/CloudProvider.hpp"
+#include "../utilities/cloud/CloudProvider_Impl.hpp"
+#include "../utilities/cloud/VagrantProvider.hpp"
+#include "../utilities/cloud/VagrantProvider_Impl.hpp"
+#include "../utilities/core/Application.hpp"
+#include "../utilities/core/ApplicationPathHelpers.hpp"
+#include "../utilities/core/Assert.hpp"
+#include "../utilities/core/PathHelpers.hpp"
+#include "../utilities/core/System.hpp"
+#include "../utilities/core/ZipFile.hpp"
+#include "../utilities/idf/IdfFile.hpp"
+
+#include <OpenStudio.hxx>
 
 #include <boost/filesystem.hpp>
 
@@ -99,8 +108,8 @@ namespace pat {
 
 PatApp::PatApp( int & argc, char ** argv, const QSharedPointer<ruleset::RubyUserScriptArgumentGetter> &t_argumentGetter )
   : QApplication(argc, argv),
-    m_onlineBclDialog(0),
-    m_cloudDialog(0),
+    m_onlineBclDialog(nullptr),
+    m_cloudDialog(nullptr),
     m_measureManager(t_argumentGetter, this)
 {
   bool isConnected = connect(this,SIGNAL(userMeasuresDirChanged()),&m_measureManager,SLOT(updateMeasuresLists()));
@@ -513,7 +522,7 @@ void PatApp::create()
     if(result == QMessageBox::Cancel) return;
   }
 
-  NewProjectDialog * dialog = new NewProjectDialog();
+  auto dialog = new NewProjectDialog();
 
   QString projectName;
   if(dialog->exec()){
@@ -720,11 +729,25 @@ bool PatApp::setSeed(const FileReference& currentSeedLocation) {
     // setting the seed model may take a long time due to version and energyplus translation
     // this progress bar will ensure process events is called to avoid locking up the app
     // we will disable the app until the processing is complete
-    ProcessEventsProgressBar* processEventsProgressBar = new ProcessEventsProgressBar();
+    auto processEventsProgressBar = new ProcessEventsProgressBar();
     mainWindow->setEnabled(false);
 
     // get original number of variables
     int nvars = m_project->analysis().problem().numVariables();
+
+    // check that the version is compatible
+    boost::optional<VersionString> candidate = IdfFile::loadVersionOnly(currentSeedLocation.path());
+    VersionString osVersion(openStudioVersion());
+    if (!candidate){
+      LOG(Error, "Cannot determine OpenStudio version for file at '" << toString(currentSeedLocation.path()) << "'");
+      mainWindow->setEnabled(true);
+      return false;
+    }else if (*candidate > osVersion){
+      LOG(Error, "OpenStudio version for file at '" << toString(currentSeedLocation.path()) << "' is '" << *candidate 
+        << "' which is newer than current Openstudio version '" << osVersion << "'");
+      mainWindow->setEnabled(true);
+      return false;
+    }
 
     // set seed model
     result = m_project->setSeed(currentSeedLocation, processEventsProgressBar);
@@ -735,7 +758,7 @@ bool PatApp::setSeed(const FileReference& currentSeedLocation) {
       m_project->seedIdf(processEventsProgressBar);
       
       // update any duplicate measures of different versions
-      Q_FOREACH(const BCLMeasure& measure, result.second) {
+      for (const BCLMeasure& measure : result.second) {
         measureManager().updateMeasure(*m_project,measure);
       }
 
@@ -887,7 +910,7 @@ bool PatApp::userInteractiveSaveAsProject()
     m_project->stop();
   }
 
-  NewProjectDialog * dialog = new NewProjectDialog();
+  auto dialog = new NewProjectDialog();
 
   QString projectName;
   if(dialog->exec()){
@@ -1278,6 +1301,21 @@ bool PatApp::openFile(const QString& fileName)
     boost::optional<openstudio::analysisdriver::SimpleProject> project = analysisdriver::openPATProject(projectDir, options);
     if(project.is_initialized()){
       OS_ASSERT(project->isPATProject());
+
+      project::ProjectDatabase projectDatabase = project->projectDatabase();
+      openstudio::VersionString projectVersion(projectDatabase.version());
+      openstudio::VersionString currentOSVersion(openStudioVersion());
+      if (projectVersion > currentOSVersion){
+        std::stringstream ss;
+        ss << "Unable to open project at '" << toString(projectDir) << "'." << std::endl;
+        ss << "Project has version of '" << projectVersion << "' which is newer than current OpenStudio version '" << currentOSVersion << "'.";
+        QMessageBox::warning(mainWindow,
+                             "Error Opening Project",
+                             QString(ss.str().c_str()));
+        showStartupView();
+        return false;
+      }
+
       attachProject(project);
       mainWindow->setWindowTitle("");
       mainWindow->setWindowFilePath(dir.absolutePath());
@@ -1287,6 +1325,7 @@ bool PatApp::openFile(const QString& fileName)
       } else {
         QTimer::singleShot(0, this, SLOT(markAsUnmodified()));
       }
+
       openstudio::path osmForThisOsp = project->projectDir().parent_path() / toPath(project->projectDir().stem());
       osmForThisOsp = setFileExtension(osmForThisOsp,"osm");
       if (boost::filesystem::exists(osmForThisOsp)) {
@@ -1296,18 +1335,45 @@ bool PatApp::openFile(const QString& fileName)
                              toQString(osmForThisOsp) + 
                              QString("'. For best results, 'Save as ...' this project elsewhere before continuing your work."));
       }
+
+      // check that all Ruby scripts exist, duplicates code in OSDocument::OSDocument
+      std::stringstream ss;
+      BOOST_FOREACH(const analysis::InputVariable& inputVariable, project->analysis().problem().variables()){
+        boost::optional<analysis::MeasureGroup> measureGroup = inputVariable.optionalCast<analysis::MeasureGroup>();
+        if (measureGroup){
+          BOOST_FOREACH(const analysis::Measure& measure, measureGroup->measures(false)){
+            boost::optional<analysis::RubyMeasure> rubyMeasure = measure.optionalCast<analysis::RubyMeasure>();
+            if (rubyMeasure){
+              boost::optional<BCLMeasure> bclMeasure = rubyMeasure->bclMeasure();
+              if (!bclMeasure){
+                ss << "Cannot find measure '" << rubyMeasure->name() << "' in scripts directory." << std::endl;
+              }
+            }
+          }
+        }
+      }
+      if (ss.str().size() > 0){
+        ss << std::endl << "Ensure that all measures are correctly located in the scripts directory.";
+        LOG(Warn,ss.str());
+        // DLM: which dialog should be parent?
+        QMessageBox::warning(0, 
+                             QString("Error opening measure and run data."),
+                             toQString(ss.str()),
+                             QMessageBox::Ok);
+      }
+
       return true;
     } else {
-      if (analysisdriver::OptionalSimpleProject plainProject = analysisdriver::SimpleProject::open(projectDir,options)) {
-        QMessageBox::warning(mainWindow,
-                             "Error Opening Project",
-                             QString("Project at '") + fileName + QString("' is not a PAT project."));
-      }
-      else {
+      //if (analysisdriver::OptionalSimpleProject plainProject = analysisdriver::SimpleProject::open(projectDir,options)) {
+      //  QMessageBox::warning(mainWindow,
+      //                       "Error Opening Project",
+      //                       QString("Project at '") + fileName + QString("' is not a PAT project."));
+      //}
+      //else {
         QMessageBox::warning(mainWindow,
                              "Error Opening Project",
                              QString("Unable to open project at '") + dirAbsolutePath + QString("'."));
-      }
+      //}
       showStartupView();
     }
   }
@@ -1328,7 +1394,7 @@ void PatApp::attachProject(boost::optional<analysisdriver::SimpleProject> projec
     analysis.disconnect();
 
     // detach all signals from project
-    disconnect(m_project->getImpl().get(), 0, this, 0);
+    disconnect(m_project->getImpl().get(), nullptr, this, nullptr);
   }
 
   // set this project as current project
@@ -1340,6 +1406,9 @@ void PatApp::attachProject(boost::optional<analysisdriver::SimpleProject> projec
 
     // TODO: Do not create baseline point here. Add SimpleProject::getOptionalBaselineDataPoint
     // and use that. Call this original version when the run button is hit.
+
+    // update built in measures that may have changed if we upgraded versions
+    m_measureManager.updatePatApplicationMeasures(*m_project);
 
     // cache the seed models here
     m_project->seedModel();
@@ -1726,13 +1795,13 @@ NewProjectDialog::NewProjectDialog(QWidget * parent)
 
   setOkButtonAsDefault(true);
 
-  QLabel * label = NULL;
+  QLabel * label = nullptr;
 
   label = new QLabel("Enter New Project Name",this);
   label->setObjectName("H1");
   upperLayout()->addWidget(label);
 
-  QVBoxLayout * vertLayout = new QVBoxLayout();
+  auto vertLayout = new QVBoxLayout();
   vertLayout->setContentsMargins(20,10,10,10);
   vertLayout->setSpacing(20);
   upperLayout()->addLayout(vertLayout);

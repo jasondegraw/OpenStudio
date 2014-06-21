@@ -17,11 +17,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_OSITEMLIST_H
-#define OPENSTUDIO_OSITEMLIST_H
+#ifndef OPENSTUDIO_OSITEMLIST_HPP
+#define OPENSTUDIO_OSITEMLIST_HPP
 
-#include <openstudio_lib/OSItemSelector.hpp>
-#include <openstudio_lib/OSItem.hpp>
+#include "OSItemSelector.hpp"
+#include "OSItem.hpp"
 
 class QVBoxLayout;
 
@@ -60,8 +60,8 @@ class OSItemList : public OSItemSelector {
   bool itemsRemoveable() const;
   void setItemsRemoveable(bool itemsRemoveable);
 
-  OSItem::Type itemsType() const;
-  void setItemsType(OSItem::Type type);
+  OSItemType itemsType() const;
+  void setItemsType(OSItemType type);
 
 public slots:
 
@@ -98,12 +98,12 @@ private:
   OSItem * m_selectedItem;
   bool m_itemsDraggable;
   bool m_itemsRemoveable;
-  OSItem::Type m_type;
+  OSItemType m_type;
   bool m_dirty;
 
 };
 
 } // openstudio
 
-#endif // OPENSTUDIO_OSITEMLIST_H
+#endif // OPENSTUDIO_OSITEMLIST_HPP
 

@@ -17,31 +17,27 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <analysis/DataPoint.hpp>
-#include <analysis/DataPoint_Impl.hpp>
+#include "DataPoint.hpp"
+#include "DataPoint_Impl.hpp"
 
-#include <analysis/Analysis.hpp>
-#include <analysis/Analysis_Impl.hpp>
-#include <analysis/InputVariable.hpp>
-#include <analysis/OptimizationDataPoint.hpp>
-#include <analysis/OptimizationDataPoint_Impl.hpp>
+#include "Analysis.hpp"
+#include "Analysis_Impl.hpp"
+#include "InputVariable.hpp"
+#include "OptimizationDataPoint.hpp"
+#include "OptimizationDataPoint_Impl.hpp"
 
-#include <runmanager/lib/Job.hpp>
-#include <runmanager/lib/JSON.hpp>
-#include <runmanager/lib/RunManager.hpp>
+#include "../runmanager/lib/Job.hpp"
+#include "../runmanager/lib/JSON.hpp"
+#include "../runmanager/lib/RunManager.hpp"
 
-#include <utilities/math/FloatCompare.hpp>
+#include "../utilities/math/FloatCompare.hpp"
 
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/Containers.hpp>
-#include <utilities/core/FileReference.hpp>
-#include <utilities/core/Finder.hpp>
-#include <utilities/core/Json.hpp>
-#include <utilities/core/UnzipFile.hpp>
-
-#include <boost/foreach.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+#include "../utilities/core/Assert.hpp"
+#include "../utilities/core/Containers.hpp"
+#include "../utilities/core/FileReference.hpp"
+#include "../utilities/core/Finder.hpp"
+#include "../utilities/core/Json.hpp"
+#include "../utilities/core/UnzipFile.hpp"
 
 namespace openstudio {
 namespace analysis {
@@ -166,13 +162,13 @@ namespace detail {
     if (other.sqlOutputData()) {
       m_sqlOutputData = other.sqlOutputData().get().clone();
     }
-    BOOST_FOREACH(const FileReference& fref, other.xmlOutputData()) {
+    for (const FileReference& fref : other.xmlOutputData()) {
       m_xmlOutputData.push_back(fref.clone());
     }
-    Q_FOREACH(const Tag& tag, other.tags()) {
+    for (const Tag& tag : other.tags()) {
       m_tags.push_back(tag.clone());
     }
-    Q_FOREACH(const Attribute& attribute, other.outputAttributes()) {
+    for (const Attribute& attribute : other.outputAttributes()) {
       m_outputAttributes.push_back(attribute.clone());
     }
     // DLM: TODO should we clone topLevelJob? for now do nothing.
@@ -183,7 +179,7 @@ namespace detail {
   }
 
   AnalysisObject DataPoint_Impl::clone() const {
-    boost::shared_ptr<DataPoint_Impl> impl(new DataPoint_Impl(*this));
+    std::shared_ptr<DataPoint_Impl> impl(new DataPoint_Impl(*this));
     return DataPoint(impl);
   }
 
@@ -325,7 +321,7 @@ namespace detail {
     if (!m_outputAttributes.empty()) {
       return m_outputAttributes;
     }
-    BOOST_FOREACH(const FileReference& attributeFile,m_xmlOutputData) {
+    for (const FileReference& attributeFile : m_xmlOutputData) {
       OptionalAttribute wrapperAttribute = Attribute::loadFromXml(attributeFile.path());
       if (wrapperAttribute &&
           (wrapperAttribute->valueType() == AttributeValueType::AttributeVector))
@@ -344,7 +340,7 @@ namespace detail {
       const std::string& attributeName) const
   {
     AttributeVector myAttributes = outputAttributes();
-    BOOST_FOREACH(const Attribute& attribute,myAttributes) {
+    for (const Attribute& attribute : myAttributes) {
       if (istringEqual(attribute.name(),attributeName)) {
         return attribute;
       }
@@ -358,7 +354,7 @@ namespace detail {
 
   bool DataPoint_Impl::isTag(const std::string& tagName) const {
     NameFinder<Tag> finder(tagName);
-    TagVector::const_iterator it = std::find_if(m_tags.begin(),m_tags.end(),finder);
+    auto it = std::find_if(m_tags.begin(),m_tags.end(),finder);
     return (it != m_tags.end());
   }
 
@@ -432,7 +428,7 @@ namespace detail {
 
   void DataPoint_Impl::deleteTag(const std::string& tagName) {
     NameFinder<Tag> finder(tagName);
-    TagVector::iterator it = std::find_if(m_tags.begin(),m_tags.end(),finder);
+    auto it = std::find_if(m_tags.begin(),m_tags.end(),finder);
     if (it != m_tags.end()) {
       m_tags.erase(it);
       onChange(AnalysisObject_Impl::Benign);
@@ -592,7 +588,7 @@ namespace detail {
     catch (...) {}
     try {
       FileReferenceVector xmlOutputData;
-      Q_FOREACH(const runmanager::FileInfo& file, allFiles.getAllByExtension("xml").files()) {
+      for (const runmanager::FileInfo& file : allFiles.getAllByExtension("xml").files()) {
         if (!boost::filesystem::exists(file.fullPath)) {
           LOG(Debug,"After unzipping the DataPoint's details and updating its topLevelJob "
               << "with the directory information, RunManager is reporting '" 
@@ -677,7 +673,7 @@ namespace detail {
   }
 
   void DataPoint_Impl::setXmlOutputData(const std::vector<FileReference>& files) {
-    BOOST_FOREACH(const FileReference& fref,files) {
+    for (const FileReference& fref : files) {
       OS_ASSERT(fref.fileType() == FileReferenceType::XML);
     }
     m_xmlOutputData = files;
@@ -721,7 +717,7 @@ namespace detail {
 
     QVariantList variableValuesList;
     int index(0);
-    Q_FOREACH(const QVariant& value, variableValues()) {
+    for (const QVariant& value : variableValues()) {
       QVariantMap valueMap;
       valueMap["variable_value_index"] = QVariant(index);
       valueMap["value_type"] = value.typeName();
@@ -734,7 +730,7 @@ namespace detail {
     if (!responseValues().empty()) {
       QVariantList responseValuesList;
       index = 0;
-      Q_FOREACH(double value,responseValues()) {
+      for (double value : responseValues()) {
         QVariantMap responseMap;
         responseMap["response_value_index"] = QVariant(index);
         responseMap["value"] = QVariant(value);
@@ -759,7 +755,7 @@ namespace detail {
     }
     if (!xmlOutputData().empty()) {
       QVariantList xmlOutputDataList;
-      Q_FOREACH(const FileReference& fref,xmlOutputData()) {
+      for (const FileReference& fref : xmlOutputData()) {
         xmlOutputDataList.push_back(openstudio::detail::toVariant(fref));
       }
       dataPointData["xml_output_data"] = xmlOutputDataList;
@@ -771,7 +767,7 @@ namespace detail {
 
     if (!dakotaParametersFiles().empty()) {
       QVariantList dakotaParametersFilesList;
-      Q_FOREACH(const openstudio::path& p,dakotaParametersFiles()) {
+      for (const openstudio::path& p : dakotaParametersFiles()) {
         dakotaParametersFilesList.push_back(toQString(p));
       }
       dataPointData["dakota_parameters_files"] = QVariant(dakotaParametersFilesList);
@@ -779,7 +775,7 @@ namespace detail {
 
     if (!tags().empty()) {
       QVariantList tagsList;
-      Q_FOREACH(const Tag& tag,tags()) {
+      for (const Tag& tag : tags()) {
         tagsList.push_back(openstudio::detail::toVariant(tag));
       }
       dataPointData["tags"] = QVariant(tagsList);
@@ -787,7 +783,7 @@ namespace detail {
 
     if (!outputAttributes().empty()) {
       QVariantList outputAttributesList;
-      Q_FOREACH(const Attribute& attribute,outputAttributes()) {
+      for (const Attribute& attribute : outputAttributes()) {
         outputAttributesList.push_back(openstudio::detail::toVariant(attribute));
       }
       dataPointData["output_attributes"] = QVariant(outputAttributesList);
@@ -848,7 +844,7 @@ namespace detail {
     QVariantList variableValuesList = map["variable_values"].toList();
     unsigned n = variableValuesList.size();
     std::vector<QVariant> variableValues(n,QVariant());
-    Q_FOREACH(const QVariant& variableValue,variableValuesList) {
+    for (const QVariant& variableValue : variableValuesList) {
       QVariantMap vvMap = variableValue.toMap();
       QVariant val;
       if (vvMap["value_type"] == QVariant(double(0.0)).typeName()) {
@@ -877,7 +873,7 @@ namespace detail {
             map["response_values"].toList(),
             "value",
             "response_value_index",
-            boost::function<double (QVariant*)>(boost::bind(&QVariant::toDouble,_1,&ok)));
+            std::function<double (QVariant*)>(std::bind(&QVariant::toDouble,std::placeholders::_1,&ok)));
     }
 
     // tags
@@ -885,7 +881,7 @@ namespace detail {
     if (map.contains("tags")) {
       tags = deserializeUnorderedVector<Tag>(
             map["tags"].toList(),
-            boost::function<Tag (const QVariant&)>(boost::bind(openstudio::detail::toTag,_1,version)));
+            std::function<Tag (const QVariant&)>(std::bind(openstudio::detail::toTag,std::placeholders::_1,version)));
     }
 
     // output attributes
@@ -893,7 +889,7 @@ namespace detail {
     if (map.contains("output_attributes")) {
       outputAttributes = deserializeUnorderedVector<Attribute>(
             map["output_attributes"].toList(),
-            boost::function<Attribute (const QVariant&)>(boost::bind(openstudio::detail::toAttribute,_1,version)));
+            std::function<Attribute (const QVariant&)>(std::bind(openstudio::detail::toAttribute,std::placeholders::_1,version)));
     }
 
     FileReferenceVector xmlOutputData;
@@ -904,7 +900,7 @@ namespace detail {
       else {
         xmlOutputData = deserializeUnorderedVector<FileReference>(
               map["xml_output_data"].toList(),
-              boost::function<FileReference (const QVariant&)>(boost::bind(openstudio::detail::toFileReference,_1,version)));
+              std::function<FileReference (const QVariant&)>(std::bind(openstudio::detail::toFileReference,std::placeholders::_1,version)));
       }
     }
 
@@ -914,7 +910,7 @@ namespace detail {
       openstudio::path (*fToPath)(const QString&) = openstudio::toPath;
       dakotaParametersFiles = deserializeUnorderedVector<openstudio::path>(
             map["dakota_parameters_files"].toList(),
-            boost::function<openstudio::path (QVariant*)>(boost::bind(fToPath,boost::bind(&QVariant::toString,_1))));
+            std::function<openstudio::path (QVariant*)>(std::bind(fToPath,std::bind(&QVariant::toString,std::placeholders::_1))));
     }
 
     return DataPoint(toUUID(map["uuid"].toString().toStdString()),
@@ -945,7 +941,7 @@ namespace detail {
 
 DataPoint::DataPoint(const Problem& problem,
                      const std::vector<QVariant>& variableValues)
-  : AnalysisObject(boost::shared_ptr<detail::DataPoint_Impl>(
+  : AnalysisObject(std::shared_ptr<detail::DataPoint_Impl>(
         new detail::DataPoint_Impl(problem,variableValues)))
 {}
 
@@ -970,7 +966,7 @@ DataPoint::DataPoint(const UUID& uuid,
                      const std::vector<openstudio::path>& dakotaParametersFiles,
                      const std::vector<Tag>& tags,
                      const std::vector<Attribute>& outputAttributes)
-  : AnalysisObject(boost::shared_ptr<detail::DataPoint_Impl>(
+  : AnalysisObject(std::shared_ptr<detail::DataPoint_Impl>(
         new detail::DataPoint_Impl(uuid,
                                    versionUUID,
                                    name,
@@ -1016,7 +1012,7 @@ DataPoint::DataPoint(const UUID& uuid,
                      const std::vector<openstudio::path>& dakotaParametersFiles,
                      const std::vector<Tag>& tags,
                      const std::vector<Attribute>& outputAttributes)
-  : AnalysisObject(boost::shared_ptr<detail::DataPoint_Impl>(
+  : AnalysisObject(std::shared_ptr<detail::DataPoint_Impl>(
         new detail::DataPoint_Impl(uuid,
                                    versionUUID,
                                    name,
@@ -1233,7 +1229,7 @@ boost::optional<DataPoint> DataPoint::loadJSON(const std::string& json)
 }
 
 /// @cond
-DataPoint::DataPoint(boost::shared_ptr<detail::DataPoint_Impl> impl)
+DataPoint::DataPoint(std::shared_ptr<detail::DataPoint_Impl> impl)
   : AnalysisObject(impl)
 {}
 /// @endcond
@@ -1301,7 +1297,7 @@ std::vector<DataPoint> toDataPointVector(const openstudio::path& jsonFilepath) {
       result = deserializeOrderedVector<DataPoint>(
                    map["data_points"].toList(),
                    "data_point_batch_index",
-                   boost::function<DataPoint (const QVariant&)>(boost::bind(detail::DataPoint_Impl::factoryFromVariant,_1,version,boost::none)));
+                   std::function<DataPoint (const QVariant&)>(std::bind(detail::DataPoint_Impl::factoryFromVariant,std::placeholders::_1,version,boost::none)));
     }
     else {
       LOG_FREE(Error,"openstudio.analysis.DataPoint",
@@ -1334,7 +1330,7 @@ std::vector<DataPoint> toDataPointVector(const std::string& json) {
       result = deserializeOrderedVector<DataPoint>(
                    map["data_points"].toList(),
                    "data_point_batch_index",
-                   boost::function<DataPoint (const QVariant&)>(boost::bind(detail::DataPoint_Impl::factoryFromVariant,_1,version,boost::none)));
+                   std::function<DataPoint (const QVariant&)>(std::bind(detail::DataPoint_Impl::factoryFromVariant,std::placeholders::_1,version,boost::none)));
     }
     else {
       LOG_FREE(Error,"openstudio.analysis.DataPoint",
@@ -1370,7 +1366,7 @@ namespace detail {
   {
     QVariantList list;
     unsigned i(0);
-    BOOST_FOREACH(const DataPoint& dataPoint, dataPoints) {
+    for (const DataPoint& dataPoint : dataPoints) {
       QVariantMap dpm = dataPoint.toVariant().toMap();
       dpm["data_point_batch_index"] = i;
       list.push_back(dpm);

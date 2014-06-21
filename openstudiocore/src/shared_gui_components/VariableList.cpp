@@ -27,22 +27,22 @@
 #include "LocalLibraryController.hpp"
 #include "WorkflowTools.hpp"
 
-#include <analysis/Analysis.hpp>
-#include <analysis/DataPoint.hpp>
-#include <analysis/MeasureGroup.hpp>
-#include <analysis/MeasureGroup_Impl.hpp>
-#include <analysis/NullMeasure.hpp>
-#include <analysis/NullMeasure_Impl.hpp>
-#include <analysis/Problem.hpp>
-#include <analysis/RubyMeasure.hpp>
-#include <analysis/RubyMeasure_Impl.hpp>
-#include <analysis/WorkflowStep.hpp>
-#include <analysisdriver/SimpleProject.hpp>
+#include "../analysis/Analysis.hpp"
+#include "../analysis/DataPoint.hpp"
+#include "../analysis/MeasureGroup.hpp"
+#include "../analysis/MeasureGroup_Impl.hpp"
+#include "../analysis/NullMeasure.hpp"
+#include "../analysis/NullMeasure_Impl.hpp"
+#include "../analysis/Problem.hpp"
+#include "../analysis/RubyMeasure.hpp"
+#include "../analysis/RubyMeasure_Impl.hpp"
+#include "../analysis/WorkflowStep.hpp"
+#include "../analysisdriver/SimpleProject.hpp"
 
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/Compare.hpp>
-#include <utilities/core/Containers.hpp>
-#include <utilities/core/RubyException.hpp>
+#include "../utilities/core/Assert.hpp"
+#include "../utilities/core/Compare.hpp"
+#include "../utilities/core/Containers.hpp"
+#include "../utilities/core/RubyException.hpp"
 
 #include <QByteArray>
 #include <QDialog>
@@ -54,8 +54,6 @@
 #include <QMimeData>
 #include <QPushButton>
 #include <QRadioButton>
-
-#include <boost/bind.hpp>
 
 
 namespace openstudio{
@@ -137,7 +135,7 @@ QWidget * VariableGroupItemDelegate::view(QSharedPointer<OSListItem> dataSource)
 
     // reporting measures cannot have measure groups
     bool fixedMeasuresOnly = (m_fixedMeasuresOnly || (measureType == MeasureType::ReportingMeasure));
-    VariableGroupItemView * variableGroupItemView = new VariableGroupItemView(fixedMeasuresOnly, measureType);
+    auto variableGroupItemView = new VariableGroupItemView(fixedMeasuresOnly, measureType);
 
     if (!fixedMeasuresOnly)
     {
@@ -175,12 +173,10 @@ VariableListController::VariableListController(MeasureType measureType, bool fil
 {
 }
 
-
 MeasureType VariableListController::measureType() const
 {
   return m_measureType;
 }
-
 
 QSharedPointer<OSListItem> VariableListController::itemAt(int i)
 {
@@ -337,8 +333,6 @@ void VariableListController::addFixedItemForDroppedMeasure(QDropEvent *event)
   addItemForDroppedMeasureImpl(event, true);
 }
 
-
-
 void VariableListController::addItemForDroppedMeasureImpl(QDropEvent * event, bool t_fixed)
 {
   if( boost::optional<analysisdriver::SimpleProject> project = m_app->project() )
@@ -357,6 +351,14 @@ void VariableListController::addItemForDroppedMeasureImpl(QDropEvent * event, bo
 
     // accept the event to make the icon refresh
     event->accept();
+
+    // don't allow user to drag standard reports or other built in measures 
+    if (m_app->measureManager().isPatApplicationMeasure(id)){
+      QMessageBox::warning( m_app->mainWidget(), 
+          "Cannot add measure", 
+          "This measure conflicts with a built in measure and cannot be added. Create a duplicate of this measure to add to this project.");
+      return;
+    }
 
     // check if we have data points other than the baseline
     if (project->analysis().dataPoints().size() > 1){
@@ -577,6 +579,18 @@ void VariableItem::remove()
     }
   }
 
+  // if any of this variable's measures are being edited, clear the edit controller
+  MeasureItem* measureItem = m_app->editController()->measureItem();
+  if (measureItem){
+    analysis::RubyMeasure rubyMeasure = measureItem->measure();
+    for (const auto & measure : m_variable.measures(false)){
+      if (measure == rubyMeasure){
+        m_app->editController()->reset();
+        break;
+      }
+    }
+  }
+
   qobject_cast<VariableListController *>(controller())->removeItemForVariable(m_variable);
 }
 
@@ -594,7 +608,7 @@ QWidget * VariableItemDelegate::view(QSharedPointer<OSListItem> dataSource)
 {
   if(QSharedPointer<VariableItem> variableItem = dataSource.objectCast<VariableItem>())
   {
-    VariableItemView * variableItemView = new VariableItemView(variableItem->isFixedMeasure());
+    auto variableItemView = new VariableItemView(variableItem->isFixedMeasure());
     variableItemView->variableHeaderView->variableNameEdit->setText(variableItem->name());
 
     bool bingo = connect(variableItemView->variableHeaderView->variableNameEdit,SIGNAL(textEdited(const QString &)),
@@ -705,7 +719,7 @@ void MeasureListController::addItemForDuplicateMeasure(const analysis::Measure& 
   analysis::RubyMeasureVector::const_iterator it = std::find_if(
       measuresInList.begin(),
       measuresInList.end(),
-      boost::bind(uuidsEqual<analysis::RubyMeasure,analysis::RubyMeasure>,duplicateMeasure,_1));
+      std::bind(uuidsEqual<analysis::RubyMeasure,analysis::RubyMeasure>,duplicateMeasure,std::placeholders::_1));
   emit itemInserted(int(it - measuresInList.begin()));
 }
 
@@ -751,17 +765,15 @@ std::vector<analysis::RubyMeasure> MeasureListController::measures() const
 
   std::vector<analysis::Measure> allPerts = m_variableItem->variable().measures(false);
 
-  for( std::vector<analysis::Measure>::iterator it = allPerts.begin();
-      it != allPerts.end();
-      ++it )
+  for( const auto & measure : allPerts )
   {
-    if( boost::optional<analysis::RubyMeasure> rubyPert = it->optionalCast<analysis::RubyMeasure>() )
+    if( boost::optional<analysis::RubyMeasure> rubyPert = measure.optionalCast<analysis::RubyMeasure>() )
     {
       //if( boost::optional<BCLMeasure> measure = rubyPert->measure() )
       //{
       //  if( measure->measureType() ==  m_variableItem->measureType() )
       //  {
-      //    result.push_back(*it);
+      //    result.push_back(measure);
       //  }
       //}
       result.push_back(rubyPert.get());
@@ -827,6 +839,7 @@ MeasureItem::MeasureItem(const analysis::RubyMeasure & measure, openstudio::Base
     m_app(t_app),
     m_measure(measure)
 {
+  OS_ASSERT(m_measure.usesBCLMeasure());
 }
 
 analysis::RubyMeasure MeasureItem::measure() const
@@ -855,20 +868,29 @@ QString MeasureItem::description() const
 
 QString MeasureItem::modelerDescription() const
 {
-  OS_ASSERT(m_measure.usesBCLMeasure());
+  QString result;
 
-  return QString::fromStdString(m_measure.measure()->modelerDescription());
+  boost::optional<BCLMeasure> bclMeasure = m_measure.bclMeasure();
+  if (bclMeasure){
+    result = QString::fromStdString(bclMeasure->modelerDescription());
+  }else{
+    LOG(Error, "Cannot load BCLMeasure '" << toString(m_measure.bclMeasureUUID()) << "' from '" << toString(m_measure.bclMeasureDirectory()) << "'");
+  }
+  return result; 
 }
 
 QString MeasureItem::scriptFileName() const
 {
-  OS_ASSERT(m_measure.usesBCLMeasure());
-
   QString scriptName;
 
-  if( boost::optional<openstudio::path> path = m_measure.measure()->primaryRubyScriptPath() )
-  {
-    scriptName = toQString(path->leaf());
+  boost::optional<BCLMeasure> bclMeasure = m_measure.bclMeasure();
+  if (bclMeasure){
+    if( boost::optional<openstudio::path> path = m_measure.measure()->primaryRubyScriptPath() )
+    {
+      scriptName = toQString(path->leaf());
+    }
+  }else{
+    LOG(Error, "Cannot load BCLMeasure '" << toString(m_measure.bclMeasureUUID()) << "' from '" << toString(m_measure.bclMeasureDirectory()) << "'");
   }
 
   return scriptName;
@@ -876,8 +898,6 @@ QString MeasureItem::scriptFileName() const
 
 void MeasureItem::setDescription(const QString & description)
 {
-  OS_ASSERT(m_measure.usesBCLMeasure());
-
   // ETH: Was setting description on the measure itself (m_measure.measure()), however, this
   // description should be attached to the instantiated measure, not the global measure.
   m_measure.setDescription(description.toStdString());
@@ -943,7 +963,10 @@ void MeasureItem::remove()
     }
   }
 
-  m_app->editController()->reset();
+  // if this measure is being edited, clear the edit controller
+  if (m_app->editController()->measureItem() == this){
+    m_app->editController()->reset();
+  }
 
   qobject_cast<MeasureListController *>(controller())->removeItemForMeasure(m_measure);
 }
@@ -953,7 +976,7 @@ void MeasureItem::setSelected(bool isSelected)
   OSListItem::setSelected(isSelected);
 
   // Ugly hack to prevent the controller from doing this for tab 2.
-  // Please someboday fix, perhaps be using a new signal from OSItemSelectionController.
+  // Please somebody fix, perhaps be using a new signal from OSItemSelectionController.
   if( ! controller()->selectionController()->allowMultipleSelections() )
   {
     if( isSelected )
@@ -970,13 +993,15 @@ void MeasureItem::setSelected(bool isSelected)
       m_app->editController()->reset();
     }
   }
+
+  //TODO
 }
 
 QWidget * MeasureItemDelegate::view(QSharedPointer<OSListItem> dataSource)
 {
   if(QSharedPointer<MeasureItem> measureItem = dataSource.objectCast<MeasureItem>())
   {
-    MeasureItemView * measureItemView = new MeasureItemView(m_fixed);
+    auto measureItemView = new MeasureItemView(m_fixed);
 
     // Name
 

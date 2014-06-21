@@ -17,11 +17,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef COMPONENT_H
-#define COMPONENT_H
+#ifndef SHAREDGUICOMPONENTS_COMPONENT_HPP
+#define SHAREDGUICOMPONENTS_COMPONENT_HPP
 
-#include <utilities/bcl/BCL.hpp>
-#include <utilities/data/Attribute.hpp>
+#include "../utilities/bcl/BCL.hpp"
+#include "../utilities/data/Attribute.hpp"
 
 #include <QAbstractButton>
 
@@ -30,6 +30,7 @@ class QLabel;
 
 namespace openstudio {
 
+class BCLMeasure;
 class BCLSearchResult;
 
 class Component : public QAbstractButton
@@ -37,13 +38,17 @@ class Component : public QAbstractButton
   Q_OBJECT
 
 public:
-  Component(const BCLSearchResult & bclSearchResult,
+  Component(const BCLMeasure & bclMeasure,
     bool showAbridgedView = true,
     bool showCheckBox = true,
     QWidget * parent = 0);
+  Component(const BCLSearchResult & bclSearchResult,
+    bool showAbridgedView = true,
+    bool showCheckBox = true,
+    QWidget * parent = nullptr);
   Component(bool showAbridgedView = false,
     bool showCheckBox = false,
-    QWidget * parent = 0);
+    QWidget * parent = nullptr);
   Component(const Component & other);
   virtual ~Component();
   Component & operator=(const Component & other);
@@ -59,6 +64,7 @@ protected:
 private:
   void createAbridgedLayout();
   void createCompleteLayout();
+  void parseBCLMeasure(const BCLMeasure & bclMeasure);
   void parseBCLSearchResult(const BCLSearchResult & bclSearchResult);
 
   QString m_componentType;
@@ -69,6 +75,7 @@ private:
   QString m_fidelityLevel;
   std::vector<Attribute> m_attributes;
   std::vector<BCLFile> m_files;
+  std::vector<BCLFileReference> m_fileReferences;
   std::vector<BCLProvenance> m_provenances;
   std::vector<std::string> m_tags;
   bool m_showAbridgedView;
@@ -86,4 +93,4 @@ private slots:
 
 } // namespace openstudio
 
-#endif // COMPONENT_H
+#endif // SHAREDGUICOMPONENTS_COMPONENT_HPP

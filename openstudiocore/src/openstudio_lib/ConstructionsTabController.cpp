@@ -17,26 +17,26 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/ConstructionsTabController.hpp>
+#include "ConstructionsTabController.hpp"
 
-#include <openstudio_lib/ConstructionsController.hpp>
-#include <openstudio_lib/ConstructionsTabView.hpp>
-#include <openstudio_lib/DefaultConstructionSetsController.hpp>
-#include <openstudio_lib/MaterialsController.hpp>
+#include "ConstructionsController.hpp"
+#include "ConstructionsTabView.hpp"
+#include "DefaultConstructionSetsController.hpp"
+#include "MaterialsController.hpp"
 
-#include <model/Construction.hpp>
-#include <model/Model.hpp>
+#include "../model/Construction.hpp"
+#include "../model/Model.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 namespace openstudio {
 
 ConstructionsTabController::ConstructionsTabController(bool isIP, const model::Model& model)
   : MainTabController(new ConstructionsTabView(model, "Constructions"))
 {
-  m_defaultConstructionSetsController = boost::shared_ptr<DefaultConstructionSetsController>(new DefaultConstructionSetsController(model));
-  m_constructionsController = boost::shared_ptr<ConstructionsController>(new ConstructionsController(isIP, model));
-  m_materialsController = boost::shared_ptr<MaterialsController>(new MaterialsController(isIP, model));
+  m_defaultConstructionSetsController = std::shared_ptr<DefaultConstructionSetsController>(new DefaultConstructionSetsController(model));
+  m_constructionsController = std::shared_ptr<ConstructionsController>(new ConstructionsController(isIP, model));
+  m_materialsController = std::shared_ptr<MaterialsController>(new MaterialsController(isIP, model));
 
   this->mainContentWidget()->addSubTab("Construction Sets", m_defaultConstructionSetsController->subTabView(),DEFAULT_CONSTRUCTIONS);
   this->mainContentWidget()->addSubTab("Constructions", m_constructionsController->subTabView(),CONSTRUCTIONS);
@@ -56,8 +56,8 @@ ConstructionsTabController::ConstructionsTabController(bool isIP, const model::M
                         m_materialsController->subTabView(), SIGNAL(toggleUnitsClicked(bool)));
   OS_ASSERT(isConnected);
 
-  isConnected = QObject::connect(m_defaultConstructionSetsController.get(), SIGNAL(openBclDlgClicked()),
-                                 this, SIGNAL(openBclDlgClicked()));
+  isConnected = QObject::connect(m_defaultConstructionSetsController.get(), SIGNAL(downloadComponentsClicked()),
+                                 this, SIGNAL(downloadComponentsClicked()));
   OS_ASSERT(isConnected);
 
   isConnected = QObject::connect(m_defaultConstructionSetsController.get(), SIGNAL(openLibDlgClicked()),

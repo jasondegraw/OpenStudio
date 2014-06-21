@@ -17,14 +17,18 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_SCRIPTSTABVIEW_H
-#define OPENSTUDIO_SCRIPTSTABVIEW_H
+#ifndef OPENSTUDIO_SCRIPTSTABVIEW_HPP
+#define OPENSTUDIO_SCRIPTSTABVIEW_HPP
 
-#include <openstudio_lib/SubTabView.hpp>
+#include "SubTabView.hpp"
+
+class QPushButton;
 
 namespace openstudio {
 
 class OSListView;
+
+class SyncMeasuresDialog;
 
 class ScriptsTabView : public MainTabView
 {
@@ -43,8 +47,18 @@ class ScriptsTabView : public MainTabView
 
   virtual void showEvent(QShowEvent *e);
 
+  private:
+
+  QPushButton * m_updateMeasuresButton;
+
+  boost::shared_ptr<SyncMeasuresDialog> m_syncMeasuresDialog;
+
+  private slots:
+
+  void openUpdateMeasuresDlg();
+
 };
 
 } // openstudio
 
-#endif // OPENSTUDIO_SCRIPTSTABVIEW_H
+#endif // OPENSTUDIO_SCRIPTSTABVIEW_HPP

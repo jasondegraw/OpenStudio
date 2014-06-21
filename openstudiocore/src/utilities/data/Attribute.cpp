@@ -17,22 +17,20 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <utilities/data/Attribute.hpp>
-#include <utilities/data/Attribute_Impl.hpp>
+#include "Attribute.hpp"
+#include "Attribute_Impl.hpp"
 
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/Containers.hpp>
-#include <utilities/core/Json.hpp>
+#include "../core/Assert.hpp"
+#include "../core/Containers.hpp"
+#include "../core/Json.hpp"
 
-#include <utilities/units/UnitFactory.hpp>
-#include <utilities/units/Quantity.hpp>
-#include <utilities/units/QuantityFactory.hpp>
-#include <utilities/units/OSOptionalQuantity.hpp>
+#include "../units/UnitFactory.hpp"
+#include "../units/Quantity.hpp"
+#include "../units/QuantityFactory.hpp"
+#include "../units/OSOptionalQuantity.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
 
 #include <sstream>
 #include <limits>
@@ -827,7 +825,7 @@ namespace detail{
       childElement.appendChild(text);
       break;
     case AttributeValueType::AttributeVector:
-      BOOST_FOREACH(const Attribute& Attribute, this->valueAsAttributeVector()){
+      for (const Attribute& Attribute : this->valueAsAttributeVector()){
         childElement.appendChild(Attribute.toXml().documentElement());
       }
       break;
@@ -938,19 +936,19 @@ AttributeDescription::AttributeDescription(const std::string& t_name,
 {}
 
 Attribute::Attribute(const std::string& name, bool value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, bool value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, bool value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
@@ -961,26 +959,26 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      bool value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, double value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, double value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, double value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
@@ -991,21 +989,21 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      double value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, const OSOptionalQuantity& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name,value)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, const Quantity& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value)))
 {
   OS_ASSERT(m_impl);
@@ -1015,14 +1013,14 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const std::string& name,
                      const boost::optional<std::string>& displayName,
                      const Quantity& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, const Unit& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name,value)))
 {
   OS_ASSERT(m_impl);
@@ -1032,26 +1030,26 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const std::string& name,
                      const boost::optional<std::string>& displayName,
                      const Unit& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, int value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, int value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, int value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
@@ -1062,26 +1060,26 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      int value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, unsigned value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, unsigned value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, unsigned value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
@@ -1092,26 +1090,26 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      unsigned value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, const char* value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, const char* value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, const char* value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
@@ -1122,26 +1120,26 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      const char* value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, const std::string& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, const std::string& value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, const std::string& value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
@@ -1152,26 +1150,26 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      const std::string& value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const std::string& name, const std::vector<openstudio::Attribute>& value)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, boost::none)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, const std::vector<openstudio::Attribute>& value, const std::string& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 Attribute::Attribute(const std::string& name, const std::vector<openstudio::Attribute>& value, const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(new detail::Attribute_Impl(name, value, units)))
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(new detail::Attribute_Impl(name, value, units)))
 {
   OS_ASSERT(m_impl);
 }
@@ -1181,14 +1179,14 @@ Attribute::Attribute(const openstudio::UUID& uuid,
                      const boost::optional<std::string>& displayName,
                      const std::vector<openstudio::Attribute>& value,
                      const boost::optional<std::string>& units)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(
              new detail::Attribute_Impl(uuid, versionUUID, name, displayName, value, units)))
 {
   OS_ASSERT(m_impl);
 }
 
 Attribute::Attribute(const QDomElement& element)
-  : m_impl(boost::shared_ptr<detail::Attribute_Impl>(new detail::Attribute_Impl(element)))
+  : m_impl(std::shared_ptr<detail::Attribute_Impl>(new detail::Attribute_Impl(element)))
 {
   OS_ASSERT(m_impl);
 }
@@ -1200,11 +1198,11 @@ Attribute::Attribute(const Attribute& other)
 }
 
 Attribute Attribute::clone() const {
-  Attribute result(boost::shared_ptr<detail::Attribute_Impl>(new detail::Attribute_Impl(*m_impl)));
+  Attribute result(std::shared_ptr<detail::Attribute_Impl>(new detail::Attribute_Impl(*m_impl)));
   return result;
 }
 
-Attribute::Attribute(const boost::shared_ptr<detail::Attribute_Impl>& impl)
+Attribute::Attribute(const std::shared_ptr<detail::Attribute_Impl>& impl)
   : m_impl(impl)
 {
   OS_ASSERT(m_impl);
@@ -1469,7 +1467,7 @@ std::ostream& operator<<(std::ostream& os, const Attribute& attribute)
 
 Attribute createAttributeFromVector(const std::string& name, std::vector<int> value) {
   AttributeVector valueAsAttributes;
-  BOOST_FOREACH(int v,value) {
+  for (int v : value) {
     Attribute attribute(std::string(),v);
     valueAsAttributes.push_back(attribute);
   }
@@ -1478,7 +1476,7 @@ Attribute createAttributeFromVector(const std::string& name, std::vector<int> va
 
 Attribute createAttributeFromVector(const std::string& name, std::vector<double> value) {
   AttributeVector valueAsAttributes;
-  BOOST_FOREACH(double v,value) {
+  for (double v : value) {
     Attribute attribute(std::string(),v);
     valueAsAttributes.push_back(attribute);
   }
@@ -1491,7 +1489,7 @@ std::vector<int> getIntVectorFromAttribute(const Attribute& attribute) {
     LOG_FREE_AND_THROW("openstudio.Attribute","Attribute must be of type AttributeVector for this function to be applicable.");
   }
   AttributeVector attributes = attribute.valueAsAttributeVector();
-  BOOST_FOREACH(const Attribute& a, attributes) {
+  for (const Attribute& a : attributes) {
     result.push_back(a.valueAsInteger());
   }
   return result;
@@ -1503,7 +1501,7 @@ std::vector<double> getDoubleVectorFromAttribute(const Attribute& attribute) {
     LOG_FREE_AND_THROW("openstudio.Attribute","Attribute must be of type AttributeVector for this function to be applicable.");
   }
   AttributeVector attributes = attribute.valueAsAttributeVector();
-  BOOST_FOREACH(const Attribute& a, attributes) {
+  for (const Attribute& a : attributes) {
     result.push_back(a.valueAsDouble());
   }
   return result;
@@ -1587,7 +1585,7 @@ namespace detail {
     }
     else if (valueType == AttributeValueType::AttributeVector) {
       QVariantList childAttributesList;
-      Q_FOREACH(const Attribute& child,attribute.valueAsAttributeVector()) {
+      for (const Attribute& child : attribute.valueAsAttributeVector()) {
         childAttributesList.push_back(toVariant(child));
       }
       attributeData["value"] = QVariant(childAttributesList);
@@ -1682,7 +1680,7 @@ namespace detail {
       case AttributeValueType::AttributeVector :
         children = deserializeUnorderedVector<Attribute>(
               map["value"].toList(),
-              boost::function<Attribute (const QVariant&)>(boost::bind(openstudio::detail::toAttribute,_1,version)));
+              std::function<Attribute (const QVariant&)>(std::bind(openstudio::detail::toAttribute,std::placeholders::_1,version)));
         return Attribute(uuid,
                          versionUUID,
                          name,
@@ -1698,7 +1696,7 @@ namespace detail {
     QVariantMap map;
     std::set<std::string> attributeNames;
 
-    BOOST_FOREACH(const Attribute& attribute,attributes) {
+    for (const Attribute& attribute : attributes) {
       std::pair<std::set<std::string>::iterator,bool> insertResult = attributeNames.insert(attribute.name());
       if (!insertResult.second) {
         LOG_FREE_AND_THROW("openstudio.Attribute","Asked to create a flat json serialization "
@@ -1761,7 +1759,7 @@ namespace detail {
     std::set<std::string> processedAttributeNames; // serialization ensures uniqueness of names
 
     int itemCount(0);
-    Q_FOREACH(const QString& key,map.keys()) {
+    for (const QString& key : map.keys()) {
       // determine attribute name
       std::string attributeName;
       std::string keyString = toString(key);

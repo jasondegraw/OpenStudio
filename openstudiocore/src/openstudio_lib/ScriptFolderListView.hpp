@@ -17,17 +17,17 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_SCRIPTFOLDERLISTVIEW_H
-#define OPENSTUDIO_SCRIPTFOLDERLISTVIEW_H
+#ifndef OPENSTUDIO_SCRIPTFOLDERLISTVIEW_HPP
+#define OPENSTUDIO_SCRIPTFOLDERLISTVIEW_HPP
 
-#include <openstudio_lib/OSCollapsibleItemList.hpp>
+#include "OSCollapsibleItemList.hpp"
 
-#include <ruleset/OSArgument.hpp>
+#include "../ruleset/OSArgument.hpp"
 
-#include <model/Model.hpp>
-#include <model/ModelObject.hpp>
+#include "../model/Model.hpp"
+#include "../model/ModelObject.hpp"
 
-#include <utilities/core/Logger.hpp>
+#include "../utilities/core/Logger.hpp"
 
 #include <QFileSystemWatcher>
 
@@ -48,7 +48,7 @@ class ScriptFolderListView : public OSCollapsibleItemList {
                        bool addScrollArea,
                        bool draggable,
                        bool removeable,
-                       OSItem::Type headerType,
+                       OSItemType headerType,
                        QWidget * parent = 0);
 
   virtual ~ScriptFolderListView();
@@ -73,7 +73,7 @@ class ScriptFolderListView : public OSCollapsibleItemList {
 
   std::vector<ruleset::UserScriptInfo> folderUserScripts(const openstudio::path& folder) const;
 
-  boost::shared_ptr<QFileSystemWatcher> fsWatcher() const;
+  std::shared_ptr<QFileSystemWatcher> fsWatcher() const;
 
  signals:
   void scriptListChanged();
@@ -84,19 +84,19 @@ class ScriptFolderListView : public OSCollapsibleItemList {
   openstudio::path iterateFileName(const openstudio::path &t_path);
 
   openstudio::path m_rootPath;
-  OSItem::Type m_headerType;
+  OSItemType m_headerType;
   std::map<openstudio::path, std::string> m_displayNames;
   std::map<openstudio::path, ScriptsListView *> m_scriptsListViews;
 
   bool m_draggable;
   bool m_removeable;
 
-  boost::shared_ptr<QFileSystemWatcher> m_fswatcher;
+  std::shared_ptr<QFileSystemWatcher> m_fswatcher;
 };
 
 
 
 } // openstudio
 
-#endif // OPENSTUDIO_SCRIPTFOLDERLISTVIEW_H
+#endif // OPENSTUDIO_SCRIPTFOLDERLISTVIEW_HPP
 

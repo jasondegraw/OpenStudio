@@ -17,11 +17,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_OSCOLLAPSIBLEITEMLIST_H
-#define OPENSTUDIO_OSCOLLAPSIBLEITEMLIST_H
+#ifndef OPENSTUDIO_OSCOLLAPSIBLEITEMLIST_HPP
+#define OPENSTUDIO_OSCOLLAPSIBLEITEMLIST_HPP
 
-#include <openstudio_lib/OSItemSelector.hpp>
-#include <openstudio_lib/OSItem.hpp>
+#include "OSItemSelector.hpp"
+#include "OSItem.hpp"
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -55,8 +55,8 @@ public:
   bool itemsRemoveable() const;
   void setItemsRemoveable(bool itemsRemoveable);
 
-  OSItem::Type itemsType() const;
-  void setItemsType(OSItem::Type type);
+  OSItemType itemsType() const;
+  void setItemsType(OSItemType type);
 
   bool showFilterLayout() const;
   void setShowFilterLayout(const bool showFilterLayout);
@@ -84,10 +84,10 @@ private:
   bool m_itemsDraggable;
   bool m_itemsRemoveable;
   bool m_showFilterLayout;
-  OSItem::Type m_itemsType;
+  OSItemType m_itemsType;
 };
 
 } // openstudio
 
-#endif // OPENSTUDIO_OSCOLLAPSIBLEITEMLIST_H
+#endif // OPENSTUDIO_OSCOLLAPSIBLEITEMLIST_HPP
 

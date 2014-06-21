@@ -17,17 +17,20 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
+#ifndef OSVERSION_VERSIONTRANSLATOR_HPP
+#define OSVERSION_VERSIONTRANSLATOR_HPP
+
 #include "OSVersionAPI.hpp"
 
-#include <model/Schedule.hpp>
+#include "../model/Schedule.hpp"
 
-#include <utilities/idf/IdfFile.hpp>
-#include <utilities/idd/IddFile.hpp>
-#include <utilities/idd/IddFileAndFactoryWrapper.hpp>
+#include "../utilities/idf/IdfFile.hpp"
+#include "../utilities/idd/IddFile.hpp"
+#include "../utilities/idd/IddFileAndFactoryWrapper.hpp"
 
-#include <utilities/core/Compare.hpp>
-#include <utilities/core/Logger.hpp>
-#include <utilities/core/StringStreamLogSink.hpp>
+#include "../utilities/core/Compare.hpp"
+#include "../utilities/core/Logger.hpp"
+#include "../utilities/core/StringStreamLogSink.hpp"
 
 #include <boost/functional.hpp>
 
@@ -87,20 +90,20 @@ class OSVERSION_API VersionTranslator {
   /** Returns a current-version OpenStudio Model, if possible. The file at pathToOldOsm must
    *  be an osm of version 0.7.0 or later. */ 
   boost::optional<model::Model> loadModel(const openstudio::path& pathToOldOsm, 
-                                          ProgressBar* progressBar = NULL);
+                                          ProgressBar* progressBar = nullptr);
 
   /** \overload */
   boost::optional<model::Model> loadModel(std::istream& is,
-                                          ProgressBar* progressBar = NULL);
+                                          ProgressBar* progressBar = nullptr);
 
   /** Returns a current-version OpenStudio Component, if possible. The file at pathToOldOsc 
    *  must be an osc of version 0.7.0 or later. */
   boost::optional<model::Component> loadComponent(const openstudio::path& pathToOldOsc, 
-                                                  ProgressBar* progressBar = NULL);
+                                                  ProgressBar* progressBar = nullptr);
 
   /** \overload */
   boost::optional<model::Component> loadComponent(std::istream& is,
-                                                  ProgressBar* progressBar = NULL);
+                                                  ProgressBar* progressBar = nullptr);
 
   //@}
   /** @name Queries 
@@ -135,6 +138,12 @@ class OSVERSION_API VersionTranslator {
    *  refactored. */
   std::vector< std::pair<IdfObject,IdfObject> > refactoredObjects() const;
 
+  /** Returns true if loading newer versions is allowable. Defaults to true. */
+  bool allowNewerVersions() const;
+
+  /** Set whether or not loading newer versions is allowed. */
+  void setAllowNewerVersions(bool allowNewerVersions);
+
   //@}  
  private:
   REGISTER_LOGGER("openstudio.osversion.VersionTranslator");
@@ -144,6 +153,7 @@ class OSVERSION_API VersionTranslator {
   std::vector<VersionString> m_startVersions;
 
   VersionString m_originalVersion;
+  bool m_allowNewerVersions;
   std::map<VersionString, IdfFile> m_map;
   StringStreamLogSink m_logSink;
   std::vector<IdfObject> m_deprecated, m_untranslated, m_new;
@@ -155,7 +165,7 @@ class OSVERSION_API VersionTranslator {
 
   boost::optional<model::Model> updateVersion(std::istream& is, 
                                               bool isComponent,
-                                              ProgressBar* progressBar = NULL);
+                                              ProgressBar* progressBar = nullptr);
 
   void initializeMap(std::istream& is);
 
@@ -177,6 +187,7 @@ class OSVERSION_API VersionTranslator {
   std::string update_1_0_1_to_1_0_2(const IdfFile& idf_1_0_1, const IddFileAndFactoryWrapper& idd_1_0_2);
   std::string update_1_0_2_to_1_0_3(const IdfFile& idf_1_0_2, const IddFileAndFactoryWrapper& idd_1_0_3);
   std::string update_1_2_2_to_1_2_3(const IdfFile& idf_1_2_2, const IddFileAndFactoryWrapper& idd_1_2_3);
+  std::string update_1_3_4_to_1_3_5(const IdfFile& idf_1_3_4, const IddFileAndFactoryWrapper& idd_1_3_5);
 
   IdfObject updateUrlField_0_7_1_to_0_7_2(const IdfObject& object, unsigned index);
 
@@ -188,13 +199,13 @@ class OSVERSION_API VersionTranslator {
     virtual ~InterobjectIssueInformation() {}
   };
 
-  std::vector< boost::shared_ptr<InterobjectIssueInformation> > fixInterobjectIssuesStage1(
+  std::vector< std::shared_ptr<InterobjectIssueInformation> > fixInterobjectIssuesStage1(
       model::Model& model,
       const VersionString& startVersion);
 
   void fixInterobjectIssuesStage2(
       model::Model& model,
-      std::vector<boost::shared_ptr<InterobjectIssueInformation> >& stage1Information);
+      std::vector<std::shared_ptr<InterobjectIssueInformation> >& stage1Information);
 
   struct InterobjectIssueInformation_0_8_3_to_0_8_4 : public InterobjectIssueInformation {
     std::vector<model::Schedule> schedules;
@@ -211,14 +222,15 @@ class OSVERSION_API VersionTranslator {
     virtual ~InterobjectIssueInformation_0_8_3_to_0_8_4() {}
   };
 
-  boost::shared_ptr<InterobjectIssueInformation> fixInterobjectIssuesStage1_0_8_3_to_0_8_4(
+  std::shared_ptr<InterobjectIssueInformation> fixInterobjectIssuesStage1_0_8_3_to_0_8_4(
       model::Model& model);
 
   void fixInterobjectIssuesStage2_0_8_3_to_0_8_4(
       model::Model& model,
-      boost::shared_ptr<InterobjectIssueInformation>& info);
+      std::shared_ptr<InterobjectIssueInformation>& info);
 };
 
 } // osversion
 } // openstudio
 
+#endif // OSVERSION_VERSIONTRANSLATOR_HPP

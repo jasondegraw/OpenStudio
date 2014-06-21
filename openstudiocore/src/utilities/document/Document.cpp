@@ -17,22 +17,21 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <utilities/document/Document.hpp>
-#include <utilities/document/DocumentRegex.hpp>
-#include <utilities/document/SectionHeading.hpp>
-#include <utilities/document/SectionHeading_Impl.hpp>
-#include <utilities/document/Section.hpp>
-#include <utilities/document/Section_Impl.hpp>
-#include <utilities/document/Table.hpp>
-#include <utilities/document/Table_Impl.hpp>
-#include <utilities/document/Text.hpp>
-#include <utilities/document/Text_Impl.hpp>
+#include "Document.hpp"
+#include "DocumentRegex.hpp"
+#include "SectionHeading.hpp"
+#include "SectionHeading_Impl.hpp"
+#include "Section.hpp"
+#include "Section_Impl.hpp"
+#include "Table.hpp"
+#include "Table_Impl.hpp"
+#include "Text.hpp"
+#include "Text_Impl.hpp"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <utilities/core/PathHelpers.hpp>
+#include "../core/PathHelpers.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/archive/archive_exception.hpp>
 
 BOOST_CLASS_EXPORT(openstudio::SectionHeading);
@@ -63,7 +62,7 @@ Document::Document(const std::string& title,
 
 Document Document::clone() const {
   Document result(m_title,m_authors,m_format,m_header,m_footer);
-  BOOST_FOREACH(const SectionElement& element,m_contents) {
+  for (const SectionElement& element : m_contents) {
     result.append(element.clone().cast<SectionElement>());
   }
   return result;
@@ -97,7 +96,7 @@ std::vector<SectionElement> Document::contents() const {
 
 std::vector<Section> Document::sections() const {
   SectionVector result;
-  BOOST_FOREACH(const SectionElement& element,m_contents) {
+  for (const SectionElement& element : m_contents) {
     OptionalSection oSection = element.optionalCast<Section>();
     if (oSection) { result.push_back(*oSection); }
   }
@@ -178,7 +177,7 @@ void Document::insert(unsigned index, const SectionElement& element) {
     append(element); 
     return;
   }
-  SectionElementVector::iterator it = m_contents.begin();
+  auto it = m_contents.begin();
   for (unsigned i = 0; i < index; ++i, ++it) {}
   m_contents.insert(it,element);
 }
@@ -196,7 +195,7 @@ Section Document::insertSection(unsigned index,const std::string& headingText) {
 
 void Document::erase(unsigned index) {
   if (index < numElements()) {
-    SectionElementVector::iterator it = m_contents.begin();
+    auto it = m_contents.begin();
     for (unsigned i = 0; i < index; ++i, ++it) {}
     m_contents.erase(it);
   }
@@ -212,7 +211,7 @@ void Document::setTopHeadingLevel(unsigned level) {
 
 void Document::makeHeadingLevelsConsistent() {
   SectionVector sections = this->sections();
-  BOOST_FOREACH(Section& section,sections) {
+  for (Section& section : sections) {
     section.heading().setLevel(m_topHeadingLevel);
     section.makeHeadingLevelsConsistent();
   }
@@ -254,7 +253,7 @@ std::string Document::print() const {
 
 std::ostream& Document::printToStream(std::ostream& os) const {
   m_printHeader(os);
-  BOOST_FOREACH(const SectionElement& element,m_contents) {
+  for (const SectionElement& element : m_contents) {
     element.printToStream(os,m_format);
   }
   m_printFooter(os);
@@ -298,7 +297,7 @@ bool Document::save(const openstudio::path& p, bool overwrite) const {
           return false;
         }
         catch (...) {
-          LOG(Error,"Error serializing Document to boost serializaiton text format (.osd).");
+          LOG(Error,"Error serializing Document to boost serialization text format (.osd).");
           return false;
         }
       }

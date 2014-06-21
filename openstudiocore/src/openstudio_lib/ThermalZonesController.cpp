@@ -17,30 +17,30 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/ThermalZonesController.hpp>
-#include <openstudio_lib/ThermalZonesView.hpp>
-#include <openstudio_lib/OSAppBase.hpp>
-#include <openstudio_lib/OSDocument.hpp>
-#include <openstudio_lib/OSItemSelectorButtons.hpp>
+#include "ThermalZonesController.hpp"
+#include "ThermalZonesView.hpp"
+#include "OSAppBase.hpp"
+#include "OSDocument.hpp"
+#include "OSItemSelectorButtons.hpp"
 
-#include <model/ThermalZone.hpp>
-#include <model/ThermalZone_Impl.hpp>
-#include <model/ZoneHVACComponent.hpp>
-#include <model/ZoneHVACComponent_Impl.hpp>
-#include <model/AirLoopHVAC.hpp>
-#include <model/AirLoopHVAC_Impl.hpp>
-#include <model/Space.hpp>
-#include <model/Space_Impl.hpp>
-#include <model/ThermostatSetpointDualSetpoint.hpp>
-#include <model/ThermostatSetpointDualSetpoint_Impl.hpp>
+#include "../model/ThermalZone.hpp"
+#include "../model/ThermalZone_Impl.hpp"
+#include "../model/ZoneHVACComponent.hpp"
+#include "../model/ZoneHVACComponent_Impl.hpp"
+#include "../model/AirLoopHVAC.hpp"
+#include "../model/AirLoopHVAC_Impl.hpp"
+#include "../model/Space.hpp"
+#include "../model/Space_Impl.hpp"
+#include "../model/ThermostatSetpointDualSetpoint.hpp"
+#include "../model/ThermostatSetpointDualSetpoint_Impl.hpp"
+#include "../model/ZoneControlHumidistat.hpp"
+#include "../model/ZoneControlHumidistat_Impl.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <QApplication>
 #include <QInputDialog>
 #include <QMessageBox>
-
-#include <boost/foreach.hpp>
 
 namespace openstudio {
 
@@ -55,6 +55,9 @@ ThermalZonesController::ThermalZonesController(bool isIP, const model::Model & m
 
   connect( thermalZoneView,SIGNAL(enableThermostatClicked(model::ThermalZone &, bool)),
            this,SLOT(enableThermostat(model::ThermalZone &, bool)) );
+
+  connect( thermalZoneView,SIGNAL(enableHumidistatClicked(model::ThermalZone &, bool)),
+           this,SLOT(enableHumidistat(model::ThermalZone &, bool)) );
 
   connect( thermalZoneView,SIGNAL(modelObjectSelected(model::OptionalModelObject &, bool )),
            this,SIGNAL(modelObjectSelected(model::OptionalModelObject &, bool )) );
@@ -131,6 +134,54 @@ void ThermalZonesController::setCoolingSchedule(model::ThermalZone & thermalZone
     else
     {
       thermostat->resetCoolingSchedule();
+    }
+  }
+}
+
+void ThermalZonesController::enableHumidistat(model::ThermalZone & thermalZone, bool enable)
+{
+  if( enable )
+  {
+    model::ZoneControlHumidistat humidistat(model());
+
+    thermalZone.setZoneControlHumidistat(humidistat);
+  }
+  else
+  {
+    thermalZone.resetZoneControlHumidistat();
+  }
+}
+
+void ThermalZonesController::setHumidifyingSchedule(model::ThermalZone & thermalZone, model::OptionalSchedule & schedule)
+{
+  model::OptionalZoneControlHumidistat humidistat = thermalZone.zoneControlHumidistat();
+
+  if( humidistat )
+  {
+    if( schedule )
+    {
+      humidistat->setHumidifyingRelativeHumiditySetpointSchedule(schedule.get());
+    }
+    else
+    {
+      humidistat->resetHumidifyingRelativeHumiditySetpointSchedule();
+    }
+  }
+}
+
+void ThermalZonesController::setDehumidifyingSchedule(model::ThermalZone & thermalZone, model::OptionalSchedule & schedule)
+{
+  model::OptionalZoneControlHumidistat humidistat = thermalZone.zoneControlHumidistat();
+
+  if( humidistat )
+  {
+    if( schedule )
+    {
+      humidistat->setDehumidifyingRelativeHumiditySetpointSchedule(schedule.get());
+    }
+    else
+    {
+      humidistat->resetDehumidifyingRelativeHumiditySetpointSchedule();
     }
   }
 }
@@ -249,7 +300,7 @@ void ThermalZonesController::onReplaceObject(openstudio::model::ModelObject mode
 void ThermalZonesController::onPurgeObjects(const openstudio::IddObjectType& iddObjectType)
 {
   //std::vector<Handle> toRemove;
-  BOOST_FOREACH(model::ThermalZone thermalZone, this->model().getConcreteModelObjects<model::ThermalZone>()){
+  for (model::ThermalZone thermalZone : this->model().getConcreteModelObjects<model::ThermalZone>()){
     if (thermalZone.spaces().empty() && thermalZone.isRemovable()){
       //toRemove.push_back(thermalZone.handle());
 

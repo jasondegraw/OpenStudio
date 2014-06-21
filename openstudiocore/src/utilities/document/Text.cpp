@@ -17,13 +17,12 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <utilities/document/Text.hpp>
-#include <utilities/document/Text_Impl.hpp>
-#include <utilities/document/DocumentRegex.hpp>
+#include "Text.hpp"
+#include "Text_Impl.hpp"
+#include "DocumentRegex.hpp"
 
-#include <utilities/core/Containers.hpp>
+#include "../core/Containers.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/regex.hpp>
 #include <boost/archive/archive_exception.hpp>
 
@@ -97,14 +96,14 @@ namespace detail {
       append(paragraph); 
       return;
     }
-    StringVector::iterator it = m_paragraphs.begin();
+    auto it = m_paragraphs.begin();
     for (unsigned i = 0; i < index; ++i, ++it) {}
     m_paragraphs.insert(it,paragraph);
   }
 
   void Text_Impl::erase(unsigned index) {
     if (index < numParagraphs()) {
-      StringVector::iterator it = m_paragraphs.begin();
+      auto it = m_paragraphs.begin();
       for (unsigned i = 0; i < index; ++i, ++it) {}
       m_paragraphs.erase(it);
     }
@@ -130,7 +129,7 @@ namespace detail {
 
   std::string Text_Impl::mf_printCOUT() const {
     std::stringstream ss;
-    BOOST_FOREACH(const std::string& str,m_paragraphs) {
+    for (const std::string& str : m_paragraphs) {
       ss << std::endl 
          << str << std::endl;
     }
@@ -139,7 +138,7 @@ namespace detail {
 
   std::string Text_Impl::mf_printLaTeX() const {
     std::stringstream ss;
-    BOOST_FOREACH(const std::string& str,m_paragraphs) {
+    for (const std::string& str : m_paragraphs) {
       ss << std::endl << formatText(str,DocumentFormat(DocumentFormat::LaTeX)) << std::endl;
     }
     return ss.str();
@@ -147,7 +146,7 @@ namespace detail {
 
   std::string Text_Impl::mf_printXHTML() const {
     std::stringstream ss;
-    BOOST_FOREACH(const std::string& str,m_paragraphs) {
+    for (const std::string& str : m_paragraphs) {
       ss << std::endl 
          << "<p>" << std::endl 
          << formatText(str,DocumentFormat(DocumentFormat::XHTML)) << std::endl 

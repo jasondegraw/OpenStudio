@@ -18,17 +18,17 @@
 **********************************************************************/
 
 #define COMPILING_FROM_OSAPP
-#include <openstudio_lib/OpenStudioAPI.hpp>
-#include <openstudio_app/OpenStudioApp.hpp>
+#include "../openstudio_lib/OpenStudioAPI.hpp"
+#include "OpenStudioApp.hpp"
 
-#include <openstudio_lib/MainWindow.hpp>
-#include <utilities/core/Application.hpp>
-#include <utilities/core/ApplicationPathHelpers.hpp>
-#include <utilities/core/FileLogSink.hpp>
-#include <utilities/bcl/BCLMeasure.hpp>
-#include <ruleset/OSArgument.hpp>
-#include <utilities/core/Logger.hpp>
-#include <utilities/idf/Workspace_Impl.hpp>
+#include "../openstudio_lib/MainWindow.hpp"
+#include "../utilities/core/Application.hpp"
+#include "../utilities/core/ApplicationPathHelpers.hpp"
+#include "../utilities/core/FileLogSink.hpp"
+#include "../utilities/bcl/BCLMeasure.hpp"
+#include "../ruleset/OSArgument.hpp"
+#include "../utilities/core/Logger.hpp"
+#include "../utilities/idf/Workspace_Impl.hpp"
 
 #include <QAbstractButton>
 #include <QApplication>
@@ -42,9 +42,9 @@ static const char *logfilepath = "/var/log/openstudio.log";
 #endif
 
 #define WSAAPI
-#include <utilities/core/Path.hpp>
-#include <utilities/core/RubyInterpreter.hpp>
-#include <ruleset/RubyUserScriptArgumentGetter_Impl.hpp>
+#include "../utilities/core/Path.hpp"
+#include "../utilities/core/RubyInterpreter.hpp"
+#include "../ruleset/EmbeddedRubyUserScriptArgumentGetter.hpp"
 
 #ifdef HAVE_RUBY_VERSION_H
 #include <ruby/version.h>
@@ -74,8 +74,6 @@ int main(int argc, char *argv[])
   while(cont) {
     cont = false;
 
-
-
     std::vector<std::string> modules;
     modules.push_back("openstudioutilitiescore");
     modules.push_back("openstudioutilitiesbcl");
@@ -94,14 +92,14 @@ int main(int argc, char *argv[])
 
     //try {
     // Initialize the embedded Ruby interpreter
-    boost::shared_ptr<openstudio::detail::RubyInterpreter> rubyInterpreter(
+    std::shared_ptr<openstudio::detail::RubyInterpreter> rubyInterpreter(
         new openstudio::detail::RubyInterpreter(openstudio::getOpenStudioRubyPath(),
           openstudio::getOpenStudioRubyScriptsPath(),
           modules));
 
     // Initialize the argument getter
     QSharedPointer<openstudio::ruleset::RubyUserScriptArgumentGetter> argumentGetter(
-        new openstudio::ruleset::detail::RubyUserScriptArgumentGetter_Impl<openstudio::detail::RubyInterpreter>(rubyInterpreter));
+        new openstudio::ruleset::EmbeddedRubyUserScriptArgumentGetter<openstudio::detail::RubyInterpreter>(rubyInterpreter));
 
     openstudio::OpenStudioApp app(argc, argv, argumentGetter);
     openstudio::Application::instance().setApplication(&app);

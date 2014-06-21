@@ -17,29 +17,29 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/LoadsTabController.hpp>
-#include <openstudio_lib/LoadsTabView.hpp>
-#include <openstudio_lib/LoadsController.hpp>
+#include "LoadsTabController.hpp"
+#include "LoadsTabView.hpp"
+#include "LoadsController.hpp"
 
-#include <model/Model.hpp>
-#include <model/Construction.hpp>
+#include "../model/Model.hpp"
+#include "../model/Construction.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 namespace openstudio {
 
 LoadsTabController::LoadsTabController(bool isIP, const model::Model& model)
   : MainTabController(new LoadsTabView(model, "Loads"))
 {
-  m_LoadsController = boost::shared_ptr<LoadsController>(new LoadsController(isIP, model));
+  m_LoadsController = std::shared_ptr<LoadsController>(new LoadsController(isIP, model));
   this->mainContentWidget()->addTabWidget(m_LoadsController->subTabView());
 
   bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)),
                         m_LoadsController.get(), SIGNAL(toggleUnitsClicked(bool)));
   OS_ASSERT(isConnected);
 
-  isConnected = QObject::connect(m_LoadsController.get(), SIGNAL(openBclDlgClicked()),
-                                 this, SIGNAL(openBclDlgClicked()));
+  isConnected = QObject::connect(m_LoadsController.get(), SIGNAL(downloadComponentsClicked()),
+                                 this, SIGNAL(downloadComponentsClicked()));
   OS_ASSERT(isConnected);
 
   isConnected = QObject::connect(m_LoadsController.get(), SIGNAL(openLibDlgClicked()),

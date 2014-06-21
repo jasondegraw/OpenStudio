@@ -17,14 +17,14 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/OSDropZone.hpp>
-#include <openstudio_lib/OSVectorController.hpp>
-#include <openstudio_lib/IconLibrary.hpp>
+#include "OSDropZone.hpp"
+#include "OSVectorController.hpp"
+#include "IconLibrary.hpp"
 
-#include <model/Model_Impl.hpp>
-#include <model/ModelObject_Impl.hpp>
+#include "../model/Model_Impl.hpp"
+#include "../model/ModelObject_Impl.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <QBoxLayout>
 #include <QDragEnterEvent>
@@ -327,16 +327,16 @@ void OSDropZone2::setItemIds(const std::vector<OSItemId>& itemIds)
   }
 
   int numItems = 0;
-  OSItem::Type type;
+  OSItemType type;
   if((this->m_maxItems > 1) && (m_growsHorizontally)){
-    type = OSItem::DROPZONE_SQUARE;
+    type = OSItemType::DropzoneSquare;
     // somewhere set show / hide scroll bar TODO
   }
   else{
-    type = OSItem::DROPZONE_RECTANGLE;
+    type = OSItemType::DropzoneRectangle;
   }
 
-  BOOST_FOREACH(const OSItemId& itemId, itemIds){
+  for (const OSItemId& itemId : itemIds){
 
     OSItem* item = OSItem::makeItem(itemId, type);
     if (!item){
@@ -673,16 +673,16 @@ void OSDropZone::setItemIds(const std::vector<OSItemId>& itemIds)
   }
 
   int numItems = 0;
-  OSItem::Type type;
+  OSItemType type;
   if((this->m_maxItems > 1) && (m_growsHorizontally)){
-    type = OSItem::DROPZONE_SQUARE;
+    type = OSItemType::DropzoneSquare;
     // somewhere set show / hide scroll bar TODO
   }
   else{
-    type = OSItem::DROPZONE_RECTANGLE;
+    type = OSItemType::DropzoneRectangle;
   }
 
-  BOOST_FOREACH(const OSItemId& itemId, itemIds){
+  for (const OSItemId& itemId : itemIds){
 
     OSItem* item = OSItem::makeItem(itemId, type);
     if (!item){

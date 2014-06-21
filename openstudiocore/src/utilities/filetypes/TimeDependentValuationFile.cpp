@@ -17,21 +17,20 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <utilities/filetypes/TimeDependentValuationFile.hpp>
+#include "TimeDependentValuationFile.hpp"
 
-#include <utilities/units/QuantityRegex.hpp>
-#include <utilities/units/UnitFactory.hpp>
-#include <utilities/units/QuantityFactory.hpp>
-#include <utilities/units/QuantityConverter.hpp>
-#include <utilities/units/SIUnit.hpp>
+#include "../units/QuantityRegex.hpp"
+#include "../units/UnitFactory.hpp"
+#include "../units/QuantityFactory.hpp"
+#include "../units/QuantityConverter.hpp"
+#include "../units/SIUnit.hpp"
 
-#include <utilities/core/Checksum.hpp>
-#include <utilities/core/Containers.hpp>
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/StringHelpers.hpp>
+#include "../core/Checksum.hpp"
+#include "../core/Containers.hpp"
+#include "../core/Assert.hpp"
+#include "../core/StringHelpers.hpp"
 
 #include <boost/regex.hpp>
-#include <boost/foreach.hpp>
 
 namespace openstudio {
 
@@ -100,7 +99,7 @@ FuelType TimeDependentValuationFile::fuelType(unsigned columnIndex) const {
   }
   catch (...) {}
   if (!oft) {
-    // try pseuodonyms
+    // try pseudonyms
     if (istringEqual(cell,"Electric")) { oft = FuelType(FuelType::Electricity); }
   }
   if (!oft) {
@@ -129,7 +128,7 @@ BuildingSector TimeDependentValuationFile::buildingSector(unsigned columnIndex) 
   }
   catch (...) {}
   if (!obs) {
-    // try pseuodonyms
+    // try pseudonyms
     if (istringEqual(cell,"Res")) { obs = BuildingSector(BuildingSector::Residential); }
     else if (istringEqual(cell,"NonRes")) { obs = BuildingSector(BuildingSector::Commercial); }
     else if (istringEqual(cell,"Non-Residential")) { obs = BuildingSector(BuildingSector::Commercial); }
@@ -175,7 +174,7 @@ std::vector<Quantity> TimeDependentValuationFile::quantities(unsigned columnInde
   std::string unitString = units(columnIndex);
   DoubleVector vals = values(columnIndex);
   QuantityVector result;
-  BOOST_FOREACH(double val,vals) {
+  for (double val : vals) {
     Quantity q;
     if (result.empty()) {
       q = createQuantity(val,unitString).get();

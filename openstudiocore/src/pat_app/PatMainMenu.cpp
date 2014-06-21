@@ -17,12 +17,12 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <pat_app/PatMainMenu.hpp>
+#include "PatMainMenu.hpp"
 
-#include <pat_app/PatApp.hpp>
-#include <pat_app/CloudMonitor.hpp>
+#include "PatApp.hpp"
+#include "CloudMonitor.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <QMenu>
 
@@ -99,10 +99,6 @@ PatMainMenu::PatMainMenu(QWidget *parent) :
   m_fileMenu->addAction(m_exportSpreadsheetAction);
   /*************************/
   m_fileMenu->addSeparator();
-  m_fileMenu->addAction(m_scanForToolsAction);
-  m_fileMenu->addAction(m_showToolsAction);
-  /*************************/
-  m_fileMenu->addSeparator();
   m_fileMenu->addAction(m_exitAction);
 
   // Preferences menu
@@ -121,10 +117,13 @@ PatMainMenu::PatMainMenu(QWidget *parent) :
   isConnected = connect(m_configureProxy, SIGNAL(triggered()),this,SIGNAL(configureProxyClicked()));
   OS_ASSERT(isConnected);
 
+  m_preferencesMenu->addAction(m_scanForToolsAction);
+  m_preferencesMenu->addAction(m_showToolsAction);
+  
   m_preferencesMenu->addAction(m_configureProxy);
 
    // Window menu
-  m_windowMenu = new QMenu(tr("&Online BCL"),this);
+  m_windowMenu = new QMenu(tr("&Measures"),this);
   addMenu(m_windowMenu);
 
   m_openBclDlgAction = new QAction(tr("Find &Measures"),this);

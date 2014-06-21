@@ -17,11 +17,11 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/OSCollapsibleItem.hpp>
+#include "OSCollapsibleItem.hpp"
 
-#include <openstudio_lib/OSCollapsibleItemHeader.hpp>
-#include <openstudio_lib/OSItemList.hpp>
-#include <utilities/core/Assert.hpp>
+#include "OSCollapsibleItemHeader.hpp"
+#include "OSItemList.hpp"
+#include "../utilities/core/Assert.hpp"
 
 #include <QBoxLayout>
 #include <QButtonGroup>
@@ -192,12 +192,12 @@ void OSCollapsibleItem::setItemsRemoveable(bool itemsRemoveable)
   m_itemList->setItemsRemoveable(itemsRemoveable);
 }
 
-OSItem::Type OSCollapsibleItem::itemsType() const
+OSItemType OSCollapsibleItem::itemsType() const
 {
   return m_itemList->itemsType();
 }
 
-void OSCollapsibleItem::setItemsType(OSItem::Type type)
+void OSCollapsibleItem::setItemsType(OSItemType type)
 {
   m_itemList->setItemsType(type);
 }

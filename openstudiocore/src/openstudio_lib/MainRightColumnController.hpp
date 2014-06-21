@@ -17,12 +17,12 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_MAINRIGHTCOLUMNCONTROLLER_H
-#define OPENSTUDIO_MAINRIGHTCOLUMNCONTROLLER_H
+#ifndef OPENSTUDIO_MAINRIGHTCOLUMNCONTROLLER_HPP
+#define OPENSTUDIO_MAINRIGHTCOLUMNCONTROLLER_HPP
 
 #include "../shared_gui_components/OSQObjectController.hpp"
 #include <boost/smart_ptr.hpp>
-#include <model/Model.hpp>
+#include "../model/Model.hpp"
 #include "../shared_gui_components/EditController.hpp"
 #include "../shared_gui_components/LocalLibraryController.hpp"
 
@@ -49,6 +49,12 @@ class MainRightColumnController : public OSQObjectController
   virtual ~MainRightColumnController() {};
 
   HorizontalTabWidget * mainRightColumnView() const;
+
+  QSharedPointer<LocalLibraryController> measureLibraryController();
+
+  void hideMyModelTab(bool hide);
+
+  bool isMyModelTabHidden(){return m_myModelTabIsHidden;}
 
   enum RightColumnTabID
   {
@@ -106,6 +112,7 @@ class MainRightColumnController : public OSQObjectController
   void chooseEditTab();
 
   QSharedPointer<LocalLibraryController> measuresLibraryController();
+
   QSharedPointer<EditController> measuresEditController();
 
   private:
@@ -119,8 +126,7 @@ class MainRightColumnController : public OSQObjectController
 
   HorizontalTabWidget * m_horizontalTabWidget; 
 
-  boost::shared_ptr<InspectorController> m_inspectorController;
-
+  std::shared_ptr<InspectorController> m_inspectorController;
 
   QStackedWidget * m_myModelView;
 
@@ -135,10 +141,13 @@ class MainRightColumnController : public OSQObjectController
   openstudio::path m_resourcesPath;
 
   QSharedPointer<LocalLibraryController> m_measureLibraryController;
+
   QSharedPointer<EditController> m_measureEditController;
+
+  bool m_myModelTabIsHidden;
 };
 
 } // openstudio
 
-#endif // OPENSTUDIO_MAINRIGHTCOLUMNCONTROLLER_H
+#endif // OPENSTUDIO_MAINRIGHTCOLUMNCONTROLLER_HPP
 

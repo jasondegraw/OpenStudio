@@ -17,34 +17,34 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <gbxml/ReverseTranslator.hpp>
+#include "ReverseTranslator.hpp"
 
-#include <model/Model.hpp>
-#include <model/ModelObject.hpp>
-#include <model/ModelObject_Impl.hpp>
-#include <model/Facility.hpp>
-#include <model/Facility_Impl.hpp>
-#include <model/Building.hpp>
-#include <model/Building_Impl.hpp>
-#include <model/BuildingStory.hpp>
-#include <model/BuildingStory_Impl.hpp>
-#include <model/ThermalZone.hpp>
-#include <model/ThermalZone_Impl.hpp>
-#include <model/Space.hpp>
-#include <model/Space_Impl.hpp>
-#include <model/Surface.hpp>
-#include <model/Surface_Impl.hpp>
-#include <model/SubSurface.hpp>
-#include <model/SubSurface_Impl.hpp>
-#include <model/ShadingSurface.hpp>
-#include <model/ShadingSurface_Impl.hpp>
-#include <model/ShadingSurfaceGroup.hpp>
-#include <model/ShadingSurfaceGroup_Impl.hpp>
+#include "../model/Model.hpp"
+#include "../model/ModelObject.hpp"
+#include "../model/ModelObject_Impl.hpp"
+#include "../model/Facility.hpp"
+#include "../model/Facility_Impl.hpp"
+#include "../model/Building.hpp"
+#include "../model/Building_Impl.hpp"
+#include "../model/BuildingStory.hpp"
+#include "../model/BuildingStory_Impl.hpp"
+#include "../model/ThermalZone.hpp"
+#include "../model/ThermalZone_Impl.hpp"
+#include "../model/Space.hpp"
+#include "../model/Space_Impl.hpp"
+#include "../model/Surface.hpp"
+#include "../model/Surface_Impl.hpp"
+#include "../model/SubSurface.hpp"
+#include "../model/SubSurface_Impl.hpp"
+#include "../model/ShadingSurface.hpp"
+#include "../model/ShadingSurface_Impl.hpp"
+#include "../model/ShadingSurfaceGroup.hpp"
+#include "../model/ShadingSurfaceGroup_Impl.hpp"
 
-#include <utilities/core/Assert.hpp>
-#include <utilities/units/UnitFactory.hpp>
-#include <utilities/units/QuantityConverter.hpp>
-#include <utilities/plot/ProgressBar.hpp>
+#include "../utilities/core/Assert.hpp"
+#include "../utilities/units/UnitFactory.hpp"
+#include "../utilities/units/QuantityConverter.hpp"
+#include "../utilities/plot/ProgressBar.hpp"
 
 #include <QFile>
 #include <QDomDocument>
@@ -105,7 +105,7 @@ namespace gbxml {
   {
     std::vector<LogMessage> result;
 
-    BOOST_FOREACH(LogMessage logMessage, m_logSink.logMessages()){
+    for (LogMessage logMessage : m_logSink.logMessages()){
       if (logMessage.logLevel() == Warn){
         result.push_back(logMessage);
       }
@@ -118,7 +118,7 @@ namespace gbxml {
   {
     std::vector<LogMessage> result;
 
-    BOOST_FOREACH(LogMessage logMessage, m_logSink.logMessages()){
+    for (LogMessage logMessage : m_logSink.logMessages()){
       if (logMessage.logLevel() > Warn){
         result.push_back(logMessage);
       }
@@ -503,6 +503,11 @@ namespace gbxml {
 
       result = shadingSurface;
 
+    }else if (surfaceType.contains("FreestandingColumn") || surfaceType.contains("EmbeddedColumn")){
+  
+      // do not handle these
+      return boost::none;
+
     }else{
 
       openstudio::model::Surface surface(vertices, model);
@@ -512,20 +517,38 @@ namespace gbxml {
 
       QString exposedToSun = element.attribute("exposedToSun");
 
+      // set surface type
+      // wall types
       if (surfaceType.contains("ExteriorWall")){
         surface.setSurfaceType("Wall"); 
       }else if (surfaceType.contains("InteriorWall")){
         surface.setSurfaceType("Wall"); 
+      }else if (surfaceType.contains("UndergroundWall")){
+        surface.setSurfaceType("Wall"); 
+      // roof types
       }else if (surfaceType.contains("Roof")){
         surface.setSurfaceType("RoofCeiling"); 
+      }else if (surfaceType.contains("Ceiling")){
+        surface.setSurfaceType("RoofCeiling");
+      }else if (surfaceType.contains("UndergroundCeiling")){
+        surface.setSurfaceType("RoofCeiling");
+      // floor types
+      }else if (surfaceType.contains("UndergroundSlab")){
+        surface.setSurfaceType("Floor"); 
       }else if (surfaceType.contains("SlabOnGrade")){
+        surface.setSurfaceType("Floor"); 
+      }else if (surfaceType.contains("InteriorFloor")){
+        surface.setSurfaceType("Floor"); 
+      }else if (surfaceType.contains("RaisedFloor")){
         surface.setSurfaceType("Floor"); 
       }
 
+      // this type can be wall, roof, or floor.  just use default surface type.
       if (surfaceType.contains("Air")){
         // TODO: set air wall construction
       }
 
+      // set boundary conditions
       if (exposedToSun.contains("true")){
         surface.setOutsideBoundaryCondition("Outdoors");
         surface.setSunExposure("SunExposed");
@@ -572,7 +595,16 @@ namespace gbxml {
 
         boost::optional<openstudio::WorkspaceObject> workspaceObject = model.getObjectByTypeAndName(IddObjectType::OS_Space, spaceName);
         if (workspaceObject && workspaceObject->optionalCast<openstudio::model::Space>()){
-        // clone the surface and sub surfaces and reverse vertices
+
+          // DLM: we have issues if interior ceilings/floors are mislabeled, override surface type for adjacent surfaces 
+          // http://code.google.com/p/cbecc/issues/detail?id=471
+          std::string currentSurfaceType = surface.surfaceType();
+          surface.assignDefaultSurfaceType();
+          if (currentSurfaceType != surface.surfaceType()){
+            LOG(Warn, "Changing surface type from '" << currentSurfaceType << "' to '" << surface.surfaceType() << "' for surface '" << escapeName(surfaceName) << "'");
+          }
+
+          // clone the surface and sub surfaces and reverse vertices
           model::Space adjacentSpace = workspaceObject->cast<openstudio::model::Space>();
           boost::optional<openstudio::model::Surface> otherSurface = surface.createAdjacentSurface(adjacentSpace);
           if(!otherSurface){

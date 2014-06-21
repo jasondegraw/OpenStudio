@@ -17,22 +17,22 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/UtilityBillAllFuelTypesListView.hpp>
+#include "UtilityBillAllFuelTypesListView.hpp"
 
-#include <openstudio_lib/ModelObjectTypeItem.hpp>
-#include <openstudio_lib/ModelObjectItem.hpp>
-#include <openstudio_lib/ModelObjectListView.hpp>
-#include <openstudio_lib/OSCollapsibleItemHeader.hpp>
-#include <openstudio_lib/OSItem.hpp>
-#include <openstudio_lib/UtilityBillFuelTypeItem.hpp>
-#include <openstudio_lib/UtilityBillFuelTypeListView.hpp>
+#include "ModelObjectTypeItem.hpp"
+#include "ModelObjectItem.hpp"
+#include "ModelObjectListView.hpp"
+#include "OSCollapsibleItemHeader.hpp"
+#include "OSItem.hpp"
+#include "UtilityBillFuelTypeItem.hpp"
+#include "UtilityBillFuelTypeListView.hpp"
 
-#include <model/Model.hpp>
-#include <model/Model_Impl.hpp>
-#include <model/UtilityBill.hpp>
-#include <model/UtilityBill_Impl.hpp>
+#include "../model/Model.hpp"
+#include "../model/Model_Impl.hpp"
+#include "../model/UtilityBill.hpp"
+#include "../model/UtilityBill_Impl.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <iostream>
 
@@ -40,7 +40,7 @@ namespace openstudio {
 
 UtilityBillAllFuelTypesListView::UtilityBillAllFuelTypesListView(const model::Model& model, 
                                                  bool addScrollArea, 
-                                                 OSItem::Type headerType,
+                                                 OSItemType headerType,
                                                  QWidget * parent )
   : OSCollapsibleItemList(addScrollArea, parent), m_model(model), m_headerType(headerType)
 { 
@@ -49,16 +49,18 @@ UtilityBillAllFuelTypesListView::UtilityBillAllFuelTypesListView(const model::Mo
 UtilityBillAllFuelTypesListView::UtilityBillAllFuelTypesListView(const std::vector<std::pair<FuelType, std::string> >& utilityBillFuelTypesAndNames,
                                                  const model::Model& model,
                                                  bool addScrollArea, 
-                                                 OSItem::Type headerType,
+                                                 OSItemType headerType,
                                                  QWidget * parent )
   : OSCollapsibleItemList(addScrollArea, parent), 
     m_utilityBillFuelTypesAndNames(utilityBillFuelTypesAndNames), 
     m_model(model),
     m_headerType(headerType)
 { 
-  typedef std::vector<std::pair<FuelType, std::string> >::value_type PairType;
-  BOOST_REVERSE_FOREACH(PairType utilityBillFuelTypesAndName, m_utilityBillFuelTypesAndNames){
-    addUtilityBillFuelType(utilityBillFuelTypesAndName.first, utilityBillFuelTypesAndName.second);
+  for(auto utilityBillFuelTypesAndName = m_utilityBillFuelTypesAndNames.rbegin();
+      utilityBillFuelTypesAndName != m_utilityBillFuelTypesAndNames.rend();
+      ++utilityBillFuelTypesAndName)
+  {
+    addUtilityBillFuelType(utilityBillFuelTypesAndName->first, utilityBillFuelTypesAndName->second);
   }
 }
 

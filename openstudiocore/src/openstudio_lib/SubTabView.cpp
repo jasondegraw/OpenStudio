@@ -17,17 +17,17 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/SubTabView.hpp>
-#include <openstudio_lib/OSItemSelector.hpp>
-#include <openstudio_lib/OSItemSelectorButtons.hpp>
-#include <openstudio_lib/ModelObjectListView.hpp>
-#include <openstudio_lib/ModelObjectTypeListView.hpp>
-#include <openstudio_lib/ModelObjectItem.hpp>
-#include <openstudio_lib/ModelObjectInspectorView.hpp>
+#include "SubTabView.hpp"
+#include "OSItemSelector.hpp"
+#include "OSItemSelectorButtons.hpp"
+#include "ModelObjectListView.hpp"
+#include "ModelObjectTypeListView.hpp"
+#include "ModelObjectItem.hpp"
+#include "ModelObjectInspectorView.hpp"
 
-#include <model/Model.hpp>
-#include <model/Model_Impl.hpp>
-#include <utilities/core/Assert.hpp>
+#include "../model/Model.hpp"
+#include "../model/Model_Impl.hpp"
+#include "../utilities/core/Assert.hpp"
 
 #include <QStyleOption>
 #include <QPainter>
@@ -138,9 +138,9 @@ SubTabView::SubTabView(OSItemSelector* itemSelector,
   OS_ASSERT(isConnected);
 
   isConnected = QObject::connect(m_itemSelectorButtons,
-                                 SIGNAL(openBclDlgClicked()),
+                                 SIGNAL(downloadComponentsClicked()),
                                  this,
-                                 SIGNAL(openBclDlgClicked()));
+                                 SIGNAL(downloadComponentsClicked()));
   OS_ASSERT(isConnected);
 
   //isConnected = QObject::connect(m_itemSelectorButtons,

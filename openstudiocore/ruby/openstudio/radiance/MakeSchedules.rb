@@ -136,6 +136,8 @@ workPath = modelPath.parent_path / OpenStudio::Path.new(modelPath.stem) / OpenSt
 # only run period in pre process job
 environmentName = "Run Period 1"
 
+
+
 # loop through each thermal zone
 model.getThermalZones.each do |thermalZone|
 
@@ -200,9 +202,9 @@ model.getThermalZones.each do |thermalZone|
 
   if options.setpointInput == true
     # we have to calculate the average ourselves
-    reportIndicies = radSqlFile.illuminanceMapHourlyReportIndices(space_name)
+    reportIndices = radSqlFile.illuminanceMapHourlyReportIndices(space_name)
 
-    reportIndicies.each do |index|
+    reportIndices.each do |index|
 
       map = radSqlFile.illuminanceMap(index)
       #  averageIlluminances << OpenStudio::mean(map)

@@ -17,19 +17,22 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_PAT_LOCALLIBRARYVIEW_H
-#define OPENSTUDIO_PAT_LOCALLIBRARYVIEW_H
+#ifndef SHAREDGUICOMPONENTS_LOCALLIBRARYVIEW_HPP
+#define SHAREDGUICOMPONENTS_LOCALLIBRARYVIEW_HPP
 
 #include "OSDragableView.hpp"
+
 #include "HeaderViews.hpp"
-#include <QWidget>
+
 #include <QPoint>
+#include <QWidget>
 
 class QPushButton;
 class QLabel;
 
 namespace openstudio{
 
+class MeasureBadge;
 class OSViewSwitcher;
   
 class LocalLibraryView : public QWidget
@@ -38,25 +41,17 @@ class LocalLibraryView : public QWidget
 
   public:
 
-  LocalLibraryView(QWidget * parent = 0);
+  LocalLibraryView(QWidget * parent = nullptr);
 
   virtual ~LocalLibraryView() {}
 
   OSViewSwitcher * mainViewSwitcher;
-
-  QPushButton * bclMeasuresButton;
-
-  QPushButton * myMeasuresButton;
 
   QPushButton * duplicateMeasureButton;
 
   QPushButton * addMeasureButton;
 
   QPushButton * myMeasuresFolderButton;
-
-  QPushButton * updateMyMeasuresButton;
-
-  QPushButton * updateBCLMeasuresButton;
 
   QPushButton * addBCLMeasureButton;
 };
@@ -105,13 +100,13 @@ class LibraryItemView : public OSDragableView
 
   public:
 
-  LibraryItemView(QWidget * parent = 0);
+  LibraryItemView(QWidget * parent = nullptr);
 
   virtual ~LibraryItemView() {}
 
   QLabel * label;
   QLabel * m_measureTypeBadge;
-  QLabel * m_bclBadge;
+  MeasureBadge * m_measureBadge;
 
   public slots:
 
@@ -124,5 +119,5 @@ class LibraryItemView : public OSDragableView
 
 } // openstudio
 
-#endif // OPENSTUDIO_PAT_LOCALLIBRARYVIEW_H
+#endif // SHAREDGUICOMPONENTS_LOCALLIBRARYVIEW_HPP
 

@@ -16,80 +16,80 @@
 *  License along with this library; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
-#include <sdd/ReverseTranslator.hpp>
-#include <sdd/ForwardTranslator.hpp>
+#include "ReverseTranslator.hpp"
+#include "ForwardTranslator.hpp"
 
-#include <model/Model.hpp>
-#include <model/ModelObject.hpp>
-#include <model/ModelObject_Impl.hpp>
-#include <model/ConstructionBase.hpp>
-#include <model/ConstructionBase_Impl.hpp>
-#include <model/Construction.hpp>
-#include <model/Construction_Impl.hpp>
-#include <model/MasslessOpaqueMaterial.hpp>
-#include <model/MasslessOpaqueMaterial_Impl.hpp>
-#include <model/StandardOpaqueMaterial.hpp>
-#include <model/StandardOpaqueMaterial_Impl.hpp>
-#include <model/FFactorGroundFloorConstruction.hpp>
-#include <model/FFactorGroundFloorConstruction_Impl.hpp>
-#include <model/CFactorUndergroundWallConstruction.hpp>
-#include <model/CFactorUndergroundWallConstruction_Impl.hpp>
-#include <model/Building.hpp>
-#include <model/Building_Impl.hpp>
-#include <model/ThermalZone.hpp>
-#include <model/ThermalZone_Impl.hpp>
-#include <model/BuildingStory.hpp>
-#include <model/BuildingStory_Impl.hpp>
-#include <model/Space.hpp>
-#include <model/Space_Impl.hpp>
-#include <model/Surface.hpp>
-#include <model/Surface_Impl.hpp>
-#include <model/SubSurface.hpp>
-#include <model/SubSurface_Impl.hpp>
-#include <model/ShadingSurface.hpp>
-#include <model/ShadingSurface_Impl.hpp>
-#include <model/ShadingSurfaceGroup.hpp>
-#include <model/ShadingSurfaceGroup_Impl.hpp>
-#include <model/PeopleDefinition.hpp>
-#include <model/People.hpp>
-#include <model/LightsDefinition.hpp>
-#include <model/Lights.hpp>
-#include <model/ElectricEquipmentDefinition.hpp>
-#include <model/ElectricEquipment.hpp>
-#include <model/GasEquipmentDefinition.hpp>
-#include <model/GasEquipment.hpp>
-#include <model/HotWaterEquipmentDefinition.hpp>
-#include <model/HotWaterEquipment.hpp>
-#include <model/DesignSpecificationOutdoorAir.hpp>
-#include <model/SpaceInfiltrationDesignFlowRate.hpp>
-#include <model/Schedule.hpp>
-#include <model/Schedule_Impl.hpp>
-#include <model/ScheduleConstant.hpp>
-#include <model/ScheduleConstant_Impl.hpp>
-#include <model/ScheduleTypeLimits.hpp>
-#include <model/ScheduleTypeLimits_Impl.hpp>
-#include <model/PlantLoop.hpp>
-#include <model/PlantLoop_Impl.hpp>
-#include <model/WaterUseConnections.hpp>
-#include <model/WaterUseConnections_Impl.hpp>
-#include <model/WaterUseEquipment.hpp>
-#include <model/WaterUseEquipment_Impl.hpp>
-#include <model/WaterUseEquipmentDefinition.hpp>
-#include <model/WaterUseEquipmentDefinition_Impl.hpp>
-#include <model/ThermostatSetpointDualSetpoint.hpp>
+#include "../model/Model.hpp"
+#include "../model/ModelObject.hpp"
+#include "../model/ModelObject_Impl.hpp"
+#include "../model/ConstructionBase.hpp"
+#include "../model/ConstructionBase_Impl.hpp"
+#include "../model/Construction.hpp"
+#include "../model/Construction_Impl.hpp"
+#include "../model/MasslessOpaqueMaterial.hpp"
+#include "../model/MasslessOpaqueMaterial_Impl.hpp"
+#include "../model/StandardOpaqueMaterial.hpp"
+#include "../model/StandardOpaqueMaterial_Impl.hpp"
+#include "../model/FFactorGroundFloorConstruction.hpp"
+#include "../model/FFactorGroundFloorConstruction_Impl.hpp"
+#include "../model/CFactorUndergroundWallConstruction.hpp"
+#include "../model/CFactorUndergroundWallConstruction_Impl.hpp"
+#include "../model/Building.hpp"
+#include "../model/Building_Impl.hpp"
+#include "../model/ThermalZone.hpp"
+#include "../model/ThermalZone_Impl.hpp"
+#include "../model/BuildingStory.hpp"
+#include "../model/BuildingStory_Impl.hpp"
+#include "../model/Space.hpp"
+#include "../model/Space_Impl.hpp"
+#include "../model/Surface.hpp"
+#include "../model/Surface_Impl.hpp"
+#include "../model/SubSurface.hpp"
+#include "../model/SubSurface_Impl.hpp"
+#include "../model/ShadingSurface.hpp"
+#include "../model/ShadingSurface_Impl.hpp"
+#include "../model/ShadingSurfaceGroup.hpp"
+#include "../model/ShadingSurfaceGroup_Impl.hpp"
+#include "../model/PeopleDefinition.hpp"
+#include "../model/People.hpp"
+#include "../model/LightsDefinition.hpp"
+#include "../model/Lights.hpp"
+#include "../model/ElectricEquipmentDefinition.hpp"
+#include "../model/ElectricEquipment.hpp"
+#include "../model/GasEquipmentDefinition.hpp"
+#include "../model/GasEquipment.hpp"
+#include "../model/HotWaterEquipmentDefinition.hpp"
+#include "../model/HotWaterEquipment.hpp"
+#include "../model/DesignSpecificationOutdoorAir.hpp"
+#include "../model/SpaceInfiltrationDesignFlowRate.hpp"
+#include "../model/Schedule.hpp"
+#include "../model/Schedule_Impl.hpp"
+#include "../model/ScheduleConstant.hpp"
+#include "../model/ScheduleConstant_Impl.hpp"
+#include "../model/ScheduleTypeLimits.hpp"
+#include "../model/ScheduleTypeLimits_Impl.hpp"
+#include "../model/PlantLoop.hpp"
+#include "../model/PlantLoop_Impl.hpp"
+#include "../model/WaterUseConnections.hpp"
+#include "../model/WaterUseConnections_Impl.hpp"
+#include "../model/WaterUseEquipment.hpp"
+#include "../model/WaterUseEquipment_Impl.hpp"
+#include "../model/WaterUseEquipmentDefinition.hpp"
+#include "../model/WaterUseEquipmentDefinition_Impl.hpp"
+#include "../model/ThermostatSetpointDualSetpoint.hpp"
 
-#include <utilities/geometry/Transformation.hpp>
-#include <utilities/units/QuantityConverter.hpp>
-#include <utilities/units/IPUnit.hpp>
-#include <utilities/units/SIUnit.hpp>
-#include <utilities/units/BTUUnit.hpp>
-#include <utilities/units/MPHUnit.hpp>
-#include <utilities/units/WhUnit.hpp>
-#include <utilities/units/UnitFactory.hpp>
-#include <utilities/units/TemperatureUnit.hpp>
-#include <utilities/units/TemperatureUnit_Impl.hpp>
-#include <utilities/plot/ProgressBar.hpp>
-#include <utilities/core/Assert.hpp>
+#include "../utilities/geometry/Transformation.hpp"
+#include "../utilities/units/QuantityConverter.hpp"
+#include "../utilities/units/IPUnit.hpp"
+#include "../utilities/units/SIUnit.hpp"
+#include "../utilities/units/BTUUnit.hpp"
+#include "../utilities/units/MPHUnit.hpp"
+#include "../utilities/units/WhUnit.hpp"
+#include "../utilities/units/UnitFactory.hpp"
+#include "../utilities/units/TemperatureUnit.hpp"
+#include "../utilities/units/TemperatureUnit_Impl.hpp"
+#include "../utilities/plot/ProgressBar.hpp"
+#include "../utilities/core/Assert.hpp"
 
 #include <QFile>
 #include <QDomDocument>
@@ -110,6 +110,25 @@ namespace sdd {
       angle += 360;
     }
     return angle;
+  }
+
+  QDomElement elementByTagNameAndIndex(const QDomElement & root, const QString & tagName, bool useIndex, const int & index){
+    QDomElement result;
+    if( useIndex ){
+      bool ok;
+      QDomNodeList nodes = root.elementsByTagName(tagName);
+      for(int i = 0; i < nodes.count(); i++){
+        QDomElement e = nodes.at(i).toElement();
+        int thisIndex = e.attribute("index").toInt(&ok);
+        if( ok && (thisIndex == index) ) {
+          result = e;
+          break;
+        }
+      }
+    }else{
+      result = root.firstChildElement(tagName); 
+    }
+    return result;
   }
 
   boost::optional<model::ModelObject> ReverseTranslator::translateBuilding(const QDomElement& element, const QDomDocument& doc, openstudio::model::Model& model)
@@ -192,14 +211,14 @@ namespace sdd {
     }
 
     // remove unused CFactor constructions
-    BOOST_FOREACH(model::CFactorUndergroundWallConstruction cFactorConstruction, model.getConcreteModelObjects<model::CFactorUndergroundWallConstruction>()){
+    for (model::CFactorUndergroundWallConstruction cFactorConstruction : model.getConcreteModelObjects<model::CFactorUndergroundWallConstruction>()){
       if (cFactorConstruction.directUseCount() == 0){
         cFactorConstruction.remove();
       }
     }
 
     // remove unused FFactor constructions
-    BOOST_FOREACH(model::FFactorGroundFloorConstruction fFactorConstruction, model.getConcreteModelObjects<model::FFactorGroundFloorConstruction>()){
+    for (model::FFactorGroundFloorConstruction fFactorConstruction : model.getConcreteModelObjects<model::FFactorGroundFloorConstruction>()){
       if (fFactorConstruction.directUseCount() == 0){
         fFactorConstruction.remove();
       }
@@ -501,80 +520,91 @@ namespace sdd {
       //<InfModelCoefD>0</InfModelCoefD>
 
       //InfMthd = {AirChangesPerHour, FlowArea, FlowExteriorArea, FlowExteriorWallArea, FlowZone}
-      QDomElement infMthdElement = element.firstChildElement("InfMthd");
-
-      //DsgnInfRt ft3 per min ft2
-      // DLM: this is only correct for InfMthd = 'FlowExteriorArea' right?
-      QDomElement dsgnInfRtElement = element.firstChildElement("DsgnInfRt");
-
-      if ((!infMthdElement.isNull()) && (!dsgnInfRtElement.isNull())){
+      QDomNodeList infMthdNodes = element.elementsByTagName("InfMthd");
+      for (int i = 0; i < infMthdNodes.count(); i++){
         
-        // DLM: for now this is the only method supported
-        if (infMthdElement.text() == "FlowExteriorWallArea"){
+        QDomElement infMthdElement = infMthdNodes.at(i).toElement();
 
-          QDomElement infSchRefElement = element.firstChildElement("InfSchRef");
-          QDomElement infModelCoefAElement = element.firstChildElement("InfModelCoefA"); // unitless
-          QDomElement infModelCoefBElement = element.firstChildElement("InfModelCoefB"); // 1/F
-          QDomElement infModelCoefCElement = element.firstChildElement("InfModelCoefC"); // hr/mile
-          QDomElement infModelCoefDElement = element.firstChildElement("InfModelCoefD"); // hr^2/mile^2
+        bool hasIndex;
+        int infIndex = infMthdElement.attribute("index").toInt(&hasIndex);
 
-          openstudio::model::SpaceInfiltrationDesignFlowRate spaceInfiltrationDesignFlowRate(model);
-          spaceInfiltrationDesignFlowRate.setName(name + " Space Infiltration Design Flow Rate");
-          spaceInfiltrationDesignFlowRate.setSpace(space);
+        QDomElement dsgnInfRtElement = elementByTagNameAndIndex(element,"DsgnInfRt",hasIndex,infIndex);
 
-          openstudio::Quantity dsgnInfRtIP(dsgnInfRtElement.text().toDouble(), openstudio::createUnit("cfm/ft^2",UnitSystem::BTU).get());
-          OptionalQuantity dsgnInfRtSI = QuantityConverter::instance().convert(dsgnInfRtIP, siSys);
-          OS_ASSERT(dsgnInfRtSI);
-          OS_ASSERT(dsgnInfRtSI->units() == SIUnit(SIExpnt(0,1,-1)));
-          spaceInfiltrationDesignFlowRate.setFlowperExteriorWallArea(dsgnInfRtSI->value());
+        if ((!infMthdElement.isNull()) && (!dsgnInfRtElement.isNull())){
+          
+          // DLM: for now this is the only method supported
+          if ((infMthdElement.text() == "FlowExteriorWallArea") ||
+              (infMthdElement.text() == "FlowArea")){
 
-          if (!infSchRefElement.isNull()){
-            std::string scheduleName = escapeName(infSchRefElement.text());
-            boost::optional<model::Schedule> schedule = model.getModelObjectByName<model::Schedule>(scheduleName);
-            if (schedule){
-              spaceInfiltrationDesignFlowRate.setSchedule(*schedule);
-            }else{
-              LOG(Error, "Could not find schedule '" << scheduleName << "'");
+            QDomElement infSchRefElement = elementByTagNameAndIndex(element,"InfSchRef",hasIndex,infIndex);
+            QDomElement infModelCoefAElement = elementByTagNameAndIndex(element,"InfModelCoefA",hasIndex,infIndex); // unitless
+            QDomElement infModelCoefBElement = elementByTagNameAndIndex(element,"InfModelCoefB",hasIndex,infIndex); // 1/deltaF
+            QDomElement infModelCoefCElement = elementByTagNameAndIndex(element,"InfModelCoefC",hasIndex,infIndex); // hr/mile
+            QDomElement infModelCoefDElement = elementByTagNameAndIndex(element,"InfModelCoefD",hasIndex,infIndex); // hr^2/mile^2
+
+            openstudio::model::SpaceInfiltrationDesignFlowRate spaceInfiltrationDesignFlowRate(model);
+            std::string infName;
+            if( hasIndex ) {
+              infName = name + " Space Infiltration Design Flow Rate " + QString::number(infIndex + 1).toStdString();
+            }
+            else
+            {
+              infName = name + " Space Infiltration Design Flow Rate";
+            }
+            spaceInfiltrationDesignFlowRate.setName(infName);
+            spaceInfiltrationDesignFlowRate.setSpace(space);
+
+            openstudio::Quantity dsgnInfRtIP(dsgnInfRtElement.text().toDouble(), openstudio::createUnit("cfm/ft^2",UnitSystem::BTU).get());
+            OptionalQuantity dsgnInfRtSI = QuantityConverter::instance().convert(dsgnInfRtIP, siSys);
+            OS_ASSERT(dsgnInfRtSI);
+            OS_ASSERT(dsgnInfRtSI->units() == SIUnit(SIExpnt(0,1,-1)));
+            if( infMthdElement.text() == "FlowArea" ) {
+              spaceInfiltrationDesignFlowRate.setFlowperSpaceFloorArea(dsgnInfRtSI->value());
+            }else{ // Assume FlowExteriorWallArea
+              spaceInfiltrationDesignFlowRate.setFlowperExteriorWallArea(dsgnInfRtSI->value());
+            }
+
+            if (!infSchRefElement.isNull()){
+              std::string scheduleName = escapeName(infSchRefElement.text());
+              boost::optional<model::Schedule> schedule = model.getModelObjectByName<model::Schedule>(scheduleName);
+              if (schedule){
+                spaceInfiltrationDesignFlowRate.setSchedule(*schedule);
+              }else{
+                LOG(Error, "Could not find schedule '" << scheduleName << "'");
+              }
+            }
+
+            if (!infModelCoefAElement.isNull()){
+              // unitless
+              double infModelCoefA = infModelCoefAElement.text().toDouble();
+              spaceInfiltrationDesignFlowRate.setConstantTermCoefficient(infModelCoefA);
+            }
+
+            if (!infModelCoefBElement.isNull()){
+              // convert 1/deltaF to 1/detlaC
+              spaceInfiltrationDesignFlowRate.setTemperatureTermCoefficient(infModelCoefBElement.text().toDouble() * 5.0 / 9.0);
+            }
+
+            if (!infModelCoefCElement.isNull()){
+              // SDD: hr/mile, OpenStudio: s/m
+              openstudio::Quantity infModelCoefCIP(infModelCoefCElement.text().toDouble(), MPHUnit(MPHExpnt(0,-1,1)));
+              OptionalQuantity infModelCoefCSI = QuantityConverter::instance().convert(infModelCoefCIP, siSys);
+              OS_ASSERT(infModelCoefCSI);
+              OS_ASSERT(infModelCoefCSI->units() == SIUnit(SIExpnt(0,-1,1)));
+              spaceInfiltrationDesignFlowRate.setVelocityTermCoefficient(infModelCoefCSI->value());
+            }
+
+            if (!infModelCoefDElement.isNull()){
+              // SDD: hr^2/mile^2, OpenStudio: s^2/m^2
+              openstudio::Quantity infModelCoefDIP(infModelCoefDElement.text().toDouble(), MPHUnit(MPHExpnt(0,-2,2)));
+              OptionalQuantity infModelCoefDSI = QuantityConverter::instance().convert(infModelCoefDIP, siSys);
+              OS_ASSERT(infModelCoefDSI);
+              OS_ASSERT(infModelCoefDSI->units() == SIUnit(SIExpnt(0,-2,2)));
+              spaceInfiltrationDesignFlowRate.setVelocitySquaredTermCoefficient(infModelCoefDSI->value());
             }
           }
-
-          if (!infModelCoefAElement.isNull()){
-            // unitless
-            double infModelCoefA = infModelCoefAElement.text().toDouble();
-            spaceInfiltrationDesignFlowRate.setConstantTermCoefficient(infModelCoefA);
-          }
-
-          if (!infModelCoefBElement.isNull()){
-            // SDD: 1/F, OpenStudio: 1/C
-            BTUUnit ipUnit(BTUExpnt(0,0,0,-1));
-            openstudio::TemperatureUnit ipTempUnit = ipUnit.cast<openstudio::TemperatureUnit>();
-            ipTempUnit.setAsRelative();
-            openstudio::Quantity infModelCoefBIP(infModelCoefBElement.text().toDouble(), ipTempUnit);
-            OptionalQuantity infModelCoefBSI = QuantityConverter::instance().convert(infModelCoefBIP, siSys);
-            OS_ASSERT(infModelCoefBSI);
-            OS_ASSERT(infModelCoefBSI->units() == SIUnit(SIExpnt(0,0,0,-1)));
-            spaceInfiltrationDesignFlowRate.setTemperatureTermCoefficient(infModelCoefBSI->value());
-          }
-
-          if (!infModelCoefCElement.isNull()){
-            // SDD: hr/mile, OpenStudio: s/m
-            openstudio::Quantity infModelCoefCIP(infModelCoefCElement.text().toDouble(), MPHUnit(MPHExpnt(0,-1,1)));
-            OptionalQuantity infModelCoefCSI = QuantityConverter::instance().convert(infModelCoefCIP, siSys);
-            OS_ASSERT(infModelCoefCSI);
-            OS_ASSERT(infModelCoefCSI->units() == SIUnit(SIExpnt(0,-1,1)));
-            spaceInfiltrationDesignFlowRate.setVelocityTermCoefficient(infModelCoefCSI->value());
-          }
-
-          if (!infModelCoefAElement.isNull()){
-            // SDD: hr^2/mile^2, OpenStudio: s^2/m^2
-            openstudio::Quantity infModelCoefDIP(infModelCoefDElement.text().toDouble(), MPHUnit(MPHExpnt(0,-2,2)));
-            OptionalQuantity infModelCoefDSI = QuantityConverter::instance().convert(infModelCoefDIP, siSys);
-            OS_ASSERT(infModelCoefDSI);
-            OS_ASSERT(infModelCoefDSI->units() == SIUnit(SIExpnt(0,-2,2)));
-            spaceInfiltrationDesignFlowRate.setVelocitySquaredTermCoefficient(infModelCoefDSI->value());
-          }
         }
-      }
+      } // end for infMthdNodes
     }
 
     //***** Interior Lights *****
@@ -1417,8 +1447,8 @@ namespace sdd {
 
   model::ConstructionBase ReverseTranslator::shadingConstruction(openstudio::model::Model& model, double solRefl, double visRefl)
   {
-    std::pair<double, double> key = std::make_pair<double, double>(solRefl, visRefl);
-    std::map<std::pair<double, double>, model::ConstructionBase>::iterator it = m_shadingConstructionMap.find(key);
+    std::pair<double, double> key = std::make_pair(solRefl, visRefl);
+    auto it = m_shadingConstructionMap.find(key);
     if (it != m_shadingConstructionMap.end()){
       return it->second;
     }
@@ -1449,7 +1479,7 @@ namespace sdd {
     test = construction.setLayers(materials);
     OS_ASSERT(test); // what type of error handling do we want?
 
-    m_shadingConstructionMap.insert(std::make_pair<std::pair<double, double>, model::ConstructionBase>(key, construction));
+    m_shadingConstructionMap.insert(std::make_pair(key, construction));
     return construction;
   }
 
@@ -1492,7 +1522,7 @@ namespace sdd {
     /*
     // aboveGradeStoryCount
     unsigned numAboveGroundStories = 0;
-    BOOST_FOREACH(const model::BuildingStory& buildingStory, buildingStories){
+    for (const model::BuildingStory& buildingStory : buildingStories){
       boost::optional<double> nominalZCoordinate = buildingStory.nominalZCoordinate();
       if (nominalZCoordinate && *nominalZCoordinate >= 0){
         numAboveGroundStories += 1;
@@ -1515,12 +1545,12 @@ namespace sdd {
       m_progressBar->setValue(0);
     }
 
-    BOOST_FOREACH(const model::ShadingSurfaceGroup& shadingSurfaceGroup, shadingSurfaceGroups){
+    for (const model::ShadingSurfaceGroup& shadingSurfaceGroup : shadingSurfaceGroups){
       if (istringEqual(shadingSurfaceGroup.shadingSurfaceType(), "Building")){
 
         Transformation transformation = shadingSurfaceGroup.siteTransformation();
 
-        BOOST_FOREACH(const model::ShadingSurface& shadingSurface, shadingSurfaceGroup.shadingSurfaces()){
+        for (const model::ShadingSurface& shadingSurface : shadingSurfaceGroup.shadingSurfaces()){
           boost::optional<QDomElement> shadingSurfaceElement = translateShadingSurface(shadingSurface, transformation, doc);
           if (shadingSurfaceElement){
             result.appendChild(*shadingSurfaceElement);
@@ -1534,7 +1564,7 @@ namespace sdd {
     }
 
     // translate building story
-    BOOST_FOREACH(const model::BuildingStory& buildingStory, buildingStories){
+    for (const model::BuildingStory& buildingStory : buildingStories){
 
       boost::optional<QDomElement> buildingStoryElement = translateBuildingStory(buildingStory, doc);
       if (buildingStoryElement){
@@ -1550,7 +1580,7 @@ namespace sdd {
     std::vector<model::Space> spaces = building.model().getConcreteModelObjects<model::Space>();
     std::sort(spaces.begin(), spaces.end(), WorkspaceObjectNameLess());
 
-    BOOST_FOREACH(const model::Space& space, spaces){
+    for (const model::Space& space : spaces){
       if (!space.buildingStory()){
         LOG(Warn, "Model contains spaces which are not assigned to a building story, these have not been translated.");
         break;
@@ -1568,7 +1598,7 @@ namespace sdd {
       m_progressBar->setValue(0);
     }
 
-    BOOST_FOREACH(const model::ThermalZone& thermalZone, thermalZones){
+    for (const model::ThermalZone& thermalZone : thermalZones){
 
       boost::optional<QDomElement> thermalZoneElement = translateThermalZone(thermalZone, doc);
       if (thermalZoneElement){
@@ -1598,7 +1628,7 @@ namespace sdd {
     std::vector<model::Space> spaces = buildingStory.spaces();
     std::sort(spaces.begin(), spaces.end(), WorkspaceObjectNameLess());
 
-    BOOST_FOREACH(const model::Space& space, spaces){
+    for (const model::Space& space : spaces){
       boost::optional<QDomElement> spaceElement = translateSpace(space, doc);
       if (spaceElement){
         result.appendChild(*spaceElement);
@@ -1648,7 +1678,7 @@ namespace sdd {
     Point3dVector vertices = transformation*space.floorPrint();
     QDomElement polyLoopElement = doc.createElement("PolyLp");
     result.appendChild(polyLoopElement);
-    BOOST_FOREACH(const Point3d& vertex, vertices){
+    for (const Point3d& vertex : vertices){
       QDomElement cartesianPointElement = doc.createElement("CartesianPt");
       polyLoopElement.appendChild(cartesianPointElement);
 
@@ -1678,10 +1708,10 @@ namespace sdd {
     std::vector<model::ShadingSurfaceGroup> shadingSurfaceGroups = space.shadingSurfaceGroups();
     std::sort(shadingSurfaceGroups.begin(), shadingSurfaceGroups.end(), WorkspaceObjectNameLess());
 
-    BOOST_FOREACH(const model::ShadingSurfaceGroup& shadingSurfaceGroup, shadingSurfaceGroups){
+    for (const model::ShadingSurfaceGroup& shadingSurfaceGroup : shadingSurfaceGroups){
       Transformation shadingTransformation = shadingSurfaceGroup.siteTransformation();
 
-      BOOST_FOREACH(const model::ShadingSurface& shadingSurface, shadingSurfaceGroup.shadingSurfaces()){
+      for (const model::ShadingSurface& shadingSurface : shadingSurfaceGroup.shadingSurfaces()){
         boost::optional<QDomElement> shadingSurfaceElement = translateShadingSurface(shadingSurface, shadingTransformation, doc);
         if (shadingSurfaceElement){
           result.appendChild(*shadingSurfaceElement);
@@ -1693,7 +1723,7 @@ namespace sdd {
     std::vector<model::Surface> surfaces = space.surfaces();
     std::sort(surfaces.begin(), surfaces.end(), WorkspaceObjectNameLess());
 
-    BOOST_FOREACH(const model::Surface& surface, surfaces){
+    for (const model::Surface& surface : surfaces){
       boost::optional<QDomElement> surfaceElement = translateSurface(surface, transformation, doc);
       if (surfaceElement){
         result.appendChild(*surfaceElement);
@@ -1841,7 +1871,7 @@ namespace sdd {
     Point3dVector vertices = transformation*surface.vertices();
     QDomElement polyLoopElement = doc.createElement("PolyLp");
     result->appendChild(polyLoopElement);
-    BOOST_FOREACH(const Point3d& vertex, vertices){
+    for (const Point3d& vertex : vertices){
       QDomElement cartesianPointElement = doc.createElement("CartesianPt");
       polyLoopElement.appendChild(cartesianPointElement);
 
@@ -1893,7 +1923,7 @@ namespace sdd {
     std::vector<model::SubSurface> subSurfaces = surface.subSurfaces();
     std::sort(subSurfaces.begin(), subSurfaces.end(), WorkspaceObjectNameLess());
 
-    BOOST_FOREACH(const model::SubSurface& subSurface, subSurfaces){
+    for (const model::SubSurface& subSurface : subSurfaces){
       boost::optional<QDomElement> subSurfaceElement = translateSubSurface(subSurface, transformation, doc);
       if (subSurfaceElement){
         result->appendChild(*subSurfaceElement);
@@ -1963,7 +1993,7 @@ namespace sdd {
     Point3dVector vertices = transformation*subSurface.vertices();
     QDomElement polyLoopElement = doc.createElement("PolyLp");
     result->appendChild(polyLoopElement);
-    BOOST_FOREACH(const Point3d& vertex, vertices){
+    for (const Point3d& vertex : vertices){
       QDomElement cartesianPointElement = doc.createElement("CartesianPt");
       polyLoopElement.appendChild(cartesianPointElement);
 
@@ -2110,7 +2140,7 @@ namespace sdd {
     Point3dVector vertices = transformation*shadingSurface.vertices();
     QDomElement polyLoopElement = doc.createElement("PolyLp");
     result->appendChild(polyLoopElement);
-    BOOST_FOREACH(const Point3d& vertex, vertices){
+    for (const Point3d& vertex : vertices){
       QDomElement cartesianPointElement = doc.createElement("CartesianPt");
       polyLoopElement.appendChild(cartesianPointElement);
 

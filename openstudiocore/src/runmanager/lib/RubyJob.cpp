@@ -31,15 +31,11 @@
 #include "WorkItem.hpp"
 #include "JSON.hpp"
 
-#include <utilities/time/DateTime.hpp>
+#include "../../utilities/time/DateTime.hpp"
 
 #include <QDir>
 #include <QDateTime>
 #include <QUrl>
-
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
-#include <boost/foreach.hpp>
 
 namespace openstudio {
 namespace runmanager {
@@ -116,12 +112,12 @@ namespace detail {
   {
   }
 
-  void RubyJob::mergeJobImpl(const boost::shared_ptr<Job_Impl> &t_parent, const boost::shared_ptr<Job_Impl> &t_job) 
+  void RubyJob::mergeJobImpl(const std::shared_ptr<Job_Impl> &t_parent, const std::shared_ptr<Job_Impl> &t_job) 
   {
 
     // only work on UserScriptJobs
-    boost::shared_ptr<UserScriptJob> usjob = boost::dynamic_pointer_cast<UserScriptJob>(t_job);
-    boost::shared_ptr<UserScriptJob> usparentjob = boost::dynamic_pointer_cast<UserScriptJob>(t_parent);
+    std::shared_ptr<UserScriptJob> usjob = std::dynamic_pointer_cast<UserScriptJob>(t_job);
+    std::shared_ptr<UserScriptJob> usparentjob = std::dynamic_pointer_cast<UserScriptJob>(t_parent);
 
     if (!usjob || !usparentjob)
     {
@@ -150,8 +146,8 @@ namespace detail {
     LOG(Info, "Merging Job " << openstudio::toString(t_job->uuid()) << " into " << openstudio::toString(uuid()));
     
     removeChild(t_job);
-    std::vector<boost::shared_ptr<Job_Impl> > children = t_job->children();
-    std::for_each(children.begin(), children.end(), boost::bind(&Job_Impl::addChild, t_parent, _1));
+    std::vector<std::shared_ptr<Job_Impl> > children = t_job->children();
+    std::for_each(children.begin(), children.end(), std::bind(&Job_Impl::addChild, t_parent, std::placeholders::_1));
 
     std::vector<JobParams> existing_merged_jobs = usjob->m_mergedJobs;
     JobParams job_to_merge = usjob->params();
@@ -251,7 +247,7 @@ namespace detail {
           to = toPath(outfilename);
         } else {
           to = toPath(
-              boost::filesystem::path(outfilename).stem() + "-" + boost::lexical_cast<std::string>(namecount) 
+              boost::filesystem::path(outfilename).stem().string() + "-" + boost::lexical_cast<std::string>(namecount) 
               + boost::filesystem::extension(outfilename));
         }
 
@@ -274,7 +270,7 @@ namespace detail {
     }
 
     // set up files that need to have "requiredFiles" copied from input to output
-    typedef std::vector<boost::tuple<std::string, std::string, std::string> > copyvectype;
+    typedef std::vector<std::tuple<std::string, std::string, std::string> > copyvectype;
     copyvectype copyfiles = rjb.copyRequiredFiles();
 
     Files inputfiles = allInputFiles();
@@ -284,7 +280,7 @@ namespace detail {
         ++itr)
     {
       try {
-        copyRequiredFiles(inputfiles.getLastByExtension(itr->get<0>()), itr->get<1>(), toPath(itr->get<2>()));
+        copyRequiredFiles(inputfiles.getLastByExtension(std::get<0>(*itr)), std::get<1>(*itr), toPath(std::get<2>(*itr)));
       } catch (const std::exception &e) {
         LOG(Error, "Error establishing file to copy required files from / to: " << e.what());
       }
@@ -347,7 +343,7 @@ namespace detail {
 
         // DLM: this does not seem to work on the top level input OSM, we may need to make the call to compute these required files
         // before this code is run
-        BOOST_FOREACH(const RequiredFileType& requiredFile, osm.requiredFiles){
+        for (const RequiredFileType& requiredFile : osm.requiredFiles){
           if (istringEqual(".epw", toString(requiredFile.second.extension()))){
             lastEpwFilePath = requiredFile.second;
             LOG(Info, "Found last EpwFile '" << toString(lastEpwFilePath->filename()) << "' attached to last OpenStudio Model");
@@ -362,7 +358,7 @@ namespace detail {
         addParameter("ruby", lastEnergyPlusWorkspacePathArgument);
 
         // DLM: assume that an EPW file attached to last idf is more recent that EPW file attached to last osm
-        BOOST_FOREACH(const RequiredFileType& requiredFile, idf.requiredFiles){
+        for (const RequiredFileType& requiredFile : idf.requiredFiles){
           if (istringEqual(".epw", toString(requiredFile.second.extension()))){
             lastEpwFilePath = requiredFile.second;
             LOG(Info, "Found last EpwFile '" << toString(lastEpwFilePath->filename()) << "' attached to last EnergyPlus Workspace");
@@ -402,16 +398,16 @@ namespace detail {
       return results;
     }
 
-    Files outputFiles = this->outputFiles();
+    Files oFiles = outputFiles();
 
     // search for stderr file in case of failure
     boost::optional<FileInfo> stderrFile;
     try { 
-      stderrFile = outputFiles.getLastByFilename("stderr"); 
+      stderrFile = oFiles.getLastByFilename("stderr"); 
     } catch (...) {
     }
 
-    std::vector<FileInfo> files = outputFiles.files();
+    std::vector<FileInfo> files = oFiles.files();
 
     // loop over all merged jobs
     bool errorAssigned = false;
@@ -448,54 +444,59 @@ namespace detail {
       }
 
       JobErrors e; // default is failed case
-      try {
-        openstudio::path p = jobfiles.getLastByExtension("ossr").fullPath;
-        boost::optional<openstudio::ruleset::OSResult> osresult = openstudio::ruleset::OSResult::load(p);
-        if (osresult)
-        {
-          ErrorInfo ei;
-          ei.osResult(*osresult);
-          e = ei.errors();
 
-          // these errors are reported with this merged job
-          for (std::vector<std::pair<ErrorType, std::string> >::const_iterator itr = e.allErrors.begin();
-               itr != e.allErrors.end();
-               ++itr)
+      // there's no way to collate the errors if the job has never run
+      if (lastRun() && !isRunning())
+      {
+        try {
+          openstudio::path p = jobfiles.getLastByExtension("ossr").fullPath;
+          boost::optional<openstudio::ruleset::OSResult> osresult = openstudio::ruleset::OSResult::load(p);
+          if (osresult)
           {
-            std::string error = itr->first.valueName() + itr->second;
-            reportedErrors.insert(error);
-          }
-        } 
-      } catch (const std::exception &) {
+            ErrorInfo ei;
+            ei.osResult(*osresult);
+            e = ei.errors();
 
-        // if this was the first merged job without an ossr we know this was the error
-        if (!errorAssigned){
-
-          // look through all JobErrors from all the merged jobs
-          JobErrors thisErrors = this->errors();
-          for (std::vector<std::pair<ErrorType, std::string> >::const_iterator itr = thisErrors.allErrors.begin();
-               itr != thisErrors.allErrors.end();
-               ++itr)
-          {
-            std::string error = itr->first.valueName() + itr->second;
-            if (reportedErrors.find(error) == reportedErrors.end()){
-              // error not yet reported, report here
-              e.addError(itr->first, itr->second);
+            // these errors are reported with this merged job
+            for (std::vector<std::pair<ErrorType, std::string> >::const_iterator itr = e.allErrors.begin();
+                itr != e.allErrors.end();
+                ++itr)
+            {
+              std::string error = itr->first.valueName() + itr->second;
+              reportedErrors.insert(error);
             }
-          }
+          } 
+        } catch (const std::exception &) {
 
-          // assign stderrFile here if it exists
-          if (stderrFile){
-            // should have at least one error here
-            if (e.errors().empty()){
-              e.addError(ErrorType::Error, "Merged job failed.");
+          // if this was the first merged job without an ossr we know this was the error
+          if (!errorAssigned){
+
+            // look through all JobErrors from all the merged jobs
+            JobErrors thisErrors = errors();
+            for (std::vector<std::pair<ErrorType, std::string> >::const_iterator itr = thisErrors.allErrors.begin();
+                itr != thisErrors.allErrors.end();
+                ++itr)
+            {
+              std::string error = itr->first.valueName() + itr->second;
+              if (reportedErrors.find(error) == reportedErrors.end()){
+                // error not yet reported, report here
+                e.addError(itr->first, itr->second);
+              }
             }
-            jobfiles.append(*stderrFile);
-          }else{
-            e.addError(ErrorType::Error, "Merged job failed but cannot find stderr file, check " + toString(this->outdir(false)) + " for output.");
-          }
 
-          errorAssigned = true;
+            // assign stderrFile here if it exists
+            if (stderrFile){
+              // should have at least one error here
+              if (e.errors().empty()){
+                e.addError(ErrorType::Error, "Merged job failed.");
+              }
+              jobfiles.append(*stderrFile);
+            }else{
+              e.addError(ErrorType::Error, "Merged job failed but cannot find stderr file, check " + toString(outdir(false)) + " for output.");
+            }
+
+            errorAssigned = true;
+          }
         }
       }
 
@@ -522,7 +523,7 @@ namespace detail {
 
     for (size_t i = 0; i <= t_rjb.mergedJobs().size(); ++i)
     {
-      typedef std::vector<boost::tuple<FileSelection, FileSource, std::string, std::string> > FileReqs;
+      typedef std::vector<std::tuple<FileSelection, FileSource, std::string, std::string> > FileReqs;
 
       FileReqs inputFiles;
       if (i == 0) { 
@@ -558,20 +559,20 @@ namespace detail {
           ++itr)
       {
         try {
-          const Files &source = PickFileSource::pick(itr->get<1>(), allinputfiles, myInputFiles, parentInputFiles);
+          const Files &source = PickFileSource::pick(std::get<1>(*itr), allinputfiles, myInputFiles, parentInputFiles);
 
           Files found;
-          switch (itr->get<0>().value())
+          switch (std::get<0>(*itr).value())
           {
             case FileSelection::Last:
-              found.append(source.getLastByRegex(itr->get<2>()));
+              found.append(source.getLastByRegex(std::get<2>(*itr)));
               break;
             case FileSelection::All:
-              found.append(source.getAllByRegex(itr->get<2>()));
+              found.append(source.getAllByRegex(std::get<2>(*itr)));
               break;
           }
 
-          m_inputfiles.push_back(std::make_pair(i, std::make_pair(found, itr->get<3>())));
+          m_inputfiles.push_back(std::make_pair(i, std::make_pair(found, std::get<3>(*itr))));
         } catch (const std::exception &) {
         }
       }

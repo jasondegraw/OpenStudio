@@ -17,16 +17,16 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/ModelObjectTypeListView.hpp>
-#include <openstudio_lib/ModelObjectTypeItem.hpp>
-#include <openstudio_lib/ModelObjectItem.hpp>
-#include <openstudio_lib/ModelObjectListView.hpp>
-#include <openstudio_lib/OSCollapsibleItemHeader.hpp>
-#include <openstudio_lib/OSItem.hpp>
+#include "ModelObjectTypeListView.hpp"
+#include "ModelObjectTypeItem.hpp"
+#include "ModelObjectItem.hpp"
+#include "ModelObjectListView.hpp"
+#include "OSCollapsibleItemHeader.hpp"
+#include "OSItem.hpp"
 
-#include <model/Model.hpp>
-#include <model/Model_Impl.hpp>
-#include <utilities/core/Assert.hpp>
+#include "../model/Model.hpp"
+#include "../model/Model_Impl.hpp"
+#include "../utilities/core/Assert.hpp"
 
 #include <iostream>
 
@@ -34,7 +34,7 @@ namespace openstudio {
 
 ModelObjectTypeListView::ModelObjectTypeListView(const model::Model& model, 
                                                  bool addScrollArea, 
-                                                 OSItem::Type headerType, 
+                                                 OSItemType headerType, 
                                                  bool showLocalBCL,
                                                  QWidget * parent )
   : OSCollapsibleItemList(addScrollArea, parent), m_model(model), m_headerType(headerType), m_showLocalBCL(showLocalBCL)
@@ -43,14 +43,16 @@ ModelObjectTypeListView::ModelObjectTypeListView(const model::Model& model,
 
 ModelObjectTypeListView::ModelObjectTypeListView(const std::vector<std::pair<IddObjectType, std::string> >& modelObjectTypesAndNames,
                                                  const model::Model& model, bool addScrollArea, 
-                                                 OSItem::Type headerType, bool showLocalBCL, QWidget * parent )
+                                                 OSItemType headerType, bool showLocalBCL, QWidget * parent )
   : OSCollapsibleItemList(addScrollArea, parent), 
     m_modelObjectTypesAndNames(modelObjectTypesAndNames), 
     m_model(model), m_headerType(headerType), m_showLocalBCL(showLocalBCL)
 { 
-  typedef std::vector<std::pair<IddObjectType, std::string> >::value_type PairType;
-  BOOST_REVERSE_FOREACH(PairType modelObjectTypeAndName, m_modelObjectTypesAndNames){
-    addModelObjectType(modelObjectTypeAndName.first, modelObjectTypeAndName.second);
+  for(auto modelObjectTypeAndName = m_modelObjectTypesAndNames.rbegin();
+      modelObjectTypeAndName != m_modelObjectTypesAndNames.rend();
+      ++modelObjectTypeAndName)
+  {
+    addModelObjectType(modelObjectTypeAndName->first, modelObjectTypeAndName->second);
   }
 }
 

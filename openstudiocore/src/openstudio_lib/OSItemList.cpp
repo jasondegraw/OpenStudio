@@ -17,11 +17,11 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/OSItemList.hpp>
-#include <openstudio_lib/OSVectorController.hpp>
-#include <openstudio_lib/ScriptsListView.hpp>
+#include "OSItemList.hpp"
+#include "OSVectorController.hpp"
+#include "ScriptsListView.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <QVBoxLayout>
 #include <QScrollArea>
@@ -42,7 +42,7 @@ OSItemList::OSItemList(OSVectorController* vectorController,
     m_selectedItem(NULL),
     m_itemsDraggable(false),
     m_itemsRemoveable(false),
-    m_type(OSItem::LIST_ITEM),
+    m_type(OSItemType::ListItem),
     m_dirty(false)
 {
   // for now we will allow this item list to manage memory of 
@@ -161,7 +161,7 @@ bool OSItemList::itemsDraggable() const
 void OSItemList::setItemsDraggable(bool itemsDraggable)
 {
   m_itemsDraggable = itemsDraggable;
-  BOOST_FOREACH(OSItem* item, this->items()){
+  for (OSItem* item : this->items()){
     item->setDraggable(itemsDraggable);
   }
 }
@@ -174,7 +174,7 @@ bool OSItemList::itemsRemoveable() const
 void OSItemList::setItemsRemoveable(bool itemsRemoveable)
 {
   m_itemsRemoveable = itemsRemoveable;
-  BOOST_FOREACH(OSItem* item, this->items()){
+  for (OSItem* item : this->items()){
     item->setRemoveable(itemsRemoveable);
   }
 }
@@ -210,8 +210,8 @@ void OSItemList::setItemIds(const std::vector<OSItemId>& itemIds)
 
   m_selectedItem = NULL;
   
-  BOOST_FOREACH(const OSItemId& itemId, itemIds){
-    OSItem* item = OSItem::makeItem(itemId, OSItem::LIST_ITEM);
+  for (const OSItemId& itemId : itemIds){
+    OSItem* item = OSItem::makeItem(itemId, OSItemType::ListItem);
     if (item){
       addItem(item, false);
     }
@@ -237,7 +237,7 @@ void OSItemList::addItem(OSItem* item, bool selectItem)
 
   item->setRemoveable(m_itemsRemoveable);
 
-  item->setType(m_type);
+  item->setOSItemType(m_type);
 
   bool isConnected = false;
   isConnected = connect(item, SIGNAL(itemClicked(OSItem*)),
@@ -347,16 +347,16 @@ void OSItemList::paintEvent( QPaintEvent * event )
   style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
-OSItem::Type OSItemList::itemsType() const
+OSItemType OSItemList::itemsType() const
 {
   return m_type;
 }
 
-void OSItemList::setItemsType(OSItem::Type type)
+void OSItemList::setItemsType(OSItemType type)
 {
   m_type = type;
-  BOOST_FOREACH(OSItem* item, this->items()){
-    item->setType(type);
+  for (OSItem* item : this->items()){
+    item->setOSItemType(type);
   }
 }
 

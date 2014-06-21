@@ -17,22 +17,29 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <pat_app/MeasuresView.hpp>
-#include "../shared_gui_components/OSViewSwitcher.hpp"
-#include "../shared_gui_components/OSListView.hpp"
-#include "../shared_gui_components/HeaderViews.hpp"
+#include "MeasuresView.hpp"
+
+#include "PatApp.hpp"
+#include "PatMainWindow.hpp"
+
 #include "../shared_gui_components/Buttons.hpp"
+#include "../shared_gui_components/HeaderViews.hpp"
+#include "../shared_gui_components/OSListView.hpp"
+#include "../shared_gui_components/OSViewSwitcher.hpp"
+#include "../shared_gui_components/SyncMeasuresDialog.hpp"
+#include "../shared_gui_components/MeasureManager.hpp"
+
+#include <QDragEnterEvent>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPainter>
+#include <QPixmap>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStackedWidget>
 #include <QStyleOption>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPixmap>
-#include <QDragEnterEvent>
 
 namespace openstudio{
   
@@ -47,7 +54,7 @@ MeasuresTabView::MeasuresTabView()
 
   mainContent = new QWidget();
 
-  QVBoxLayout * mainContentVLayout = new QVBoxLayout();
+  auto mainContentVLayout = new QVBoxLayout();
   mainContentVLayout->setContentsMargins(0,0,0,0);
   mainContentVLayout->setSpacing(0);
   mainContentVLayout->setAlignment(Qt::AlignTop);
@@ -57,7 +64,7 @@ MeasuresTabView::MeasuresTabView()
 
   // Select Baseline Header
 
-  QWidget * selectBaselineHeader = new QWidget();
+  auto selectBaselineHeader = new QWidget();
   selectBaselineHeader->setFixedHeight(30);
   selectBaselineHeader->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
   selectBaselineHeader->setObjectName("SelectBaselineHeader");
@@ -65,7 +72,7 @@ MeasuresTabView::MeasuresTabView()
 
   mainContentVLayout->addWidget(selectBaselineHeader);
 
-  QHBoxLayout * baselineHeaderHLayout = new QHBoxLayout(); 
+  auto baselineHeaderHLayout = new QHBoxLayout(); 
   baselineHeaderHLayout->setContentsMargins(5,5,5,5);
   baselineHeaderHLayout->setSpacing(10);
 
@@ -83,7 +90,7 @@ MeasuresTabView::MeasuresTabView()
   baselineNameBackground->setObjectName("BaselineNameBackground");
   baselineNameBackground->setStyleSheet("QWidget#BaselineNameBackground { background: #D9D9D9 }");
   baselineNameBackground->setMinimumWidth(250);
-  QHBoxLayout * baselineNameBackgroundLayout = new QHBoxLayout();
+  auto baselineNameBackgroundLayout = new QHBoxLayout();
   baselineNameBackgroundLayout->setContentsMargins(5,2,5,2);
   baselineNameBackgroundLayout->setSpacing(5);
   baselineNameBackground->setLayout(baselineNameBackgroundLayout);
@@ -102,8 +109,46 @@ MeasuresTabView::MeasuresTabView()
   variableGroupListView->setContentsMargins(0,0,0,0);
   variableGroupListView->setSpacing(0);
   mainContentVLayout->addWidget(variableGroupListView);
+
+  QString style;
+  style.append("QWidget#Footer {");
+  style.append("border-top: 1px solid black; ");
+  style.append("background-color: qlineargradient(x1:0,y1:0,x2:0,y2:1,stop: 0 #B6B5B6, stop: 1 #737172); ");
+  style.append("}");
+
+  QWidget * footer = new QWidget();
+  footer->setObjectName("Footer");
+  footer->setStyleSheet(style);
+  mainContentVLayout->addWidget(footer);
+
+  QHBoxLayout * layout = new QHBoxLayout();
+  layout->setSpacing(0);
+  footer->setLayout(layout);
+
+  m_updateMeasuresButton = new BlueButton();
+  m_updateMeasuresButton->setText("Sync Project Measures with Library");
+  m_updateMeasuresButton->setToolTip("Check the Library for Newer Versions of the Measures in Your Project and Provides Sync Option");
+  layout->addStretch();
+  layout->addWidget(m_updateMeasuresButton);
+
+  bool isConnected = false;
+  isConnected = connect(m_updateMeasuresButton,SIGNAL(clicked()), this,SLOT(openUpdateMeasuresDlg()));
+  OS_ASSERT(isConnected);
 }
 
+//*****SLOTS*****
+
+void MeasuresTabView::openUpdateMeasuresDlg()
+{
+  PatApp * app = PatApp::instance();
+
+  boost::optional<analysisdriver::SimpleProject> project = app->project();
+  OS_ASSERT(project);
+
+  m_syncMeasuresDialog = boost::shared_ptr<SyncMeasuresDialog>(new SyncMeasuresDialog(&(project.get()),&(app->measureManager())));
+  m_syncMeasuresDialog->setGeometry(app->mainWindow->geometry());
+  m_syncMeasuresDialog->exec();
+}
 
 } // pat
 

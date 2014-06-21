@@ -19,9 +19,9 @@
 
 require 'openstudio'
 
-require 'test/unit'
+require 'minitest/autorun'
 
-class PluginTemplates_Test < Test::Unit::TestCase
+class PluginTemplates_Test < MiniTest::Unit::TestCase
 
   def test_Templates
     templates_path = "#{$OpenStudio_LibPath}/openstudio/sketchup_plugin/resources/templates/"
@@ -33,6 +33,8 @@ class PluginTemplates_Test < Test::Unit::TestCase
       path = OpenStudio::Path.new(template)
       
       vt = OpenStudio::OSVersion::VersionTranslator.new
+      vt.setAllowNewerVersions(false)
+      
       model = vt.loadModel(path)
       assert((not model.empty?))
       model = model.get

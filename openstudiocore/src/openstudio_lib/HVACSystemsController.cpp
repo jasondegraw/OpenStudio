@@ -31,72 +31,72 @@
 #include "OSDocument.hpp"
 #include "RefrigerationScene.hpp"
 #include "../shared_gui_components/OSSwitch.hpp"
-#include <openstudio_lib/ServiceWaterScene.hpp>
-#include <openstudio_lib/HorizontalTabWidget.hpp>
-#include <openstudio_lib/MainRightColumnController.hpp>
+#include "ServiceWaterScene.hpp"
+#include "HorizontalTabWidget.hpp"
+#include "MainRightColumnController.hpp"
 #include "../shared_gui_components/OSViewSwitcher.hpp"
-#include <model/ModelObject.hpp>
-#include <model/HVACComponent.hpp>
-#include <model/HVACComponent_Impl.hpp>
-#include <model/WaterToAirComponent.hpp>
-#include <model/WaterToAirComponent_Impl.hpp>
-#include <model/WaterToWaterComponent.hpp>
-#include <model/WaterToWaterComponent_Impl.hpp>
-#include <model/WaterUseConnections.hpp>
-#include <model/WaterUseConnections_Impl.hpp>
-#include <model/WaterUseEquipment.hpp>
-#include <model/WaterUseEquipment_Impl.hpp>
-#include <model/WaterUseEquipmentDefinition.hpp>
-#include <model/WaterUseEquipmentDefinition_Impl.hpp>
-#include <model/AirLoopHVACOutdoorAirSystem.hpp>
-#include <model/AirLoopHVACOutdoorAirSystem_Impl.hpp>
-#include <model/AirLoopHVACUnitaryHeatPumpAirToAir.hpp>
-#include <model/AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp>
-#include <model/ControllerMechanicalVentilation.hpp>
-#include <model/ControllerMechanicalVentilation_Impl.hpp>
-#include <model/ControllerOutdoorAir.hpp>
-#include <model/ControllerOutdoorAir_Impl.hpp>
-#include <model/SetpointManagerSingleZoneReheat.hpp>
-#include <model/SetpointManagerSingleZoneReheat_Impl.hpp>
-#include <model/SetpointManagerScheduled.hpp>
-#include <model/SetpointManagerScheduled_Impl.hpp>
-#include <model/SetpointManagerFollowOutdoorAirTemperature.hpp>
-#include <model/SetpointManagerFollowOutdoorAirTemperature_Impl.hpp>
-#include <model/SetpointManagerOutdoorAirReset.hpp>
-#include <model/SetpointManagerOutdoorAirReset_Impl.hpp>
-#include <model/CoilCoolingDXSingleSpeed.hpp>
-#include <model/CoilCoolingDXSingleSpeed_Impl.hpp>
-#include <model/CoilCoolingDXTwoSpeed.hpp>
-#include <model/CoilCoolingDXTwoSpeed_Impl.hpp>
-#include <model/CoilCoolingWater.hpp>
-#include <model/CoilCoolingWater_Impl.hpp>
-#include <model/CoilHeatingGas.hpp>
-#include <model/CoilHeatingGas_Impl.hpp>
-#include <model/CoilHeatingElectric.hpp>
-#include <model/CoilHeatingElectric_Impl.hpp>
-#include <model/CoilHeatingWater.hpp>
-#include <model/CoilHeatingWater_Impl.hpp>
-#include <model/Model.hpp>
-#include <model/Model_Impl.hpp>
-#include <model/Node.hpp>
-#include <model/Node_Impl.hpp>
-#include <model/Loop.hpp>
-#include <model/Loop_Impl.hpp>
-#include <model/Splitter.hpp>
-#include <model/Splitter_Impl.hpp>
-#include <model/Schedule.hpp>
-#include <model/Schedule_Impl.hpp>
-#include <model/Mixer.hpp>
-#include <model/Mixer_Impl.hpp>
-#include <model/PlantLoop.hpp>
-#include <model/PlantLoop_Impl.hpp>
-#include <model/AirLoopHVAC.hpp>
-#include <model/AirLoopHVAC_Impl.hpp>
-#include <model/ThermalZone.hpp>
-#include <model/ThermalZone_Impl.hpp>
-#include <model/HVACTemplates.hpp>
+#include "../model/ModelObject.hpp"
+#include "../model/HVACComponent.hpp"
+#include "../model/HVACComponent_Impl.hpp"
+#include "../model/WaterToAirComponent.hpp"
+#include "../model/WaterToAirComponent_Impl.hpp"
+#include "../model/WaterToWaterComponent.hpp"
+#include "../model/WaterToWaterComponent_Impl.hpp"
+#include "../model/WaterUseConnections.hpp"
+#include "../model/WaterUseConnections_Impl.hpp"
+#include "../model/WaterUseEquipment.hpp"
+#include "../model/WaterUseEquipment_Impl.hpp"
+#include "../model/WaterUseEquipmentDefinition.hpp"
+#include "../model/WaterUseEquipmentDefinition_Impl.hpp"
+#include "../model/AirLoopHVACOutdoorAirSystem.hpp"
+#include "../model/AirLoopHVACOutdoorAirSystem_Impl.hpp"
+#include "../model/AirLoopHVACUnitaryHeatPumpAirToAir.hpp"
+#include "../model/AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp"
+#include "../model/ControllerMechanicalVentilation.hpp"
+#include "../model/ControllerMechanicalVentilation_Impl.hpp"
+#include "../model/ControllerOutdoorAir.hpp"
+#include "../model/ControllerOutdoorAir_Impl.hpp"
+#include "../model/SetpointManagerSingleZoneReheat.hpp"
+#include "../model/SetpointManagerSingleZoneReheat_Impl.hpp"
+#include "../model/SetpointManagerScheduled.hpp"
+#include "../model/SetpointManagerScheduled_Impl.hpp"
+#include "../model/SetpointManagerFollowOutdoorAirTemperature.hpp"
+#include "../model/SetpointManagerFollowOutdoorAirTemperature_Impl.hpp"
+#include "../model/SetpointManagerOutdoorAirReset.hpp"
+#include "../model/SetpointManagerOutdoorAirReset_Impl.hpp"
+#include "../model/CoilCoolingDXSingleSpeed.hpp"
+#include "../model/CoilCoolingDXSingleSpeed_Impl.hpp"
+#include "../model/CoilCoolingDXTwoSpeed.hpp"
+#include "../model/CoilCoolingDXTwoSpeed_Impl.hpp"
+#include "../model/CoilCoolingWater.hpp"
+#include "../model/CoilCoolingWater_Impl.hpp"
+#include "../model/CoilHeatingGas.hpp"
+#include "../model/CoilHeatingGas_Impl.hpp"
+#include "../model/CoilHeatingElectric.hpp"
+#include "../model/CoilHeatingElectric_Impl.hpp"
+#include "../model/CoilHeatingWater.hpp"
+#include "../model/CoilHeatingWater_Impl.hpp"
+#include "../model/Model.hpp"
+#include "../model/Model_Impl.hpp"
+#include "../model/Node.hpp"
+#include "../model/Node_Impl.hpp"
+#include "../model/Loop.hpp"
+#include "../model/Loop_Impl.hpp"
+#include "../model/Splitter.hpp"
+#include "../model/Splitter_Impl.hpp"
+#include "../model/Schedule.hpp"
+#include "../model/Schedule_Impl.hpp"
+#include "../model/Mixer.hpp"
+#include "../model/Mixer_Impl.hpp"
+#include "../model/PlantLoop.hpp"
+#include "../model/PlantLoop_Impl.hpp"
+#include "../model/AirLoopHVAC.hpp"
+#include "../model/AirLoopHVAC_Impl.hpp"
+#include "../model/ThermalZone.hpp"
+#include "../model/ThermalZone_Impl.hpp"
+#include "../model/HVACTemplates.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <QMessageBox>
 #include <QTimer>
@@ -117,9 +117,9 @@ HVACSystemsController::HVACSystemsController(bool isIP, const model::Model & mod
 {
   m_hvacSystemsView = new HVACSystemsView();
 
-  m_hvacLayoutController = boost::shared_ptr<HVACLayoutController>(new HVACLayoutController(this));
+  m_hvacLayoutController = std::shared_ptr<HVACLayoutController>(new HVACLayoutController(this));
 
-  m_hvacControlsController = boost::shared_ptr<HVACControlsController>(new HVACControlsController(this));
+  m_hvacControlsController = std::shared_ptr<HVACControlsController>(new HVACControlsController(this));
 
   bool bingo;
 
@@ -288,7 +288,7 @@ void HVACSystemsController::update()
 
       if( m_hvacSystemsView->hvacToolbarView->topologyViewButton->isChecked() )
       {
-        m_refrigerationController = boost::shared_ptr<RefrigerationController>(new RefrigerationController());
+        m_refrigerationController = std::shared_ptr<RefrigerationController>(new RefrigerationController());
 
         m_hvacSystemsView->mainViewSwitcher->setView(m_refrigerationController->refrigerationView());
       }  
@@ -302,7 +302,7 @@ void HVACSystemsController::update()
         m_hvacSystemsView->hvacToolbarView->addButton->hide();
         m_hvacSystemsView->hvacToolbarView->deleteButton->hide();
 
-        m_refrigerationGridController = boost::shared_ptr<RefrigerationGridController>(new RefrigerationGridController(m_isIP, m_model));
+        m_refrigerationGridController = std::shared_ptr<RefrigerationGridController>(new RefrigerationGridController(m_isIP, m_model));
 
         bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)),
                                    m_refrigerationGridController.get()->refrigerationGridView(), SIGNAL(toggleUnitsClicked(bool)));
@@ -316,7 +316,7 @@ void HVACSystemsController::update()
       }
       else
       {
-          m_hvacControlsController = boost::shared_ptr<HVACControlsController>(new HVACControlsController(this));
+          m_hvacControlsController = std::shared_ptr<HVACControlsController>(new HVACControlsController(this));
 
           m_hvacSystemsView->mainViewSwitcher->setView(m_hvacControlsController->noControlsView());
       }
@@ -328,13 +328,13 @@ void HVACSystemsController::update()
 
       if( m_hvacSystemsView->hvacToolbarView->topologyViewButton->isChecked() )
       {
-        m_vrfController = boost::shared_ptr<VRFController>(new VRFController());
+        m_vrfController = std::shared_ptr<VRFController>(new VRFController());
 
         m_hvacSystemsView->mainViewSwitcher->setView(m_vrfController->vrfView());
       }
       else
       {
-          m_hvacControlsController = boost::shared_ptr<HVACControlsController>(new HVACControlsController(this));
+          m_hvacControlsController = std::shared_ptr<HVACControlsController>(new HVACControlsController(this));
 
           m_hvacSystemsView->mainViewSwitcher->setView(m_hvacControlsController->noControlsView());
       }
@@ -343,7 +343,7 @@ void HVACSystemsController::update()
     {
       if( m_hvacSystemsView->hvacToolbarView->topologyViewButton->isChecked() )
       {
-        m_hvacLayoutController = boost::shared_ptr<HVACLayoutController>(new HVACLayoutController(this));
+        m_hvacLayoutController = std::shared_ptr<HVACLayoutController>(new HVACLayoutController(this));
         m_hvacSystemsView->mainViewSwitcher->setView(m_hvacLayoutController->hvacGraphicsView());
 
         m_hvacSystemsView->hvacToolbarView->zoomInButton->setEnabled(true);
@@ -354,7 +354,7 @@ void HVACSystemsController::update()
       else if( m_hvacSystemsView->hvacToolbarView->gridViewButton->isChecked() )
       {
         // TODO
-        m_refrigerationGridController = boost::shared_ptr<RefrigerationGridController>(new RefrigerationGridController(m_isIP, m_model));
+        m_refrigerationGridController = std::shared_ptr<RefrigerationGridController>(new RefrigerationGridController(m_isIP, m_model));
 
         bool isConnected = connect(this, SIGNAL(toggleUnitsClicked(bool)),
                                    m_refrigerationGridController.get()->refrigerationGridView(), SIGNAL(toggleUnitsClicked(bool)));
@@ -368,7 +368,7 @@ void HVACSystemsController::update()
       }
       else
       {
-        m_hvacControlsController = boost::shared_ptr<HVACControlsController>(new HVACControlsController(this));
+        m_hvacControlsController = std::shared_ptr<HVACControlsController>(new HVACControlsController(this));
 
         if( currentLoop() && currentLoop()->optionalCast<model::AirLoopHVAC>() )
         {
@@ -404,12 +404,12 @@ HVACSystemsView * HVACSystemsController::hvacSystemsView() const
   return m_hvacSystemsView;
 }
 
-boost::shared_ptr<HVACLayoutController> HVACSystemsController::hvacLayoutController() const
+std::shared_ptr<HVACLayoutController> HVACSystemsController::hvacLayoutController() const
 {
   return m_hvacLayoutController;
 }
 
-boost::shared_ptr<HVACControlsController> HVACSystemsController::hvacControlsController() const
+std::shared_ptr<HVACControlsController> HVACSystemsController::hvacControlsController() const
 {
   return m_hvacControlsController;
 }
@@ -653,7 +653,7 @@ void HVACLayoutController::goToOtherLoop( model::ModelObject & modelObject )
 
   if( boost::optional<model::Loop> loop = modelObject.optionalCast<model::Loop>() )
   {
-    m_hvacSystemsController->setCurrentHandle(loop->handle());
+    m_hvacSystemsController->setCurrentHandle(loop->handle().toString());
 
     return;
   }
@@ -668,7 +668,7 @@ void HVACLayoutController::goToOtherLoop( model::ModelObject & modelObject )
       {
         if( boost::optional<model::PlantLoop> plantLoop = comp->plantLoop() )
         {
-          m_hvacSystemsController->setCurrentHandle(plantLoop->handle());
+          m_hvacSystemsController->setCurrentHandle(plantLoop->handle().toString());
         }
 
         return;
@@ -677,7 +677,7 @@ void HVACLayoutController::goToOtherLoop( model::ModelObject & modelObject )
       {
         if( boost::optional<model::AirLoopHVAC> airLoopHVAC = comp->airLoopHVAC() )
         {
-          m_hvacSystemsController->setCurrentHandle(airLoopHVAC->handle());
+          m_hvacSystemsController->setCurrentHandle(airLoopHVAC->handle().toString());
         }
 
         return;
@@ -692,7 +692,7 @@ void HVACLayoutController::goToOtherLoop( model::ModelObject & modelObject )
         {
           if( boost::optional<model::PlantLoop> secondaryPlantLoop = comp->secondaryPlantLoop() )
           {
-            m_hvacSystemsController->setCurrentHandle(secondaryPlantLoop->handle());
+            m_hvacSystemsController->setCurrentHandle(secondaryPlantLoop->handle().toString());
 
             return;
           }
@@ -705,7 +705,7 @@ void HVACLayoutController::goToOtherLoop( model::ModelObject & modelObject )
         {
           if( boost::optional<model::PlantLoop> plantLoop = comp->plantLoop() )
           {
-            m_hvacSystemsController->setCurrentHandle(plantLoop->handle());
+            m_hvacSystemsController->setCurrentHandle(plantLoop->handle().toString());
 
             return;
           }
@@ -783,7 +783,7 @@ void HVACSystemsController::addToModel(AddToModelEnum addToModelEnum)
 
   if( loop )
   {
-    m_currentHandle = loop->handle();
+    m_currentHandle = loop->handle().toString();
   }
 }
 
@@ -836,11 +836,11 @@ void HVACSystemsController::onRemoveLoopClicked()
 
     if( i == 0 )
     {
-      setCurrentHandle(QUuid(chooser->itemData(i + 1).toString()));
+      setCurrentHandle(QUuid(chooser->itemData(i + 1).toString()).toString());
     }
     else
     {
-      setCurrentHandle(QUuid(chooser->itemData(i - 1).toString()));
+      setCurrentHandle(QUuid(chooser->itemData(i - 1).toString()).toString());
     }
 
     loop->remove();
@@ -853,7 +853,7 @@ void HVACLayoutController::onModelObjectSelected(model::OptionalModelObject & mo
   {
     if( boost::optional<model::WaterUseConnections> waterUseConnections = modelObject->optionalCast<model::WaterUseConnections>() )
     {
-      m_hvacSystemsController->setCurrentHandle(waterUseConnections->handle());
+      m_hvacSystemsController->setCurrentHandle(waterUseConnections->handle().toString());
     }
     else
     {
@@ -1346,7 +1346,7 @@ HVACLayoutController::HVACLayoutController(HVACSystemsController * hvacSystemsCo
 {
   m_hvacGraphicsView = new HVACGraphicsView();
 
-  //m_refrigerationController = boost::shared_ptr<RefrigerationController>(new RefrigerationController());
+  //m_refrigerationController = std::shared_ptr<RefrigerationController>(new RefrigerationController());
 
   bool bingo;
 
@@ -1369,7 +1369,7 @@ HVACLayoutController::~HVACLayoutController()
   }
 }
 
-//boost::shared_ptr<RefrigerationController> HVACLayoutController::refrigerationController() const
+//std::shared_ptr<RefrigerationController> HVACLayoutController::refrigerationController() const
 //{
 //  return m_refrigerationController;
 //}
@@ -1383,7 +1383,7 @@ void HVACLayoutController::goToServiceWaterScene()
 {
   // A null QUuid signals the service water scene
 
-  m_hvacSystemsController->setCurrentHandle(QUuid());
+  m_hvacSystemsController->setCurrentHandle(QUuid().toString());
 }
 
 void HVACLayoutController::clearSceneSelection()

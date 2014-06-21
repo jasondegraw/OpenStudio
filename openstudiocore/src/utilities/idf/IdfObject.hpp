@@ -20,16 +20,13 @@
 #ifndef UTILITIES_IDF_IDFOBJECT_HPP
 #define UTILITIES_IDF_IDFOBJECT_HPP
 
-#include <utilities/UtilitiesAPI.hpp>
+#include "../UtilitiesAPI.hpp"
 
-#include <utilities/idf/Handle.hpp>
+#include "Handle.hpp"
 
-#include <utilities/core/Logger.hpp>
+#include "../core/Logger.hpp"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>
-#include <boost/foreach.hpp>
-#include <boost/bind.hpp>
 
 #include <string>
 #include <ostream>
@@ -86,11 +83,13 @@ class UTILITIES_API IdfObject {
 
   /** Constructor from type. Equivalent to IdfObject(IddFactory::instance.iddObject(type)),
    *  unless type == IddObjectType::UserCustom, in which case, the constructed object is equivalent
-   *  to IdfObject(IddObjectType::Catchall). */
-  explicit IdfObject(IddObjectType type);
+   *  to IdfObject(IddObjectType::Catchall). If fastName is true a UUID is assigned as the name, 
+   *  otherwise no name is assigned.*/
+  explicit IdfObject(IddObjectType type, bool fastName=false);
 
-  /** Constructor from iddObject. */
-  explicit IdfObject(const IddObject& iddObject);
+  /** Constructor from iddObject. If fastName is true a UUID is assigned as the name, 
+   *  otherwise no name is assigned.*/
+  explicit IdfObject(const IddObject&, bool fastName=false);
   
   /** Copy constructor. Shares data with other, so changes made by either copy affects the data of
    *  both. */
@@ -224,12 +223,12 @@ class UTILITIES_API IdfObject {
   bool setQuantity (unsigned index, const Quantity q);
 
   /** Sets the field at index to value, if possible. Returns false if the value cannot be set for
-   *  any reaons. (Perhaps index >= numFields(), the field is not IntegerType, or the value is out 
+   *  any reason. (Perhaps index >= numFields(), the field is not IntegerType, or the value is out 
    *  of bounds per IddField.properties()). */
   bool setUnsigned(unsigned index, unsigned value);
 
   /** Sets the field at index to value, if possible. Returns false if the value cannot be set for
-   *  any reaons. (Perhaps index >= numFields(), the field is not IntegerType, or the value is out 
+   *  any reason. (Perhaps index >= numFields(), the field is not IntegerType, or the value is out 
    *  of bounds per IddField.properties()). */
   bool setInt(unsigned index, int value);
 
@@ -327,7 +326,7 @@ class UTILITIES_API IdfObject {
    *  Prerequisite: iddObject()s must be equal. */
   bool objectListFieldsNonConflicting(const IdfObject& other) const;
 
-  /** Equality comparitor for IdfObjects. Objects must be exactly equal, that is, they must 
+  /** Equality comparator for IdfObjects. Objects must be exactly equal, that is, they must 
    *  share data for the operator to return true. */
   bool operator==(const IdfObject& other) const;
 
@@ -351,8 +350,8 @@ class UTILITIES_API IdfObject {
   /** Serialize this object to os as Idf text. */
   std::ostream& print(std::ostream& os) const;
 
-  /** Serialize just the preceding comments and name of this IdfObject in the formmat used by 
-   *  full object print. If hasFields, the name is follwed by a ','. Otherwise, the name is 
+  /** Serialize just the preceding comments and name of this IdfObject in the format used by 
+   *  full object print. If hasFields, the name is followed by a ','. Otherwise, the name is 
    *  followed by a ';'. */
   std::ostream& printName(std::ostream& os, bool hasFields=true) const;
 
@@ -365,18 +364,18 @@ class UTILITIES_API IdfObject {
   //@{
 
   // ETH@20101015 Why is this public?!
-  //LER@20101028 so that impls can call (someModel.getImpl<yomama_Impl>())
-  //impls do NOT inheret from the object tree, so its either freind every single
-  //freaking model class or make it public.
+  //LER@20101028 so that impls can call (someModel.getImpl<some_Impl>())
+  //impls do NOT inherit from the object tree, so it's either friend every single
+  //model class or make it public.
   // get the impl
   template<typename T>
-    boost::shared_ptr<T> getImpl() const
-  {  return boost::dynamic_pointer_cast<T>(m_impl); }
+    std::shared_ptr<T> getImpl() const
+  {  return std::dynamic_pointer_cast<T>(m_impl); }
 
   /// cast to type T, can throw std::bad_cast
   template<typename T>
   T cast() const{
-    boost::shared_ptr<typename T::ImplType> impl = this->getImpl<typename T::ImplType>();
+    std::shared_ptr<typename T::ImplType> impl = this->getImpl<typename T::ImplType>();
     if (!impl){
       throw(std::bad_cast());
     }
@@ -387,7 +386,7 @@ class UTILITIES_API IdfObject {
   template<typename T>
   boost::optional<T> optionalCast() const{
     boost::optional<T> result;
-    boost::shared_ptr<typename T::ImplType> impl = this->getImpl<typename T::ImplType>();
+    std::shared_ptr<typename T::ImplType> impl = this->getImpl<typename T::ImplType>();
     if (impl){
       result = T(impl);
     }
@@ -407,13 +406,13 @@ class UTILITIES_API IdfObject {
   friend class WorkspaceObject;              // for WorkspaceObject::idfObject()
   friend class Workspace;                    // for toIdfFile completion (constructs IdfObject from impl)
 
-  /** Protected contructor from impl. */
-  IdfObject(boost::shared_ptr<detail::IdfObject_Impl> impl);
+  /** Protected constructor from impl. */
+  IdfObject(std::shared_ptr<detail::IdfObject_Impl> impl);
 
  private:
 
   // pointer to impl
-  boost::shared_ptr<detail::IdfObject_Impl> m_impl;
+  std::shared_ptr<detail::IdfObject_Impl> m_impl;
 
   // configure logging
   REGISTER_LOGGER("utilities.idf.IdfObject");
@@ -451,7 +450,7 @@ template<typename T>
 std::vector<Handle> getHandles(const std::vector<T>& objects)
 {
   HandleVector result;
-  BOOST_FOREACH (const T& object, objects) { result.push_back(object.handle()); }
+  for (const T& object : objects) { result.push_back(object.handle()); }
   return result;
 }
 
@@ -463,7 +462,7 @@ template<typename T>
 std::vector<T> sortByObjectName(std::vector<T> objects) {
   std::sort(objects.begin(),
             objects.end(),
-            boost::bind(&istringLess,boost::bind(&objectName,_1),boost::bind(&objectName,_1)));
+            std::bind(&istringLess,std::bind(&objectName,std::placeholders::_1),std::bind(&objectName,std::placeholders::_1)));
   return objects;
 }
 

@@ -27,16 +27,14 @@
 #include "JobOutputCleanup.hpp"
 #include "RunManager_Util.hpp"
 
-#include <utilities/time/DateTime.hpp>
-#include <utilities/core/ApplicationPathHelpers.hpp>
-#include <utilities/core/PathHelpers.hpp>
+#include "../../utilities/time/DateTime.hpp"
+#include "../../utilities/core/ApplicationPathHelpers.hpp"
+#include "../../utilities/core/PathHelpers.hpp"
 
 #include <QDir>
 #include <QDateTime>
 
-#include <boost/bind.hpp>
-
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 #include <Windows.h>
 #else
 #include <signal.h>
@@ -54,14 +52,14 @@ namespace detail {
 
   void MyQProcess::checkProcessStatus()
   {
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN
     // Check for process status if the exit was not handled correctly. 
 
     Q_PID qpid = pid();
 
     if (qpid != 0 && atEnd() && state() != QProcess::Starting)
     {
-      pid_t result = waitpid(qpid, 0, WNOHANG);
+      pid_t result = waitpid(qpid, nullptr, WNOHANG);
       if (result != 0 && m_exitedCount != -1)
       {
         LOG(Debug, "PROCESS EXITED");
@@ -97,7 +95,7 @@ namespace detail {
     QFileInfo qfi(openstudio::toQString(t_tool.localBinPath));
     if (!qfi.isFile() || !qfi.isExecutable())
     {
-      throw std::runtime_error("Unable to find valid executable while creating local process: " + toString(t_tool.localBinPath.external_file_string()));
+      throw std::runtime_error("Unable to find valid executable while creating local process: " + toString(t_tool.localBinPath.native()));
     }
 
     for (std::vector<std::pair<openstudio::path, openstudio::path> >::const_iterator itr = m_requiredFiles.begin();
@@ -130,7 +128,7 @@ namespace detail {
           m_copiedRequiredFiles.insert(itr->second);
         }
       } else if (exists(frompath) && is_directory(frompath)) {
-        typedef boost::filesystem::basic_directory_iterator<openstudio::path> diritr;
+        typedef boost::filesystem::directory_iterator diritr;
 
         diritr begin(frompath);
         diritr end;
@@ -203,7 +201,7 @@ namespace detail {
     connect(&m_fileCheckTimer, SIGNAL(timeout()), this, SLOT(directoryChanged()));
 //    m_outfiles = dirFiles(openstudio::toQString(m_outdir));
 
-//    m_fswatcher = boost::shared_ptr<QFileSystemWatcher>(new QFileSystemWatcher());
+//    m_fswatcher = std::shared_ptr<QFileSystemWatcher>(new QFileSystemWatcher());
 
 //    connect(m_fswatcher.get(), SIGNAL(directoryChanged(const QString &)),
 //         this, SLOT(directoryChanged(const QString &)));
@@ -229,7 +227,7 @@ namespace detail {
 
     // set up path to be binary directory to catch ancillary tools
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     env.insert("PATH", openstudio::toQString(m_tool.localBinPath.parent_path()) + ";" + env.value("PATH"));
 #else
     env.insert("PATH", openstudio::toQString(m_tool.localBinPath.parent_path()) + ":" + env.value("PATH"));
@@ -263,7 +261,7 @@ namespace detail {
   {
     if (t_process.state() == QProcess::Running)
     {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
       PROCESS_INFORMATION *pinfo = (PROCESS_INFORMATION*)t_process.pid();
       if (pinfo)
       {
@@ -309,9 +307,9 @@ namespace detail {
 
   void LocalProcess::cleanup(const std::vector<std::string> &t_files)
   {
-    for (size_t i = 0; i < t_files.size(); ++i)
+    for (const auto & file : t_files)
     {
-      QString path = toQString(m_outdir / toPath(t_files[i]));
+      QString path = toQString(m_outdir / toPath(file));
       QFile::remove(path);
       fileChanged(path);
     }
@@ -327,11 +325,9 @@ namespace detail {
   {
     std::vector<FileInfo> ret;
     
-    for (std::vector<std::pair<openstudio::path, openstudio::path> >::const_iterator itr = m_requiredFiles.begin();
-         itr != m_requiredFiles.end();
-         ++itr)
+    for (const auto & requiredFile : m_requiredFiles)
     {
-      ret.push_back(RunManager_Util::dirFile(QFileInfo(toQString(itr->second))));
+      ret.push_back(RunManager_Util::dirFile(QFileInfo(toQString(requiredFile.second))));
     }
 
     return ret;
@@ -367,7 +363,7 @@ namespace detail {
 
 //    monitorFiles(diff.begin(), diff.end());
 
-    std::for_each(diff.begin(), diff.end(), boost::bind(&LocalProcess::emitUpdatedFileInfo, this, _1));
+    std::for_each(diff.begin(), diff.end(), std::bind(&LocalProcess::emitUpdatedFileInfo, this, std::placeholders::_1));
 
     m_process.checkProcessStatus();
   }
@@ -397,17 +393,13 @@ namespace detail {
     QFileInfoList filtered;
 
     // Filter out all files that are part of the set of input files. Everything remaining should be an outputfile
-    for (QFileInfoList::const_iterator itr = fil.begin();
-         itr != fil.end();
-         ++itr)
+    for (const auto & fileInfo : fil)
     {
       bool partofinput = false;
-      for (std::vector<std::pair<openstudio::path, openstudio::path> >::const_iterator itr2 = m_requiredFiles.begin();
-          itr2 != m_requiredFiles.end();
-          ++itr2)
+      for (const auto & requiredFile : m_requiredFiles)
       {
-        QString fileName = itr->fileName();
-        QString fileName2 = toQString(itr2->second.filename());
+        QString fileName = fileInfo.fileName();
+        QString fileName2 = toQString(requiredFile.second.filename());
         if (fileName == fileName2)
         {
           partofinput = true;
@@ -417,7 +409,7 @@ namespace detail {
 
       if (!partofinput)
       {
-        filtered.push_back(*itr);
+        filtered.push_back(fileInfo);
       }
     }
 
@@ -437,20 +429,18 @@ namespace detail {
 
   void LocalProcess::cleanUpRequiredFiles()
   {
-    for (std::set<openstudio::path>::const_iterator itr = m_copiedRequiredFiles.begin();
-        itr != m_copiedRequiredFiles.end();
-        ++itr)
+    for (const auto & copiedRequiredFile : m_copiedRequiredFiles)
     {
-      LOG(Debug, "cleanUpRequiredFiles: " << openstudio::toString(*itr));
+      LOG(Debug, "cleanUpRequiredFiles: " << openstudio::toString(copiedRequiredFile));
       try {
-        boost::filesystem::remove(*itr);
+        boost::filesystem::remove(copiedRequiredFile);
       } catch (const std::exception &e) {
         LOG(Trace, "Unable to remove file: " << e.what());
         // no error if it doesn't manage to delete it
       }
 
       try {
-        openstudio::path p = itr->parent_path();
+        openstudio::path p = copiedRequiredFile.parent_path();
 
         while (!p.empty() && !relativePath(p, m_outdir).empty() && m_outdir != p)
         {
@@ -500,7 +490,7 @@ namespace detail {
     if (m_process.state() != QProcess::Running
         && t_e == QProcess::WriteError)
     {
-      LOG(Info, "WriteError occured when process was not running, ignoring it");
+      LOG(Info, "WriteError occurred when process was not running, ignoring it");
     } else {
       //directoryChanged(openstudio::toQString(m_outdir));
       emit error(t_e);

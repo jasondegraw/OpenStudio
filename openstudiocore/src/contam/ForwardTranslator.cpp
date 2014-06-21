@@ -17,38 +17,35 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <contam/ForwardTranslator.hpp>
-#include <airflow/WindPressure.hpp>
+#include "ForwardTranslator.hpp"
+#include "WindPressure.hpp"
 
-#include <model/Model.hpp>
-#include <model/Building.hpp>
-#include <model/Building_Impl.hpp>
-#include <model/BuildingStory.hpp>
-#include <model/BuildingStory_Impl.hpp>
-#include <model/ThermalZone.hpp>
-#include <model/ThermalZone_Impl.hpp>
-#include <model/Space.hpp>
-#include <model/Space_Impl.hpp>
-#include <model/Surface.hpp>
-#include <model/Surface_Impl.hpp>
-#include <model/SubSurface.hpp>
-#include <model/SubSurface_Impl.hpp>
-#include <model/AirLoopHVAC.hpp>
-#include <model/AirLoopHVAC_Impl.hpp>
-#include <model/Node.hpp>
-#include <model/Node_Impl.hpp>
-#include <model/PortList.hpp>
-#include <model/WeatherFile.hpp>
-#include <model/RunPeriod.hpp>
+#include "../model/Model.hpp"
+#include "../model/Building.hpp"
+#include "../model/Building_Impl.hpp"
+#include "../model/BuildingStory.hpp"
+#include "../model/BuildingStory_Impl.hpp"
+#include "../model/ThermalZone.hpp"
+#include "../model/ThermalZone_Impl.hpp"
+#include "../model/Space.hpp"
+#include "../model/Space_Impl.hpp"
+#include "../model/Surface.hpp"
+#include "../model/Surface_Impl.hpp"
+#include "../model/AirLoopHVAC.hpp"
+#include "../model/AirLoopHVAC_Impl.hpp"
+#include "../model/Node.hpp"
+#include "../model/Node_Impl.hpp"
+#include "../model/PortList.hpp"
+#include "../model/WeatherFile.hpp"
+#include "../model/RunPeriod.hpp"
 
-#include <utilities/time/Date.hpp>
+#include "../utilities/time/Date.hpp"
 
-#include <utilities/sql/SqlFile.hpp>
-#include <utilities/core/Logger.hpp>
-#include <utilities/geometry/Geometry.hpp>
-#include <utilities/plot/ProgressBar.hpp>
+#include "../utilities/sql/SqlFile.hpp"
+#include "../utilities/core/Logger.hpp"
+#include "../utilities/geometry/Geometry.hpp"
+#include "../utilities/plot/ProgressBar.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/math/constants/constants.hpp>
 
 #include <QFile>
@@ -173,7 +170,7 @@ void ForwardTranslator::clear()
   m_startDateTime = boost::optional<DateTime>();
   m_endDateTime = boost::optional<DateTime>();
   m_translateHVAC = true;
-  setProgressBar(0);
+  setProgressBar(nullptr);
 }
 
 int ForwardTranslator::tableLookup(QMap<std::string,int> map, std::string str, const char *name)
@@ -368,7 +365,7 @@ boost::optional<double> ForwardTranslator::exteriorDeltaP() const
 
 bool ForwardTranslator::setExteriorFlowRate(double flow, double n, double deltaP)
 {
-  if(flow > 0 && m_n > 0 && m_deltaP > 0)
+  if(flow > 0 && n > 0 && deltaP > 0)
   {
     m_flow = boost::optional<double>(flow);
     m_n = boost::optional<double>(n);
@@ -502,7 +499,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
   std::vector<openstudio::model::BuildingStory> stories = model.getConcreteModelObjects<openstudio::model::BuildingStory>();
   initProgress(2*stories.size(),"Translating building levels");
   // It appears that we will need for each story to have an elevation
-  BOOST_FOREACH(const openstudio::model::BuildingStory& buildingStory, stories) {
+  for (const openstudio::model::BuildingStory& buildingStory : stories) {
     boost::optional<double> elevation = buildingStory.nominalZCoordinate();
     if(!elevation) {
       LOG(Error, "Story '" << buildingStory.name().get() << "' has no elevation, translation aborted");
@@ -514,7 +511,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
   std::sort(stories.begin(),stories.end(),compareElevation);
   nr=1;
   double totalHeight = 0;
-  BOOST_FOREACH(const openstudio::model::BuildingStory& buildingStory, stories) {
+  for (const openstudio::model::BuildingStory& buildingStory : stories) {
     openstudio::contam::Level level;
     level.setName(QString("<%1>").arg(nr).toStdString());
     m_levelMap[buildingStory.handle()] = nr;
@@ -527,7 +524,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     m_prjModel.addLevel(level);
     nr++;
     progress();
-  }
+    }
   m_prjModel.setWind_H(QString().sprintf("%g",totalHeight).toStdString());
   // Check for levels - translation can't proceed without levels
   if(m_prjModel.levels().size() == 0) {
@@ -538,7 +535,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
   std::vector<model::ThermalZone> thermalZones = model.getConcreteModelObjects<model::ThermalZone>();
   initProgress(thermalZones.size(), "Translating Zones");
   nr=0;
-  BOOST_FOREACH(model::ThermalZone thermalZone, thermalZones)
+  for (model::ThermalZone thermalZone : thermalZones)
   {
     nr++;
     openstudio::contam::Zone zone;
@@ -552,7 +549,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     } else {
       // No warning unless we can't get a value
       double vol=0.0;
-      BOOST_FOREACH(openstudio::model::Space space, thermalZone.spaces()) {
+      for (openstudio::model::Space space : thermalZone.spaces()) {
         vol += space.volume();
       }
       if(vol == 0.0) {
@@ -568,7 +565,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     // where a zone is on more than one level. There are ugly workarounds - will need to
     // think about
     int levelNr = 0;
-    BOOST_FOREACH(openstudio::model::Space space, thermalZone.spaces()) {
+    for (openstudio::model::Space space : thermalZone.spaces()) {
       boost::optional<openstudio::model::BuildingStory> story = space.buildingStory();
       if(story) {
         levelNr = tableLookup(m_levelMap,(*story).handle(),"levelMap");
@@ -585,8 +582,8 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     zone.setT0(QString("293.15").toStdString());
     m_prjModel.addZone(zone);
     progress();
-  }
- 
+    }
+
   // Loop over surfaces to generate paths and a lookup table by name
   build(model);
 
@@ -594,7 +591,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     // Generate air handling systems
     std::vector<openstudio::model::AirLoopHVAC> systems = model.getConcreteModelObjects<openstudio::model::AirLoopHVAC>();
     initProgress(systems.size(), "Translating AirLoops");
-    BOOST_FOREACH(openstudio::model::AirLoopHVAC airloop,systems) {
+	for (openstudio::model::AirLoopHVAC airloop : systems) {
       // Skip loops with no zones attached
       if(!airloop.thermalZones().size()) {
         progress();
@@ -626,7 +623,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
       m_prjModel.addZone(rz);
       m_prjModel.addZone(sz);
       // Now hook the served zones up to the supply and return zones
-      BOOST_FOREACH(openstudio::model::ThermalZone thermalZone, airloop.thermalZones()) {
+      for (openstudio::model::ThermalZone thermalZone : airloop.thermalZones()) {
         int zoneNr = tableLookup(m_zoneMap,thermalZone.handle(),"zoneMap");
         // Supply path
         openstudio::contam::AirflowPath sp;
@@ -703,14 +700,14 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     if(sqlFile) {
       std::vector<std::string> available = sqlFile->availableTimeSeries();
       std::string envPeriod; 
-      BOOST_FOREACH(std::string t, sqlFile->availableEnvPeriods()) {
+      for (std::string t : sqlFile->availableEnvPeriods()) {
         envPeriod = t; // should only ever be one
         break;
       }
       // bool setTime=false;
       if(std::find(available.begin(), available.end(), "Zone Mean Air Temperature")!=available.end()) {
         // Loop through and get a time series for each zone we can find
-        BOOST_FOREACH(model::ThermalZone thermalZone, model.getConcreteModelObjects<model::ThermalZone>()) {
+        for (model::ThermalZone thermalZone : model.getConcreteModelObjects<model::ThermalZone>()) {
           boost::optional<std::string> name = thermalZone.name();
           if(!name) {
             LOG(Warn,"Zone " << openstudio::toString(thermalZone.handle()) << " has no name and will have constant temperature");
@@ -742,7 +739,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
       if(std::find(available.begin(), available.end(), "System Node MassFlowRate")!=available.end()) {
         LOG(Warn, "Zone equipment not yet accounted for.");
         // get sizing results, get flow rate schedules for each zone's inlet, return, and exhaust nodes
-        BOOST_FOREACH(model::ThermalZone thermalZone, model.getConcreteModelObjects<model::ThermalZone>()) {
+        for (model::ThermalZone thermalZone : model.getConcreteModelObjects<model::ThermalZone>()) {
           // todo: this does not include OA from zone equipment (PTAC, PTHP, etc) or exhaust fans
           boost::optional<model::Node> supplyAirNode;
           boost::optional<model::ModelObject> supplyAirModelObject = thermalZone.inletPortList().airLoopHVACModelObject();
@@ -822,20 +819,20 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
                 m_prjModel.addControlNode(ctrl);
                 // Connect to the path
                 m_prjModel.airflowPaths()[nr-1].setPc(ctrl.nr());
-              }
             }
           }
         }
+      }
       } else {
         LOG(Warn, "Activate \"System Node MassFlowRate\" output to set zone supply/return flows.");
       }
     } else {
       LOG(Warn, "Simulation results not available, using 1 scfm/ft^2 to set supply flows");
       // Use the 1 scfm/ft^2 approximation with 90% return
-      BOOST_FOREACH(openstudio::model::ThermalZone thermalZone,
+      for (openstudio::model::ThermalZone thermalZone :
         model.getConcreteModelObjects<openstudio::model::ThermalZone>()) {
         double area=0.0;
-        BOOST_FOREACH(openstudio::model::Space space, thermalZone.spaces()) {
+        for (openstudio::model::Space space : thermalZone.spaces()) {
           area += space.floorArea();
         }
         if(area == 0.0) {
@@ -1000,8 +997,8 @@ bool ForwardTranslator::linkInteriorSurface(openstudio::model::ThermalZone zone,
   int zoneNr;
   if(!(zoneNr=tableLookup(m_zoneMap,zone.handle(),"zoneMap"))) {
     // Maybe this needs a warning?
-    return false;
-  }
+  return false;
+}
   contam::Zone airflowZone = m_prjModel.zones()[zoneNr-1];
   // Get the surface area - will need to do more work here later if large openings are present
   double area = surface.grossArea();
@@ -1050,7 +1047,7 @@ std::vector<LogMessage> ForwardTranslator::warnings() const
 {
   std::vector<LogMessage> result;
 
-  BOOST_FOREACH(LogMessage logMessage, m_logSink.logMessages())
+  for (LogMessage logMessage : m_logSink.logMessages())
   {
     if (logMessage.logLevel() == Warn)
     {
@@ -1065,7 +1062,7 @@ std::vector<LogMessage> ForwardTranslator::errors() const
 {
   std::vector<LogMessage> result;
 
-  BOOST_FOREACH(LogMessage logMessage, m_logSink.logMessages())
+  for (LogMessage logMessage : m_logSink.logMessages())
   {
     if (logMessage.logLevel() > Warn)
     {

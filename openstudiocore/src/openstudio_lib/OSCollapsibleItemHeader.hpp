@@ -17,10 +17,10 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_OSCOLLAPSIBLEITEMHEADER_H
-#define OPENSTUDIO_OSCOLLAPSIBLEITEMHEADER_H
+#ifndef OPENSTUDIO_OSCOLLAPSIBLEITEMHEADER_HPP
+#define OPENSTUDIO_OSCOLLAPSIBLEITEMHEADER_HPP
 
-#include <openstudio_lib/OSItem.hpp>
+#include "OSItem.hpp"
 
 class QLabel;
 class QVBoxLayout;
@@ -37,7 +37,7 @@ class OSCollapsibleItemHeader : public QWidget
 
     OSCollapsibleItemHeader(const std::string& text,
                             const OSItemId& itemId,
-                            OSItem::Type type = OSItem::COLLAPSIBLE_LIST_HEADER,
+                            OSItemType type = OSItemType::CollapsibleListHeader,
                             QWidget * parent = 0);
 
     virtual ~OSCollapsibleItemHeader() {}
@@ -73,5 +73,5 @@ class OSCollapsibleItemHeader : public QWidget
 
 } // openstudio
 
-#endif // OPENSTUDIO_OSCOLLAPSIBLEITEMHEADER_H
+#endif // OPENSTUDIO_OSCOLLAPSIBLEITEMHEADER_HPP
 

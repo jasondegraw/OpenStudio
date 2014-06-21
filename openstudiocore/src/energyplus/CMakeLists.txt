@@ -1,6 +1,6 @@
-SET( target_name openstudio_energyplus )
+set(target_name openstudio_energyplus)
 
-SET( ${target_name}_src
+set(${target_name}_src
   EnergyPlusAPI.hpp
   mainpage.hpp
   ErrorFile.hpp
@@ -98,6 +98,7 @@ SET( ${target_name}_src
   ForwardTranslator/ForwardTranslateGroundHeatExchangerVertical.cpp
   ForwardTranslator/ForwardTranslateHeatBalanceAlgorithm.cpp
   ForwardTranslator/ForwardTranslateHeatExchangerAirToAirSensibleAndLatent.cpp
+  ForwardTranslator/ForwardTranslateHeatExchangerFluidToFluid.cpp
   ForwardTranslator/ForwardTranslateHotWaterEquipment.cpp
   ForwardTranslator/ForwardTranslateIlluminanceMap.cpp
   ForwardTranslator/ForwardTranslateInsideSurfaceConvectionAlgorithm.cpp
@@ -182,6 +183,7 @@ SET( ${target_name}_src
   ForwardTranslator/ForwardTranslateSteamEquipment.cpp
   ForwardTranslator/ForwardTranslateSubSurface.cpp
   ForwardTranslator/ForwardTranslateSurface.cpp
+  ForwardTranslator/ForwardTranslateTableMultiVariableLookup.cpp
   ForwardTranslator/ForwardTranslateThermalZone.cpp
   ForwardTranslator/ForwardTranslateThermostatSetpointDualSetpoint.cpp
   ForwardTranslator/ForwardTranslateTimestep.cpp
@@ -190,6 +192,7 @@ SET( ${target_name}_src
   ForwardTranslator/ForwardTranslateWaterUseConnections.cpp
   ForwardTranslator/ForwardTranslateWaterUseEquipment.cpp
   ForwardTranslator/ForwardTranslateZoneAirHeatBalanceAlgorithm.cpp
+  ForwardTranslator/ForwardTranslateZoneControlHumidistat.cpp
   ForwardTranslator/ForwardTranslateZoneHVACBaseboardConvectiveElectric.cpp
   ForwardTranslator/ForwardTranslateZoneHVACBaseboardConvectiveWater.cpp
   ForwardTranslator/ForwardTranslateZoneHVACEquipmentList.cpp
@@ -311,7 +314,7 @@ SET( ${target_name}_src
   ReverseTranslator/ReverseTranslateZoneVentilationDesignFlowRate.cpp
 )
 
-SET( ${target_name}_test_src
+set(${target_name}_test_src
   Test/EnergyPlusFixture.hpp
   Test/EnergyPlusFixture.cpp
 
@@ -349,51 +352,54 @@ SET( ${target_name}_test_src
   Test/SpaceInfiltrationEffectiveLeakageArea_GTest.cpp
   Test/SubSurface_GTest.cpp
   Test/Surface_GTest.cpp
+  Test/TableMultiVariableLookup_GTest.cpp
   Test/ThermalZone_GTest.cpp
   Test/ZoneHVACLowTemperatureRadiantConstFlow_GTest.cpp
   Test/ZoneHVACLowTempRadiantElectric_GTest.cpp
   Test/ZoneHVACLowTempRadiantVarFlow_GTest.cpp
 )
 
-SET( ${target_name}_swig_src
+set(${target_name}_swig_src
   EnergyPlus.i
 )
 
 ## resource files
-SET( ${target_name}_qrc
+set(${target_name}_qrc
   EnergyPlus.qrc
 )
 
 # generate rules for building source files from the resources
-qt4_add_resources(${target_name}_qrcs ${${target_name}_qrc} )
+qt5_add_resources(${target_name}_qrcs ${${target_name}_qrc})
 
-SET( ${target_name}_depends
+set(${target_name}_depends
   openstudio_model
 )
 
 
-ADD_LIBRARY( ${target_name} SHARED ${${target_name}_src} ${${target_name}_qrcs} )
-TARGET_LINK_LIBRARIES( ${target_name} ${${target_name}_depends} )
+add_library(${target_name} SHARED ${${target_name}_src} ${${target_name}_qrcs})
+target_link_libraries(${target_name} ${${target_name}_depends})
 
 AddPCH(${target_name})
 
-IF( NOT APPLE )
-INSTALL(TARGETS ${target_name} 
+if(NOT APPLE)
+  install(TARGETS ${target_name}
   RUNTIME DESTINATION bin 
-  LIBRARY DESTINATION lib )
-ENDIF()
+    LIBRARY DESTINATION lib
+  )
+endif()
 
-CREATE_SRC_GROUPS( "${${target_name}_src}" )
-#CREATE_SRC_GROUPS( "${${target_name}_test_src}" )
-#CREATE_SRC_GROUPS( "${${target_name}_swig_src}" )
+CREATE_SRC_GROUPS("${${target_name}_src}")
+#CREATE_SRC_GROUPS("${${target_name}_test_src}")
+#CREATE_SRC_GROUPS("${${target_name}_swig_src}")
 
-CREATE_TEST_TARGETS( ${target_name} "${${target_name}_test_src}" "${${target_name}_depends}")
-IF(BUILD_TESTING)
+CREATE_TEST_TARGETS(${target_name} "${${target_name}_test_src}" "${${target_name}_depends}")
+if(BUILD_TESTING)
 
-  ADD_DEPENDENCIES(${target_name}_tests 
+  add_dependencies(${target_name}_tests
     ResultsViewer_resources
-    openstudio_energyplus_resources)
+    openstudio_energyplus_resources
+  )
     
-ENDIF()
+endif()
 
-MAKE_SWIG_TARGET( OpenStudioEnergyPlus EnergyPlus "${CMAKE_CURRENT_SOURCE_DIR}/EnergyPlus.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModel )
+MAKE_SWIG_TARGET(OpenStudioEnergyPlus EnergyPlus "${CMAKE_CURRENT_SOURCE_DIR}/EnergyPlus.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModel)

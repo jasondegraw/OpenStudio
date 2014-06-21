@@ -17,12 +17,12 @@
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 **********************************************************************/
 
-#include <openstudio_lib/OSItemSelectorButtons.hpp>
-#include <openstudio_lib/OSDropZone.hpp>
-#include <openstudio_lib/OSItem.hpp>
-#include <openstudio_lib/OSVectorController.hpp>
+#include "OSItemSelectorButtons.hpp"
+#include "OSDropZone.hpp"
+#include "OSItem.hpp"
+#include "OSVectorController.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 #include <QStyleOption>
 #include <QPainter>
@@ -138,7 +138,7 @@ OSItemSelectorButtons::OSItemSelectorButtons(QWidget * parent)
   //m_openBclDlgButton->hide();
   //m_vLayout->addWidget(m_openBclDlgButton);
   //
-  //isConnected = connect(m_openBclDlgButton,SIGNAL(clicked()),this,SIGNAL(openBclDlgClicked()));
+  //isConnected = connect(m_openBclDlgButton,SIGNAL(clicked()),this,SIGNAL(downloadComponentsClicked()));
   //OS_ASSERT(isConnected);
 }
 

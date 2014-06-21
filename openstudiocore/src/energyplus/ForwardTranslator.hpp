@@ -17,16 +17,17 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_ENERGYPLUS_FORWARDTRANSLATOR_HPP
-#define OPENSTUDIO_ENERGYPLUS_FORWARDTRANSLATOR_HPP
+#ifndef ENERGYPLUS_FORWARDTRANSLATOR_HPP
+#define ENERGYPLUS_FORWARDTRANSLATOR_HPP
 
-#include <energyplus/EnergyPlusAPI.hpp>
-#include <model/Model.hpp>
-#include <model/ConstructionBase.hpp>
-#include <model/HVACComponent.hpp>
-#include <utilities/idf/Workspace.hpp>
-#include <utilities/core/Logger.hpp>
-#include <utilities/core/StringStreamLogSink.hpp>
+#include "EnergyPlusAPI.hpp"
+#include "../model/Model.hpp"
+#include "../model/ConstructionBase.hpp"
+#include "../model/HVACComponent.hpp"
+#include "../utilities/idf/Workspace.hpp"
+#include "../utilities/core/Logger.hpp"
+#include "../utilities/core/StringStreamLogSink.hpp"
+#include "../utilities/time/Time.hpp"
 
 namespace openstudio {
 
@@ -121,6 +122,7 @@ class GasMixture;
 class GroundHeatExchangerVertical;
 class HeatBalanceAlgorithm;
 class HeatExchangerAirToAirSensibleAndLatent;
+class HeatExchangerFluidToFluid;
 class HotWaterEquipment;
 class IlluminanceMap;
 class InsideSurfaceConvectionAlgorithm;
@@ -206,6 +208,7 @@ class SpaceType;
 class SteamEquipment;
 class SubSurface;
 class Surface;
+class TableMultiVariableLookup;
 class ThermalZone;
 class ThermostatSetpointDualSetpoint;
 class Timestep;
@@ -214,6 +217,7 @@ class WaterHeaterMixed;
 class WaterUseConnections;
 class WaterUseEquipment;
 class ZoneAirHeatBalanceAlgorithm;
+class ZoneControlHumidistat;
 class ZoneHVACBaseboardConvectiveElectric;
 class ZoneHVACBaseboardConvectiveWater;
 class ZoneHVACFourPipeFanCoil;
@@ -245,7 +249,7 @@ class ENERGYPLUS_API ForwardTranslator {
 
   /** Translates the given Model to a Workspace. 
    */
-  Workspace translateModel( const model::Model & model, ProgressBar* progressBar=NULL );
+  Workspace translateModel( const model::Model & model, ProgressBar* progressBar=nullptr );
 
   /** Translates a ModelObject into a Workspace
    */
@@ -289,7 +293,7 @@ class ENERGYPLUS_API ForwardTranslator {
    *  not only the direct model object passed into it, but also related model objects under its purview.  Related objects
    *  are often identified by an object list reference pointing to them, but this rule is not absolute.  For example,
    *  AirLoopHVAC is connected to other components via node connections and the translate function for AirLoopHVAC
-   *  is responsbile for translating the components associated with the loop.  The method translateAndMapModelObject()
+   *  is responsible for translating the components associated with the loop.  The method translateAndMapModelObject()
    *  uses an internal map to determine if a model object has already been translated, therefore there is no
    *  concern of translating a model object twice, provided that model objects are always translated using the 
    *  translateAndMapModelObject() interface as opposed to the type specific translators.
@@ -476,6 +480,8 @@ class ENERGYPLUS_API ForwardTranslator {
 
   boost::optional<IdfObject> translateHeatExchangerAirToAirSensibleAndLatent( model::HeatExchangerAirToAirSensibleAndLatent & modelObject );
 
+  boost::optional<IdfObject> translateHeatExchangerFluidToFluid( model::HeatExchangerFluidToFluid & modelObject );
+
   boost::optional<IdfObject> translateHotWaterEquipment( model::HotWaterEquipment & modelObject );
 
   boost::optional<IdfObject> translateIlluminanceMap( model::IlluminanceMap & modelObject );
@@ -644,6 +650,8 @@ class ENERGYPLUS_API ForwardTranslator {
 
   boost::optional<IdfObject> translateSurface( model::Surface & modelObject );
 
+  boost::optional<IdfObject> translateTableMultiVariableLookup( model::TableMultiVariableLookup & modelObject );
+
   boost::optional<IdfObject> translateThermalZone( model::ThermalZone & modelObject );
 
   boost::optional<IdfObject> translateThermostatSetpointDualSetpoint( model::ThermostatSetpointDualSetpoint& tsds );
@@ -659,6 +667,8 @@ class ENERGYPLUS_API ForwardTranslator {
   boost::optional<IdfObject> translateWaterUseEquipment( model::WaterUseEquipment & modelObject );
 
   boost::optional<IdfObject> translateZoneAirHeatBalanceAlgorithm( model::ZoneAirHeatBalanceAlgorithm & modelObject );
+
+  boost::optional<IdfObject> translateZoneControlHumidistat( model::ZoneControlHumidistat& modelObject );
   
   boost::optional<IdfObject> translateZoneHVACBaseboardConvectiveElectric( model::ZoneHVACBaseboardConvectiveElectric & modelObject );
 
@@ -739,13 +749,25 @@ class ENERGYPLUS_API ForwardTranslator {
   static std::vector<IddObjectType> iddObjectsToTranslate();
   static std::vector<IddObjectType> iddObjectsToTranslateInitializer();
 
-  /** Determines whether or not the HVACComponent is part of a unitary sytem or on an
+  /** Determines whether or not the HVACComponent is part of a unitary system or on an
    *  AirLoopHVAC */
   bool isHVACComponentWithinUnitary(const model::HVACComponent& hvacComponent) const;
 
   /** Takes the path to a Qt resource file, loads the IdfFile from the qrc, and returns the
    *  IdfFile if successful. */
   boost::optional<IdfFile> findIdfFile(const std::string& path);
+
+  /** Create a simple Schedule:Compact based on input vectors. The function will consume the vectors in
+   *  order, so the times must be in chronological order otherwise E+ will output an error. Summer and
+   *  winter design days are not required entries, only defaultDay and name are required. At the moment,
+   *  there is no ScheduleTypeLimit so there is no validation and E+ outputs a warning. It is up to the 
+   *  developer to make sure all E+ rules and validation for Schedule:Compact are upheld. This converts
+   *  openstudio::Time of 00:00 to 24:00 and makes sure it is the last value.
+   */
+  boost::optional<IdfObject> createSimpleSchedule(const std::string & name,
+                                                  const std::vector< std::pair<openstudio::Time, double> > & defaultDay,
+                                                  const std::vector< std::pair<openstudio::Time, double> > & summerDesignDay = std::vector< std::pair<openstudio::Time, double> > (),
+                                                  const std::vector< std::pair<openstudio::Time, double> > & winterDesignDay = std::vector< std::pair<openstudio::Time, double> > ());
 
   /** Creates the FluidProperties IdfObjects and adds them to m_idfObjects based on the input 
    *  fluidType. Returns an uninitialized object if unsuccessful for any reason. If successful, returns
@@ -755,7 +777,7 @@ class ENERGYPLUS_API ForwardTranslator {
   boost::optional<IdfObject> createFluidProperties(const std::string& fluidType);
 
   /** Creates the FluidProperties IdfObjects and adds them to m_idfObjects based on the input 
-   *  glycolType adn glycolConcentration. Returns an uninitialized object if unsuccessful for any reason. 
+   *  glycolType and glycolConcentration. Returns an uninitialized object if unsuccessful for any reason. 
    *  If successful, returns the FluidProperties:Name IdfObject with a FluidName of 
    *  glycolType + "_" + glycolConcentration ie. PropyleneGlycol_30. If the fluidType already 
    *  exists in m_idfObjects, it will not add new IdfObjects and will return the existing 
@@ -817,4 +839,4 @@ namespace detail
 
 } // openstudio
 
-#endif // OPENSTUDIO_ENERGYPLUS_FORWARDTRANSLATOR_HPP
+#endif // ENERGYPLUS_FORWARDTRANSLATOR_HPP

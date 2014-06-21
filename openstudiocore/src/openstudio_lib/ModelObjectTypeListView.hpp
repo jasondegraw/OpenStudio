@@ -17,13 +17,13 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_MODELOBJECTTYPELISTVIEW_H
-#define OPENSTUDIO_MODELOBJECTTYPELISTVIEW_H
+#ifndef OPENSTUDIO_MODELOBJECTTYPELISTVIEW_HPP
+#define OPENSTUDIO_MODELOBJECTTYPELISTVIEW_HPP
 
-#include <openstudio_lib/OSCollapsibleItemList.hpp>
+#include "OSCollapsibleItemList.hpp"
 
-#include <model/Model.hpp>
-#include <model/ModelObject.hpp>
+#include "../model/Model.hpp"
+#include "../model/ModelObject.hpp"
 
 #include <boost/optional.hpp>
 
@@ -40,12 +40,12 @@ class ModelObjectTypeListView : public OSCollapsibleItemList
   public:
     ModelObjectTypeListView(const model::Model& model, 
                             bool addScrollArea, 
-                            OSItem::Type headerType,
+                            OSItemType headerType,
                             bool showLocalBCL = false,
                             QWidget * parent = 0);
 
     ModelObjectTypeListView(const std::vector<std::pair<IddObjectType, std::string> >& modelObjectTypesAndNames,
-                            const model::Model& model, bool addScrollArea, OSItem::Type headerType,
+                            const model::Model& model, bool addScrollArea, OSItemType headerType,
                             bool showLocalBCL = false,
                             QWidget * parent = 0);
 
@@ -62,7 +62,7 @@ class ModelObjectTypeListView : public OSCollapsibleItemList
     std::vector<std::pair<IddObjectType, std::string> > m_modelObjectTypesAndNames;
 
     model::Model m_model;
-    OSItem::Type m_headerType;
+    OSItemType m_headerType;
     bool m_showLocalBCL;
 };
 
@@ -70,5 +70,5 @@ class ModelObjectTypeListView : public OSCollapsibleItemList
 
 } // openstudio
 
-#endif // OPENSTUDIO_MODELOBJECTTYPELISTVIEW_H
+#endif // OPENSTUDIO_MODELOBJECTTYPELISTVIEW_HPP
 

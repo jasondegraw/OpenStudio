@@ -17,8 +17,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef OPENSTUDIO_PAT_EDITVIEW_H
-#define OPENSTUDIO_PAT_EDITVIEW_H
+#ifndef SHAREDGUICOMPONENTS_EDITVIEW_HPP
+#define SHAREDGUICOMPONENTS_EDITVIEW_HPP
 
 #include <QWidget>
 #include <QComboBox>
@@ -40,7 +40,7 @@ class EditNullView : public QWidget
 
   public:
 
-  EditNullView();
+  EditNullView(const QString & text = "Select a Measure to Edit");
   virtual ~EditNullView() {}
 
   protected:
@@ -54,7 +54,7 @@ class EditRubyMeasureView : public QWidget
 
   public:
 
-  EditRubyMeasureView();
+  EditRubyMeasureView(bool applyMeasureNow);
   virtual ~EditRubyMeasureView() {}
 
   QLineEdit * nameLineEdit;
@@ -213,5 +213,5 @@ class InputCheckBox : public QAbstractButton
 
 } // openstudio
 
-#endif // OPENSTUDIO_PAT_EDITVIEW_H
+#endif // SHAREDGUICOMPONENTS_EDITVIEW_HPP
 

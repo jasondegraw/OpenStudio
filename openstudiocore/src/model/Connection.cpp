@@ -17,23 +17,16 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <model/Connection.hpp>
-#include <model/Connection_Impl.hpp>
-#include <model/ModelObject.hpp>
+#include "Connection.hpp"
+#include "Connection_Impl.hpp"
+#include "ModelObject.hpp"
+
+#include "../utilities/core/Assert.hpp"
+#include "../utilities/core/Compare.hpp"
+#include "../utilities/core/Containers.hpp"
+#include "../utilities/core/UUID.hpp"
 
 #include <utilities/idd/OS_Connection_FieldEnums.hxx>
-
-#include <utilities/core/Compare.hpp>
-#include <utilities/core/UUID.hpp>
-#include <utilities/core/Assert.hpp>
-
-#include <boost/foreach.hpp>
-
-#include <utilities/idd/OS_Connection_FieldEnums.hxx>
-
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/UUID.hpp>
-#include <utilities/core/Containers.hpp>
 
 namespace openstudio {
 namespace model {
@@ -121,27 +114,15 @@ namespace detail {
     this->setUnsigned(openstudio::OS_ConnectionFields::InletPort,port);
   }
 
-  boost::optional<std::string> Connection_Impl::createName(bool overwrite) {
-    if (OptionalUnsigned index = iddObject().nameFieldIndex())
-    {
-      OptionalString oName = name();
-      if (!oName || oName->empty() || overwrite) {
-        std::string newName = handle().toString().toStdString();
-        return setName(newName);
-      }
-    }
-    return boost::none;
-  }
-
 } // detail
 
 Connection::Connection(const Model& model)
-  : ModelObject(Connection::iddObjectType(),model)
+  : ModelObject(Connection::iddObjectType(), model, true)
 {
   OS_ASSERT(getImpl<detail::Connection_Impl>());
 }
 
-Connection::Connection(boost::shared_ptr<detail::Connection_Impl> p)
+Connection::Connection(std::shared_ptr<detail::Connection_Impl> p)
   : ModelObject(p)
 {}
 

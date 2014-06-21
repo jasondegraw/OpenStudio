@@ -20,7 +20,7 @@
 #ifndef MODEL_CONNECTION_IMPL_HPP
 #define MODEL_CONNECTION_IMPL_HPP
 
-#include <model/ModelObject_Impl.hpp>
+#include "ModelObject_Impl.hpp"
 
 namespace openstudio {
 namespace model {
@@ -59,8 +59,6 @@ namespace detail {
     void setTargetObject(ModelObject object);
 
     void setTargetObjectPort(unsigned port);
-
-    boost::optional<std::string> createName(bool overwrite);
 
    private:
 
