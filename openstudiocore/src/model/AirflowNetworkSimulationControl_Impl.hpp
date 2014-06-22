@@ -92,6 +92,7 @@ public:
   boost::optional<double> convergenceAccelerationLimit() const;
   boost::optional<double> azimuthAngleofLongAxisofBuilding() const;
   boost::optional<double> ratioofBuildingWidthAlongShortAxistoWidthAlongLongAxis() const;
+  boost::optional<std::string> networkBuildType() const;
 
   //@}
   /** @name Setters */
@@ -120,6 +121,8 @@ public:
   bool setAzimuthAngleofLongAxisofBuilding(double angle);
   bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(boost::optional<double> ratio);
   bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(double ratio);
+  bool setNetworkBuildType(boost::optional<std::string> type);
+  bool setNetworkBuildType(std::string type);
 
   //@}
 

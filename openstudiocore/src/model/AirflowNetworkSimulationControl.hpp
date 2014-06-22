@@ -145,6 +145,10 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
    */
   boost::optional<double> ratioofBuildingWidthAlongShortAxistoWidthAlongLongAxis() const;
 
+  /** Determines what (if any) network elements will be added to the model.
+   */
+  boost::optional<std::string> networkBuildType() const;
+
   //@}
   /** @name Setters */
   //@{
@@ -171,6 +175,8 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
   bool setAzimuthAngleofLongAxisofBuilding(double angle);
   bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(boost::optional<double> ratio);
   bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(double ratio);
+  bool setNetworkBuildType(boost::optional<std::string> type);
+  bool setNetworkBuildType(std::string type);
 
   //@}
 

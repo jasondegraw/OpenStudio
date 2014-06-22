@@ -16822,10 +16822,18 @@ OS:AirflowNetworkSimulationControl,
       \default 0.0
       \note Degrees clockwise from true North.
       \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
- N6;  \field Ratio of Building Width Along Short Axis to Width Along Long Axis
+ N6 , \field Ratio of Building Width Along Short Axis to Width Along Long Axis
       \type real
       \minimum> 0.0
       \maximum 1.0
       \default 1.0
       \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
+ A9 ; \field Network Build Type
+      \type choice
+	  \key None
+	  \key Surfaces
+	  \key SurfacesAndSubSurfaces
+	  \key DoorsOnly
+	  \key WindowsOnly
+	  \default Surfaces
       

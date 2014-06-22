@@ -21,17 +21,12 @@
 #include <energyplus/Test/EnergyPlusFixture.hpp>
 
 #include <energyplus/ForwardTranslator.hpp>
-#include <energyplus/ReverseTranslator.hpp>
-
-#include <utilities/data/TimeSeries.hpp>
-#include <utilities/time/Date.hpp>
-#include <utilities/time/Time.hpp>
 
 #include <model/Model.hpp>
 #include <model/AirflowNetworkSimulationControl.hpp>
 #include <model/AirflowNetworkSimulationControl_Impl.hpp>
 
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 
 #include <sstream>
 
@@ -40,9 +35,45 @@ using namespace openstudio;
 
 TEST_F(EnergyPlusFixture,ForwardTranslator_AirflowNetworkSimulationControl_NoNetwork)
 {
-  model::Model model; // = model::exampleModel();
+  model::Model model = model::exampleModel();
   model::AirflowNetworkSimulationControl control = model.getUniqueModelObject<model::AirflowNetworkSimulationControl>();
-  control.setAirflowNetworkControl("NoMultizoneOrDistribution");
+  boost::optional<std::string> value = control.airflowNetworkControl();
+  ASSERT_TRUE(value);
+  EXPECT_EQ("NoMultizoneOrDistribution",value.get());
+  value = control.windPressureCoefficientType();
+  ASSERT_TRUE(value);
+  EXPECT_EQ("SurfaceAverageCalculation",value.get());
+  value = control.heightSelectionforLocalWindPressureCalculation();
+  ASSERT_TRUE(value);
+  // Add AirflowNetworkWindPressureCoefficientArrayName test here
+  EXPECT_EQ("OpeningHeight",value.get());
+  value = control.buildingType();
+  ASSERT_TRUE(value);
+  EXPECT_EQ("LowRise",value.get());
+  boost::optional<int> intValue = control.maximumNumberofIterations();
+  ASSERT_TRUE(intValue);
+  EXPECT_EQ(500,intValue.get());
+  value = control.initializationType();
+  ASSERT_TRUE(value);
+  EXPECT_EQ("ZeroNodePressures",value.get());
+  boost::optional<double> doubleValue = control.relativeAirflowConvergenceTolerance();
+  ASSERT_TRUE(doubleValue);
+  EXPECT_EQ(0.0001,doubleValue.get());
+  doubleValue = control.absoluteAirflowConvergenceTolerance();
+  ASSERT_TRUE(doubleValue);
+  EXPECT_EQ(1e-006,doubleValue.get());
+  doubleValue = control.convergenceAccelerationLimit();
+  ASSERT_TRUE(doubleValue);
+  EXPECT_EQ(-0.5,doubleValue.get());
+  doubleValue = control.azimuthAngleofLongAxisofBuilding();
+  ASSERT_TRUE(doubleValue);
+  EXPECT_EQ(0.0,doubleValue.get());
+  doubleValue = control.ratioofBuildingWidthAlongShortAxistoWidthAlongLongAxis();
+  ASSERT_TRUE(doubleValue);
+  EXPECT_EQ(1.0,doubleValue.get());
+  value = control.networkBuildType();
+  ASSERT_TRUE(value);
+  EXPECT_EQ("Surfaces",value.get());
 
   ForwardTranslator ft;
   Workspace workspace = ft.translateModel(model);
@@ -53,8 +84,27 @@ TEST_F(EnergyPlusFixture,ForwardTranslator_AirflowNetworkSimulationControl_NoNet
   ASSERT_EQ(1,objects.size());
 
   unsigned N = objects[0].numFields();
-  std::cout << N << std::endl;
-  //ASSERT_TRUE(false);
+  EXPECT_EQ(13,N);
+
+  std::string fields[13] = {"Airflow Network Simulation Control 1",
+    "NoMultizoneOrDistribution",
+    "SurfaceAverageCalculation",
+    std::string(),
+    "OpeningHeight",
+    "LowRise",
+    "500",
+    "ZeroNodePressures",
+    "0.0001",
+    "1e-006",
+    "-0.5",
+    "0",
+    "1"};
+
+  for ( unsigned i = 0; i < N; ++i) {
+    boost::optional<std::string> field = objects[0].getString(i, true, false);
+    ASSERT_TRUE(field);
+    EXPECT_EQ(fields[i],field.get());
+  }
 }
 
 /*
