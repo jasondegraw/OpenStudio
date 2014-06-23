@@ -49,6 +49,8 @@ public:
   bool read(Reader &input);
   std::string toString();
 
+  void clear();
+
   /** Returns the program name, should be "ContamW". */
   std::string programName() const;
   /** Sets the program name. */

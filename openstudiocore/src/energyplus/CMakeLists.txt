@@ -6,13 +6,14 @@ set(${target_name}_src
   ErrorFile.hpp
   ErrorFile.cpp
   GeometryTranslator.hpp
-  GeometryTranslator.cpp
+  GeometryTranslator.cpp 
   MapFields.hpp
   MapFields.cpp
 
   ForwardTranslator.hpp
   ForwardTranslator.cpp
   ForwardTranslator/ForwardTranslateAirConditionerVariableRefrigerantFlow.cpp
+  ForwardTranslator/ForwardTranslateAirflowNetworkSimulationControl.cpp
   ForwardTranslator/ForwardTranslateAirGap.cpp
   ForwardTranslator/ForwardTranslateAirLoopHVAC.cpp
   ForwardTranslator/ForwardTranslateAirLoopHVACOutdoorAirSystem.cpp
@@ -195,15 +196,15 @@ set(${target_name}_src
   ForwardTranslator/ForwardTranslateZoneHVACBaseboardConvectiveElectric.cpp
   ForwardTranslator/ForwardTranslateZoneHVACBaseboardConvectiveWater.cpp
   ForwardTranslator/ForwardTranslateZoneHVACEquipmentList.cpp
-  ForwardTranslator/ForwardTranslateZoneHVACFourPipeFanCoil.cpp
+  ForwardTranslator/ForwardTranslateZoneHVACFourPipeFanCoil.cpp    
   ForwardTranslator/ForwardTranslateZoneHVACIdealLoadsAirSystem.cpp
   ForwardTranslator/ForwardTranslateZoneHVACLowTemperatureRadiantElectric.cpp
   ForwardTranslator/ForwardTranslateZoneHVACLowTempRadiantConstFlow.cpp
   ForwardTranslator/ForwardTranslateZoneHVACLowTempRadiantVarFlow.cpp
   ForwardTranslator/ForwardTranslateZoneHVACPackagedTerminalHeatPump.cpp
   ForwardTranslator/ForwardTranslateZoneHVACPackagedTerminalAirConditioner.cpp
-  ForwardTranslator/ForwardTranslateZoneHVACTerminalUnitVariableRefrigerantFlow.cpp
-  ForwardTranslator/ForwardTranslateZoneHVACWaterToAirHeatPump.cpp
+  ForwardTranslator/ForwardTranslateZoneHVACTerminalUnitVariableRefrigerantFlow.cpp 
+  ForwardTranslator/ForwardTranslateZoneHVACWaterToAirHeatPump.cpp 
   ForwardTranslator/ForwardTranslateZoneHVACUnitHeater.cpp
   ForwardTranslator/CreateAirLoopHVACSupplyPath.cpp
   ForwardTranslator/CreateAirLoopHVACReturnPath.cpp
@@ -248,7 +249,7 @@ set(${target_name}_src
   ReverseTranslator/ReverseTranslateEvaporativeFluidCoolerSingleSpeed.cpp
   ReverseTranslator/ReverseTranslateExteriorLights.cpp
   ReverseTranslator/ReverseTranslateFanConstantVolume.cpp
-  ReverseTranslator/ReverseTranslateFenestrationSurfaceDetailed.cpp
+  ReverseTranslator/ReverseTranslateFenestrationSurfaceDetailed.cpp 
   ReverseTranslator/ReverseTranslateGasEquipment.cpp
   ReverseTranslator/ReverseTranslateGroundHeatExchangerVertical.cpp
   ReverseTranslator/ReverseTranslateHeatBalanceAlgorithm.cpp
@@ -305,7 +306,7 @@ set(${target_name}_src
   ReverseTranslator/ReverseTranslateWindowMaterialSimpleGlazingSystem.cpp
   ReverseTranslator/ReverseTranslateZoneAirHeatBalanceAlgorithm.cpp
   ReverseTranslator/ReverseTranslateZone.cpp
-  ReverseTranslator/ReverseTranslateZoneHVACEquipmentList.cpp
+  ReverseTranslator/ReverseTranslateZoneHVACEquipmentList.cpp 
   ReverseTranslator/ReverseTranslateZoneHVACIdealLoadsAirSystem.cpp
   ReverseTranslator/ReverseTranslateZoneInfiltrationDesignFlowRate.cpp
   ReverseTranslator/ReverseTranslateZoneInfiltrationEffectiveLeakageArea.cpp
@@ -322,7 +323,8 @@ set(${target_name}_test_src
   Test/GeometryTranslator_GTest.cpp
   Test/ForwardTranslator_GTest.cpp
   Test/ReverseTranslator_GTest.cpp
-
+  
+  Test/AirflowNetwork_GTest.cpp
   Test/AirWallMaterial_GTest.cpp
   Test/Building_GTest.cpp
   Test/Construction_GTest.cpp
@@ -381,7 +383,7 @@ AddPCH(${target_name})
 
 if(NOT APPLE)
   install(TARGETS ${target_name}
-    RUNTIME DESTINATION bin
+  RUNTIME DESTINATION bin 
     LIBRARY DESTINATION lib
   )
 endif()
@@ -397,7 +399,7 @@ if(BUILD_TESTING)
     ResultsViewer_resources
     openstudio_energyplus_resources
   )
-
+    
 endif()
 
 MAKE_SWIG_TARGET(OpenStudioEnergyPlus EnergyPlus "${CMAKE_CURRENT_SOURCE_DIR}/EnergyPlus.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModel)

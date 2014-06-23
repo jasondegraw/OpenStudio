@@ -412,6 +412,8 @@ public:
   /** @name Other Functions */
   //@{
 
+  /** Return the object to default state. */
+  void clear();
   /** Return a vector of vectors of the CONTAM indices of all plot paths to the exterior of each zone. */
   std::vector<std::vector<int> > zoneExteriorFlowPaths();
   /** Compute the infiltration on a per zone basis from simulation results. */

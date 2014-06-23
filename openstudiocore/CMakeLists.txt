@@ -11,7 +11,7 @@ set(CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number") # git sha
 set(OPENSTUDIO_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}")
 set(OPENSTUDIO_LONG_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.${CMAKE_VERSION_BUILD}")
 
-# EnergyPlus Idd version
+# EnergyPlus Idd version 
 set(ENERGYPLUS_VERSION "8.1" CACHE INTERNAL "EnergyPlus Version")
 
 # configure file with version information
@@ -65,6 +65,9 @@ option(BUILD_PACKAGE "Build package" OFF)
 # Build test runner targets.
 # This is a convenience for Visual Studio users
 option(ENABLE_TEST_RUNNER_TARGETS "Create test runner targets" OFF)
+
+# Build AFN support
+OPTION( BUILD_AFN "Build with AFN support" OFF )
 
 # Build with OpenSSL support
 set(BUILD_WITH_OPENSSL ON CACHE INTERNAL "Build With OpenSSL Support For SSH Connections")
@@ -152,6 +155,7 @@ set(project_directories
   radiance
   gbxml
   contam
+  airflow 
   isomodel
   osversion
   ruleset
@@ -269,10 +273,10 @@ endif()
 # EnergyPlus
 find_package(EnergyPlus "${ENERGYPLUS_VERSION}" REQUIRED)
 mark_as_advanced(
-  ENERGYPLUS_EXE
-  ENERGYPLUS_IDD
-  ENERGYPLUS_WEATHER_DIR
-)
+    ENERGYPLUS_EXE
+    ENERGYPLUS_IDD
+    ENERGYPLUS_WEATHER_DIR
+  )
 
 # Ruby
 find_program(RUBY_EXECUTABLE NAMES ruby PATHS $ENV{CMAKE_RUBY_PATH} NO_SYSTEM_ENVIRONMENT_PATH)
@@ -511,7 +515,7 @@ if(BUILD_DOCUMENTATION)
 
     set(ALL_CPP_DOC_TARGETS ${ALL_CPP_DOC_TARGETS}
       openstudio_${DOC_NAME}_doc
-    )
+      )
     #list(APPEND ALL_CPP_DOC_TARGETS "openstudio_${DOC_NAME}_doc")
 
   endforeach()
@@ -754,7 +758,7 @@ if(UNIX AND NOT APPLE)
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${relative}/openstudio.rb\" \"\$ENV{DESTDIR}/\${CMAKE_INSTALL_PREFIX}/${RUBY_MODULE_SITE_DIR}/openstudio.rb\")
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${relative}/openstudio\" \"\$ENV{DESTDIR}/\${CMAKE_INSTALL_PREFIX}/${RUBY_MODULE_SITE_DIR}/openstudio\")
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${relative}/cloud\" \"\$ENV{DESTDIR}/\${CMAKE_INSTALL_PREFIX}/${RUBY_MODULE_SITE_DIR}/cloud\")
-  ")
+    ")
 
 endif()
 
@@ -852,6 +856,7 @@ set(all_lib_targets
   openstudio_lib
   openstudio_sdd
   openstudio_contam
+  openstudio_airflow
   ${QTWINMIGRATE_EXPORT}
   zkexpat
   zkqwt
@@ -877,7 +882,7 @@ set(all_exe_targets
   litesql-gen
   ResultsViewer
   Pat
-)
+  )
 
 if(UNIX AND NOT APPLE)
   foreach(targ ${all_lib_targets} ${all_exe_targets} ${ALL_TESTING_TARGETS})

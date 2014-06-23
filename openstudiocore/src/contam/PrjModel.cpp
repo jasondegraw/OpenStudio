@@ -815,6 +815,11 @@ bool IndexModel::valid() const
   return m_impl->valid();
 }
 
+void IndexModel::clear()
+{
+  m_impl->clear();
+}
+
 std::vector<std::vector<int> > IndexModel::zoneExteriorFlowPaths()
 {
   return m_impl->zoneExteriorFlowPaths();

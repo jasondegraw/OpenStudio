@@ -187,6 +187,7 @@ if (_className::iddObjectType() == typeToCreate) { \
 
     REGISTER_CONSTRUCTOR(AirConditionerVariableRefrigerantFlow);
     REGISTER_CONSTRUCTOR(EvaporativeFluidCoolerSingleSpeed);
+    REGISTER_CONSTRUCTOR(AirflowNetworkSimulationControl);
     REGISTER_CONSTRUCTOR(AirGap);
     REGISTER_CONSTRUCTOR(AirLoopHVAC);
     REGISTER_CONSTRUCTOR(AirLoopHVACUnitaryHeatPumpAirToAir);
@@ -478,6 +479,7 @@ if (_className::iddObjectType() == typeToCreate) { \
 
     REGISTER_COPYCONSTRUCTORS(AirConditionerVariableRefrigerantFlow);
     REGISTER_COPYCONSTRUCTORS(EvaporativeFluidCoolerSingleSpeed);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkSimulationControl);
     REGISTER_COPYCONSTRUCTORS(AirGap);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVAC);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVACUnitaryHeatPumpAirToAir);
