@@ -26,20 +26,6 @@ namespace openstudio {
 
 namespace model {
 
-/*
-class ConvergenceLimits;
-class HeatBalanceAlgorithm;
-class InsideSurfaceConvectionAlgorithm;
-class OutsideSurfaceConvectionAlgorithm;
-class RunPeriod;
-class ShadowCalculation;
-class SizingParameters;
-class Timestep;
-class ZoneAirContaminantBalance;
-class ZoneAirHeatBalanceAlgorithm;
-class ZoneCapacitanceMultiplierResearchSpecial;
-*/
-
 namespace detail {
   class AirflowNetworkSimulationControl_Impl;
 }

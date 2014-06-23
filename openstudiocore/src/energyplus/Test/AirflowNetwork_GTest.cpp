@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture,ForwardTranslator_AirflowNetworkSimulationControl_NoNet
     "0",
     "1"};
 
-  for ( unsigned i = 0; i < N; ++i) {
+  for(unsigned i = 0; i < N; ++i) {
     boost::optional<std::string> field = objects[0].getString(i, true, false);
     ASSERT_TRUE(field);
     EXPECT_EQ(fields[i],field.get());

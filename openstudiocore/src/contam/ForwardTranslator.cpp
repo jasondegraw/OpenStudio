@@ -940,16 +940,6 @@ bool ForwardTranslator::writeCvFile(openstudio::path filepath)
   return false;
 }
 
-bool ForwardTranslator::interiorSubSurfacesLinked() const
-{
-  return false;
-}
-
-bool ForwardTranslator::exteriorSubSurfacesLinked() const
-{
-  return false;
-}
-
 bool ForwardTranslator::linkExteriorSurface(openstudio::model::ThermalZone zone, openstudio::model::Space space, openstudio::model::Surface surface)
 {
   contam::AirflowPath path;

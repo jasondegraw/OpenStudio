@@ -33,17 +33,11 @@
 #include <utilities/idd/IddFactory.hxx>
 #include <utilities/idd/OS_AirflowNetworkSimulationControl_FieldEnums.hxx>
 
-#include <utilities/sql/SqlFile.hpp>
-#include <utilities/core/Assert.hpp>
-#include <utilities/core/Compare.hpp>
-#include <utilities/units/Unit.hpp>
-
 #include "../utilities/plot/ProgressBar.hpp"
 #include "../utilities/idf/Handle.hpp"
 
-#include <boost/bind.hpp>
-
 #include <QThread>
+#include <QVector>
 
 namespace openstudio{
 namespace model{
@@ -53,7 +47,7 @@ namespace detail{
 SurfaceNetworkBuilder::SurfaceNetworkBuilder(ProgressBar *progressBar) : m_progressBar(progressBar)
 {
   m_logSink.setLogLevel(Info);
-  m_logSink.setChannelRegex(boost::regex("openstudio\\.airflow\\.NetworkBuilder"));
+  m_logSink.setChannelRegex(boost::regex("openstudio\\.model\\.SurfaceNetworkBuilder"));
   m_logSink.setThreadId(QThread::currentThread());
   m_progressBar = 0;
 }
@@ -226,15 +220,10 @@ bool SurfaceNetworkBuilder::build(Model &model)
       }
       // If we made it to here, then the exterior surface is good.
       linkExteriorSurface(thermalZone.get(),space.get(),surface);
-      if(exteriorSubSurfacesLinked()){
-        std::vector<model::SubSurface> 	subSurfaces = surface.subSurfaces();
-        BOOST_FOREACH(model::SubSurface subSurface,subSurfaces) {
-          linkExteriorSubSurface(thermalZone.get(),space.get(),surface,subSurface);
-        }
+      BOOST_FOREACH(model::SubSurface subSurface, surface.subSurfaces()) {
+        linkExteriorSubSurface(thermalZone.get(),space.get(),surface,subSurface);
       }
-    }
-    else if(!used.contains(surface.handle()) && bc == "Surface")
-    {
+    } else if(!used.contains(surface.handle()) && bc == "Surface") {
       // Get the associated thermal zone
       boost::optional<openstudio::model::Space> space = surface.space();
       if(!space)
@@ -292,24 +281,23 @@ bool SurfaceNetworkBuilder::build(Model &model)
       }
       // Now have a surface that is fully connected and separates two zones so it can be linked
       linkInteriorSurface(thermalZone.get(),space.get(),surface,adjacentSurface.get(),adjacentSpace.get(),adjacentZone.get());
-      // Link subsurfaces if needed
-      if(interiorSubSurfacesLinked()) {
-        std::vector<model::SubSurface> 	subSurfaces = surface.subSurfaces();
-        BOOST_FOREACH(model::SubSurface subSurface, subSurfaces) {
-          // Now we need to check the connections as we did with the surface
-          boost::optional<model::SubSurface> adjacentSubSurface = subSurface.adjacentSubSurface();
-          if(!adjacentSubSurface) {
-            LOG(Warn, "Unable to find adjacent subsurface for subsurface of '" << openstudio::toString(surface.handle()) << "'");
-            continue;
-          }
-          if(adjacentSubSurface->surface() != adjacentSurface) {
-            LOG(Warn, "Adjacent subsurface for subsurface of '" << openstudio::toString(surface.handle()) << "' is not attached to the expected surface");
-            continue;
-          }
-          // If we made it here, then the subsurface is fully connected and can be linked
-          linkInteriorSubSurface(thermalZone.get(),space.get(),surface,subSurface,adjacentSubSurface.get(),adjacentSurface.get(),
-            adjacentSpace.get(),adjacentZone.get());
+      // Link subsurfaces
+      BOOST_FOREACH(model::SubSurface subSurface, surface.subSurfaces()) {
+        // Now we need to check the connections as we did with the surface
+        boost::optional<model::SubSurface> adjacentSubSurface = subSurface.adjacentSubSurface();
+        if(!adjacentSubSurface) {
+          LOG(Warn, "Unable to find adjacent subsurface for subsurface of '" << openstudio::toString(surface.handle()) << "'");
+          nowarnings = false;
+          continue;
         }
+        if(adjacentSubSurface->surface() != adjacentSurface) {
+          LOG(Warn, "Adjacent subsurface for subsurface of '" << openstudio::toString(surface.handle()) << "' is not attached to the expected surface");
+          nowarnings = false;
+          continue;
+        }
+        // If we made it here, then the subsurface is fully connected and can be linked
+        linkInteriorSubSurface(thermalZone.get(),space.get(),surface,subSurface,adjacentSubSurface.get(),adjacentSurface.get(),
+          adjacentSpace.get(),adjacentZone.get());
       }
     }
   }
