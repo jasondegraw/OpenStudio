@@ -19,8 +19,8 @@
 #ifndef MODEL_AIRFLOWNETWORKSIMULATIONCONTROL_HPP
 #define MODEL_AIRFLOWNETWORKSIMULATIONCONTROL_HPP
 
-#include <model/ModelAPI.hpp>
-#include <model/ParentObject.hpp>
+#include "ModelAPI.hpp"
+#include "ParentObject.hpp"
 
 namespace openstudio {
 
@@ -196,7 +196,7 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
 
   typedef detail::AirflowNetworkSimulationControl_Impl ImplType;
 
-  explicit AirflowNetworkSimulationControl(boost::shared_ptr<ImplType> impl);
+  explicit AirflowNetworkSimulationControl(std::shared_ptr<ImplType> impl);
 
  private:
 

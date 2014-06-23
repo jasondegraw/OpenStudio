@@ -17,8 +17,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <model/AirflowNetworkSimulationControl.hpp>
-#include <model/AirflowNetworkSimulationControl_Impl.hpp>
+#include "AirflowNetworkSimulationControl.hpp"
+#include "AirflowNetworkSimulationControl_Impl.hpp"
 
 #include <model/Model.hpp>
 #include <model/ConvergenceLimits.hpp>
@@ -495,7 +495,7 @@ ParentObject(iddObjectType(),model)
   OS_ASSERT(getImpl<detail::AirflowNetworkSimulationControl_Impl>());
 }
 
-AirflowNetworkSimulationControl::AirflowNetworkSimulationControl(boost::shared_ptr<detail::AirflowNetworkSimulationControl_Impl> impl)
+AirflowNetworkSimulationControl::AirflowNetworkSimulationControl(std::shared_ptr<detail::AirflowNetworkSimulationControl_Impl> impl)
 : ParentObject(impl)
 {}
 

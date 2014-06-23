@@ -76,11 +76,11 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
 {
   // Remove previous infiltration objects
   std::vector<openstudio::model::SpaceInfiltrationDesignFlowRate> dfrInf = model.getConcreteModelObjects<openstudio::model::SpaceInfiltrationDesignFlowRate>();
-  BOOST_FOREACH(openstudio::model::SpaceInfiltrationDesignFlowRate inf, dfrInf) {
+  for(openstudio::model::SpaceInfiltrationDesignFlowRate inf : dfrInf) {
     inf.remove();
   }
   std::vector<openstudio::model::SpaceInfiltrationEffectiveLeakageArea> elaInf = model.getConcreteModelObjects<openstudio::model::SpaceInfiltrationEffectiveLeakageArea>();
-  BOOST_FOREACH(openstudio::model::SpaceInfiltrationEffectiveLeakageArea inf, elaInf) {
+  for(openstudio::model::SpaceInfiltrationEffectiveLeakageArea inf : elaInf) {
     inf.remove();
   }
 
@@ -122,9 +122,7 @@ boost::optional<openstudio::Workspace> ForwardTranslator::translateModel(openstu
   1.0;                     !- Ratio of Building Width Along Short Axis to Width Along Long Axis
   */
   // Create an airflow zone for each thermal zone
-  BOOST_FOREACH(openstudio::model::ThermalZone thermalZone,
-    model.getConcreteModelObjects<openstudio::model::ThermalZone>())
-  {
+  for(openstudio::model::ThermalZone thermalZone : model.getConcreteModelObjects<openstudio::model::ThermalZone>()) {
     boost::optional<std::string> name = thermalZone.name();
     if(!name)
     {
@@ -366,16 +364,14 @@ std::map<std::string,double> ForwardTranslator::largestSurfaceAreas(openstudio::
   maxAreas["Interior"] = 0.0;
   std::vector<openstudio::model::Surface> extSurfs = getExteriorZoneSurfaces(model);
   std::vector<openstudio::model::Surface> intSurfs = getInteriorZoneSurfaces(model);
-  BOOST_FOREACH(openstudio::model::Surface surface, extSurfs)
-  {
+  for(openstudio::model::Surface surface : extSurfs) {
     double area = surface.grossArea(); // Will need to account for openings at some point
     if(area > maxAreas["Exterior"])
     {
       maxAreas["Exterior"] = area;
     }
   }
-  BOOST_FOREACH(openstudio::model::Surface surface, intSurfs)
-  {
+  for(openstudio::model::Surface surface : intSurfs) {
     double area = surface.grossArea(); // Will need to account for openings at some point
     if(area > maxAreas["Interior"])
     {

@@ -1,24 +1,24 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
-*  All rights reserved.
-*
-*  This library is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU Lesser General Public
-*  License as published by the Free Software Foundation; either
-*  version 2.1 of the License, or (at your option) any later version.
-*
-*  This library is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*  Lesser General Public License for more details.
-*
-*  You should have received a copy of the GNU Lesser General Public
-*  License along with this library; if not, write to the Free Software
-*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-**********************************************************************/
+ *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ **********************************************************************/
 
 #include "ForwardTranslator.hpp"
-#include "WindPressure.hpp"
+#include "../airflow/WindPressure.hpp"
 
 #include "../model/Model.hpp"
 #include "../model/Building.hpp"
@@ -31,6 +31,8 @@
 #include "../model/Space_Impl.hpp"
 #include "../model/Surface.hpp"
 #include "../model/Surface_Impl.hpp"
+#include "../model/SubSurface.hpp"
+#include "../model/SubSurface_Impl.hpp"
 #include "../model/AirLoopHVAC.hpp"
 #include "../model/AirLoopHVAC_Impl.hpp"
 #include "../model/Node.hpp"
@@ -591,7 +593,7 @@ boost::optional<contam::IndexModel> ForwardTranslator::translateModel(model::Mod
     // Generate air handling systems
     std::vector<openstudio::model::AirLoopHVAC> systems = model.getConcreteModelObjects<openstudio::model::AirLoopHVAC>();
     initProgress(systems.size(), "Translating AirLoops");
-    BOOST_FOREACH(openstudio::model::AirLoopHVAC airloop,systems) {
+    for(openstudio::model::AirLoopHVAC airloop : systems) {
       // Skip loops with no zones attached
       if(!airloop.thermalZones().size()) {
         progress();
@@ -962,7 +964,7 @@ bool ForwardTranslator::linkExteriorSurface(openstudio::model::ThermalZone zone,
   std::string type = surface.surfaceType();
   double averageZ = 0;
   double numVertices = surface.vertices().size();
-  BOOST_FOREACH(const Point3d& point, surface.vertices()) {
+  for(const Point3d& point : surface.vertices()) {
     averageZ += point.z();
   }
   // Now set the path info
@@ -1005,7 +1007,7 @@ bool ForwardTranslator::linkInteriorSurface(openstudio::model::ThermalZone zone,
   std::string type = surface.surfaceType();
   double averageZ = 0;
   double numVertices = surface.vertices().size();
-  BOOST_FOREACH(const Point3d& point, surface.vertices()) {
+  for(const Point3d& point : surface.vertices()) {
     averageZ += point.z();
   }
   // Now set the path info

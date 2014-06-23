@@ -22,7 +22,6 @@ SET( ${target_name}_depends
   openstudio_model
   openstudio_energyplus
   openstudio_osversion
-  boost_log
 )
 
 IF(WIN32)
