@@ -34,7 +34,7 @@
 #include <utilities/time/Date.hpp>
 #include <utilities/filetypes/EpwFile.hpp>
 
-#include "../airflow/NetworkBuilder.hpp"
+#include "../model/AirflowNetworkSimulationControl_Impl.hpp"
 
 namespace openstudio{
 class ProgressBar;
@@ -90,7 +90,7 @@ private:
  *  overall leakage rate and individual components are not directly represented.
  *
  */
-class CONTAM_API ForwardTranslator : public airflow::NetworkBuilder
+class CONTAM_API ForwardTranslator : public model::detail::SurfaceNetworkBuilder
 {
 public:
   /** @name Constructors and Destructors */

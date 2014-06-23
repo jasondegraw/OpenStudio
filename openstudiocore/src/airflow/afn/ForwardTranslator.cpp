@@ -64,7 +64,7 @@
 namespace openstudio {
 namespace afn {
 
-ForwardTranslator::ForwardTranslator(ProgressBar *progressBar) : NetworkBuilder(progressBar)
+ForwardTranslator::ForwardTranslator(ProgressBar *progressBar) : openstudio::model::detail::SurfaceNetworkBuilder(progressBar)
 {
 }
 

@@ -23,7 +23,7 @@
 
 #include "../AirflowAPI.hpp"
 
-#include "../NetworkBuilder.hpp"
+#include "../model/AirflowNetworkSimulationControl_Impl.hpp"
 
 #include "../../utilities/idf/Handle.hpp"
 #include "../../utilities/core/Logger.hpp"
@@ -41,7 +41,7 @@ namespace model {
 
 namespace afn {
 
-class AIRFLOW_API ForwardTranslator : public airflow::NetworkBuilder
+class AIRFLOW_API ForwardTranslator : public model::detail::SurfaceNetworkBuilder
 {
 public:
 

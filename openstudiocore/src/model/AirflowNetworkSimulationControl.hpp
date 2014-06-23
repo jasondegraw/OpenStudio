@@ -19,16 +19,14 @@
 #ifndef MODEL_AIRFLOWNETWORKSIMULATIONCONTROL_HPP
 #define MODEL_AIRFLOWNETWORKSIMULATIONCONTROL_HPP
 
-#include <model/ModelAPI.hpp>
-#include <model/ParentObject.hpp>
+#include "ModelAPI.hpp"
+#include "ParentObject.hpp"
 
 namespace openstudio {
 
-class Quantity;
-class OSOptionalQuantity;
-
 namespace model {
 
+/*
 class ConvergenceLimits;
 class HeatBalanceAlgorithm;
 class InsideSurfaceConvectionAlgorithm;
@@ -40,6 +38,7 @@ class Timestep;
 class ZoneAirContaminantBalance;
 class ZoneAirHeatBalanceAlgorithm;
 class ZoneCapacitanceMultiplierResearchSpecial;
+*/
 
 namespace detail {
   class AirflowNetworkSimulationControl_Impl;
