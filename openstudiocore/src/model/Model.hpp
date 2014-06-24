@@ -407,7 +407,7 @@ bool MODEL_API compareInputAndOutput(const ModelObject& object,
 MODEL_API Model exampleModel();
 
 /// Adds example model objects to an existing model.
-MODEL_API void addExampleModelObjects(Model& model);
+MODEL_API void addExampleModelObjects(Model& model, bool addZone=true);
 
 } // model
 } // openstudio

@@ -1396,7 +1396,7 @@ void addExampleSchedules(Model& model);
 
 void addExampleConstructions(Model& model);
 
-void addExampleModelObjects(Model& model)
+void addExampleModelObjects(Model& model, bool addZone)
 {
   std::vector<Surface> searchResults;
 
@@ -1544,297 +1544,301 @@ void addExampleModelObjects(Model& model)
   building.setDefaultConstructionSet(defaultConstructionSet);
   building.setDefaultScheduleSet(defaultScheduleSet);
 
-  // create a thermal zone
-  ThermalZone thermalZone(model);
+  if(addZone) {
 
-  ThermostatSetpointDualSetpoint thermostat(model);
-  thermalZone.setThermostatSetpointDualSetpoint(thermostat);
+    // create a thermal zone
+    ThermalZone thermalZone(model);
 
-  Schedule heatingSchedule = model.getModelObjectByName<Schedule>("Medium Office Heating Setpoint Schedule").get();
-  Schedule coolingSchedule = model.getModelObjectByName<Schedule>("Medium Office Cooling Setpoint Schedule").get();
+    ThermostatSetpointDualSetpoint thermostat(model);
+    thermalZone.setThermostatSetpointDualSetpoint(thermostat);
 
-  thermostat.setHeatingSchedule(heatingSchedule);
-  thermostat.setCoolingSchedule(coolingSchedule);
+    Schedule heatingSchedule = model.getModelObjectByName<Schedule>("Medium Office Heating Setpoint Schedule").get();
+    Schedule coolingSchedule = model.getModelObjectByName<Schedule>("Medium Office Cooling Setpoint Schedule").get();
 
-  // create a building story
-  BuildingStory buildingStory(model);
-  buildingStory.setNominalZCoordinate(0);
-  buildingStory.setNominalFloortoFloorHeight(3);
+    thermostat.setHeatingSchedule(heatingSchedule);
+    thermostat.setCoolingSchedule(coolingSchedule);
 
-  // create spaces from floor print
-  std::vector<Point3d> floorPrint;
-  floorPrint.push_back(Point3d(0,0,0));
-  floorPrint.push_back(Point3d(0,10,0));
-  floorPrint.push_back(Point3d(10,10,0));
-  floorPrint.push_back(Point3d(10,0,0));
+    // create a building story
+    BuildingStory buildingStory(model);
+    buildingStory.setNominalZCoordinate(0);
+    buildingStory.setNominalFloortoFloorHeight(3);
 
-  // make spaces
-  boost::optional<Space> space1 = Space::fromFloorPrint(floorPrint, 3, model);
-  OS_ASSERT(space1);
-  space1->setThermalZone(thermalZone);
-  space1->setBuildingStory(buildingStory);
+    // create spaces from floor print
+    std::vector<Point3d> floorPrint;
+    floorPrint.push_back(Point3d(0,0,0));
+    floorPrint.push_back(Point3d(0,10,0));
+    floorPrint.push_back(Point3d(10,10,0));
+    floorPrint.push_back(Point3d(10,0,0));
 
-  ModelObject clone = space1->clone(model);
-  Space space2 = clone.cast<Space>();
-  space2.setXOrigin(10);
+    // make spaces
+    boost::optional<Space> space1 = Space::fromFloorPrint(floorPrint, 3, model);
+    OS_ASSERT(space1);
+    space1->setThermalZone(thermalZone);
+    space1->setBuildingStory(buildingStory);
 
-  clone = space1->clone(model);
-  Space space3 = clone.cast<Space>();
-  space3.setYOrigin(10);
+    ModelObject clone = space1->clone(model);
+    Space space2 = clone.cast<Space>();
+    space2.setXOrigin(10);
 
-  clone = space1->clone(model);
-  Space space4 = clone.cast<Space>();
-  space4.setXOrigin(10);
-  space4.setYOrigin(10);
+    clone = space1->clone(model);
+    Space space3 = clone.cast<Space>();
+    space3.setYOrigin(10);
 
-  // add a door to south wall of space1
-  std::vector<Point3d> doorPoints;
-  doorPoints.push_back(Point3d(2,0,2));
-  doorPoints.push_back(Point3d(2,0,0));
-  doorPoints.push_back(Point3d(4,0,0));
-  doorPoints.push_back(Point3d(4,0,2));
+    clone = space1->clone(model);
+    Space space4 = clone.cast<Space>();
+    space4.setXOrigin(10);
+    space4.setYOrigin(10);
 
-  // find south wall
-  searchResults = space1->findSurfaces(180.0,180.0,90.0,90.0);
-  OS_ASSERT(searchResults.size() >= 1);
+    // add a door to south wall of space1
+    std::vector<Point3d> doorPoints;
+    doorPoints.push_back(Point3d(2,0,2));
+    doorPoints.push_back(Point3d(2,0,0));
+    doorPoints.push_back(Point3d(4,0,0));
+    doorPoints.push_back(Point3d(4,0,2));
 
-  // add door
-  SubSurface door(doorPoints, model);
-  door.setSurface(searchResults[0]);
+    // find south wall
+    searchResults = space1->findSurfaces(180.0,180.0,90.0,90.0);
+    OS_ASSERT(searchResults.size() >= 1);
 
-  // add a window to east wall of space2
-  std::vector<Point3d> windowPoints;
-  windowPoints.push_back(Point3d(10,2,2));
-  windowPoints.push_back(Point3d(10,2,1));
-  windowPoints.push_back(Point3d(10,8,1));
-  windowPoints.push_back(Point3d(10,8,2));
+    // add door
+    SubSurface door(doorPoints, model);
+    door.setSurface(searchResults[0]);
 
-  // find east wall
-  searchResults = space2.findSurfaces(90.0,90.0,90.0,90.0);
-  OS_ASSERT(searchResults.size() >= 1);
+    // add a window to east wall of space2
+    std::vector<Point3d> windowPoints;
+    windowPoints.push_back(Point3d(10,2,2));
+    windowPoints.push_back(Point3d(10,2,1));
+    windowPoints.push_back(Point3d(10,8,1));
+    windowPoints.push_back(Point3d(10,8,2));
 
-  // add window
-  SubSurface window(windowPoints, model);
-  window.setSurface(searchResults[0]);
+    // find east wall
+    searchResults = space2.findSurfaces(90.0,90.0,90.0,90.0);
+    OS_ASSERT(searchResults.size() >= 1);
 
-  // add overhang to the window
-  bool test = window.addOverhangByProjectionFactor(0.5, 0.1);
-  OS_ASSERT(test);
+    // add window
+    SubSurface window(windowPoints, model);
+    window.setSurface(searchResults[0]);
 
-  // add daylighting control point to center of space2
-  DaylightingControl daylightingControl(model);
-  daylightingControl.setSpace(space2);
-  daylightingControl.setPosition(Point3d(5, 5, 1.1));
+    // add overhang to the window
+    bool test = window.addOverhangByProjectionFactor(0.5, 0.1);
+    OS_ASSERT(test);
 
-  // hook daylighting control up to zone
-  test = thermalZone.setPrimaryDaylightingControl(daylightingControl);
-  OS_ASSERT(test);
-  thermalZone.setFractionofZoneControlledbyPrimaryDaylightingControl(0.25);
+    // add daylighting control point to center of space2
+    DaylightingControl daylightingControl(model);
+    daylightingControl.setSpace(space2);
+    daylightingControl.setPosition(Point3d(5, 5, 1.1));
 
-  // add illuminance map to space2
-  IlluminanceMap illuminanceMap(model);
-  illuminanceMap.setSpace(space2);
-  illuminanceMap.setOriginXCoordinate(1);
-  illuminanceMap.setXLength(8);
-  illuminanceMap.setOriginYCoordinate(1);
-  illuminanceMap.setYLength(8);
-  illuminanceMap.setOriginZCoordinate(1.1);
+    // hook daylighting control up to zone
+    test = thermalZone.setPrimaryDaylightingControl(daylightingControl);
+    OS_ASSERT(test);
+    thermalZone.setFractionofZoneControlledbyPrimaryDaylightingControl(0.25);
 
-  // hook illuminanceMap up to zone
-  test = thermalZone.setIlluminanceMap(illuminanceMap);
-  OS_ASSERT(test);
+    // add illuminance map to space2
+    IlluminanceMap illuminanceMap(model);
+    illuminanceMap.setSpace(space2);
+    illuminanceMap.setOriginXCoordinate(1);
+    illuminanceMap.setXLength(8);
+    illuminanceMap.setOriginYCoordinate(1);
+    illuminanceMap.setYLength(8);
+    illuminanceMap.setOriginZCoordinate(1.1);
+
+    // hook illuminanceMap up to zone
+    test = thermalZone.setIlluminanceMap(illuminanceMap);
+    OS_ASSERT(test);
 
 
-  // add a glare sensor to center of space2
-  GlareSensor glareSensor(model);
-  glareSensor.setSpace(space2);
-  glareSensor.setPosition(Point3d(5, 5, 1.1));
+    // add a glare sensor to center of space2
+    GlareSensor glareSensor(model);
+    glareSensor.setSpace(space2);
+    glareSensor.setPosition(Point3d(5, 5, 1.1));
 
-  // add a desk to space 2
-  InteriorPartitionSurfaceGroup deskGroup(model);
-  deskGroup.setSpace(space2);
+    // add a desk to space 2
+    InteriorPartitionSurfaceGroup deskGroup(model);
+    deskGroup.setSpace(space2);
 
-  std::vector<Point3d> deskPoints;
-  deskPoints.push_back(Point3d(5,8,1));
-  deskPoints.push_back(Point3d(5,6,1));
-  deskPoints.push_back(Point3d(8,6,1));
-  deskPoints.push_back(Point3d(8,8,1));
-  InteriorPartitionSurface desk(deskPoints, model);
-  desk.setInteriorPartitionSurfaceGroup(deskGroup);
+    std::vector<Point3d> deskPoints;
+    deskPoints.push_back(Point3d(5,8,1));
+    deskPoints.push_back(Point3d(5,6,1));
+    deskPoints.push_back(Point3d(8,6,1));
+    deskPoints.push_back(Point3d(8,8,1));
+    InteriorPartitionSurface desk(deskPoints, model);
+    desk.setInteriorPartitionSurfaceGroup(deskGroup);
 
-  // add a printer to space4
-  ElectricEquipmentDefinition printerDefinition(model);
-  printerDefinition.setName("Printer Definition");
-  printerDefinition.setDesignLevel(200.0);
-  ElectricEquipment printer(printerDefinition);
-  printer.setName("Printer");
-  printer.setSpace(space4);
+    // add a printer to space4
+    ElectricEquipmentDefinition printerDefinition(model);
+    printerDefinition.setName("Printer Definition");
+    printerDefinition.setDesignLevel(200.0);
+    ElectricEquipment printer(printerDefinition);
+    printer.setName("Printer");
+    printer.setSpace(space4);
 
-  // add a building shading device
-  ShadingSurfaceGroup canopyGroup(model);
-  canopyGroup.setShadingSurfaceType("Building");
+    // add a building shading device
+    ShadingSurfaceGroup canopyGroup(model);
+    canopyGroup.setShadingSurfaceType("Building");
 
-  std::vector<Point3d> canopyPoints;
-  canopyPoints.push_back(Point3d(2,0,2));
-  canopyPoints.push_back(Point3d(2,-1,2));
-  canopyPoints.push_back(Point3d(4,-1,2));
-  canopyPoints.push_back(Point3d(4,0,2));
-  ShadingSurface canopy(canopyPoints, model);
-  canopy.setShadingSurfaceGroup(canopyGroup);
+    std::vector<Point3d> canopyPoints;
+    canopyPoints.push_back(Point3d(2,0,2));
+    canopyPoints.push_back(Point3d(2,-1,2));
+    canopyPoints.push_back(Point3d(4,-1,2));
+    canopyPoints.push_back(Point3d(4,0,2));
+    ShadingSurface canopy(canopyPoints, model);
+    canopy.setShadingSurfaceGroup(canopyGroup);
 
-  // add a neighboring building
-  ShadingSurfaceGroup neighboringBuildingGroup(model);
-  neighboringBuildingGroup.setShadingSurfaceType("Site");
+    // add a neighboring building
+    ShadingSurfaceGroup neighboringBuildingGroup(model);
+    neighboringBuildingGroup.setShadingSurfaceType("Site");
 
-  std::vector<Point3d> neighboringBuildingPoints;
-  neighboringBuildingPoints.push_back(Point3d(-30,0,20));
-  neighboringBuildingPoints.push_back(Point3d(-30,0,0));
-  neighboringBuildingPoints.push_back(Point3d(-30,20,0));
-  neighboringBuildingPoints.push_back(Point3d(-30,20,20));
-  ShadingSurface neighboringBuilding(neighboringBuildingPoints, model);
-  neighboringBuilding.setShadingSurfaceGroup(neighboringBuildingGroup);
+    std::vector<Point3d> neighboringBuildingPoints;
+    neighboringBuildingPoints.push_back(Point3d(-30,0,20));
+    neighboringBuildingPoints.push_back(Point3d(-30,0,0));
+    neighboringBuildingPoints.push_back(Point3d(-30,20,0));
+    neighboringBuildingPoints.push_back(Point3d(-30,20,20));
+    ShadingSurface neighboringBuilding(neighboringBuildingPoints, model);
+    neighboringBuilding.setShadingSurfaceGroup(neighboringBuildingGroup);
 
-  // match surfaces
-  std::vector<Space> spaces =  model.getConcreteModelObjects<Space>();
-  matchSurfaces(spaces);
+    // match surfaces
+    std::vector<Space> spaces =  model.getConcreteModelObjects<Space>();
+    matchSurfaces(spaces);
 
-  // Add an air loop
-  ScheduleCompact alwaysOnSchedule(model);
-  alwaysOnSchedule.setName("ALWAYS_ON");
-  alwaysOnSchedule.setString(3,"Through: 12/31");
-  alwaysOnSchedule.setString(4,"For: AllDays");
-  alwaysOnSchedule.setString(5,"Until: 24:00");
-  alwaysOnSchedule.setString(6,"1");
+    // Add an air loop
+    ScheduleCompact alwaysOnSchedule(model);
+    alwaysOnSchedule.setName("ALWAYS_ON");
+    alwaysOnSchedule.setString(3,"Through: 12/31");
+    alwaysOnSchedule.setString(4,"For: AllDays");
+    alwaysOnSchedule.setString(5,"Until: 24:00");
+    alwaysOnSchedule.setString(6,"1");
 
-  FanConstantVolume fan(model,alwaysOnSchedule);
-  fan.setName("Standard Fan");
-  CoilHeatingGas coilHeatingGas(model,alwaysOnSchedule);
+    FanConstantVolume fan(model,alwaysOnSchedule);
+    fan.setName("Standard Fan");
+    CoilHeatingGas coilHeatingGas(model,alwaysOnSchedule);
 
-  CurveBiquadratic coolingCurveFofTemp(model);
-  coolingCurveFofTemp.setCoefficient1Constant(0.42415);
-  coolingCurveFofTemp.setCoefficient2x(0.04426);
-  coolingCurveFofTemp.setCoefficient3xPOW2(-0.00042);
-  coolingCurveFofTemp.setCoefficient4y(0.00333);
-  coolingCurveFofTemp.setCoefficient5yPOW2(-0.00008);
-  coolingCurveFofTemp.setCoefficient6xTIMESY(-0.00021);
-  coolingCurveFofTemp.setMinimumValueofx(17.0);
-  coolingCurveFofTemp.setMaximumValueofx(22.0);
-  coolingCurveFofTemp.setMinimumValueofy(13.0);
-  coolingCurveFofTemp.setMaximumValueofy(46.0);
-  coolingCurveFofTemp.setMinimumCurveOutput(-1000);
-  coolingCurveFofTemp.setMaximumCurveOutput(1000);
+    CurveBiquadratic coolingCurveFofTemp(model);
+    coolingCurveFofTemp.setCoefficient1Constant(0.42415);
+    coolingCurveFofTemp.setCoefficient2x(0.04426);
+    coolingCurveFofTemp.setCoefficient3xPOW2(-0.00042);
+    coolingCurveFofTemp.setCoefficient4y(0.00333);
+    coolingCurveFofTemp.setCoefficient5yPOW2(-0.00008);
+    coolingCurveFofTemp.setCoefficient6xTIMESY(-0.00021);
+    coolingCurveFofTemp.setMinimumValueofx(17.0);
+    coolingCurveFofTemp.setMaximumValueofx(22.0);
+    coolingCurveFofTemp.setMinimumValueofy(13.0);
+    coolingCurveFofTemp.setMaximumValueofy(46.0);
+    coolingCurveFofTemp.setMinimumCurveOutput(-1000);
+    coolingCurveFofTemp.setMaximumCurveOutput(1000);
 
-  CurveQuadratic coolingCurveFofFlow(model);
-  coolingCurveFofFlow.setCoefficient1Constant(0.77136);
-  coolingCurveFofFlow.setCoefficient2x(0.34053);
-  coolingCurveFofFlow.setCoefficient3xPOW2(-0.11088);
-  coolingCurveFofFlow.setMinimumValueofx(0.75918);
-  coolingCurveFofFlow.setMaximumValueofx(1.13877);
-  coolingCurveFofFlow.setMinimumCurveOutput(-1000);
-  coolingCurveFofFlow.setMaximumCurveOutput(1000);
+    CurveQuadratic coolingCurveFofFlow(model);
+    coolingCurveFofFlow.setCoefficient1Constant(0.77136);
+    coolingCurveFofFlow.setCoefficient2x(0.34053);
+    coolingCurveFofFlow.setCoefficient3xPOW2(-0.11088);
+    coolingCurveFofFlow.setMinimumValueofx(0.75918);
+    coolingCurveFofFlow.setMaximumValueofx(1.13877);
+    coolingCurveFofFlow.setMinimumCurveOutput(-1000);
+    coolingCurveFofFlow.setMaximumCurveOutput(1000);
 
-  CurveBiquadratic energyInputRatioFofTemp(model);
-  energyInputRatioFofTemp.setCoefficient1Constant(1.23649);
-  energyInputRatioFofTemp.setCoefficient2x(-0.02431);
-  energyInputRatioFofTemp.setCoefficient3xPOW2(0.00057);
-  energyInputRatioFofTemp.setCoefficient4y(-0.01434);
-  energyInputRatioFofTemp.setCoefficient5yPOW2(0.00063);
-  energyInputRatioFofTemp.setCoefficient6xTIMESY(-0.00038);
-  energyInputRatioFofTemp.setMinimumValueofx(17.0);
-  energyInputRatioFofTemp.setMaximumValueofx(22.0);
-  energyInputRatioFofTemp.setMaximumValueofy(13.0);
-  energyInputRatioFofTemp.setMaximumValueofy(46.0);
-  energyInputRatioFofTemp.setMinimumCurveOutput(-1000);
-  energyInputRatioFofTemp.setMaximumCurveOutput(1000);
+    CurveBiquadratic energyInputRatioFofTemp(model);
+    energyInputRatioFofTemp.setCoefficient1Constant(1.23649);
+    energyInputRatioFofTemp.setCoefficient2x(-0.02431);
+    energyInputRatioFofTemp.setCoefficient3xPOW2(0.00057);
+    energyInputRatioFofTemp.setCoefficient4y(-0.01434);
+    energyInputRatioFofTemp.setCoefficient5yPOW2(0.00063);
+    energyInputRatioFofTemp.setCoefficient6xTIMESY(-0.00038);
+    energyInputRatioFofTemp.setMinimumValueofx(17.0);
+    energyInputRatioFofTemp.setMaximumValueofx(22.0);
+    energyInputRatioFofTemp.setMaximumValueofy(13.0);
+    energyInputRatioFofTemp.setMaximumValueofy(46.0);
+    energyInputRatioFofTemp.setMinimumCurveOutput(-1000);
+    energyInputRatioFofTemp.setMaximumCurveOutput(1000);
 
-  CurveQuadratic energyInputRatioFofFlow(model);
-  energyInputRatioFofFlow.setCoefficient1Constant(1.20550);
-  energyInputRatioFofFlow.setCoefficient2x(-0.32953);
-  energyInputRatioFofFlow.setCoefficient3xPOW2(0.12308);
-  energyInputRatioFofFlow.setMinimumValueofx(0.75918);
-  energyInputRatioFofFlow.setMaximumValueofx(1.13877);
-  energyInputRatioFofFlow.setMinimumCurveOutput(-1000);
-  energyInputRatioFofFlow.setMaximumCurveOutput(1000);
+    CurveQuadratic energyInputRatioFofFlow(model);
+    energyInputRatioFofFlow.setCoefficient1Constant(1.20550);
+    energyInputRatioFofFlow.setCoefficient2x(-0.32953);
+    energyInputRatioFofFlow.setCoefficient3xPOW2(0.12308);
+    energyInputRatioFofFlow.setMinimumValueofx(0.75918);
+    energyInputRatioFofFlow.setMaximumValueofx(1.13877);
+    energyInputRatioFofFlow.setMinimumCurveOutput(-1000);
+    energyInputRatioFofFlow.setMaximumCurveOutput(1000);
 
-  CurveQuadratic partLoadFraction(model);
-  partLoadFraction.setCoefficient1Constant(0.77100);
-  partLoadFraction.setCoefficient2x(0.22900);
-  partLoadFraction.setCoefficient3xPOW2(0.0);
-  partLoadFraction.setMinimumValueofx(0.0);
-  partLoadFraction.setMaximumValueofx(1.0);
-  partLoadFraction.setMinimumCurveOutput(0.71);
-  partLoadFraction.setMaximumCurveOutput(1.0);
+    CurveQuadratic partLoadFraction(model);
+    partLoadFraction.setCoefficient1Constant(0.77100);
+    partLoadFraction.setCoefficient2x(0.22900);
+    partLoadFraction.setCoefficient3xPOW2(0.0);
+    partLoadFraction.setMinimumValueofx(0.0);
+    partLoadFraction.setMaximumValueofx(1.0);
+    partLoadFraction.setMinimumCurveOutput(0.71);
+    partLoadFraction.setMaximumCurveOutput(1.0);
 
-  CoilCoolingDXSingleSpeed coilCooling( model,
-                                        alwaysOnSchedule,
-                                        coolingCurveFofTemp,
-                                        coolingCurveFofFlow,
-                                        energyInputRatioFofTemp,
-                                        energyInputRatioFofFlow,
-                                        partLoadFraction );
-  EvaporativeCoolerDirectResearchSpecial evaporativeCoolerDirectResearchSpecial(model,alwaysOnSchedule);
+    CoilCoolingDXSingleSpeed coilCooling( model,
+      alwaysOnSchedule,
+      coolingCurveFofTemp,
+      coolingCurveFofFlow,
+      energyInputRatioFofTemp,
+      energyInputRatioFofFlow,
+      partLoadFraction );
+    EvaporativeCoolerDirectResearchSpecial evaporativeCoolerDirectResearchSpecial(model,alwaysOnSchedule);
 
-  AirTerminalSingleDuctUncontrolled airTerminalSingleDuctUncontrolled(model,alwaysOnSchedule);
+    AirTerminalSingleDuctUncontrolled airTerminalSingleDuctUncontrolled(model,alwaysOnSchedule);
 
-  ControllerOutdoorAir controller(model);
+    ControllerOutdoorAir controller(model);
 
-  AirLoopHVACOutdoorAirSystem outdoorAirSystem(model,controller);
+    AirLoopHVACOutdoorAirSystem outdoorAirSystem(model,controller);
 
-  AirLoopHVAC airLoopHVAC(model);
+    AirLoopHVAC airLoopHVAC(model);
 
-  airLoopHVAC.addBranchForZone(thermalZone,airTerminalSingleDuctUncontrolled);
+    airLoopHVAC.addBranchForZone(thermalZone,airTerminalSingleDuctUncontrolled);
 
-  Node supplyInletNode = airLoopHVAC.supplyInletNode();
-  Node supplyOutletNode = airLoopHVAC.supplyOutletNode();
+    Node supplyInletNode = airLoopHVAC.supplyInletNode();
+    Node supplyOutletNode = airLoopHVAC.supplyOutletNode();
 
-  fan.addToNode(supplyInletNode);
+    fan.addToNode(supplyInletNode);
 
-  coilHeatingGas.addToNode(supplyInletNode);
+    coilHeatingGas.addToNode(supplyInletNode);
 
-  coilCooling.addToNode(supplyInletNode);
+    coilCooling.addToNode(supplyInletNode);
 
-  outdoorAirSystem.addToNode(supplyInletNode);
+    outdoorAirSystem.addToNode(supplyInletNode);
 
-  Node mixedAirNode = outdoorAirSystem.mixedAirModelObject()->cast<Node>();
-  Node coolCoilOutletNode = coilCooling.outletModelObject()->cast<Node>();
-  Node heatingCoilOutletNode = coilHeatingGas.outletModelObject()->cast<Node>();
-  Node oaNode = outdoorAirSystem.outdoorAirModelObject()->cast<Node>();
+    Node mixedAirNode = outdoorAirSystem.mixedAirModelObject()->cast<Node>();
+    Node coolCoilOutletNode = coilCooling.outletModelObject()->cast<Node>();
+    Node heatingCoilOutletNode = coilHeatingGas.outletModelObject()->cast<Node>();
+    Node oaNode = outdoorAirSystem.outdoorAirModelObject()->cast<Node>();
 
-  evaporativeCoolerDirectResearchSpecial.addToNode(oaNode);
+    evaporativeCoolerDirectResearchSpecial.addToNode(oaNode);
 
-  Node evapOutletNode = evaporativeCoolerDirectResearchSpecial.outletModelObject()->cast<Node>();
+    Node evapOutletNode = evaporativeCoolerDirectResearchSpecial.outletModelObject()->cast<Node>();
 
-  SetpointManagerMixedAir setpointMMA1(model);
-  SetpointManagerMixedAir setpointMMA2(model);
-  SetpointManagerMixedAir setpointMMA3(model);
-  SetpointManagerMixedAir setpointMMA4(model);
-  SetpointManagerSingleZoneReheat setpointMSZR(model);
+    SetpointManagerMixedAir setpointMMA1(model);
+    SetpointManagerMixedAir setpointMMA2(model);
+    SetpointManagerMixedAir setpointMMA3(model);
+    SetpointManagerMixedAir setpointMMA4(model);
+    SetpointManagerSingleZoneReheat setpointMSZR(model);
 
-  setpointMSZR.addToNode(supplyOutletNode);
-  setpointMMA1.addToNode(mixedAirNode);
-  setpointMMA2.addToNode(coolCoilOutletNode);
-  setpointMMA3.addToNode(heatingCoilOutletNode);
-  setpointMMA4.addToNode(evapOutletNode);
+    setpointMSZR.addToNode(supplyOutletNode);
+    setpointMMA1.addToNode(mixedAirNode);
+    setpointMMA2.addToNode(coolCoilOutletNode);
+    setpointMMA3.addToNode(heatingCoilOutletNode);
+    setpointMMA4.addToNode(evapOutletNode);
 
-  // add some example variables
-  int i = 1;
-  BOOST_FOREACH(const std::string& variableName, thermalZone.outputVariableNames()){
-    OutputVariable(variableName, model);
-    if (++i > 2){
-      break;
-    }
-  }
-
-  // add some example variables
-  i = 1;
-  BOOST_FOREACH(const Surface& surface, model.getConcreteModelObjects<Surface>()){
-    BOOST_FOREACH(const std::string& variableName, surface.outputVariableNames()){
+    // add some example variables
+    int i = 1;
+    BOOST_FOREACH(const std::string& variableName, thermalZone.outputVariableNames()){
       OutputVariable(variableName, model);
       if (++i > 2){
         break;
       }
     }
-    break;
+
+    // add some example variables
+    i = 1;
+    BOOST_FOREACH(const Surface& surface, model.getConcreteModelObjects<Surface>()){
+      BOOST_FOREACH(const std::string& variableName, surface.outputVariableNames()){
+        OutputVariable(variableName, model);
+        if (++i > 2){
+          break;
+        }
+      }
+      break;
+    }
+
   }
 
   // add some meters
