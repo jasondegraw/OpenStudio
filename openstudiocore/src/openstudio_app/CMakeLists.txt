@@ -20,6 +20,13 @@ set(${target_name}_SRC
   StartupView.cpp
   StartupMenu.hpp
   StartupMenu.cpp
+
+  ../shared_gui_components/BusyWidget.cpp
+  ../shared_gui_components/BusyWidget.hpp
+  ../shared_gui_components/OSDialog.cpp
+  ../shared_gui_components/OSDialog.hpp
+  ../shared_gui_components/WaitDialog.cpp
+  ../shared_gui_components/WaitDialog.hpp
 )
 
 # moc files
@@ -27,6 +34,10 @@ set(${target_name}_moc
   OpenStudioApp.hpp
   StartupView.hpp
   StartupMenu.hpp
+
+  ../shared_gui_components/BusyWidget.hpp
+  ../shared_gui_components/OSDialog.hpp
+  ../shared_gui_components/WaitDialog.hpp
 )
 
 ## Qt UI generation
@@ -55,7 +66,7 @@ if(APPLE)
     PROPERTIES MACOSX_PACKAGE_LOCATION Resources
   )
   set(MACOSX_BUNDLE_EXECUTABLE_NAME ${target_name})
-  set(MACOSX_BUNDLE_GUI_IDENTIFIER "gov.nrel.openstudio.openstudio")
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "gov.nrel.openstudio.${CMAKE_VERSION_BUILD}.openstudio")
   set(MACOSX_BUNDLE_BUNDLE_NAME "OpenStudio")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 endif()
@@ -78,6 +89,7 @@ set(depends
   openstudio_energyplus
   openstudio_modeleditor
   openstudio_sdd
+  openstudio_gbxml
   ${QT_LIBS}
   ${RUBY_LIBRARY}
 )
@@ -142,6 +154,10 @@ if(APPLE)
 
   install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/openstudio_app/Resources/
           DESTINATION OpenStudio.app/Contents/share/openstudio-${OPENSTUDIO_VERSION}/OSApp
+  )
+
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/pat_app/Measures
+          DESTINATION OpenStudio.app/Contents/share/openstudio-${OPENSTUDIO_VERSION}/pat
   )
 elseif(WIN32)
   #list(APPEND DIRS "${CMAKE_BINARY_DIR}/Products/OSAppConfigInstall/Release" "${CMAKE_BINARY_DIR}/Products/OSAppConfigInstall/Debug")

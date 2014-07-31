@@ -98,10 +98,14 @@ namespace detail {
                                          const SimpleProjectOptions& options)
     : m_projectDir(completeAndNormalize(projectDir)),
       m_analysisDriver(analysisDriver),
-      m_analysis(analysis),
+      m_alternativeModelMeasureUUID(BCLMeasure::alternativeModelMeasure().uuid()),
+      m_standardReportMeasureUUID(BCLMeasure::standardReportMeasure().uuid()),
+      m_calibrationReportMeasureUUID(BCLMeasure::calibrationReportMeasure().uuid()),
+      m_analysis(analysis),   
       m_cloudSessionSettingsDirty(false),
       m_logFile(projectDir / toPath("project.log"))
   {
+
     bool test = m_analysisDriver.connect(SIGNAL(analysisStatusChanged(analysisdriver::AnalysisStatus)), this, SIGNAL(analysisStatusChanged(analysisdriver::AnalysisStatus)));
     OS_ASSERT(test);
 
@@ -176,6 +180,7 @@ namespace detail {
       FileReference seed = analysis().seed();
       if (seed.fileType() == FileReferenceType::OSM) {
         osversion::VersionTranslator translator;
+        //translator.allowNewerVersions(false); // allow loading newer versions here
         m_seedModel = translator.loadModel(seed.path(), progressBar);
       }
     }
@@ -558,7 +563,7 @@ namespace detail {
               found = false;
               break;
             }
-            if (rpert.measureUUID() != alternativeModelMeasureUUID()) {
+            if (rpert.measureUUID() != m_alternativeModelMeasureUUID) {
               found = false;
               break;
             }
@@ -595,7 +600,7 @@ namespace detail {
                itEnd = params.children.end(); it != itEnd; ++it)
           {
             if (it->value == "bcl_measure_uuid") {
-              if (openstudio::toUUID(it->children.at(0).value) == standardReportMeasureUUID()) {
+              if (openstudio::toUUID(it->children.at(0).value) == m_standardReportMeasureUUID) {
                 result = step;
                 break;
               }
@@ -642,7 +647,7 @@ namespace detail {
                itEnd = params.children.end(); it != itEnd; ++it)
           {
             if (it->value == "bcl_measure_uuid") {
-              if (openstudio::toUUID(it->children.at(0).value) == calibrationReportMeasureUUID()) {
+              if (openstudio::toUUID(it->children.at(0).value) == m_calibrationReportMeasureUUID) {
                 result = step;
                 break;
               }
@@ -1220,7 +1225,7 @@ namespace detail {
     std::vector<BCLMeasure>::const_iterator it = std::find_if(
           patMeasures.begin(),
           patMeasures.end(),
-          std::bind(uuidEquals<BCLMeasure,openstudio::UUID>,std::placeholders::_1,alternativeModelMeasureUUID()));
+          std::bind(uuidEquals<BCLMeasure,openstudio::UUID>,std::placeholders::_1,m_alternativeModelMeasureUUID));
     OS_ASSERT(it != patMeasures.end());
     BCLMeasure replaceModelMeasure = insertMeasure(*it);
     RubyMeasure swapModel(replaceModelMeasure,false); // false so not used in algorithms
@@ -1327,7 +1332,6 @@ namespace detail {
                                              optTempPoint.osmInputData(),
                                              optTempPoint.idfInputData(),
                                              optTempPoint.sqlOutputData(),
-                                             optTempPoint.xmlOutputData(),
                                              optTempPoint.topLevelJob(),
                                              optTempPoint.dakotaParametersFiles(),
                                              optTempPoint.tags(),
@@ -1353,7 +1357,6 @@ namespace detail {
                               tempPoint.osmInputData(),
                               tempPoint.idfInputData(),
                               tempPoint.sqlOutputData(),
-                              tempPoint.xmlOutputData(),
                               tempPoint.topLevelJob(),
                               tempPoint.dakotaParametersFiles(),
                               tempPoint.tags(),
@@ -1401,7 +1404,7 @@ namespace detail {
     std::vector<BCLMeasure>::const_iterator it = std::find_if(
           patMeasures.begin(),
           patMeasures.end(),
-          std::bind(uuidEquals<BCLMeasure,openstudio::UUID>,std::placeholders::_1,standardReportMeasureUUID()));
+          std::bind(uuidEquals<BCLMeasure,openstudio::UUID>,std::placeholders::_1,m_standardReportMeasureUUID));
     OS_ASSERT(it != patMeasures.end());
     BCLMeasure bclMeasure = insertMeasure(*it);
 
@@ -1449,7 +1452,7 @@ namespace detail {
     std::vector<BCLMeasure>::const_iterator it = std::find_if(
           patMeasures.begin(),
           patMeasures.end(),
-          std::bind(uuidEquals<BCLMeasure,openstudio::UUID>,std::placeholders::_1,calibrationReportMeasureUUID()));
+          std::bind(uuidEquals<BCLMeasure,openstudio::UUID>,std::placeholders::_1,m_calibrationReportMeasureUUID));
     OS_ASSERT(it != patMeasures.end());
     BCLMeasure bclMeasure = insertMeasure(*it);
 
@@ -1722,8 +1725,9 @@ namespace detail {
   }
 
   bool SimpleProject_Impl::upgradeModel(const openstudio::path& modelPath, ProgressBar* progressBar) {
-    VersionTranslator translator;
     if (requiresVersionTranslation(modelPath)) {
+      VersionTranslator translator;
+      //translator.allowNewerVersions(false); // allow newer versions here
       OptionalModel upgradedModel = translator.loadModel(modelPath, progressBar);
       if (upgradedModel) {
         upgradedModel->save(modelPath,true);
@@ -2027,18 +2031,6 @@ namespace detail {
       removeMeasure(*existing);
     }
     return addMeasure(measure);
-  }
-
-  openstudio::UUID SimpleProject_Impl::alternativeModelMeasureUUID() {
-    return toUUID("{d234ecee-c118-44e7-a381-db0a8917d751}");
-  }
-
-  openstudio::UUID SimpleProject_Impl::standardReportMeasureUUID() {
-    return toUUID("fc337100-8634-404e-8966-01243d292a79");
-  }
-
-  openstudio::UUID SimpleProject_Impl::calibrationReportMeasureUUID() {
-    return toUUID("e6642d40-7366-4647-8724-53a37991d579");
   }
 
 } // detail

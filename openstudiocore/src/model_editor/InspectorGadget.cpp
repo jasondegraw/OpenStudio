@@ -58,9 +58,9 @@
 #include "../utilities/units/Quantity.hpp"
 #include "../utilities/units/OSOptionalQuantity.hpp"
 #include "../utilities/units/QuantityConverter.hpp"
-#include "../utilities/document/DocumentRegex.hpp"
 #include "../utilities/core/Assert.hpp"
 #include "../utilities/core/Compare.hpp"
+#include "../utilities/core/StringHelpers.hpp"
 
 using namespace openstudio;
 using namespace openstudio::model;
@@ -424,6 +424,7 @@ void InspectorGadget::parseItem(QVBoxLayout* layout,
 
   switch( prop.type.value() )
   {
+
   case IddFieldType::IntegerType:
     {
       layoutText(layout,parent,field,level,name,curVal,index,comment,exists,true,false);
@@ -492,9 +493,21 @@ void InspectorGadget::parseItem(QVBoxLayout* layout,
       }
       break;
     }
+  case IddFieldType::NodeType:
+    {
+      break;
+    }
+  case IddFieldType::URLType:
+    {
+      break;
+    }
+  case IddFieldType::HandleType:
+    {
+      break;
+    }
   default:
     {
-      cout<<"InspectorGadget::parseItem has failed"<<endl;
+      LOG(Error, "InspectorGadget::parseItem has failed, unknown IddFieldType " << prop.type.valueDescription());
     }
     
   }

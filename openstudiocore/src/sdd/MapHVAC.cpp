@@ -17,8 +17,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include "ReverseTranslator.hpp"
-#include "ForwardTranslator.hpp"
+#include "../sdd/ReverseTranslator.hpp"
+#include "../sdd/ForwardTranslator.hpp"
 
 #include "../model/AirLoopHVAC.hpp"
 #include "../model/AirLoopHVAC_Impl.hpp"
@@ -28,6 +28,8 @@
 #include "../model/AirLoopHVACZoneSplitter_Impl.hpp"
 #include "../model/AirLoopHVACOutdoorAirSystem.hpp"
 #include "../model/ControllerOutdoorAir.hpp"
+#include "../model/FanConstantVolume.hpp"
+#include "../model/FanVariableVolume.hpp"
 #include "../model/FanOnOff.hpp"
 #include "../model/FanOnOff_Impl.hpp"
 #include "../model/CoilCoolingDXSingleSpeed.hpp"
@@ -37,8 +39,12 @@
 #include "../model/CoilHeatingDXSingleSpeed.hpp"
 #include "../model/ControllerWaterCoil.hpp"
 #include "../model/ControllerWaterCoil_Impl.hpp"
+#include "../model/CurveBiquadratic.hpp"
+#include "../model/CurveBiquadratic_Impl.hpp"
 #include "../model/CurveCubic.hpp"
 #include "../model/CurveCubic_Impl.hpp"
+#include "../model/CurveQuadratic.hpp"
+#include "../model/CurveQuadratic_Impl.hpp"
 #include "../model/Curve.hpp"
 #include "../model/Curve_Impl.hpp"
 #include "../model/ScheduleRuleset.hpp"
@@ -56,11 +62,15 @@
 #include "../model/Space_Impl.hpp"
 #include "../model/DesignSpecificationOutdoorAir.hpp"
 #include "../model/DesignSpecificationOutdoorAir_Impl.hpp"
+#include "../model/CurveCubic.hpp"
+#include "../model/CurveQuadratic.hpp"
+#include "../model/CurveBiquadratic.hpp"
 #include "../model/CoolingTowerSingleSpeed.hpp"
 #include "../model/CoolingTowerVariableSpeed.hpp"
 #include "../model/SetpointManagerFollowOutdoorAirTemperature.hpp"
 #include "../model/SetpointManagerMixedAir.hpp"
 #include "../model/SetpointManagerSingleZoneReheat.hpp"
+#include "../model/SetpointManagerSingleZoneReheat_Impl.hpp"
 #include "../model/SetpointManagerScheduled.hpp"
 #include "../model/SetpointManagerWarmest.hpp"
 #include "../model/SetpointManagerOutdoorAirReset.hpp"
@@ -121,6 +131,7 @@
 #include "../model/SizingPlant_Impl.hpp"
 #include "../model/SizingSystem.hpp"
 #include "../model/SizingSystem_Impl.hpp"
+#include "../model/AirTerminalSingleDuctVAVReheat.hpp"
 #include "../model/AirTerminalSingleDuctVAVReheat_Impl.hpp"
 #include "../model/PipeAdiabatic.hpp"
 #include "../model/PipeAdiabatic_Impl.hpp"
@@ -1053,7 +1064,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateAirS
 
     deckSPM = spm;
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
   }
   else if(istringEqual(clgCtrlElement.text().toStdString(),"NoSATControl"))
   {
@@ -1061,7 +1072,8 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateAirS
 
     deckSPM = spm;
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
+
   }
   else if( istringEqual(clgCtrlElement.text().toStdString(),"WarmestResetFlowFirst") ||
            istringEqual(clgCtrlElement.text().toStdString(),"WarmestReset") )
@@ -1075,7 +1087,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateAirS
 
     deckSPM = spm;
 
-    supplyOutletNode.addSetpointManagerWarmest(spm);
+    spm.addToNode(supplyOutletNode);
 
     if( istringEqual("SZVAVAC",airSystemTypeElement.text().toStdString()) || 
         istringEqual("SZVAVHP",airSystemTypeElement.text().toStdString()) ) 
@@ -1128,7 +1140,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateAirS
 
     deckSPM = spm;
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
   }
   else if( istringEqual(clgCtrlElement.text().toStdString(),"OutsideAirReset") )
   {
@@ -1136,7 +1148,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateAirS
 
     deckSPM = spm;
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
 
     boost::optional<double> rstSupHi;
     boost::optional<double> rstSupLow;
@@ -1223,6 +1235,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateAirS
   {
     if( deckSPM )
     {
+      deckSPM->setName(airLoopHVAC.name().get() + " Deck SPM");
       std::vector<model::ModelObject> supplyNodes;
 
       if( boost::optional<model::Node> mixedAirNode = airLoopHVAC.mixedAirNode() )
@@ -1395,7 +1408,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateCoil
 
       coil.setRatedInletAirTemperature(16.6);
 
-      coil.setRatedOutletWaterTemperature(54.4);
+      coil.setRatedOutletWaterTemperature(71.1);
 
       coil.setRatedOutletAirTemperature(32.2);
 
@@ -1416,23 +1429,23 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateCoil
         sysElement = znSysElement;
       }
 
-      QDomElement htgDsgnSupAirTempElement = sysElement.firstChildElement("HtgDsgnSupAirTemp");
+      //QDomElement htgDsgnSupAirTempElement = sysElement.firstChildElement("HtgDsgnSupAirTemp");
 
-      value = htgDsgnSupAirTempElement.text().toDouble(&ok);
+      //value = htgDsgnSupAirTempElement.text().toDouble(&ok);
 
-      if( ok )
-      {
-        coil.setRatedOutletAirTemperature(unitToUnit(value,"F","C").get());
-      }
+      //if( ok )
+      //{
+      //  coil.setRatedOutletAirTemperature(unitToUnit(value,"F","C").get());
+      //}
 
-      if( plant )
-      {
-        model::SizingPlant sizingPlant = plant->sizingPlant();
+      //if( plant )
+      //{
+      //  model::SizingPlant sizingPlant = plant->sizingPlant();
 
-        coil.setRatedInletWaterTemperature(sizingPlant.designLoopExitTemperature());
+      //  coil.setRatedInletWaterTemperature(sizingPlant.designLoopExitTemperature());
 
-        coil.setRatedOutletWaterTemperature(sizingPlant.designLoopExitTemperature() - sizingPlant.loopDesignTemperatureDifference());
-      }
+      //  coil.setRatedOutletWaterTemperature(sizingPlant.designLoopExitTemperature() - sizingPlant.loopDesignTemperatureDifference());
+      //}
     }
 
     result = coil;
@@ -2691,11 +2704,11 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateTher
 
   // Daylighting
   QDomNodeList daylighting1CoordElements = thermalZoneElement.elementsByTagName("DayltgIllumRefPt1Coord");
-  QDomElement daylighting1SetpointElement = thermalZoneElement.firstChildElement("DayltgIllumSetPt1");
+  QDomElement daylighting1SetpointElement = thermalZoneElement.firstChildElement("DayltgIllumSetpt1");
   QDomElement daylighting1FractionElement = thermalZoneElement.firstChildElement("DayltgCtrlLtgFrac1");
 
   QDomNodeList daylighting2CoordElements = thermalZoneElement.elementsByTagName("DayltgIllumRefPt2Coord");
-  QDomElement daylighting2SetpointElement = thermalZoneElement.firstChildElement("DayltgIllumSetPt2");
+  QDomElement daylighting2SetpointElement = thermalZoneElement.firstChildElement("DayltgIllumSetpt2");
   QDomElement daylighting2FractionElement = thermalZoneElement.firstChildElement("DayltgCtrlLtgFrac2");
 
   QDomElement daylightingMinLightingElement = thermalZoneElement.firstChildElement("DayltgMinDimLtgFrac");
@@ -3175,9 +3188,12 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateTher
   {
     model::Node supplyOutletNode = airLoopHVAC->supplyOutletNode();
 
-    boost::optional<model::SetpointManagerSingleZoneReheat> spm; 
+    boost::optional<model::SetpointManagerSingleZoneReheat> spm;
 
-    spm = supplyOutletNode.getSetpointManagerSingleZoneReheat();
+    std::vector<model::SetpointManagerSingleZoneReheat> _setpointManagers = subsetCastVector<model::SetpointManagerSingleZoneReheat>(supplyOutletNode.setpointManagers());
+    if( !_setpointManagers.empty() ) {
+      spm = _setpointManagers.front();
+    }
 
     // Only set the control zone if there is a SetpointManagerSingleZoneReheat on the supply outlet node
     if( spm && ! airSystemElement.isNull() )
@@ -3397,6 +3413,8 @@ boost::optional<model::ModelObject> ReverseTranslator::translateTrmlUnit(const Q
     }
     else // Not SZVAV
     {
+      terminal.resetMaximumFlowPerZoneFloorAreaDuringReheat();
+
       if( primaryAirFlowMin )
       {
         terminal.setZoneMinimumAirFlowMethod("FixedFlowRate");
@@ -3703,11 +3721,11 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateFlui
 
     model::SetpointManagerScheduled spm(model,schedule);
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
   }
   else if( istringEqual(tempCtrlElement.text().toStdString(),"Scheduled") )
   {
-    QDomElement tempSetPtSchRefElement = fluidSysElement.firstChildElement("TempSetPtSchRef");
+    QDomElement tempSetPtSchRefElement = fluidSysElement.firstChildElement("TempSetptSchRef");
 
     boost::optional<model::Schedule> schedule = model.getModelObjectByName<model::Schedule>(tempSetPtSchRefElement.text().toStdString());
 
@@ -3726,7 +3744,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateFlui
 
     model::SetpointManagerScheduled spm(model,schedule.get());
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
   }
   else if( istringEqual(tempCtrlElement.text().toStdString(),"WetBulbReset") )
   {
@@ -3734,7 +3752,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateFlui
 
     spm.setReferenceTemperatureType("OutdoorAirWetBulb");
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
 
     boost::optional<double> rstSupHi;
     boost::optional<double> rstSupLow;
@@ -3774,7 +3792,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateFlui
   {
     model::SetpointManagerOutdoorAirReset spm(model);
 
-    supplyOutletNode.addSetpointManager(spm);
+    spm.addToNode(supplyOutletNode);
 
     boost::optional<double> rstSupHi;
     boost::optional<double> rstSupLow;
@@ -3854,7 +3872,7 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateFlui
 
       model::SetpointManagerScheduled spm(model,schedule);
 
-      supplyOutletNode.addSetpointManager(spm);
+      spm.addToNode(supplyOutletNode);
 
       LOG(Warn,plantLoop.name().get() << " Using DsgnSupWtrTemp for LoadReset temperature control.  This control scheme is not fully implemented.");
     }
@@ -4817,19 +4835,18 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateChil
 
   chiller.setName(nameElement.text().toStdString());
 
+  double value;
+  bool ok;
+
   // CndsrInRef
-
+  boost::optional<double> condDsgnSupWtrDelT;
   QDomElement cndsrInRefElement = chillerElement.firstChildElement("CndsrFluidSegInRef");
-
   boost::optional<model::PlantLoop> condenserSystem = loopForSupplySegment(cndsrInRefElement.text(),doc,model);
-
   if( condenserSystem )
   {
     condenserSystem->addDemandBranchForComponent(chiller);
+    condDsgnSupWtrDelT = condenserSystem->sizingPlant().loopDesignTemperatureDifference();
   }
-
-  double value;
-  bool ok;
 
   // COP
   boost::optional<double> cop;
@@ -4894,9 +4911,11 @@ boost::optional<openstudio::model::ModelObject> ReverseTranslator::translateChil
 
       chiller.setReferenceChilledWaterFlowRate(flow);
 
-      double condFlow = capRtd.get() * (1.0 + 1.0 / cop.get()) / ( cpWater * densityWater * (entTempDsgn.get() - lvgTempDsgn.get()));
-
-      chiller.setReferenceCondenserFluidFlowRate(condFlow);
+      if( condDsgnSupWtrDelT )
+      {
+        double condFlow = capRtd.get() * (1.0 + 1.0 / cop.get()) / ( cpWater * densityWater * condDsgnSupWtrDelT.get() );
+        chiller.setReferenceCondenserFluidFlowRate(condFlow);
+      }
     }
   }
 

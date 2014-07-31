@@ -54,6 +54,11 @@ namespace openstudio{
     ((ReportingMeasure)(Reporting Measure)) 
   );
 
+  OPENSTUDIO_ENUM( MeasureBadgeType,
+    ((BCLMeasure))
+    ((MyMeasure))
+  );
+
   /** BCLMeasure is a class for managing the contents of a BCL Measure directory including the xml description file.
   **/
   class UTILITIES_API BCLMeasure {
@@ -84,6 +89,12 @@ namespace openstudio{
 
     /// Load all measures in the PAT application's measures directory.
     static std::vector<BCLMeasure> patApplicationMeasures();
+
+    static BCLMeasure alternativeModelMeasure();
+
+    static BCLMeasure standardReportMeasure();
+
+    static BCLMeasure calibrationReportMeasure();
 
     /// Returns the path to the PAT application's measures directory.
     static openstudio::path patApplicationMeasuresDir();

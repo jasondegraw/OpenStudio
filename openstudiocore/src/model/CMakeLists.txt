@@ -35,9 +35,6 @@ set(${target_name}_src
   AirConditionerVariableRefrigerantFlow.hpp
   AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirConditionerVariableRefrigerantFlow.cpp
-  AirflowNetworkSimulationControl.hpp
-  AirflowNetworkSimulationControl_Impl.hpp
-  AirflowNetworkSimulationControl.cpp
   AirGap.hpp
   AirGap_Impl.hpp
   AirGap.cpp
@@ -643,6 +640,9 @@ set(${target_name}_src
   Screen.hpp
   Screen_Impl.hpp
   Screen.cpp
+  SetpointManager.hpp
+  SetpointManager_Impl.hpp
+  SetpointManager.cpp
   SetpointManagerFollowOutdoorAirTemperature.hpp
   SetpointManagerFollowOutdoorAirTemperature_Impl.hpp
   SetpointManagerFollowOutdoorAirTemperature.cpp
@@ -917,7 +917,6 @@ set(${target_name}_moc
   ModelObject_Impl.hpp
 
   AirConditionerVariableRefrigerantFlow_Impl.hpp
-  AirflowNetworkSimulationControl_Impl.hpp
   AirGap_Impl.hpp
   AirLoopHVAC_Impl.hpp
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp
@@ -1135,7 +1134,6 @@ endif()
 
 set(${target_name}_test_src
   test/AirConditionerVariableRefrigerantFlow_GTest.cpp
-  test/AirflowNetworkSimulationControl_GTest.cpp
   test/AirGap_GTest.cpp
   test/AirLoopHVACOutdoorAirSystem_GTest.cpp
   test/AirLoopHVACUnitaryHeatPumpAirToAir_GTest.cpp
@@ -1263,7 +1261,11 @@ set(${target_name}_test_src
   test/RoofVegetation_GTest.cpp
   test/RunPeriodControlDaylightSavingTime_GTest.cpp
   test/RunPeriodControlSpecialDays_GTest.cpp
+  test/SetpointManagerFollowOutdoorAirTemperature_GTest.cpp
+  test/SetpointManagerMixedAir_GTest.cpp
   test/SetpointManagerOutdoorAirReset_GTest.cpp
+  test/SetpointManagerScheduled_GTest.cpp
+  test/SetpointManagerSingleZoneReheat_GTest.cpp
   test/SetpointManagerWarmest_GTest.cpp
   test/ScheduleDay_GTest.cpp
   test/ScheduleInterval_GTest.cpp
