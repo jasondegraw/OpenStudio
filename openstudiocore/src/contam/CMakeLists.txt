@@ -4,6 +4,8 @@ set(${target_name}_src
   ContamAPI.hpp
   ForwardTranslator.hpp
   ForwardTranslator.cpp
+  ReverseTranslator.hpp
+  ReverseTranslator.cpp
   PrjReader.hpp
   PrjReader.cpp
   SimFile.hpp
