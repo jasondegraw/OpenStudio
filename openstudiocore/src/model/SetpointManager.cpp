@@ -17,15 +17,15 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#include <model/SetpointManager.hpp>
-#include <model/SetpointManager_Impl.hpp>
-#include <model/Model.hpp>
-#include <model/Node.hpp>
-#include <model/Node_Impl.hpp>
-#include <model/AirLoopHVAC.hpp>
-#include <model/PlantLoop.hpp>
+#include "SetpointManager.hpp"
+#include "SetpointManager_Impl.hpp"
+#include "Model.hpp"
+#include "Node.hpp"
+#include "Node_Impl.hpp"
+#include "AirLoopHVAC.hpp"
+#include "PlantLoop.hpp"
 
-#include <utilities/core/Assert.hpp>
+#include "../utilities/core/Assert.hpp"
 
 namespace openstudio {
 
@@ -111,15 +111,7 @@ namespace detail{
       }
       if(OptionalAirLoopHVACOutdoorAirSystem oaSystem = airLoop->airLoopHVACOutdoorAirSystem())
       {
-        if(node == oaSystem->outboardOANode().get())
-        {
-          return false;
-        }
-
-        if(oaSystem->oaComponent(node.handle()))
-        {
-          return this->setSetpointNode(node);
-        }
+        return this->setSetpointNode(node);
       }
     }
     return false;
@@ -135,6 +127,38 @@ namespace detail{
     SetpointManager clonedObject = HVACComponent_Impl::clone( model ).cast<SetpointManager>();
     clonedObject.getImpl<detail::SetpointManager_Impl>()->resetSetpointNode();
     return clonedObject;
+  }
+
+  boost::optional<Loop> SetpointManager_Impl::loop() const
+  {
+    if( boost::optional<Node> node = setpointNode() ) {
+      return node->loop();
+    }
+    return boost::none;
+  }
+
+  boost::optional<AirLoopHVAC> SetpointManager_Impl::airLoopHVAC() const
+  {
+    if( boost::optional<Node> node = setpointNode() ) {
+      return node->airLoopHVAC();
+    }
+    return boost::none;
+  }
+
+  boost::optional<AirLoopHVACOutdoorAirSystem> SetpointManager_Impl::airLoopHVACOutdoorAirSystem() const
+  {
+    if( boost::optional<Node> node = setpointNode() ) {
+      return node->airLoopHVACOutdoorAirSystem();
+    }
+    return boost::none;
+  }
+
+  boost::optional<PlantLoop> SetpointManager_Impl::plantLoop() const
+  {
+    if( boost::optional<Node> node = setpointNode() ) {
+      return node->plantLoop();
+    }
+    return boost::none;
   }
 
 } // detail

@@ -157,7 +157,6 @@ set(project_directories
   osversion
   ruleset
   runmanager/lib
-  runmanager/app
   analysis
   project
   analysisdriver
@@ -199,6 +198,9 @@ endif()
 ###############################################################################
 # Compiler and system specific options
 if(UNIX)
+
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fPIC -fno-strict-aliasing")
+
   # all warnings
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -fno-strict-aliasing -Winvalid-pch -Wnon-virtual-dtor")
   if(APPLE)
@@ -206,11 +208,22 @@ if(UNIX)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overloaded-virtual")
   endif()
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fPIC -fno-strict-aliasing -std=c11")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  # effective c++
+  
+  if(APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  endif()
+
+  # extra warnings - DLM: we should shoot for this
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")  
+  # warn the user if a variable declaration shadows another with the same name in the same scope - DLM: we should shoot for this
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")    
+  # effective c++ - DLM: we should shoot for this
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++")
-  # treat warnings as errors
+  # warn about non-portable code - DLM: we should shoot for this
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")  
+  # treat warnings as errors - DLM: we should shoot for this
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif()
 if(MINGW)
@@ -228,21 +241,31 @@ endif()
 if(MSVC)
   # warning level 3
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
-  # all warnings
+  
+  # warning level 4 - DLM: we should shoot for this
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")  
+  
+  # all warnings - DLM: probably too high to ever use
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
+  
   # create compiler processes on all effective processors
   if(BUILD_WITH_MULTIPLE_PROCESSES)
     add_definitions(/MP)
   endif()
+  
+  #Enable warning on thread un-safe static member initialization - DLM: we have been bit by this many times
+  add_definitions(/w44640)
+  
   # ignore decorated name length exceeded
   add_definitions(/wd4503)
+  
   # ignore needs to have dll-interface to be used by clients of class
   # we will not rely on exporting templates instead all libraries must
   # be linked against the same runtime
   add_definitions(/wd4251)
-  # treat warnings as errors
-
+  
   if(NOT CMAKE_CL_64)
+    # treat warnings as errors
     add_definitions(/WX)
   else()
     add_definitions(/bigobj)
@@ -263,12 +286,14 @@ if(CMAKE_COMPILER_IS_GNUCC)
 endif()
 
 
-
 ###############################################################################
 # Dependencies
 
 # EnergyPlus
-find_package(EnergyPlus "${ENERGYPLUS_VERSION}" REQUIRED)
+find_package(EnergyPlus "${ENERGYPLUS_VERSION}")
+if(NOT ${EnergyPlus_FOUND})
+  message(FATAL_ERROR "EnergyPlus ${ENERGYPLUS_VERSION} could not be found")
+endif()
 mark_as_advanced(
   ENERGYPLUS_EXE
   ENERGYPLUS_IDD
@@ -277,24 +302,32 @@ mark_as_advanced(
 
 # Ruby
 find_program(RUBY_EXECUTABLE NAMES ruby PATHS $ENV{CMAKE_RUBY_PATH} NO_SYSTEM_ENVIRONMENT_PATH)
-find_package(Ruby REQUIRED)
 
+if(APPLE)
+  if(CMAKE_OSX_SYSROOT MATCHES ".*10\\.8.*")
+    # set RUBYLIB environment variable so find_package can find the right Ruby libraries
+    get_filename_component(RUBY_EXECUTABLE_DIR ${RUBY_EXECUTABLE} PATH)
+    set(ENV{RUBYLIB} "${RUBY_EXECUTABLE_DIR}/../lib/ruby/2.0.0/universal-darwin12.5.0/:${RUBY_EXECUTABLE_DIR}/../lib/ruby/2.0.0/" )
+    set(RUBY_INCLUDE_DIR "${RUBY_EXECUTABLE_DIR}/../include/ruby-2.0.0/" CACHE PATH "The Ruby include dir" FORCE)
+    set(RUBY_CONFIG_INCLUDE_DIR "${RUBY_EXECUTABLE_DIR}/../include/ruby-2.0.0/universal-darwin12.5.0/" CACHE PATH "The Ruby config include dir" FORCE)
+    set(RUBY_LIBRARY "${RUBY_EXECUTABLE_DIR}/../lib/libruby.2.0.0.dylib" CACHE PATH "The Ruby library" FORCE)
+  endif()
+endif()
+
+find_package(Ruby REQUIRED)
 
 set(RUBY_MODULE_DIR "Ruby")
 
 set(RUBY_MODULE_ARCH_DIR "Ruby/openstudio")
 
-if(WIN32 AND MSVC AND CMAKE_CL_64)
-  message(WARNING "64bit Support on Windows is EXPERIMENTAL. The SketchUp plugin will not work. Expect problems with ruby support in general. There are lots of warnings, so we are disabling warnings as errors.")
+if(WIN32)
+  if(MSVC AND CMAKE_CL_64)
+    message(WARNING "Treat Warnings As Errors is disabled for 64-bit Windows builds")
+  endif()
 
   if(NOT "${RUBY_VERSION_MAJOR}" EQUAL "2")
     message(SEND_ERROR "64bit Windows support requires Ruby >= 2.0.0")
   endif()
-endif()
-
-# Adding math.h definitions to avoid "inconsistent dll linkage" from Ruby 1.8 and VS2013
-if(${MSVC} AND ${MSVC_VERSION} EQUAL 1800 AND RUBY_VERSION_MAJOR EQUAL 1 AND RUBY_VERSION_MINOR EQUAL 8)
-  add_definitions(-DHAVE_ACOSH -DHAVE_ERF)
 endif()
 
 
@@ -325,9 +358,7 @@ if(BUILD_WITH_OPENSSL)
   find_package(OpenSSL)
   if(NOT ${OPENSSL_FOUND})
     message(SEND_ERROR "OpenSSL could not be found, and is required for HTTPS communication")
-    if(WIN32)
-      message(SEND_ERROR "You can install OpenSSL for windows by visiting http://www.slproweb.com/products/Win32OpenSSL.html and installing the latest recommended full installation package")
-    else()
+    if(UNIX)
       message(SEND_ERROR "Please install OpenSSL development libraries using your package management system (possibly libssl-dev)")
     endif()
   elseif(WIN32)
@@ -345,7 +376,7 @@ endif()
 
 
 
-find_package(SWIG 2.0 REQUIRED)
+find_package(SWIG 2.0.10 REQUIRED)
 mark_as_advanced(
   SWIG_DIR
   SWIG_EXECUTABLE
@@ -357,8 +388,9 @@ set(ALL_RUBY_BINDING_TARGETS "") # global list
 # build rdoc
 if(BUILD_DOCUMENTATION)
   if(WIN32)
-    find_file(RDOC NAMES rdoc.bat HINTS $ENV{PATH} "C:/Ruby/bin")
-    find_file(RI NAMES ri.bat HINTS $ENV{PATH} "C:/Ruby/bin")
+    get_filename_component(RUBY_BIN_DIR "${RUBY_EXECUTABLE}" PATH)
+    find_file(RDOC NAMES rdoc.bat HINTS $ENV{PATH} "${RUBY_BIN_DIR}")
+    find_file(RI NAMES ri.bat HINTS $ENV{PATH} "${RUBY_BIN_DIR}")
   else()
     find_program(RDOC NAMES rdoc)
     find_program(RI NAMES ri)
@@ -402,114 +434,68 @@ if(BUILD_DOCUMENTATION)
   # need doxygen
   find_package(Doxygen REQUIRED)
 
-  option(DOXYGEN_INLINE_INHERITED_MEMBERS_OPTION "Show all inherited members of a class as if those members were ordinary class members" OFF)
-
-  mark_as_advanced(DOXYGEN_INLINE_INHERITED_MEMBERS_OPTION)
-
-  if(DOXYGEN_INLINE_INHERITED_MEMBERS_OPTION)
-    set(DOXYGEN_INLINE_INHERITED_MEMBERS "YES")
-  else()
-    set(DOXYGEN_INLINE_INHERITED_MEMBERS "NO")
-  endif()
-
   # if have dot you have more options
-  if(DOXYGEN_DOT_FOUND)
+  #if(DOXYGEN_DOT_FOUND)
 
-    option(DOXYGEN_COLLABORATION_GRAPH_OPTION "Generate implementation dependency diagrams (inheritance, containment, and class reference)" OFF)
-    option(DOXYGEN_CLASS_GRAPH_OPTION "Graph direct and indirect inheritance relations" ON)
-    option(DOXYGEN_UML_LOOK_OPTION "Generate graphs in UML format" OFF)
-    option(DOXYGEN_GRAPHICAL_HIERARCHY_OPTION "Graphical hierarchy of all classes instead of a textual one" OFF)
+  #endif()
 
-    mark_as_advanced(
-      DOXYGEN_COLLABORATION_GRAPH_OPTION
-      DOXYGEN_CLASS_GRAPH_OPTION
-      DOXYGEN_UML_LOOK_OPTION
-      DOXYGEN_GRAPHICAL_HIERARCHY_OPTION
-    )
-
-    if(DOXYGEN_COLLABORATION_GRAPH_OPTION)
-      set(DOXYGEN_COLLABORATION_GRAPH "YES")
-    else()
-      set(DOXYGEN_COLLABORATION_GRAPH "NO")
-    endif()
-
-    if(DOXYGEN_CLASS_GRAPH_OPTION)
-      set(DOXYGEN_CLASS_GRAPH "YES")
-    else()
-      set(DOXYGEN_CLASS_GRAPH "NO")
-    endif()
-
-    if(DOXYGEN_UML_LOOK_OPTION)
-      set(DOXYGEN_UML_LOOK "YES")
-    else()
-      set(DOXYGEN_UML_LOOK "NO")
-    endif()
-
-    if(DOXYGEN_GRAPHICAL_HIERARCHY_OPTION)
-      set(DOXYGEN_GRAPHICAL_HIERARCHY "YES")
-    else()
-      set(DOXYGEN_GRAPHICAL_HIERARCHY "NO")
-    endif()
-
-  endif()
-
-  configure_file(${CMAKE_SOURCE_DIR}/doc/index.html.in ${CMAKE_BINARY_DIR}/doc/index.html)
+  configure_file(${CMAKE_SOURCE_DIR}/doc/index.html ${CMAKE_BINARY_DIR}/doc/index.html COPYONLY)
 
   set(doxygen_directories ${project_directories})
   # Add the idd files to the documentation list as a separate entry
   list(APPEND doxygen_directories utilities/idd)
 
-  # ETH@20110823 In theory, doxygen tag files let you have links between individual projects.
-  # In practice, the links generated do not quite work (at least in the verison of Doxygen that
-  # I have on my desktop). I also didn't quite figure out how to make the custom _doc targets
-  # dependent on each other. (I didn't try very hard since the tag links don't work right.)
+  # Remove directories we don't want documentation generated for
+  list(REMOVE_ITEM doxygen_directories generateiddfactory)
 
-  # Default TAGFILES
-  set(DOXY_TAGFILES "")
 
   foreach(D ${doxygen_directories})
     string(REPLACE "/" "_" DOC_NAME ${D})
+
+    set(DOXY_INPUT_DIR "\"${CMAKE_SOURCE_DIR}/src/${D}\"")
+    set(DOXY_ADDITIONAL_DIR "")
+    set(DOXY_EXCLUDE_DIR "")
+    set(DOXY_TAGFILES "")
+
+    # Specific settings
     if(${D} MATCHES "utilities/idd")
       # We want to build the idd documentation separately because of the generated files
-      set(DOXY_INPUT_DIR "\"${CMAKE_SOURCE_DIR}/src/${D}\"")
       set(DOXY_ADDITIONAL_DIR "\"${CMAKE_BINARY_DIR}/src/${D}\"")
-      set(DOXY_ADDITIONAL_FILES "")
-      set(DOXY_EXCLUDE_DIR "")
-      set(DOXY_DEPENDS "")
     elseif(${D} MATCHES "utilities")
       # Exclude the idd directory when building the utilities documentation
-      set(DOXY_INPUT_DIR "\"${CMAKE_SOURCE_DIR}/src/${D}\"")
-      set(DOXY_ADDITIONAL_DIR "")
-      set(DOXY_ADDITIONAL_FILES "")
       set(DOXY_EXCLUDE_DIR "\"${CMAKE_SOURCE_DIR}/src/utilities/idd\"")
-      #set(DOXY_TAGFILES "utilities_idd.tag")
+      set(DOXY_TAGFILES "utilities_idd/utilities_idd.tag=../../utilities_idd/html")
     elseif(${D} MATCHES "model")
-      set(DOXY_INPUT_DIR "\"${CMAKE_SOURCE_DIR}/src/${D}\"")
-      set(DOXY_ADDITIONAL_DIR "")
-      set(DOXY_ADDITIONAL_FILES "")
-      set(DOXY_EXCLUDE_DIR "")
-      #set(DOXY_TAGFILES "utilities_idd.tag utilities.tag")
-    else()
-      set(DOXY_INPUT_DIR "\"${CMAKE_SOURCE_DIR}/src/${D}\"")
-      set(DOXY_ADDITIONAL_DIR "")
-      set(DOXY_ADDITIONAL_FILES "")
-      set(DOXY_EXCLUDE_DIR "")
+      set(DOXY_TAGFILES "utilities_idd/utilities_idd.tag=../../utilities_idd/html utilities/utilities.tag=../../utilities/html")
     endif()
-    configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile_${DOC_NAME})
+    configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/${DOC_NAME}.cfg)
 
     add_custom_target(openstudio_${DOC_NAME}_doc
-      COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/doc/${DOC_NAME}
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/doc/${DOC_NAME}
-      COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile_${DOC_NAME}
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      COMMAND ${CMAKE_COMMAND} -E remove_directory "${DOC_NAME}"
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${DOC_NAME}"
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOC_NAME}.cfg
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/doc/css" "${DOC_NAME}/html/css"
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/doc/fonts" "${DOC_NAME}/html/fonts"
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/doc/js" "${DOC_NAME}/html/js"
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/doc/search" "${DOC_NAME}/html/search"
+      COMMAND ${PATCH_EXE} "${DOC_NAME}/html/search/search.js" < "${CMAKE_SOURCE_DIR}/doc/patch/search.js.patch"
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc
     )
 
     set(ALL_CPP_DOC_TARGETS ${ALL_CPP_DOC_TARGETS}
       openstudio_${DOC_NAME}_doc
     )
-    #list(APPEND ALL_CPP_DOC_TARGETS "openstudio_${DOC_NAME}_doc")
 
   endforeach()
+
+  # Set up dependencies after all targets have been created
+  add_dependencies(openstudio_utilities_doc
+    openstudio_utilities_idd_doc
+  )
+  add_dependencies(openstudio_model_doc
+    openstudio_utilities_doc
+    openstudio_utilities_idd_doc
+  )
 
 
 endif()
@@ -826,6 +812,27 @@ if(BUILD_DOCUMENTATION)
   add_custom_target(ALL_RDOC)
   add_dependencies(ALL_RDOC ${ALL_RDOC_TARGETS})
 
+  # Zip documentation
+  if(WIN32)
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/7za.exe")
+      file(DOWNLOAD "http://developer.nrel.gov/downloads/buildings/openstudio/src/7za.zip" "${CMAKE_BINARY_DIR}/7za.zip" TIMEOUT 120 INACTIVITY_TIMEOUT 120 EXPECTED_MD5 860077d3f314e939abab680218a3febe)
+      execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${CMAKE_BINARY_DIR}/7za.zip" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+    endif()
+    add_custom_command(TARGET ALL_DOXYGEN
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E remove OpenStudio-${OPENSTUDIO_VERSION}-doc.zip
+      COMMAND ${CMAKE_BINARY_DIR}/7za a -mmt -mx9 -tzip OpenStudio-${OPENSTUDIO_VERSION}-doc.zip * -r -x!*.cfg -x!*.tag -x!*.map -x!*.md5
+      COMMAND ${CMAKE_BINARY_DIR}/7za d OpenStudio-${OPENSTUDIO_VERSION}-doc.zip index.html
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc
+    )
+    add_custom_command(TARGET ALL_RDOC
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E remove OpenStudio-${OPENSTUDIO_VERSION}-rdoc.zip
+      COMMAND ${CMAKE_BINARY_DIR}/7za a -mmt -mx9 -tzip OpenStudio-${OPENSTUDIO_VERSION}-rdoc.zip * -r
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ruby/rdocify
+    )
+  endif()
+
 endif()
 
 
@@ -877,7 +884,6 @@ set(all_exe_targets
   GenerateIddFactory
   gbXMLToIdf
   OpenStudio
-  RunManager
   ruby_cpp
   litesql-gen
   ResultsViewer

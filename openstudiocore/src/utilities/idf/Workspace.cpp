@@ -2288,7 +2288,7 @@ namespace detail {
       }
     }
     ptr->disconnect();
-    disconnect(ptr.get(),SIGNAL(onChange()),this,SLOT(change()));
+    disconnect(ptr.get(), &WorkspaceObject_Impl::onChange, this, &Workspace_Impl::change);
   }
 
   void Workspace_Impl::registerRemovalOfObjects(std::vector<SavedWorkspaceObject>& savedObjects,
@@ -2301,7 +2301,7 @@ namespace detail {
   }
 
   void Workspace_Impl::registerAdditionOfObject(const WorkspaceObject& object) {
-    connect(object.getImpl<WorkspaceObject_Impl>().get(),SIGNAL(onChange()),this,SLOT(change()));
+    connect(object.getImpl<WorkspaceObject_Impl>().get(), &WorkspaceObject_Impl::onChange, this, &Workspace_Impl::change);
     emit addWorkspaceObject(object, object.iddObject().type(), object.handle());
     emit addWorkspaceObject(object.getImpl<WorkspaceObject_Impl>(), object.iddObject().type(), object.handle());
     emit onChange();
@@ -2424,7 +2424,14 @@ namespace detail {
             {
               origpath = toPath(url->toLocalFile());
             } else {
-              origpath = toPath(url->toString());
+              // DLM: When using QUrl constructor from a string as in getURL, QUrl will assume the 
+              // drive letter in any file path is a scheme and automatically convert the scheme to lower case
+              boost::optional<std::string> rawString = workspaceObject.getString(i);
+              if (rawString && istringEqual(*rawString, url->toString().toStdString())){
+                origpath = toPath(*rawString);
+              } else {
+                origpath = toPath(url->toString());
+              }
             }
 
             if (!origpath.is_complete())

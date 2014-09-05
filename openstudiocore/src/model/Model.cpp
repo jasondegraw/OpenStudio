@@ -199,6 +199,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(AirTerminalSingleDuctConstantVolumeCooledBeam);
     REGISTER_CONSTRUCTOR(AirTerminalSingleDuctConstantVolumeReheat);
     REGISTER_CONSTRUCTOR(AirTerminalSingleDuctParallelPIUReheat);
+    REGISTER_CONSTRUCTOR(AirTerminalSingleDuctSeriesPIUReheat);
     REGISTER_CONSTRUCTOR(AirTerminalSingleDuctUncontrolled);
     REGISTER_CONSTRUCTOR(AirTerminalSingleDuctVAVReheat);
     REGISTER_CONSTRUCTOR(AirTerminalSingleDuctVAVNoReheat);
@@ -280,6 +281,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(ElectricEquipment);
     REGISTER_CONSTRUCTOR(ElectricEquipmentDefinition);
     REGISTER_CONSTRUCTOR(EvaporativeCoolerDirectResearchSpecial);
+    REGISTER_CONSTRUCTOR(EvaporativeCoolerIndirectResearchSpecial);
     REGISTER_CONSTRUCTOR(ExteriorLights);
     REGISTER_CONSTRUCTOR(ExteriorLightsDefinition);
     REGISTER_CONSTRUCTOR(Facility);
@@ -369,8 +371,10 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(Screen);
     REGISTER_CONSTRUCTOR(SetpointManagerFollowOutdoorAirTemperature);
     REGISTER_CONSTRUCTOR(SetpointManagerMixedAir);
+    REGISTER_CONSTRUCTOR(SetpointManagerOutdoorAirPretreat);
     REGISTER_CONSTRUCTOR(SetpointManagerOutdoorAirReset);
     REGISTER_CONSTRUCTOR(SetpointManagerScheduled);
+    REGISTER_CONSTRUCTOR(SetpointManagerScheduledDualSetpoint);
     REGISTER_CONSTRUCTOR(SetpointManagerSingleZoneReheat);
     REGISTER_CONSTRUCTOR(SetpointManagerWarmest);
     REGISTER_CONSTRUCTOR(Shade);
@@ -490,6 +494,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctConstantVolumeCooledBeam);
     REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctConstantVolumeReheat);
     REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctParallelPIUReheat);
+    REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctSeriesPIUReheat);
     REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctUncontrolled);
     REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctVAVReheat);
     REGISTER_COPYCONSTRUCTORS(AirTerminalSingleDuctVAVNoReheat);
@@ -571,6 +576,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(ElectricEquipment);
     REGISTER_COPYCONSTRUCTORS(ElectricEquipmentDefinition);
     REGISTER_COPYCONSTRUCTORS(EvaporativeCoolerDirectResearchSpecial);
+    REGISTER_COPYCONSTRUCTORS(EvaporativeCoolerIndirectResearchSpecial);
     REGISTER_COPYCONSTRUCTORS(ExteriorLights);
     REGISTER_COPYCONSTRUCTORS(ExteriorLightsDefinition);
     REGISTER_COPYCONSTRUCTORS(Facility);
@@ -660,8 +666,10 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(Screen);
     REGISTER_COPYCONSTRUCTORS(SetpointManagerFollowOutdoorAirTemperature);
     REGISTER_COPYCONSTRUCTORS(SetpointManagerMixedAir);
+    REGISTER_COPYCONSTRUCTORS(SetpointManagerOutdoorAirPretreat);
     REGISTER_COPYCONSTRUCTORS(SetpointManagerOutdoorAirReset);
     REGISTER_COPYCONSTRUCTORS(SetpointManagerScheduled);
+    REGISTER_COPYCONSTRUCTORS(SetpointManagerScheduledDualSetpoint);
     REGISTER_COPYCONSTRUCTORS(SetpointManagerSingleZoneReheat);
     REGISTER_COPYCONSTRUCTORS(SetpointManagerWarmest);
     REGISTER_COPYCONSTRUCTORS(Shade);
@@ -777,11 +785,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     boost::optional<Building> result = this->model().getOptionalUniqueModelObject<Building>();
     if (result){
       m_cachedBuilding = result;
-      bool connected = QObject::connect(result->getImpl<Building_Impl>().get(),
-                                        SIGNAL(onRemoveFromWorkspace(Handle)),
-                                        this,
-                                        SLOT(clearCachedBuilding()));
-      OS_ASSERT(connected);
+      QObject::connect(result->getImpl<Building_Impl>().get(), &Building_Impl::onRemoveFromWorkspace, this, &Model_Impl::clearCachedBuilding);
     }
 
     return m_cachedBuilding;
@@ -796,11 +800,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     boost::optional<LifeCycleCostParameters> result = this->model().getOptionalUniqueModelObject<LifeCycleCostParameters>();
     if (result){
       m_cachedLifeCycleCostParameters = result;
-      bool connected = QObject::connect(result->getImpl<LifeCycleCostParameters_Impl>().get(),
-                                        SIGNAL(onRemoveFromWorkspace(Handle)),
-                                        this,
-                                        SLOT(clearCachedLifeCycleCostParameters()));
-      OS_ASSERT(connected);
+      QObject::connect(result->getImpl<LifeCycleCostParameters_Impl>().get(), &LifeCycleCostParameters_Impl::onRemoveFromWorkspace,
+        this, &Model_Impl::clearCachedLifeCycleCostParameters);
     }
 
     return m_cachedLifeCycleCostParameters;
@@ -815,11 +816,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     boost::optional<RunPeriod> result = this->model().getOptionalUniqueModelObject<RunPeriod>();
     if (result){
       m_cachedRunPeriod = result;
-      bool connected = QObject::connect(result->getImpl<RunPeriod_Impl>().get(),
-                                        SIGNAL(onRemoveFromWorkspace(Handle)),
-                                        this,
-                                        SLOT(clearCachedRunPeriod()));
-      OS_ASSERT(connected);
+      QObject::connect(result->getImpl<RunPeriod_Impl>().get(), &RunPeriod_Impl::onRemoveFromWorkspace, this, &Model_Impl::clearCachedRunPeriod);
     }
 
     return m_cachedRunPeriod;
@@ -834,11 +831,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     boost::optional<YearDescription> result = this->model().getOptionalUniqueModelObject<YearDescription>();
     if (result){
       m_cachedYearDescription = result;
-      bool connected = QObject::connect(result->getImpl<YearDescription_Impl>().get(),
-                                        SIGNAL(onRemoveFromWorkspace(Handle)),
-                                        this,
-                                        SLOT(clearCachedYearDescription()));
-      OS_ASSERT(connected);
+      QObject::connect(result->getImpl<YearDescription_Impl>().get(), &YearDescription_Impl::onRemoveFromWorkspace,
+        this, &Model_Impl::clearCachedYearDescription);
     }
 
     return m_cachedYearDescription;
@@ -853,11 +847,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     boost::optional<WeatherFile> result = this->model().getOptionalUniqueModelObject<WeatherFile>();
     if (result){
       m_cachedWeatherFile = result;
-      bool connected = QObject::connect(result->getImpl<WeatherFile_Impl>().get(),
-                                        SIGNAL(onRemoveFromWorkspace(Handle)),
-                                        this,
-                                        SLOT(clearCachedWeatherFile()));
-      OS_ASSERT(connected);
+      QObject::connect(result->getImpl<WeatherFile_Impl>().get(), &WeatherFile_Impl::onRemoveFromWorkspace, this, &Model_Impl::clearCachedWeatherFile);
     }
 
     return m_cachedWeatherFile;
@@ -1166,12 +1156,7 @@ if (_className::iddObjectType() == typeToCreate) { \
   void Model_Impl::mf_createComponentWatcher(ComponentData& componentData) {
     try {
       ComponentWatcher watcher(componentData);
-      bool connected = QObject::connect(watcher.getImpl().get(),
-                                        SIGNAL(obsolete(const ComponentWatcher&)),
-                                        SLOT(obsoleteComponentWatcher(const ComponentWatcher&)));
-      if (!connected) {
-        LOG_AND_THROW("Cannot connect obsolete() signal.");
-      }
+      QObject::connect(watcher.getImpl().get(), &ComponentWatcher_Impl::obsolete, this, &Model_Impl::obsoleteComponentWatcher);
       m_componentWatchers.push_back(watcher);
     }
     catch (...) {

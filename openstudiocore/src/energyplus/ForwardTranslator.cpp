@@ -442,6 +442,12 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateAirTerminalSingleDuctParallelPIUReheat(airTerminal);
       break;
     }
+  case openstudio::IddObjectType::OS_AirTerminal_SingleDuct_SeriesPIU_Reheat :
+    {
+      model::AirTerminalSingleDuctSeriesPIUReheat airTerminal = modelObject.cast<AirTerminalSingleDuctSeriesPIUReheat>();
+      retVal = translateAirTerminalSingleDuctSeriesPIUReheat(airTerminal);
+      break;
+    }
   case openstudio::IddObjectType::OS_AirTerminal_SingleDuct_Uncontrolled :
     {
       model::AirTerminalSingleDuctUncontrolled airTerminal = modelObject.cast<AirTerminalSingleDuctUncontrolled>();
@@ -941,6 +947,12 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateEvaporativeCoolerDirectResearchSpecial(evap);
       break;
     }
+  case openstudio::IddObjectType::OS_EvaporativeCooler_Indirect_ResearchSpecial :
+    {
+      model::EvaporativeCoolerIndirectResearchSpecial evap = modelObject.cast<EvaporativeCoolerIndirectResearchSpecial>();
+      retVal = translateEvaporativeCoolerIndirectResearchSpecial(evap);
+      break;
+    }
   case openstudio::IddObjectType::OS_EvaporativeFluidCooler_SingleSpeed :
     {
       model::EvaporativeFluidCoolerSingleSpeed evap = modelObject.cast<EvaporativeFluidCoolerSingleSpeed>();
@@ -1384,6 +1396,12 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateSetpointManagerScheduled(spm);
       break;
     }
+  case  openstudio::IddObjectType::OS_SetpointManager_Scheduled_DualSetpoint :
+    {
+      model::SetpointManagerScheduledDualSetpoint spm = modelObject.cast<SetpointManagerScheduledDualSetpoint>();
+      retVal = translateSetpointManagerScheduledDualSetpoint(spm);
+      break;
+    }
   case  openstudio::IddObjectType::OS_SetpointManager_MixedAir :
     {
       model::SetpointManagerMixedAir spm = modelObject.cast<SetpointManagerMixedAir>();
@@ -1394,6 +1412,12 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
     {
       model::SetpointManagerOutdoorAirReset spm = modelObject.cast<SetpointManagerOutdoorAirReset>();
       retVal = translateSetpointManagerOutdoorAirReset(spm);
+      break;
+    }
+  case  openstudio::IddObjectType::OS_SetpointManager_OutdoorAirPretreat :
+    {
+      model::SetpointManagerOutdoorAirPretreat spm = modelObject.cast<SetpointManagerOutdoorAirPretreat>();
+      retVal = translateSetpointManagerOutdoorAirPretreat(spm);
       break;
     }
   case  openstudio::IddObjectType::OS_SetpointManager_Warmest :

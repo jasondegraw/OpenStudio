@@ -108,7 +108,7 @@ namespace detail {
 
       /// Executes a workflow which is defined by a JSON string from Nick
       ///
-      /// \param[in] t_json the path to a json file to load and parse
+      /// \param[in] t_jsonPath the path to a json file to load and parse
       /// \param[in] t_basePath the path of the directory containing the input files necessary
       /// \param[in] t_runPath directory to execute the simulations in
       /// \param[in] t_tools tools to use for executing job
@@ -116,7 +116,7 @@ namespace detail {
       openstudio::runmanager::Job runWorkflow(const openstudio::path &t_jsonPath, const openstudio::path &t_basePath, const openstudio::path &t_runPath,
           const openstudio::runmanager::Tools &t_tools, const openstudio::runmanager::JSONWorkflowOptions &t_options);
 
-      /// Return tue if the given job is out of date
+      /// Return true if the given job is out of date
       /// \todo This should probably be removed in favor of openstudio::runmanager::Job::isOutOfDate
       bool outOfDate(const openstudio::runmanager::Job &job) const;
 
@@ -149,7 +149,7 @@ namespace detail {
       /// Queue up a job (and all children) for processing
       /// \param[in] job Job to enqueue
       /// \param[in] force Process job even if it is out of date
-      /// \param[in] t_basePath Path by which relative paths in this job should be evaluated. If not provided,
+      /// \param[in] basePath Path by which relative paths in this job should be evaluated. If not provided,
       ///                       the path of the runmanager db is used.
       bool enqueue(const Job &job,
                    bool force,
@@ -263,7 +263,7 @@ namespace detail {
       /// Connect a Qt SIGNAL to a slot in the underlying RunManager_Impl object
       /// available slots:
       ///   - setPaused(bool t_state);
-      /// \param sender object that SIGNAL is comming from
+      /// \param sender object that SIGNAL is coming from
       /// \param signal signal on object to connect
       /// \param method slot on RunManager_Impl to connect to
       /// \param type type of Qt connection to make
@@ -276,15 +276,11 @@ namespace detail {
       /// \returns a set of named statistics regarding the job queue
       std::map<std::string, double> statistics() const;
 
-//      /// Sets the password to use when making a SLURM connection.
-//      /// Passwords are not persisted.
-//      void setSLURMPassword(const std::string &t_pass);
-
       /// Persist a workflow to the database
       /// \returns the key the workflow is stored under
       std::string persistWorkflow(const Workflow &_wf);
 
-      /// \returns a vector of all worklows in the database
+      /// \returns a vector of all workflows in the database
       std::vector<Workflow> loadWorkflows() const;
 
       /// \returns a specific workflow 

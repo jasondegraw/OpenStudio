@@ -20,7 +20,7 @@
 #ifndef MODEL_SETPOINTMANAGER_IMPL_HPP
 #define MODEL_SETPOINTMANAGER_IMPL_HPP
 
-#include <model/HVACComponent_Impl.hpp>
+#include "HVACComponent_Impl.hpp"
 #include <boost/optional.hpp>
 
 namespace openstudio {
@@ -60,6 +60,14 @@ namespace detail {
     virtual bool setControlVariable( const std::string & value ) = 0;
 
     virtual boost::optional<Node> setpointNode() const = 0;
+
+    virtual boost::optional<AirLoopHVAC> airLoopHVAC() const;
+
+    virtual boost::optional<PlantLoop> plantLoop() const;
+
+    virtual boost::optional<Loop> loop() const;
+
+    virtual boost::optional<AirLoopHVACOutdoorAirSystem> airLoopHVACOutdoorAirSystem() const;
 
    private:
 

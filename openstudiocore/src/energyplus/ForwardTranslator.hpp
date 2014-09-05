@@ -47,6 +47,7 @@ class AirLoopHVACZoneSplitter;
 class AirTerminalSingleDuctConstantVolumeCooledBeam;
 class AirTerminalSingleDuctConstantVolumeReheat;
 class AirTerminalSingleDuctParallelPIUReheat;
+class AirTerminalSingleDuctSeriesPIUReheat;
 class AirTerminalSingleDuctUncontrolled;
 class AirTerminalSingleDuctVAVNoReheat;
 class AirTerminalSingleDuctVAVReheat;
@@ -108,6 +109,7 @@ class DistrictCooling;
 class DistrictHeating;
 class ElectricEquipment;
 class EvaporativeCoolerDirectResearchSpecial;
+class EvaporativeCoolerIndirectResearchSpecial;
 class EvaporativeFluidCoolerSingleSpeed;
 class ExteriorLights;
 class FanConstantVolume;
@@ -168,8 +170,10 @@ class RunPeriodControlSpecialDays;
 class Screen;
 class SetpointManagerFollowOutdoorAirTemperature;
 class SetpointManagerMixedAir;
+class SetpointManagerOutdoorAirPretreat;
 class SetpointManagerOutdoorAirReset;
 class SetpointManagerScheduled;
+class SetpointManagerScheduledDualSetpoint;
 class SetpointManagerSingleZoneReheat;
 class SetpointManagerWarmest;
 class ShadowCalculation;
@@ -327,6 +331,8 @@ class ENERGYPLUS_API ForwardTranslator {
 
   boost::optional<IdfObject> translateAirTerminalSingleDuctParallelPIUReheat( model::AirTerminalSingleDuctParallelPIUReheat & modelObject );
 
+  boost::optional<IdfObject> translateAirTerminalSingleDuctSeriesPIUReheat( model::AirTerminalSingleDuctSeriesPIUReheat & modelObject );
+
   boost::optional<IdfObject> translateAirTerminalSingleDuctUncontrolled( model::AirTerminalSingleDuctUncontrolled & modelObject );
 
   boost::optional<IdfObject> translateAirTerminalSingleDuctVAVNoReheat( model::AirTerminalSingleDuctVAVNoReheat & modelObject );
@@ -463,6 +469,8 @@ class ENERGYPLUS_API ForwardTranslator {
 
   boost::optional<IdfObject> translateEvaporativeCoolerDirectResearchSpecial( model::EvaporativeCoolerDirectResearchSpecial & modelObject );
 
+  boost::optional<IdfObject> translateEvaporativeCoolerIndirectResearchSpecial( model::EvaporativeCoolerIndirectResearchSpecial & modelObject );
+
   boost::optional<IdfObject> translateFFactorGroundFloorConstruction( model::FFactorGroundFloorConstruction & modelObject );
 
   boost::optional<IdfObject> translateGas( model::Gas & modelObject );
@@ -589,9 +597,13 @@ class ENERGYPLUS_API ForwardTranslator {
 
   boost::optional<IdfObject> translateSetpointManagerMixedAir( model::SetpointManagerMixedAir & modelObject );
 
+  boost::optional<IdfObject> translateSetpointManagerOutdoorAirPretreat( model::SetpointManagerOutdoorAirPretreat & modelObject );
+
   boost::optional<IdfObject> translateSetpointManagerOutdoorAirReset( model::SetpointManagerOutdoorAirReset & modelObject );
 
   boost::optional<IdfObject> translateSetpointManagerScheduled( model::SetpointManagerScheduled & modelObject );
+
+  boost::optional<IdfObject> translateSetpointManagerScheduledDualSetpoint( model::SetpointManagerScheduledDualSetpoint & modelObject );
 
   boost::optional<IdfObject> translateSetpointManagerSingleZoneReheat( model::SetpointManagerSingleZoneReheat & modelObject);
 
