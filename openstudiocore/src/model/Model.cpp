@@ -187,6 +187,7 @@ if (_className::iddObjectType() == typeToCreate) { \
 }
 
     REGISTER_CONSTRUCTOR(AirConditionerVariableRefrigerantFlow);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneReferenceCrackConditions);
     REGISTER_CONSTRUCTOR(EvaporativeFluidCoolerSingleSpeed);
     REGISTER_CONSTRUCTOR(AirGap);
     REGISTER_CONSTRUCTOR(AirLoopHVAC);
@@ -500,6 +501,7 @@ if (_className::iddObjectType() == typeToCreate) { \
 }
 
     REGISTER_COPYCONSTRUCTORS(AirConditionerVariableRefrigerantFlow);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneReferenceCrackConditions);
     REGISTER_COPYCONSTRUCTORS(EvaporativeFluidCoolerSingleSpeed);
     REGISTER_COPYCONSTRUCTORS(AirGap);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVAC);

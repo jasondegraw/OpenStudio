@@ -21,6 +21,7 @@
 #define MODEL_CONCRETEMODELOBJECTS_HPP
 
 #include "AirConditionerVariableRefrigerantFlow.hpp"
+#include "AirflowNetworkMultiZoneReferenceCrackConditions.hpp"
 #include "AirGap.hpp"
 #include "AirLoopHVAC.hpp"
 #include "AirLoopHVACOutdoorAirSystem.hpp"
@@ -302,6 +303,7 @@
 
 // include all concrete ModelObject Impls too
 #include "AirConditionerVariableRefrigerantFlow_Impl.hpp"
+#include "AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp"
 #include "AirGap_Impl.hpp"
 #include "AirLoopHVAC_Impl.hpp"
 #include "AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass_Impl.hpp"

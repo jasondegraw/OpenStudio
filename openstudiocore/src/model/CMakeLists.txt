@@ -35,6 +35,9 @@ set(${target_name}_src
   AirConditionerVariableRefrigerantFlow.hpp
   AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirConditionerVariableRefrigerantFlow.cpp
+  AirflowNetworkMultiZoneReferenceCrackConditions.hpp
+  AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp
+  AirflowNetworkMultiZoneReferenceCrackConditions.cpp
   AirGap.hpp
   AirGap_Impl.hpp
   AirGap.cpp
@@ -986,6 +989,7 @@ set(${target_name}_moc
   ModelObject_Impl.hpp
 
   AirConditionerVariableRefrigerantFlow_Impl.hpp
+  AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp
   AirGap_Impl.hpp
   AirLoopHVAC_Impl.hpp
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp

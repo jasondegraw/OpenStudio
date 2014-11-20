@@ -18741,3 +18741,34 @@ OS:Output:Variable,
        \type object-list
        \object-list ScheduleNames
 
+\group OpenStudio Airflow
+OS:AirflowNetworkMultiZoneReferenceCrackConditions,
+       \min-fields 5
+       \memo This object specifies the conditions under which the air mass flow coefficient was measured.
+  A1, \field Handle
+       \type handle
+       \required-field
+  A2, \field Name
+       \required-field
+       \type alpha
+       \reference ReferenceCrackConditions
+       \note Enter a unique name for this object.
+  N1, \field Reference Temperature
+       \type real
+       \units C
+       \default 20
+       \note Enter the reference temperature under which the surface crack data were obtained.
+  N2, \field Reference Barometric Pressure
+       \type real
+       \units Pa
+       \default 101325
+       \minimum 31000
+       \maximum 120000
+       \ip-units inHg
+       \note Enter the reference barometric pressure under which the surface crack data were obtained.
+  N3; \field Reference Humidity Ratio
+       \type real
+       \units kgWater/kgDryAir
+       \default 0
+       \note Enter the reference humidity ratio under which the surface crack data were obtained.
+
