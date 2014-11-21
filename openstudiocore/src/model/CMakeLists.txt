@@ -38,6 +38,9 @@ set(${target_name}_src
   AirflowNetworkMultiZoneReferenceCrackConditions.hpp
   AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp
   AirflowNetworkMultiZoneReferenceCrackConditions.cpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.hpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.cpp
   AirGap.hpp
   AirGap_Impl.hpp
   AirGap.cpp
@@ -990,6 +993,7 @@ set(${target_name}_moc
 
   AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp
   AirGap_Impl.hpp
   AirLoopHVAC_Impl.hpp
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp
