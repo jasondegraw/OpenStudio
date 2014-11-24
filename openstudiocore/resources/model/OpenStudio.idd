@@ -18772,9 +18772,41 @@ OS:AirflowNetworkMultiZoneReferenceCrackConditions,
        \default 0
        \note The reference humidity ratio under which the surface crack data were obtained.
 
+OS:AirflowNetworkMultiZoneSurfaceCrack,
+       \min-fields 3
+       \memo This object specifies the properties of airflow through a crack.
+  A1, \field Handle
+       \type handle
+       \required-field
+  A2, \field Name
+       \required-field
+       \type alpha
+       \reference SurfaceAirflowLeakageNames
+       \note A unique name for this object.
+  N1, \field Air Mass Flow Coefficient at Reference Conditions
+       \type real
+       \required-field
+       \units kg/s
+       \minimum> 0
+       \note The air mass flow coefficient at the conditions defined
+       \note in the Reference Crack Conditions object.
+       \note Defined at 1 Pa pressure difference across this crack.
+  N2, \field Air Mass Flow Exponent
+       \type real
+       \units dimensionless
+       \minimum 0.5
+       \maximum 1.0
+       \default 0.65
+       \note The air mass flow exponent for the surface crack.
+  A3; \field Reference Crack Conditions
+       \type object-list
+       \object-list ReferenceCrackConditions
+       \note The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object associated with
+       \note the air mass flow coefficient.
+
 OS:AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea,
-      \min-fields 6
-      \memo This object is used to define surface air leakage.
+       \min-fields 6
+       \memo This object is used to define surface air leakage.
   A1, \field Handle
        \type handle
        \required-field

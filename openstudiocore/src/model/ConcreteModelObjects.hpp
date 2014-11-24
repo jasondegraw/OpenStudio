@@ -22,6 +22,7 @@
 
 #include "AirConditionerVariableRefrigerantFlow.hpp"
 #include "AirflowNetworkMultiZoneReferenceCrackConditions.hpp"
+#include "AirflowNetworkMultiZoneSurfaceCrack.hpp"
 #include "AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.hpp"
 #include "AirGap.hpp"
 #include "AirLoopHVAC.hpp"
@@ -305,6 +306,7 @@
 // include all concrete ModelObject Impls too
 #include "AirConditionerVariableRefrigerantFlow_Impl.hpp"
 #include "AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp"
+#include "AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp"
 #include "AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp"
 #include "AirGap_Impl.hpp"
 #include "AirLoopHVAC_Impl.hpp"
