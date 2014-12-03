@@ -29,13 +29,13 @@ namespace model {
 
 namespace detail {
 
-  class AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl;
+class AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl;
 
 } // detail
 
 /** AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea is a ModelObject that wraps the OpenStudio IDD object 'OS:AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea'. */
 class MODEL_API AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea : public ModelObject {
- public:
+public:
   /** @name Constructors and Destructors */
   //@{
 
@@ -87,7 +87,7 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea : public Mode
   //@{
 
   //@}
- protected:
+protected:
   /// @cond
   typedef detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl ImplType;
 
@@ -98,7 +98,7 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea : public Mode
   friend class IdfObject;
   friend class openstudio::detail::IdfObject_Impl;
   /// @endcond
- private:
+private:
   REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea");
 };
 

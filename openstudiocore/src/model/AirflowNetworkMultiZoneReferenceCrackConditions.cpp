@@ -62,66 +62,79 @@ const std::vector<std::string>& AirflowNetworkMultiZoneReferenceCrackConditions_
   return result;
 }
 
-IddObjectType AirflowNetworkMultiZoneReferenceCrackConditions_Impl::iddObjectType() const {
+IddObjectType AirflowNetworkMultiZoneReferenceCrackConditions_Impl::iddObjectType() const
+{
   return AirflowNetworkMultiZoneReferenceCrackConditions::iddObjectType();
 }
 
-double AirflowNetworkMultiZoneReferenceCrackConditions_Impl::referenceTemperature() const {
+double AirflowNetworkMultiZoneReferenceCrackConditions_Impl::referenceTemperature() const
+{
   boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceTemperature, true);
   OS_ASSERT(value);
   return value.get();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::isReferenceTemperatureDefaulted() const {
+bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::isReferenceTemperatureDefaulted() const
+{
   return isEmpty(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceTemperature);
 }
 
-double AirflowNetworkMultiZoneReferenceCrackConditions_Impl::referenceBarometricPressure() const {
+double AirflowNetworkMultiZoneReferenceCrackConditions_Impl::referenceBarometricPressure() const
+{
   boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceBarometricPressure, true);
   OS_ASSERT(value);
   return value.get();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::isReferenceBarometricPressureDefaulted() const {
+bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::isReferenceBarometricPressureDefaulted() const
+{
   return isEmpty(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceBarometricPressure);
 }
 
-double AirflowNetworkMultiZoneReferenceCrackConditions_Impl::referenceHumidityRatio() const {
+double AirflowNetworkMultiZoneReferenceCrackConditions_Impl::referenceHumidityRatio() const
+{
   boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceHumidityRatio, true);
   OS_ASSERT(value);
   return value.get();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::isReferenceHumidityRatioDefaulted() const {
+bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::isReferenceHumidityRatioDefaulted() const
+{
   return isEmpty(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceHumidityRatio);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::setReferenceTemperature(double referenceTemperature) {
+void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::setReferenceTemperature(double referenceTemperature)
+{
   bool result = setDouble(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceTemperature, referenceTemperature);
   OS_ASSERT(result);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::resetReferenceTemperature() {
+void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::resetReferenceTemperature()
+{
   bool result = setString(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceTemperature, "");
   OS_ASSERT(result);
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::setReferenceBarometricPressure(double referenceBarometricPressure) {
+bool AirflowNetworkMultiZoneReferenceCrackConditions_Impl::setReferenceBarometricPressure(double referenceBarometricPressure)
+{
   bool result = setDouble(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceBarometricPressure, referenceBarometricPressure);
   return result;
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::resetReferenceBarometricPressure() {
+void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::resetReferenceBarometricPressure()
+{
   bool result = setString(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceBarometricPressure, "");
   OS_ASSERT(result);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::setReferenceHumidityRatio(double referenceHumidityRatio) {
+void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::setReferenceHumidityRatio(double referenceHumidityRatio)
+{
   bool result = setDouble(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceHumidityRatio, referenceHumidityRatio);
   OS_ASSERT(result);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::resetReferenceHumidityRatio() {
+void AirflowNetworkMultiZoneReferenceCrackConditions_Impl::resetReferenceHumidityRatio()
+{
   bool result = setString(OS_AirflowNetworkMultiZoneReferenceCrackConditionsFields::ReferenceHumidityRatio, "");
   OS_ASSERT(result);
 }
@@ -139,55 +152,68 @@ AirflowNetworkMultiZoneReferenceCrackConditions::AirflowNetworkMultiZoneReferenc
   OS_ASSERT(ok);
 }
 
-IddObjectType AirflowNetworkMultiZoneReferenceCrackConditions::iddObjectType() {
+IddObjectType AirflowNetworkMultiZoneReferenceCrackConditions::iddObjectType()
+{
   return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneReferenceCrackConditions);
 }
 
-double AirflowNetworkMultiZoneReferenceCrackConditions::referenceTemperature() const {
+double AirflowNetworkMultiZoneReferenceCrackConditions::referenceTemperature() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->referenceTemperature();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions::isReferenceTemperatureDefaulted() const {
+bool AirflowNetworkMultiZoneReferenceCrackConditions::isReferenceTemperatureDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->isReferenceTemperatureDefaulted();
 }
 
-double AirflowNetworkMultiZoneReferenceCrackConditions::referenceBarometricPressure() const {
+double AirflowNetworkMultiZoneReferenceCrackConditions::referenceBarometricPressure() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->referenceBarometricPressure();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions::isReferenceBarometricPressureDefaulted() const {
+bool AirflowNetworkMultiZoneReferenceCrackConditions::isReferenceBarometricPressureDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->isReferenceBarometricPressureDefaulted();
 }
 
-double AirflowNetworkMultiZoneReferenceCrackConditions::referenceHumidityRatio() const {
+double AirflowNetworkMultiZoneReferenceCrackConditions::referenceHumidityRatio() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->referenceHumidityRatio();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions::isReferenceHumidityRatioDefaulted() const {
+bool AirflowNetworkMultiZoneReferenceCrackConditions::isReferenceHumidityRatioDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->isReferenceHumidityRatioDefaulted();
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions::setReferenceTemperature(double referenceTemperature) {
+void AirflowNetworkMultiZoneReferenceCrackConditions::setReferenceTemperature(double referenceTemperature)
+{
   getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->setReferenceTemperature(referenceTemperature);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions::resetReferenceTemperature() {
+void AirflowNetworkMultiZoneReferenceCrackConditions::resetReferenceTemperature()
+{
   getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->resetReferenceTemperature();
 }
 
-bool AirflowNetworkMultiZoneReferenceCrackConditions::setReferenceBarometricPressure(double referenceBarometricPressure) {
+bool AirflowNetworkMultiZoneReferenceCrackConditions::setReferenceBarometricPressure(double referenceBarometricPressure)
+{
   return getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->setReferenceBarometricPressure(referenceBarometricPressure);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions::resetReferenceBarometricPressure() {
+void AirflowNetworkMultiZoneReferenceCrackConditions::resetReferenceBarometricPressure()
+{
   getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->resetReferenceBarometricPressure();
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions::setReferenceHumidityRatio(double referenceHumidityRatio) {
+void AirflowNetworkMultiZoneReferenceCrackConditions::setReferenceHumidityRatio(double referenceHumidityRatio)
+{
   getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->setReferenceHumidityRatio(referenceHumidityRatio);
 }
 
-void AirflowNetworkMultiZoneReferenceCrackConditions::resetReferenceHumidityRatio() {
+void AirflowNetworkMultiZoneReferenceCrackConditions::resetReferenceHumidityRatio()
+{
   getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>()->resetReferenceHumidityRatio();
 }
 

@@ -28,80 +28,81 @@ namespace model {
 
 namespace detail {
 
-  /** AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.*/
-  class MODEL_API AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl : public ModelObject_Impl {
-    Q_OBJECT;
-   public:
-    /** @name Constructors and Destructors */
-    //@{
+/** AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.*/
+class MODEL_API AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl : public ModelObject_Impl
+{
+  Q_OBJECT;
+public:
+  /** @name Constructors and Destructors */
+  //@{
 
-    AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const IdfObject& idfObject,
-                                                            Model_Impl* model,
-                                                            bool keepHandle);
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const IdfObject& idfObject,
+    Model_Impl* model,
+    bool keepHandle);
 
-    AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
-                                                            Model_Impl* model,
-                                                            bool keepHandle);
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
+    Model_Impl* model,
+    bool keepHandle);
 
-    AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl& other,
-                                                            Model_Impl* model,
-                                                            bool keepHandle);
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl& other,
+    Model_Impl* model,
+    bool keepHandle);
 
-    virtual ~AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl() {}
+  virtual ~AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl() {}
 
-    //@}
-    /** @name Virtual Methods */
-    //@{
+  //@}
+  /** @name Virtual Methods */
+  //@{
 
-    virtual const std::vector<std::string>& outputVariableNames() const;
+  virtual const std::vector<std::string>& outputVariableNames() const;
 
-    virtual IddObjectType iddObjectType() const;
+  virtual IddObjectType iddObjectType() const;
 
-    //@}
-    /** @name Getters */
-    //@{
+  //@}
+  /** @name Getters */
+  //@{
 
-    double effectiveLeakageArea() const;
+  double effectiveLeakageArea() const;
 
-    double dischargeCoefficient() const;
+  double dischargeCoefficient() const;
 
-    bool isDischargeCoefficientDefaulted() const;
+  bool isDischargeCoefficientDefaulted() const;
 
-    double referencePressureDifference() const;
+  double referencePressureDifference() const;
 
-    bool isReferencePressureDifferenceDefaulted() const;
+  bool isReferencePressureDifferenceDefaulted() const;
 
-    double airMassFlowExponent() const;
+  double airMassFlowExponent() const;
 
-    bool isAirMassFlowExponentDefaulted() const;
+  bool isAirMassFlowExponentDefaulted() const;
 
-    //@}
-    /** @name Setters */
-    //@{
+  //@}
+  /** @name Setters */
+  //@{
 
-    bool setEffectiveLeakageArea(double effectiveLeakageArea);
+  bool setEffectiveLeakageArea(double effectiveLeakageArea);
 
-    bool setDischargeCoefficient(double dischargeCoefficient);
+  bool setDischargeCoefficient(double dischargeCoefficient);
 
-    void resetDischargeCoefficient();
+  void resetDischargeCoefficient();
 
-    bool setReferencePressureDifference(double referencePressureDifference);
+  bool setReferencePressureDifference(double referencePressureDifference);
 
-    void resetReferencePressureDifference();
+  void resetReferencePressureDifference();
 
-    bool setAirMassFlowExponent(double airMassFlowExponent);
+  bool setAirMassFlowExponent(double airMassFlowExponent);
 
-    void resetAirMassFlowExponent();
+  void resetAirMassFlowExponent();
 
-    //@}
-    /** @name Other */
-    //@{
+  //@}
+  /** @name Other */
+  //@{
 
-    //@}
-   protected:
-   private:
-    REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea");
-  };
+  //@}
+protected:
+private:
+  REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea");
+};
 
 } // detail
 
