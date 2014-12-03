@@ -1216,6 +1216,7 @@ endif()
 set(${target_name}_test_src
   test/AirConditionerVariableRefrigerantFlow_GTest.cpp
   test/AirflowNetworkMultiZoneReferenceCrackConditions_GTest.cpp
+  test/AirflowNetworkMultiZoneSurfaceCrack_GTest.cpp
   test/AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_GTest.cpp
   test/AirGap_GTest.cpp
   test/AirLoopHVACOutdoorAirSystem_GTest.cpp

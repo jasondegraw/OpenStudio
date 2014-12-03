@@ -26,77 +26,77 @@
 namespace openstudio {
 namespace model {
 
-// TODO: Check the following class names against object getters and setters.
 class AirflowNetworkMultiZoneReferenceCrackConditions;
 
 namespace detail {
 
-  /** AirflowNetworkMultiZoneSurfaceCrack_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurfaceCrack.*/
-  class MODEL_API AirflowNetworkMultiZoneSurfaceCrack_Impl : public ModelObject_Impl {
-    Q_OBJECT;
-   public:
-    /** @name Constructors and Destructors */
-    //@{
+/** AirflowNetworkMultiZoneSurfaceCrack_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurfaceCrack.*/
+class MODEL_API AirflowNetworkMultiZoneSurfaceCrack_Impl : public ModelObject_Impl
+{
+  Q_OBJECT;
+public:
+  /** @name Constructors and Destructors */
+  //@{
 
-    AirflowNetworkMultiZoneSurfaceCrack_Impl(const IdfObject& idfObject,
-                                             Model_Impl* model,
-                                             bool keepHandle);
+  AirflowNetworkMultiZoneSurfaceCrack_Impl(const IdfObject& idfObject,
+    Model_Impl* model,
+    bool keepHandle);
 
-    AirflowNetworkMultiZoneSurfaceCrack_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
-                                             Model_Impl* model,
-                                             bool keepHandle);
+  AirflowNetworkMultiZoneSurfaceCrack_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
+    Model_Impl* model,
+    bool keepHandle);
 
-    AirflowNetworkMultiZoneSurfaceCrack_Impl(const AirflowNetworkMultiZoneSurfaceCrack_Impl& other,
-                                             Model_Impl* model,
-                                             bool keepHandle);
+  AirflowNetworkMultiZoneSurfaceCrack_Impl(const AirflowNetworkMultiZoneSurfaceCrack_Impl& other,
+    Model_Impl* model,
+    bool keepHandle);
 
-    virtual ~AirflowNetworkMultiZoneSurfaceCrack_Impl() {}
+  virtual ~AirflowNetworkMultiZoneSurfaceCrack_Impl() {}
 
-    //@}
-    /** @name Virtual Methods */
-    //@{
+  //@}
+  /** @name Virtual Methods */
+  //@{
 
-    virtual const std::vector<std::string>& outputVariableNames() const;
+  virtual const std::vector<std::string>& outputVariableNames() const;
 
-    virtual IddObjectType iddObjectType() const;
+  virtual IddObjectType iddObjectType() const;
 
-    //@}
-    /** @name Getters */
-    //@{
+  //@}
+  /** @name Getters */
+  //@{
 
-    double airMassFlowCoefficientatReferenceConditions() const;
+  double airMassFlowCoefficientatReferenceConditions() const;
 
-    double airMassFlowExponent() const;
+  double airMassFlowExponent() const;
 
-    bool isAirMassFlowExponentDefaulted() const;
+  bool isAirMassFlowExponentDefaulted() const;
 
-    // TODO: Check return type. From object lists, some candidates are: ReferenceCrackConditions.
-    boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
+  // TODO: Check return type. From object lists, some candidates are: ReferenceCrackConditions.
+  boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
 
-    //@}
-    /** @name Setters */
-    //@{
+  //@}
+  /** @name Setters */
+  //@{
 
-    bool setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions);
+  bool setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions);
 
-    bool setAirMassFlowExponent(double airMassFlowExponent);
+  bool setAirMassFlowExponent(double airMassFlowExponent);
 
-    void resetAirMassFlowExponent();
+  void resetAirMassFlowExponent();
 
-    // TODO: Check argument type. From object lists, some candidates are: ReferenceCrackConditions.
-    bool setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions);
+  // TODO: Check argument type. From object lists, some candidates are: ReferenceCrackConditions.
+  bool setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions);
 
-    void resetReferenceCrackConditions();
+  void resetReferenceCrackConditions();
 
-    //@}
-    /** @name Other */
-    //@{
+  //@}
+  /** @name Other */
+  //@{
 
-    //@}
-   protected:
-   private:
-    REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceCrack");
-  };
+  //@}
+protected:
+private:
+  REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceCrack");
+};
 
 } // detail
 

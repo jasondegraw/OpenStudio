@@ -36,91 +36,99 @@ namespace model {
 
 namespace detail {
 
-  AirflowNetworkMultiZoneSurfaceCrack_Impl::AirflowNetworkMultiZoneSurfaceCrack_Impl(const IdfObject& idfObject,
-                                                                                     Model_Impl* model,
-                                                                                     bool keepHandle)
-    : ModelObject_Impl(idfObject,model,keepHandle)
-  {
-    OS_ASSERT(idfObject.iddObject().type() == AirflowNetworkMultiZoneSurfaceCrack::iddObjectType());
-  }
+AirflowNetworkMultiZoneSurfaceCrack_Impl::AirflowNetworkMultiZoneSurfaceCrack_Impl(const IdfObject& idfObject,
+  Model_Impl* model,
+  bool keepHandle)
+  : ModelObject_Impl(idfObject, model, keepHandle)
+{
+  OS_ASSERT(idfObject.iddObject().type() == AirflowNetworkMultiZoneSurfaceCrack::iddObjectType());
+}
 
-  AirflowNetworkMultiZoneSurfaceCrack_Impl::AirflowNetworkMultiZoneSurfaceCrack_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
-                                                                                     Model_Impl* model,
-                                                                                     bool keepHandle)
-    : ModelObject_Impl(other,model,keepHandle)
-  {
-    OS_ASSERT(other.iddObject().type() == AirflowNetworkMultiZoneSurfaceCrack::iddObjectType());
-  }
+AirflowNetworkMultiZoneSurfaceCrack_Impl::AirflowNetworkMultiZoneSurfaceCrack_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
+  Model_Impl* model,
+  bool keepHandle)
+  : ModelObject_Impl(other, model, keepHandle)
+{
+  OS_ASSERT(other.iddObject().type() == AirflowNetworkMultiZoneSurfaceCrack::iddObjectType());
+}
 
-  AirflowNetworkMultiZoneSurfaceCrack_Impl::AirflowNetworkMultiZoneSurfaceCrack_Impl(const AirflowNetworkMultiZoneSurfaceCrack_Impl& other,
-                                                                                     Model_Impl* model,
-                                                                                     bool keepHandle)
-    : ModelObject_Impl(other,model,keepHandle)
-  {}
+AirflowNetworkMultiZoneSurfaceCrack_Impl::AirflowNetworkMultiZoneSurfaceCrack_Impl(const AirflowNetworkMultiZoneSurfaceCrack_Impl& other,
+  Model_Impl* model,
+  bool keepHandle)
+  : ModelObject_Impl(other, model, keepHandle)
+{}
 
-  const std::vector<std::string>& AirflowNetworkMultiZoneSurfaceCrack_Impl::outputVariableNames() const
-  {
-    static std::vector<std::string> result;
-    if (result.empty()){
-    }
-    return result;
+const std::vector<std::string>& AirflowNetworkMultiZoneSurfaceCrack_Impl::outputVariableNames() const
+{
+  static std::vector<std::string> result;
+  if(result.empty()){
   }
+  return result;
+}
 
-  IddObjectType AirflowNetworkMultiZoneSurfaceCrack_Impl::iddObjectType() const {
-    return AirflowNetworkMultiZoneSurfaceCrack::iddObjectType();
-  }
+IddObjectType AirflowNetworkMultiZoneSurfaceCrack_Impl::iddObjectType() const
+{
+  return AirflowNetworkMultiZoneSurfaceCrack::iddObjectType();
+}
 
-  double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowCoefficientatReferenceConditions() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions,true);
-    OS_ASSERT(value);
-    return value.get();
-  }
+double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowCoefficientatReferenceConditions() const
+{
+  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, true);
+  OS_ASSERT(value);
+  return value.get();
+}
 
-  double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowExponent() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent,true);
-    OS_ASSERT(value);
-    return value.get();
-  }
+double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowExponent() const
+{
+  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, true);
+  OS_ASSERT(value);
+  return value.get();
+}
 
-  bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isAirMassFlowExponentDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent);
-  }
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isAirMassFlowExponentDefaulted() const
+{
+  return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent);
+}
 
-  boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> AirflowNetworkMultiZoneSurfaceCrack_Impl::referenceCrackConditions() const {
-    return getObject<ModelObject>().getModelObjectTarget<AirflowNetworkMultiZoneReferenceCrackConditions>(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions);
-  }
+boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> AirflowNetworkMultiZoneSurfaceCrack_Impl::referenceCrackConditions() const
+{
+  return getObject<ModelObject>().getModelObjectTarget<AirflowNetworkMultiZoneReferenceCrackConditions>(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions);
+}
 
-  bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, airMassFlowCoefficientatReferenceConditions);
-    return result;
-  }
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions)
+{
+  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, airMassFlowCoefficientatReferenceConditions);
+  return result;
+}
 
-  bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowExponent(double airMassFlowExponent) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, airMassFlowExponent);
-    return result;
-  }
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowExponent(double airMassFlowExponent)
+{
+  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, airMassFlowExponent);
+  return result;
+}
 
-  void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetAirMassFlowExponent() {
-    bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, "");
-    OS_ASSERT(result);
-  }
+void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetAirMassFlowExponent()
+{
+  bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, "");
+  OS_ASSERT(result);
+}
 
-  bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions) {
-    bool result(false);
-    if (referenceCrackConditions) {
-      result = setPointer(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions, referenceCrackConditions.get().handle());
-    }
-    else {
-      resetReferenceCrackConditions();
-      result = true;
-    }
-    return result;
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions)
+{
+  bool result(false);
+  if(referenceCrackConditions) {
+    result = setPointer(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions, referenceCrackConditions.get().handle());
+  } else {
+    resetReferenceCrackConditions();
+    result = true;
   }
+  return result;
+}
 
-  void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetReferenceCrackConditions() {
-    bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions, "");
-    OS_ASSERT(result);
-  }
+void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetReferenceCrackConditions() {
+  bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions, "");
+  OS_ASSERT(result);
+}
 
 } // detail
 
@@ -137,35 +145,43 @@ AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const M
   OS_ASSERT(ok);
 }
 
-IddObjectType AirflowNetworkMultiZoneSurfaceCrack::iddObjectType() {
+IddObjectType AirflowNetworkMultiZoneSurfaceCrack::iddObjectType()
+{
   return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneSurfaceCrack);
 }
 
-double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowCoefficientatReferenceConditions() const {
+double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowCoefficientatReferenceConditions() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->airMassFlowCoefficientatReferenceConditions();
 }
 
-double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowExponent() const {
+double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowExponent() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->airMassFlowExponent();
 }
 
-bool AirflowNetworkMultiZoneSurfaceCrack::isAirMassFlowExponentDefaulted() const {
+bool AirflowNetworkMultiZoneSurfaceCrack::isAirMassFlowExponentDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->isAirMassFlowExponentDefaulted();
 }
 
-boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> AirflowNetworkMultiZoneSurfaceCrack::referenceCrackConditions() const {
+boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> AirflowNetworkMultiZoneSurfaceCrack::referenceCrackConditions() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->referenceCrackConditions();
 }
 
-bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions) {
+bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions)
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->setAirMassFlowCoefficientatReferenceConditions(airMassFlowCoefficientatReferenceConditions);
 }
 
-bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowExponent(double airMassFlowExponent) {
+bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowExponent(double airMassFlowExponent)
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->setAirMassFlowExponent(airMassFlowExponent);
 }
 
-void AirflowNetworkMultiZoneSurfaceCrack::resetAirMassFlowExponent() {
+void AirflowNetworkMultiZoneSurfaceCrack::resetAirMassFlowExponent()
+{
   getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->resetAirMassFlowExponent();
 }
 
@@ -173,7 +189,8 @@ bool AirflowNetworkMultiZoneSurfaceCrack::setReferenceCrackConditions(const Airf
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->setReferenceCrackConditions(referenceCrackConditions);
 }
 
-void AirflowNetworkMultiZoneSurfaceCrack::resetReferenceCrackConditions() {
+void AirflowNetworkMultiZoneSurfaceCrack::resetReferenceCrackConditions()
+{
   getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->resetReferenceCrackConditions();
 }
 

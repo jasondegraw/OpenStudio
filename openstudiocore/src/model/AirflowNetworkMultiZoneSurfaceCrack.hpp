@@ -27,7 +27,6 @@ namespace openstudio {
 
 namespace model {
 
-// TODO: Check the following class names against object getters and setters.
 class AirflowNetworkMultiZoneReferenceCrackConditions;
 
 namespace detail {
@@ -37,8 +36,9 @@ class AirflowNetworkMultiZoneSurfaceCrack_Impl;
 } // detail
 
 /** AirflowNetworkMultiZoneSurfaceCrack is a ModelObject that wraps the OpenStudio IDD object 'OS:AirflowNetworkMultiZoneSurfaceCrack'. */
-class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject {
- public:
+class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject
+{
+public:
   /** @name Constructors and Destructors */
   //@{
 
@@ -59,7 +59,6 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject {
 
   bool isAirMassFlowExponentDefaulted() const;
 
-  // TODO: Check return type. From object lists, some candidates are: ReferenceCrackConditions.
   boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
 
   //@}
@@ -72,7 +71,6 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject {
 
   void resetAirMassFlowExponent();
 
-  // TODO: Check argument type. From object lists, some candidates are: ReferenceCrackConditions.
   bool setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions& referenceCrackConditions);
 
   void resetReferenceCrackConditions();
@@ -82,7 +80,7 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject {
   //@{
 
   //@}
- protected:
+protected:
   /// @cond
   typedef detail::AirflowNetworkMultiZoneSurfaceCrack_Impl ImplType;
 
@@ -93,7 +91,7 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject {
   friend class IdfObject;
   friend class openstudio::detail::IdfObject_Impl;
   /// @endcond
- private:
+private:
   REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceCrack");
 };
 
