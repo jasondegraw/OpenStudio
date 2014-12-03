@@ -34,8 +34,9 @@ class AirflowNetworkMultiZoneReferenceCrackConditions_Impl;
 } // detail
 
 /** AirflowNetworkMultiZoneReferenceCrackConditions is a ModelObject that wraps the OpenStudio IDD object 'OS:AirflowNetworkMultiZoneReferenceCrackConditions'. */
-class MODEL_API AirflowNetworkMultiZoneReferenceCrackConditions : public ModelObject {
- public:
+class MODEL_API AirflowNetworkMultiZoneReferenceCrackConditions : public ModelObject
+{
+public:
   /** @name Constructors and Destructors */
   //@{
 
@@ -83,7 +84,7 @@ class MODEL_API AirflowNetworkMultiZoneReferenceCrackConditions : public ModelOb
   //@{
 
   //@}
- protected:
+protected:
   /// @cond
   typedef detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl ImplType;
 
@@ -94,7 +95,7 @@ class MODEL_API AirflowNetworkMultiZoneReferenceCrackConditions : public ModelOb
   friend class IdfObject;
   friend class openstudio::detail::IdfObject_Impl;
   /// @endcond
- private:
+private:
   REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneReferenceCrackConditions");
 };
 

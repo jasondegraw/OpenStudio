@@ -32,115 +32,130 @@ namespace model {
 
 namespace detail {
 
-  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const IdfObject& idfObject,
-                                                                                                                   Model_Impl* model,
-                                                                                                                   bool keepHandle)
-    : ModelObject_Impl(idfObject,model,keepHandle)
-  {
-    OS_ASSERT(idfObject.iddObject().type() == AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType());
-  }
+AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const IdfObject& idfObject,
+  Model_Impl* model,
+  bool keepHandle)
+  : ModelObject_Impl(idfObject, model, keepHandle)
+{
+  OS_ASSERT(idfObject.iddObject().type() == AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType());
+}
 
-  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
-                                                                                                                   Model_Impl* model,
-                                                                                                                   bool keepHandle)
-    : ModelObject_Impl(other,model,keepHandle)
-  {
-    OS_ASSERT(other.iddObject().type() == AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType());
-  }
+AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
+  Model_Impl* model,
+  bool keepHandle)
+  : ModelObject_Impl(other, model, keepHandle)
+{
+  OS_ASSERT(other.iddObject().type() == AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType());
+}
 
-  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl& other,
-                                                                                                                   Model_Impl* model,
-                                                                                                                   bool keepHandle)
-    : ModelObject_Impl(other,model,keepHandle)
-  {}
+AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl(const AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl& other,
+  Model_Impl* model,
+  bool keepHandle)
+  : ModelObject_Impl(other, model, keepHandle)
+{}
 
-  const std::vector<std::string>& AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::outputVariableNames() const
-  {
-    static std::vector<std::string> result;
-    if (result.empty()){
-    }
-    return result;
+const std::vector<std::string>& AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::outputVariableNames() const
+{
+  static std::vector<std::string> result;
+  if(result.empty()){
   }
+  return result;
+}
 
-  IddObjectType AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::iddObjectType() const {
-    return AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType();
-  }
+IddObjectType AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::iddObjectType() const
+{
+  return AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType();
+}
 
-  double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::effectiveLeakageArea() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::EffectiveLeakageArea,true);
-    OS_ASSERT(value);
-    return value.get();
-  }
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::effectiveLeakageArea() const
+{
+  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::EffectiveLeakageArea, true);
+  OS_ASSERT(value);
+  return value.get();
+}
 
-  double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::dischargeCoefficient() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient,true);
-    OS_ASSERT(value);
-    return value.get();
-  }
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::dischargeCoefficient() const
+{
+  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient, true);
+  OS_ASSERT(value);
+  return value.get();
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::isDischargeCoefficientDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient);
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::isDischargeCoefficientDefaulted() const
+{
+  return isEmpty(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient);
+}
 
-  double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::referencePressureDifference() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference,true);
-    OS_ASSERT(value);
-    return value.get();
-  }
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::referencePressureDifference() const
+{
+  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference, true);
+  OS_ASSERT(value);
+  return value.get();
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::isReferencePressureDifferenceDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference);
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::isReferencePressureDifferenceDefaulted() const
+{
+  return isEmpty(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference);
+}
 
-  double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::airMassFlowExponent() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent,true);
-    OS_ASSERT(value);
-    return value.get();
-  }
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::airMassFlowExponent() const
+{
+  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent, true);
+  OS_ASSERT(value);
+  return value.get();
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::isAirMassFlowExponentDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent);
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::isAirMassFlowExponentDefaulted() const
+{
+  return isEmpty(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent);
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setEffectiveLeakageArea(double effectiveLeakageArea) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::EffectiveLeakageArea, effectiveLeakageArea);
-    return result;
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setEffectiveLeakageArea(double effectiveLeakageArea)
+{
+  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::EffectiveLeakageArea, effectiveLeakageArea);
+  return result;
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setDischargeCoefficient(double dischargeCoefficient) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient, dischargeCoefficient);
-    return result;
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setDischargeCoefficient(double dischargeCoefficient)
+{
+  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient, dischargeCoefficient);
+  return result;
+}
 
-  void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetDischargeCoefficient() {
-    bool result = setString(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient, "");
-    OS_ASSERT(result);
-  }
+void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetDischargeCoefficient()
+{
+  bool result = setString(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::DischargeCoefficient, "");
+  OS_ASSERT(result);
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setReferencePressureDifference(double referencePressureDifference) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference, referencePressureDifference);
-    return result;
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setReferencePressureDifference(double referencePressureDifference)
+{
+  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference, referencePressureDifference);
+  return result;
+}
 
-  void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetReferencePressureDifference() {
-    bool result = setString(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference, "");
-    OS_ASSERT(result);
-  }
+void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetReferencePressureDifference()
+{
+  bool result = setString(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::ReferencePressureDifference, "");
+  OS_ASSERT(result);
+}
 
-  bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setAirMassFlowExponent(double airMassFlowExponent) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent, airMassFlowExponent);
-    return result;
-  }
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::setAirMassFlowExponent(double airMassFlowExponent)
+{
+  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent, airMassFlowExponent);
+  return result;
+}
 
-  void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetAirMassFlowExponent() {
-    bool result = setString(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent, "");
-    OS_ASSERT(result);
-  }
+void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetAirMassFlowExponent()
+{
+  bool result = setString(OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageAreaFields::AirMassFlowExponent, "");
+  OS_ASSERT(result);
+}
 
 } // detail
 
 AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model)
-  : ModelObject(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType(),model)
+  : ModelObject(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType(), model)
 {
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>());
 
@@ -152,63 +167,78 @@ AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::AirflowNetworkMultiZoneSurfa
   OS_ASSERT(ok);
 }
 
-IddObjectType AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType() {
+IddObjectType AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType()
+{
   return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
 }
 
-double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::effectiveLeakageArea() const {
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::effectiveLeakageArea() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->effectiveLeakageArea();
 }
 
-double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::dischargeCoefficient() const {
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::dischargeCoefficient() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->dischargeCoefficient();
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::isDischargeCoefficientDefaulted() const {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::isDischargeCoefficientDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->isDischargeCoefficientDefaulted();
 }
 
-double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::referencePressureDifference() const {
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::referencePressureDifference() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->referencePressureDifference();
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::isReferencePressureDifferenceDefaulted() const {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::isReferencePressureDifferenceDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->isReferencePressureDifferenceDefaulted();
 }
 
-double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::airMassFlowExponent() const {
+double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::airMassFlowExponent() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->airMassFlowExponent();
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::isAirMassFlowExponentDefaulted() const {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::isAirMassFlowExponentDefaulted() const
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->isAirMassFlowExponentDefaulted();
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setEffectiveLeakageArea(double effectiveLeakageArea) {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setEffectiveLeakageArea(double effectiveLeakageArea)
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->setEffectiveLeakageArea(effectiveLeakageArea);
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setDischargeCoefficient(double dischargeCoefficient) {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setDischargeCoefficient(double dischargeCoefficient)
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->setDischargeCoefficient(dischargeCoefficient);
 }
 
-void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::resetDischargeCoefficient() {
+void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::resetDischargeCoefficient()
+{
   getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->resetDischargeCoefficient();
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setReferencePressureDifference(double referencePressureDifference) {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setReferencePressureDifference(double referencePressureDifference)
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->setReferencePressureDifference(referencePressureDifference);
 }
 
-void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::resetReferencePressureDifference() {
+void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::resetReferencePressureDifference()
+{
   getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->resetReferencePressureDifference();
 }
 
-bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setAirMassFlowExponent(double airMassFlowExponent) {
+bool AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::setAirMassFlowExponent(double airMassFlowExponent)
+{
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->setAirMassFlowExponent(airMassFlowExponent);
 }
 
-void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::resetAirMassFlowExponent() {
+void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::resetAirMassFlowExponent()
+{
   getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>()->resetAirMassFlowExponent();
 }
 

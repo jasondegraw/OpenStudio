@@ -28,76 +28,77 @@ namespace model {
 
 namespace detail {
 
-  /** AirflowNetworkMultiZoneReferenceCrackConditions_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneReferenceCrackConditions.*/
-  class MODEL_API AirflowNetworkMultiZoneReferenceCrackConditions_Impl : public ModelObject_Impl {
-    Q_OBJECT;
-   public:
-    /** @name Constructors and Destructors */
-    //@{
+/** AirflowNetworkMultiZoneReferenceCrackConditions_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneReferenceCrackConditions.*/
+class MODEL_API AirflowNetworkMultiZoneReferenceCrackConditions_Impl : public ModelObject_Impl
+{
+  Q_OBJECT;
+public:
+  /** @name Constructors and Destructors */
+  //@{
 
-    AirflowNetworkMultiZoneReferenceCrackConditions_Impl(const IdfObject& idfObject,
-                                                         Model_Impl* model,
-                                                         bool keepHandle);
+  AirflowNetworkMultiZoneReferenceCrackConditions_Impl(const IdfObject& idfObject,
+    Model_Impl* model,
+    bool keepHandle);
 
-    AirflowNetworkMultiZoneReferenceCrackConditions_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
-                                                         Model_Impl* model,
-                                                         bool keepHandle);
+  AirflowNetworkMultiZoneReferenceCrackConditions_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
+    Model_Impl* model,
+    bool keepHandle);
 
-    AirflowNetworkMultiZoneReferenceCrackConditions_Impl(const AirflowNetworkMultiZoneReferenceCrackConditions_Impl& other,
-                                                         Model_Impl* model,
-                                                         bool keepHandle);
+  AirflowNetworkMultiZoneReferenceCrackConditions_Impl(const AirflowNetworkMultiZoneReferenceCrackConditions_Impl& other,
+    Model_Impl* model,
+    bool keepHandle);
 
-    virtual ~AirflowNetworkMultiZoneReferenceCrackConditions_Impl() {}
+  virtual ~AirflowNetworkMultiZoneReferenceCrackConditions_Impl() {}
 
-    //@}
-    /** @name Virtual Methods */
-    //@{
+  //@}
+  /** @name Virtual Methods */
+  //@{
 
-    virtual const std::vector<std::string>& outputVariableNames() const;
+  virtual const std::vector<std::string>& outputVariableNames() const;
 
-    virtual IddObjectType iddObjectType() const;
+  virtual IddObjectType iddObjectType() const;
 
-    //@}
-    /** @name Getters */
-    //@{
+  //@}
+  /** @name Getters */
+  //@{
 
-    double referenceTemperature() const;
+  double referenceTemperature() const;
 
-    bool isReferenceTemperatureDefaulted() const;
+  bool isReferenceTemperatureDefaulted() const;
 
-    double referenceBarometricPressure() const;
+  double referenceBarometricPressure() const;
 
-    bool isReferenceBarometricPressureDefaulted() const;
+  bool isReferenceBarometricPressureDefaulted() const;
 
-    double referenceHumidityRatio() const;
+  double referenceHumidityRatio() const;
 
-    bool isReferenceHumidityRatioDefaulted() const;
+  bool isReferenceHumidityRatioDefaulted() const;
 
-    //@}
-    /** @name Setters */
-    //@{
+  //@}
+  /** @name Setters */
+  //@{
 
-    void setReferenceTemperature(double referenceTemperature);
+  void setReferenceTemperature(double referenceTemperature);
 
-    void resetReferenceTemperature();
+  void resetReferenceTemperature();
 
-    bool setReferenceBarometricPressure(double referenceBarometricPressure);
+  bool setReferenceBarometricPressure(double referenceBarometricPressure);
 
-    void resetReferenceBarometricPressure();
+  void resetReferenceBarometricPressure();
 
-    void setReferenceHumidityRatio(double referenceHumidityRatio);
+  void setReferenceHumidityRatio(double referenceHumidityRatio);
 
-    void resetReferenceHumidityRatio();
+  void resetReferenceHumidityRatio();
 
-    //@}
-    /** @name Other */
-    //@{
+  //@}
+  /** @name Other */
+  //@{
 
-    //@}
-   protected:
-   private:
-    REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneReferenceCrackConditions");
-  };
+  //@}
+protected:
+private:
+  REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneReferenceCrackConditions");
+};
 
 } // detail
 
