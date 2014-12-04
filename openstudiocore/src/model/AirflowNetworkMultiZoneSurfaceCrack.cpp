@@ -19,8 +19,8 @@
 
 #include <model/AirflowNetworkMultiZoneSurfaceCrack.hpp>
 #include <model/AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp>
+#include <model/Model.hpp>
 
-// TODO: Check the following class names against object getters and setters.
 #include <model/AirflowNetworkMultiZoneReferenceCrackConditions.hpp>
 #include <model/AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp>
 
@@ -95,6 +95,18 @@ boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> AirflowNetworkM
   return getObject<ModelObject>().getModelObjectTarget<AirflowNetworkMultiZoneReferenceCrackConditions>(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions);
 }
 
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isReferenceCrackConditionsObjectDefaulted() const
+{
+  // If there is a reference crack conditions object, then it is not defaulted
+  if(!isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions)) {
+    return false;
+  }
+  // Check to see if there are any reference crack conditions objects in the model
+  auto refCondObjs = this->model().getConcreteModelObjects<AirflowNetworkMultiZoneReferenceCrackConditions>();
+  // If there are 0 or 2 or more reference condition objects, it is defaulted
+  return !(refCondObjs.size() == 1);
+}
+
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions)
 {
   bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, airMassFlowCoefficientatReferenceConditions);
@@ -132,17 +144,39 @@ void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetReferenceCrackConditions() {
 
 } // detail
 
-AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const Model& model)
+AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient)
   : ModelObject(AirflowNetworkMultiZoneSurfaceCrack::iddObjectType(),model)
 {
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>());
 
   // TODO: Appropriately handle the following required object-list fields.
-  bool ok = true;
-  // ok = setHandle();
-  OS_ASSERT(ok);
-  // ok = setAirMassFlowCoefficientatReferenceConditions();
-  OS_ASSERT(ok);
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientatReferenceConditions(massFlowCoefficient));
+}
+
+AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient,
+  double massFlowExponent)
+  : ModelObject(AirflowNetworkMultiZoneSurfaceCrack::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>());
+
+  // TODO: Appropriately handle the following required object-list fields.
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientatReferenceConditions(massFlowCoefficient));
+  OS_ASSERT(setAirMassFlowExponent(massFlowExponent));
+}
+
+AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient,
+  double massFlowExponent, const AirflowNetworkMultiZoneReferenceCrackConditions &referenceCrackConditions)
+  : ModelObject(AirflowNetworkMultiZoneSurfaceCrack::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>());
+
+  // TODO: Appropriately handle the following required object-list fields.
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientatReferenceConditions(massFlowCoefficient));
+  OS_ASSERT(setAirMassFlowExponent(massFlowExponent));
+  OS_ASSERT(setReferenceCrackConditions(referenceCrackConditions));
 }
 
 IddObjectType AirflowNetworkMultiZoneSurfaceCrack::iddObjectType()
@@ -173,6 +207,11 @@ boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> AirflowNetworkM
 bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions)
 {
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->setAirMassFlowCoefficientatReferenceConditions(airMassFlowCoefficientatReferenceConditions);
+}
+
+bool AirflowNetworkMultiZoneSurfaceCrack::isReferenceCrackConditionsObjectDefaulted() const
+{
+  return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->isReferenceCrackConditionsObjectDefaulted();
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowExponent(double airMassFlowExponent)

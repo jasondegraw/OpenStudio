@@ -41,8 +41,14 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceCrack : public ModelObject
 public:
   /** @name Constructors and Destructors */
   //@{
-
-  explicit AirflowNetworkMultiZoneSurfaceCrack(const Model& model);
+  /** Construct a surface crack object with default values and a specified mass flow coefficient. */
+  AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient);
+  /** Construct a surface crack object without a reference conditions object. */
+  AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient,
+    double massFlowExponent);
+  /** Construct a surface crack object. */
+  AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient, double massFlowExponent,
+    const AirflowNetworkMultiZoneReferenceCrackConditions &referenceCrackConditions);
 
   virtual ~AirflowNetworkMultiZoneSurfaceCrack() {}
 
@@ -52,32 +58,32 @@ public:
 
   /** @name Getters */
   //@{
-
+  /** Returns the mass flow coefficient in kg/s at 1 Pa. */
   double airMassFlowCoefficientatReferenceConditions() const;
-
+  /** Returns the mass flow exponent. */
   double airMassFlowExponent() const;
-
+  /** Returns true if the mass flow exponent is defaulted. */
   bool isAirMassFlowExponentDefaulted() const;
-
+  /** Returns the reference conditions object for this crack if it has been set. */
   boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
+  /** Returns true if the reference conditions object is defaulted. */
+  bool isReferenceCrackConditionsObjectDefaulted() const;
 
   //@}
   /** @name Setters */
   //@{
-
+  /** Sets the mass flow coefficient in kg/s at 1 Pa.  */
   bool setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions);
-
+  /** Sets the mass flow exponent. */
   bool setAirMassFlowExponent(double airMassFlowExponent);
-
+  /** Returns the mass flow exponent to the default value. */
   void resetAirMassFlowExponent();
-
+  /** Sets the reference conditions object for this crack. */
   bool setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions& referenceCrackConditions);
-
+  /** Unsets the reference conditions object for this crack. This does not necessarily result in defaulted
+    values. Default values will only be used if the this is unset and there are no reference crack conditions
+    objects in the model. */
   void resetReferenceCrackConditions();
-
-  //@}
-  /** @name Other */
-  //@{
 
   //@}
 protected:

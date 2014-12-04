@@ -70,8 +70,9 @@ public:
 
   bool isAirMassFlowExponentDefaulted() const;
 
-  // TODO: Check return type. From object lists, some candidates are: ReferenceCrackConditions.
   boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
+
+  bool isReferenceCrackConditionsObjectDefaulted() const;
 
   //@}
   /** @name Setters */
@@ -83,14 +84,9 @@ public:
 
   void resetAirMassFlowExponent();
 
-  // TODO: Check argument type. From object lists, some candidates are: ReferenceCrackConditions.
   bool setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions);
 
   void resetReferenceCrackConditions();
-
-  //@}
-  /** @name Other */
-  //@{
 
   //@}
 protected:

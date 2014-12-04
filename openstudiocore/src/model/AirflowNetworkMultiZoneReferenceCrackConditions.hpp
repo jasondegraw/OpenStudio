@@ -41,6 +41,9 @@ public:
   //@{
   /** Construct a reference crack conditions object with default values. */
   explicit AirflowNetworkMultiZoneReferenceCrackConditions(const Model& model);
+  /** Construct a reference crack conditions object. */
+  AirflowNetworkMultiZoneReferenceCrackConditions(const Model& model, double referenceTemperature,
+    double referenceBarometricPressure, double referenceHumidityRatio);
 
   virtual ~AirflowNetworkMultiZoneReferenceCrackConditions() {}
 

@@ -91,10 +91,6 @@ public:
   void resetReferenceHumidityRatio();
 
   //@}
-  /** @name Other */
-  //@{
-
-  //@}
 protected:
 private:
   REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneReferenceCrackConditions");

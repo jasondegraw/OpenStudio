@@ -55,4 +55,23 @@ TEST_F(ModelFixture, ReferenceCrackConditions)
   refconds.resetReferenceHumidityRatio();
   EXPECT_TRUE(refconds.isReferenceHumidityRatioDefaulted());
 
+  // Do it again
+  refconds = openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions(model, 25.75, 101425.7, 0.007);
+
+  // Check the values
+  EXPECT_FALSE(refconds.isReferenceTemperatureDefaulted());
+  EXPECT_EQ(25.75, refconds.referenceTemperature());
+  EXPECT_FALSE(refconds.isReferenceBarometricPressureDefaulted());
+  EXPECT_EQ(101425.7, refconds.referenceBarometricPressure());
+  EXPECT_FALSE(refconds.isReferenceHumidityRatioDefaulted());
+  EXPECT_EQ(0.007, refconds.referenceHumidityRatio());
+
+  // Reset it all back and check
+  refconds.resetReferenceTemperature();
+  EXPECT_TRUE(refconds.isReferenceTemperatureDefaulted());
+  refconds.resetReferenceBarometricPressure();
+  EXPECT_TRUE(refconds.isReferenceBarometricPressureDefaulted());
+  refconds.resetReferenceHumidityRatio();
+  EXPECT_TRUE(refconds.isReferenceHumidityRatioDefaulted());
+
 }

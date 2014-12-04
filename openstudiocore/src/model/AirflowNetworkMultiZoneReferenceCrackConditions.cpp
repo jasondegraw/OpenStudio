@@ -147,9 +147,21 @@ AirflowNetworkMultiZoneReferenceCrackConditions::AirflowNetworkMultiZoneReferenc
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>());
 
   // TODO: Appropriately handle the following required object-list fields.
-  bool ok = true;
-  // ok = setHandle();
-  OS_ASSERT(ok);
+  // OS_ASSERT(setHandle());
+}
+
+AirflowNetworkMultiZoneReferenceCrackConditions::AirflowNetworkMultiZoneReferenceCrackConditions(const Model& model,
+  double referenceTemperature, double referenceBarometricPressure, double referenceHumidityRatio)
+  : ModelObject(AirflowNetworkMultiZoneReferenceCrackConditions::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneReferenceCrackConditions_Impl>());
+  // TODO: Appropriately handle the following required object-list fields.
+  // OS_ASSERT(setHandle());
+  //OS_ASSERT(setReferenceTemperature(referenceTemperature));
+  setReferenceTemperature(referenceTemperature);
+  OS_ASSERT(setReferenceBarometricPressure(referenceBarometricPressure));
+  //OS_ASSERT(setReferenceHumidityRatio(referenceHumidityRatio));
+  setReferenceHumidityRatio(referenceHumidityRatio);
 }
 
 IddObjectType AirflowNetworkMultiZoneReferenceCrackConditions::iddObjectType()
