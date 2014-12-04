@@ -84,7 +84,7 @@ public:
 
   void resetAirMassFlowExponent();
 
-  bool setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions);
+  bool setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions &referenceCrackConditions);
 
   void resetReferenceCrackConditions();
 

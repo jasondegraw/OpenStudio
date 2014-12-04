@@ -23,7 +23,59 @@
 
 #include <model/AirflowNetworkMultiZoneSurfaceCrack.hpp>
 #include <model/AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp>
+#include <model/AirflowNetworkMultiZoneReferenceCrackConditions.hpp>
 
-using namespace openstudio;
-using namespace openstudio::model;
+TEST_F(ModelFixture, Crack)
+{
+  openstudio::model::Model model;
+
+  // Create the crack
+  openstudio::model::AirflowNetworkMultiZoneSurfaceCrack crack(model,0.0006);
+
+  // Check that everything is as it should be
+  EXPECT_EQ(0.0006, crack.airMassFlowCoefficientatReferenceConditions());
+  EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
+  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted()); // No reference conditions available
+  EXPECT_FALSE(crack.referenceCrackConditions());
+
+  // Create a reference conditions object
+  openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds0(model, 25.75, 101425.7, 0.007);
+
+  // Check that the reference conditions are no longer defaulted
+  EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds0 implicitly
+  EXPECT_FALSE(crack.referenceCrackConditions());
+
+  // Add in a second reference conditions object
+  openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds1(model, 25.75, 101225.7, 0.007);
+
+  // Check that the reference conditions are no longer defaulted
+  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+  EXPECT_FALSE(crack.referenceCrackConditions());
+
+  // Explicitly set the reference conditions object
+  EXPECT_TRUE(crack.setReferenceCrackConditions(refconds1));
+
+  // Check that the reference conditions are no longer defaulted
+  EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds1 explicitly
+  EXPECT_TRUE(crack.referenceCrackConditions());
+  EXPECT_EQ(refconds1, crack.referenceCrackConditions());
+
+  // Set the exponent
+  crack.setAirMassFlowExponent(0.65);
+
+  // Check that it worked
+  EXPECT_FALSE(crack.isAirMassFlowExponentDefaulted());
+  EXPECT_EQ(0.65, crack.airMassFlowExponent());
+
+  // Reset
+  crack.resetReferenceCrackConditions();
+  crack.resetAirMassFlowExponent();
+
+  // Check that the reset worked
+  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+  EXPECT_FALSE(crack.referenceCrackConditions());
+  EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
+
+  //JWD: Maybe should continue rolling stuff back here?
+}
 

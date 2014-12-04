@@ -125,15 +125,9 @@ void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetAirMassFlowExponent()
   OS_ASSERT(result);
 }
 
-bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceCrackConditions(const boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions>& referenceCrackConditions)
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions &referenceCrackConditions)
 {
-  bool result(false);
-  if(referenceCrackConditions) {
-    result = setPointer(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions, referenceCrackConditions.get().handle());
-  } else {
-    resetReferenceCrackConditions();
-    result = true;
-  }
+  bool result = setPointer(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceCrackConditions, referenceCrackConditions.handle());
   return result;
 }
 
