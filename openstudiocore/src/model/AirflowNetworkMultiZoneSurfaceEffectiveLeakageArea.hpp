@@ -38,8 +38,11 @@ class MODEL_API AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea : public Mode
 public:
   /** @name Constructors and Destructors */
   //@{
-
-  explicit AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model);
+  /** Construct an effective leakage area object with default values and a specified effective leakage area. */
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model, double effectiveLeakageArea);
+  /** Construct an effective leakage area object. */
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model, double effectiveLeakageArea,
+    double dischargeCoefficient, double referencePressureDifference, double massFlowExponent);
 
   virtual ~AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea() {}
 
@@ -49,42 +52,38 @@ public:
 
   /** @name Getters */
   //@{
-
+  /** Returns the effective leakage area in square meters. */
   double effectiveLeakageArea() const;
-
+  /** Returns the discharge coefficient. */
   double dischargeCoefficient() const;
-
+  /** Returns true if the discharge coefficient is defaulted. */
   bool isDischargeCoefficientDefaulted() const;
-
+  /** Returns the reference pressure difference in Pa. */
   double referencePressureDifference() const;
-
+  /** Returns true if the reference pressure difference is defaulted. */
   bool isReferencePressureDifferenceDefaulted() const;
-
+  /** Returns the mass flow exponent. */
   double airMassFlowExponent() const;
-
+  /** Returns true if the mass flow exponent. */
   bool isAirMassFlowExponentDefaulted() const;
 
   //@}
   /** @name Setters */
   //@{
-
+  /** Sets the effective leakage area in square meters. */
   bool setEffectiveLeakageArea(double effectiveLeakageArea);
-
+  /** Sets the discharge coefficient. */
   bool setDischargeCoefficient(double dischargeCoefficient);
-
+  /** Returns the discharge coefficient to the default value. */
   void resetDischargeCoefficient();
-
+  /** Sets the reference pressure difference in Pa. */
   bool setReferencePressureDifference(double referencePressureDifference);
-
+  /** Returns the reference pressure difference to the default value. */
   void resetReferencePressureDifference();
-
+  /** Sets the mass flow exponent. */
   bool setAirMassFlowExponent(double airMassFlowExponent);
-
+  /** Returns the mass flow exponent to the default value. */
   void resetAirMassFlowExponent();
-
-  //@}
-  /** @name Other */
-  //@{
 
   //@}
 protected:

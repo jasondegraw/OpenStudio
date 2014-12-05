@@ -61,11 +61,13 @@ TEST_F(ModelFixture, Crack)
   EXPECT_EQ(refconds1, crack.referenceCrackConditions());
 
   // Set the exponent
-  crack.setAirMassFlowExponent(0.65);
+  EXPECT_TRUE(crack.setAirMassFlowExponent(0.66));
+  EXPECT_FALSE(crack.setAirMassFlowExponent(0.499999));
+  EXPECT_FALSE(crack.setAirMassFlowExponent(1.000001));
 
   // Check that it worked
   EXPECT_FALSE(crack.isAirMassFlowExponentDefaulted());
-  EXPECT_EQ(0.65, crack.airMassFlowExponent());
+  EXPECT_EQ(0.66, crack.airMassFlowExponent());
 
   // Reset
   crack.resetReferenceCrackConditions();
