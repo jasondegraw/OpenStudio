@@ -76,6 +76,11 @@ TEST_F(ModelFixture, Crack)
   EXPECT_FALSE(crack.referenceCrackConditions());
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
 
-  //JWD: Maybe should continue rolling stuff back here?
+  // Go backwards
+  refconds1.remove();
+  EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted());
+  refconds0.remove();
+  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+
 }
 
