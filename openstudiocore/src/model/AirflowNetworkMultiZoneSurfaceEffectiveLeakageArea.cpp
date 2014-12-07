@@ -154,17 +154,29 @@ void AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl::resetAirMassFlowEx
 
 } // detail
 
-AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model)
+AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model,
+  double effectiveLeakageArea)
   : ModelObject(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType(), model)
 {
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>());
 
   // TODO: Appropriately handle the following required object-list fields.
-  bool ok = true;
-  // ok = setHandle();
-  OS_ASSERT(ok);
-  // ok = setEffectiveLeakageArea();
-  OS_ASSERT(ok);
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setEffectiveLeakageArea(effectiveLeakageArea));
+}
+
+AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea(const Model& model, 
+  double effectiveLeakageArea, double dischargeCoefficient, double referencePressureDifference, double massFlowExponent)
+  : ModelObject(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl>());
+
+  // TODO: Appropriately handle the following required object-list fields.
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setEffectiveLeakageArea(effectiveLeakageArea));
+  OS_ASSERT(setDischargeCoefficient(dischargeCoefficient));
+  OS_ASSERT(setReferencePressureDifference(referencePressureDifference));
+  OS_ASSERT(setAirMassFlowExponent(massFlowExponent));
 }
 
 IddObjectType AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType()
