@@ -39,8 +39,17 @@ class MODEL_API AirflowNetworkMultiZoneComponentSimpleOpening : public ModelObje
 public:
   /** @name Constructors and Destructors */
   //@{
-
-  explicit AirflowNetworkMultiZoneComponentSimpleOpening(const Model& model);
+  /** Construct a simple opening object with default mass flow exponent. */
+  AirflowNetworkMultiZoneComponentSimpleOpening(const Model& model,
+    double massFlowCoefficientWhenOpeningisClosed,
+    double minimumDensityDifferenceforTwoWayFlow,
+    double dischargeCoefficient);
+  /** Construct a simple opening object. */
+  AirflowNetworkMultiZoneComponentSimpleOpening(const Model& model,
+    double massFlowCoefficientWhenOpeningisClosed,
+    double massFlowExponentWhenOpeningisClosed,
+    double minimumDensityDifferenceforTwoWayFlow,
+    double dischargeCoefficient);
 
   virtual ~AirflowNetworkMultiZoneComponentSimpleOpening() {}
 
@@ -50,29 +59,29 @@ public:
 
   /** @name Getters */
   //@{
-
+  /** Returns the mass flow coefficient when the opening is closed in kg/s-m at 1 Pa pressure difference. */
   double airMassFlowCoefficientWhenOpeningisClosed() const;
-
+  /** Returns the mass flow exponent when the opening is closed. */
   double airMassFlowExponentWhenOpeningisClosed() const;
-
+  /** Returns true if the  mass flow exponent is defaulted. */
   bool isAirMassFlowExponentWhenOpeningisClosedDefaulted() const;
-
+  /** Returns the minimum density difference above which two-way flow may occur due to stack effect in kg/m3. */
   double minimumDensityDifferenceforTwoWayFlow() const;
-
+  /** Returns the discharge coefficient. */
   double dischargeCoefficient() const;
 
   //@}
   /** @name Setters */
   //@{
-
+  /** Sets the mass flow coefficient when the opening is closed in kg/s-m at 1 Pa pressure difference. */
   bool setAirMassFlowCoefficientWhenOpeningisClosed(double airMassFlowCoefficientWhenOpeningisClosed);
-
+  /** Sets the mass flow exponent when the opening is closed. */
   bool setAirMassFlowExponentWhenOpeningisClosed(double airMassFlowExponentWhenOpeningisClosed);
-
+  /** Resets the mass flow exponent when the opening is closed to the default value. */
   void resetAirMassFlowExponentWhenOpeningisClosed();
-
+  /** Sets the minimum density difference above which two-way flow may occur due to stack effect in kg/m3. */
   bool setMinimumDensityDifferenceforTwoWayFlow(double minimumDensityDifferenceforTwoWayFlow);
-
+  /** Sets the discharge coefficient. */
   bool setDischargeCoefficient(double dischargeCoefficient);
 
   //@}

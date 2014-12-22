@@ -130,19 +130,34 @@ namespace detail {
 
 } // detail
 
-AirflowNetworkMultiZoneComponentHorizontalOpening::AirflowNetworkMultiZoneComponentHorizontalOpening(const Model& model)
-  : ModelObject(AirflowNetworkMultiZoneComponentHorizontalOpening::iddObjectType(),model)
+AirflowNetworkMultiZoneComponentHorizontalOpening::AirflowNetworkMultiZoneComponentHorizontalOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double dischargeCoefficient)
+  : ModelObject(AirflowNetworkMultiZoneComponentHorizontalOpening::iddObjectType(), model)
 {
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentHorizontalOpening_Impl>());
 
   // TODO: Appropriately handle the following required object-list fields.
-  bool ok = true;
-  // ok = setHandle();
-  OS_ASSERT(ok);
-  // ok = setAirMassFlowCoefficientWhenOpeningisClosed();
-  OS_ASSERT(ok);
-  // ok = setDischargeCoefficient();
-  OS_ASSERT(ok);
+  //OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setDischargeCoefficient(dischargeCoefficient));
+}
+
+AirflowNetworkMultiZoneComponentHorizontalOpening::AirflowNetworkMultiZoneComponentHorizontalOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double massFlowExponentWhenOpeningisClosed,
+  double slopingPlaneAngle,
+  double dischargeCoefficient)
+  : ModelObject(AirflowNetworkMultiZoneComponentHorizontalOpening::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentHorizontalOpening_Impl>());
+
+  // TODO: Appropriately handle the following required object-list fields.
+  //OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
+  OS_ASSERT(setSlopingPlaneAngle(slopingPlaneAngle));
+  OS_ASSERT(setDischargeCoefficient(dischargeCoefficient));
 }
 
 IddObjectType AirflowNetworkMultiZoneComponentHorizontalOpening::iddObjectType() {

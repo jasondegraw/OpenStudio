@@ -121,22 +121,38 @@ namespace detail {
 
 } // detail
 
-AirflowNetworkMultiZoneComponentSimpleOpening::AirflowNetworkMultiZoneComponentSimpleOpening(const Model& model)
+AirflowNetworkMultiZoneComponentSimpleOpening::AirflowNetworkMultiZoneComponentSimpleOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double minimumDensityDifferenceforTwoWayFlow,
+  double dischargeCoefficient)
   : ModelObject(AirflowNetworkMultiZoneComponentSimpleOpening::iddObjectType(),model)
 {
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentSimpleOpening_Impl>());
 
   // TODO: Appropriately handle the following required object-list fields.
-  bool ok = true;
-  // ok = setHandle();
-  OS_ASSERT(ok);
-  // ok = setAirMassFlowCoefficientWhenOpeningisClosed();
-  OS_ASSERT(ok);
-  // ok = setMinimumDensityDifferenceforTwoWayFlow();
-  OS_ASSERT(ok);
-  // ok = setDischargeCoefficient();
-  OS_ASSERT(ok);
+  //OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setMinimumDensityDifferenceforTwoWayFlow(minimumDensityDifferenceforTwoWayFlow));
+  OS_ASSERT(setDischargeCoefficient(dischargeCoefficient));
 }
+
+AirflowNetworkMultiZoneComponentSimpleOpening::AirflowNetworkMultiZoneComponentSimpleOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double massFlowExponentWhenOpeningisClosed,
+  double minimumDensityDifferenceforTwoWayFlow,
+  double dischargeCoefficient)
+  : ModelObject(AirflowNetworkMultiZoneComponentSimpleOpening::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentSimpleOpening_Impl>());
+
+  // TODO: Appropriately handle the following required object-list fields.
+  //OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
+  OS_ASSERT(setMinimumDensityDifferenceforTwoWayFlow(minimumDensityDifferenceforTwoWayFlow));
+  OS_ASSERT(setDischargeCoefficient(dischargeCoefficient));
+}
+
 
 IddObjectType AirflowNetworkMultiZoneComponentSimpleOpening::iddObjectType() {
   return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneComponentSimpleOpening);

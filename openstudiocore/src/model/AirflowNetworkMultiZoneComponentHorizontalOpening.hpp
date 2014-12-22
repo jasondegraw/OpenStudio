@@ -39,8 +39,16 @@ class MODEL_API AirflowNetworkMultiZoneComponentHorizontalOpening : public Model
 public:
   /** @name Constructors and Destructors */
   //@{
-
-  explicit AirflowNetworkMultiZoneComponentHorizontalOpening(const Model& model);
+  /** Construct a horizontal opening object with default mass flow exponent and sloping plane angle. */
+  AirflowNetworkMultiZoneComponentHorizontalOpening(const Model& model,
+    double massFlowCoefficientWhenOpeningisClosed,
+    double dischargeCoefficient);
+  /** Construct a horizontal opening object. */
+  AirflowNetworkMultiZoneComponentHorizontalOpening(const Model& model,
+    double massFlowCoefficientWhenOpeningisClosed,
+    double massFlowExponentWhenOpeningisClosed,
+    double slopingPlaneAngle,
+    double dischargeCoefficient);
 
   virtual ~AirflowNetworkMultiZoneComponentHorizontalOpening() {}
 
@@ -50,33 +58,35 @@ public:
 
   /** @name Getters */
   //@{
-
+  /** Returns the mass flow coefficient when the opening is closed in kg/s-m at 1 Pa pressure difference. */
   double airMassFlowCoefficientWhenOpeningisClosed() const;
-
+  /** Returns the mass flow exponent when the opening is closed. */
   double airMassFlowExponentWhenOpeningisClosed() const;
-
+  /** Returns true if the  mass flow exponent is defaulted. */
   bool isAirMassFlowExponentWhenOpeningisClosedDefaulted() const;
-
+  /** Returns the angle of the horizontal opening to a sloping plane beneath it (reducing the effective opening area)
+      in degrees, 90 degrees corresponds to fully open. */
   double slopingPlaneAngle() const;
-
+  /** Returns true if the sloping plane angle is defaulted. */
   bool isSlopingPlaneAngleDefaulted() const;
-
+  /** Returns the discharge coefficient. */
   double dischargeCoefficient() const;
 
   //@}
   /** @name Setters */
   //@{
-
+  /** Sets the mass flow coefficient when the opening is closed in kg/s-m at 1 Pa pressure difference. */
   bool setAirMassFlowCoefficientWhenOpeningisClosed(double airMassFlowCoefficientWhenOpeningisClosed);
-
+  /** Sets the mass flow exponent when the opening is closed. */
   bool setAirMassFlowExponentWhenOpeningisClosed(double airMassFlowExponentWhenOpeningisClosed);
-
+  /** Resets the mass flow exponent when the opening is closed to the default value. */
   void resetAirMassFlowExponentWhenOpeningisClosed();
-
+  /** Sets the angle of the horizontal opening to a sloping plane beneath it (reducing the effective opening area)
+  in degrees, 90 degrees corresponds to fully open. */
   bool setSlopingPlaneAngle(double slopingPlaneAngle);
-
+  /** Resets the sloping plane to the default value. */
   void resetSlopingPlaneAngle();
-
+  /** Sets the discharge coefficient. */
   bool setDischargeCoefficient(double dischargeCoefficient);
 
   //@}
