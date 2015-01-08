@@ -635,21 +635,151 @@ void AirflowNetworkMultiZoneComponentDetailedOpening_Impl::resetStartHeightFacto
 
 } // detail
 
-AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model)
+AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double massFlowExponentWhenOpeningisClosed,
+  std::string typeofRectangulerLargeVerticalOpening,
+  double extraCrackLengthorHeightofPivotingAxis,
+  double openingFactor1,
+  double dischargeCoefficientforOpeningFactor1,
+  double widthFactorforOpeningFactor1,
+  double heightFactorforOpeningFactor1,
+  double startHeightFactorforOpeningFactor1,
+  double openingFactor2,
+  double dischargeCoefficientforOpeningFactor2,
+  double widthFactorforOpeningFactor2,
+  double heightFactorforOpeningFactor2,
+  double startHeightFactorforOpeningFactor2)
   : ModelObject(AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType(), model)
 {
   OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>());
 
-  // TODO: Appropriately handle the following required object-list fields.
-  bool ok = true;
-  // ok = setHandle();
-  OS_ASSERT(ok);
-  // ok = setAirMassFlowCoefficientWhenOpeningisClosed();
-  OS_ASSERT(ok);
-  // ok = setNumberofSetsofOpeningFactorData();
-  OS_ASSERT(ok);
-  // ok = setOpeningFactor2();
-  OS_ASSERT(ok);
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
+  OS_ASSERT(setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening));
+  OS_ASSERT(setNumberofSetsofOpeningFactorData(2));
+  // Set 1
+  OS_ASSERT(setOpeningFactor1(openingFactor1));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor1(dischargeCoefficientforOpeningFactor1));
+  OS_ASSERT(setWidthFactorforOpeningFactor1(widthFactorforOpeningFactor1));
+  OS_ASSERT(setHeightFactorforOpeningFactor1(heightFactorforOpeningFactor1));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor1(startHeightFactorforOpeningFactor1));
+  // Set 2
+  OS_ASSERT(setOpeningFactor2(openingFactor2));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor2(dischargeCoefficientforOpeningFactor2));
+  OS_ASSERT(setWidthFactorforOpeningFactor2(widthFactorforOpeningFactor2));
+  OS_ASSERT(setHeightFactorforOpeningFactor2(heightFactorforOpeningFactor2));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor2(startHeightFactorforOpeningFactor2));
+}
+
+AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double massFlowExponentWhenOpeningisClosed,
+  std::string typeofRectangulerLargeVerticalOpening,
+  double extraCrackLengthorHeightofPivotingAxis,
+  double openingFactor1,
+  double dischargeCoefficientforOpeningFactor1,
+  double widthFactorforOpeningFactor1,
+  double heightFactorforOpeningFactor1,
+  double startHeightFactorforOpeningFactor1,
+  double openingFactor2,
+  double dischargeCoefficientforOpeningFactor2,
+  double widthFactorforOpeningFactor2,
+  double heightFactorforOpeningFactor2,
+  double startHeightFactorforOpeningFactor2,
+  double openingFactor3,
+  double dischargeCoefficientforOpeningFactor3,
+  double widthFactorforOpeningFactor3,
+  double heightFactorforOpeningFactor3,
+  double startHeightFactorforOpeningFactor3)
+  : ModelObject(AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>());
+
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
+  OS_ASSERT(setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening));
+  OS_ASSERT(setNumberofSetsofOpeningFactorData(3));
+  // Set 1
+  OS_ASSERT(setOpeningFactor1(openingFactor1));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor1(dischargeCoefficientforOpeningFactor1));
+  OS_ASSERT(setWidthFactorforOpeningFactor1(widthFactorforOpeningFactor1));
+  OS_ASSERT(setHeightFactorforOpeningFactor1(heightFactorforOpeningFactor1));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor1(startHeightFactorforOpeningFactor1));
+  // Set 2
+  OS_ASSERT(setOpeningFactor2(openingFactor2));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor2(dischargeCoefficientforOpeningFactor2));
+  OS_ASSERT(setWidthFactorforOpeningFactor2(widthFactorforOpeningFactor2));
+  OS_ASSERT(setHeightFactorforOpeningFactor2(heightFactorforOpeningFactor2));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor2(startHeightFactorforOpeningFactor2));
+  // Set 3
+  OS_ASSERT(setOpeningFactor3(openingFactor3));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor3(dischargeCoefficientforOpeningFactor3));
+  OS_ASSERT(setWidthFactorforOpeningFactor3(widthFactorforOpeningFactor3));
+  OS_ASSERT(setHeightFactorforOpeningFactor3(heightFactorforOpeningFactor3));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor3(startHeightFactorforOpeningFactor3));
+}
+
+AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double massFlowExponentWhenOpeningisClosed,
+  std::string typeofRectangulerLargeVerticalOpening,
+  double extraCrackLengthorHeightofPivotingAxis,
+  double openingFactor1,
+  double dischargeCoefficientforOpeningFactor1,
+  double widthFactorforOpeningFactor1,
+  double heightFactorforOpeningFactor1,
+  double startHeightFactorforOpeningFactor1,
+  double openingFactor2,
+  double dischargeCoefficientforOpeningFactor2,
+  double widthFactorforOpeningFactor2,
+  double heightFactorforOpeningFactor2,
+  double startHeightFactorforOpeningFactor2,
+  double openingFactor3,
+  double dischargeCoefficientforOpeningFactor3,
+  double widthFactorforOpeningFactor3,
+  double heightFactorforOpeningFactor3,
+  double startHeightFactorforOpeningFactor3,
+  double openingFactor4,
+  double dischargeCoefficientforOpeningFactor4,
+  double widthFactorforOpeningFactor4,
+  double heightFactorforOpeningFactor4,
+  double startHeightFactorforOpeningFactor4)
+  : ModelObject(AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>());
+
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
+  OS_ASSERT(setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening));
+  OS_ASSERT(setNumberofSetsofOpeningFactorData(4));
+  // Set 1
+  OS_ASSERT(setOpeningFactor1(openingFactor1));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor1(dischargeCoefficientforOpeningFactor1));
+  OS_ASSERT(setWidthFactorforOpeningFactor1(widthFactorforOpeningFactor1));
+  OS_ASSERT(setHeightFactorforOpeningFactor1(heightFactorforOpeningFactor1));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor1(startHeightFactorforOpeningFactor1));
+  // Set 2
+  OS_ASSERT(setOpeningFactor2(openingFactor2));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor2(dischargeCoefficientforOpeningFactor2));
+  OS_ASSERT(setWidthFactorforOpeningFactor2(widthFactorforOpeningFactor2));
+  OS_ASSERT(setHeightFactorforOpeningFactor2(heightFactorforOpeningFactor2));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor2(startHeightFactorforOpeningFactor2));
+  // Set 3
+  OS_ASSERT(setOpeningFactor3(openingFactor3));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor3(dischargeCoefficientforOpeningFactor3));
+  OS_ASSERT(setWidthFactorforOpeningFactor3(widthFactorforOpeningFactor3));
+  OS_ASSERT(setHeightFactorforOpeningFactor3(heightFactorforOpeningFactor3));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor3(startHeightFactorforOpeningFactor3));
+  // Set 4
+  OS_ASSERT(setOpeningFactor4(openingFactor4));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor4(dischargeCoefficientforOpeningFactor4));
+  OS_ASSERT(setWidthFactorforOpeningFactor4(widthFactorforOpeningFactor4));
+  OS_ASSERT(setHeightFactorforOpeningFactor4(heightFactorforOpeningFactor4));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor4(startHeightFactorforOpeningFactor4));
 }
 
 IddObjectType AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType()
