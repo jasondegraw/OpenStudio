@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -476,6 +476,15 @@ CoilCoolingWater::CoilCoolingWater(const Model& model, Schedule & availableSched
   OS_ASSERT(getImpl<detail::CoilCoolingWater_Impl>());
 
   setAvailableSchedule( availableSchedule );
+}
+
+CoilCoolingWater::CoilCoolingWater(const Model& model)
+  : WaterToAirComponent(CoilCoolingWater::iddObjectType(),model)
+{
+  OS_ASSERT(getImpl<detail::CoilCoolingWater_Impl>());
+
+  auto schedule = model.alwaysOnDiscreteSchedule();
+  setAvailableSchedule(schedule);
 }
 
 CoilCoolingWater::CoilCoolingWater(std::shared_ptr<detail::CoilCoolingWater_Impl> p)

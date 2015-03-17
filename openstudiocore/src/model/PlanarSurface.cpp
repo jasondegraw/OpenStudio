@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -511,20 +511,24 @@ namespace model {
         Transformation faceTransformationInverse = faceTransformation.inverse();
 
         std::vector<Point3d> faceVertices = faceTransformationInverse*this->vertices();
+        std::reverse(faceVertices.begin(), faceVertices.end());
 
         std::vector<std::vector<Point3d> > faceHoles;
         for (const ModelObject& child : this->children()){
           OptionalPlanarSurface surface = child.optionalCast<PlanarSurface>();
           if (surface){
             if (surface->subtractFromGrossArea()){
-              faceHoles.push_back(faceTransformationInverse*surface->vertices());
+              std::vector<Point3d> holeVertices = faceTransformationInverse*surface->vertices();
+              std::reverse(holeVertices.begin(), holeVertices.end());
+              faceHoles.push_back(holeVertices);
             }
           }
         }
 
         std::vector<std::vector<Point3d> > faceTriangulation = computeTriangulation(faceVertices, faceHoles);
 
-        for (const std::vector<Point3d>& faceTriangle : faceTriangulation){
+        for (std::vector<Point3d> faceTriangle : faceTriangulation){
+          std::reverse(faceTriangle.begin(), faceTriangle.end());
           m_cachedTriangulation.push_back(faceTransformation*faceTriangle);
         }
       }

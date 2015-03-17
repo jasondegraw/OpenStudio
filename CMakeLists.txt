@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.8.11)
 project(OpenStudio)
 
 set(CMAKE_VERSION_MAJOR 1)
-set(CMAKE_VERSION_MINOR 5)
-set(CMAKE_VERSION_PATCH 3)
+set(CMAKE_VERSION_MINOR 7)
+set(CMAKE_VERSION_PATCH 0)
 
 set(CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number")
 find_package(Git)
@@ -40,7 +40,12 @@ if(PATCH_EXE_NOTFOUND)
 endif()
 
 # EnergyPlus Idd version
-set(ENERGYPLUS_VERSION "8.1" CACHE INTERNAL "EnergyPlus Version")
+set(ENERGYPLUS_VERSION_MAJOR 8)
+set(ENERGYPLUS_VERSION_MINOR 2)
+set(ENERGYPLUS_VERSION_PATCH 0)
+set(ENERGYPLUS_VERSION "${ENERGYPLUS_VERSION_MAJOR}.${ENERGYPLUS_VERSION_MINOR}.${ENERGYPLUS_VERSION_PATCH}")
+# Build SHA is not required to have a value, but if it does OpenStudio will require this build.
+set(ENERGYPLUS_BUILD_SHA "8397c2e30b" )
 
 option(NIGHTLY_BUILD "Use configurations for Nightly Build" OFF)
 
@@ -80,6 +85,9 @@ option(BUILD_TESTING "Build testing targets" OFF)
 # Build package
 # Requires: EnergyPlus
 option(BUILD_PACKAGE "Build package" OFF)
+
+# Build regressions
+option(BUILD_REGRESSIONS "Build regressions" OFF)
 
 # Build test runner targets.
 # This is a convenience for Visual Studio users
@@ -171,25 +179,7 @@ if(APPLE)
 endif()
 
 # EnergyPlus
-find_package(EnergyPlus "${ENERGYPLUS_VERSION}")
-if(NOT ${EnergyPlus_FOUND})
-  message(FATAL_ERROR "EnergyPlus ${ENERGYPLUS_VERSION} could not be found")
-endif()
-mark_as_advanced(
-  ENERGYPLUS_EXE
-  ENERGYPLUS_IDD
-  ENERGYPLUS_WEATHER_DIR
-)
-
-# Package Radiance and EnergyPlus for convenience
-option(PACKAGE_RADIANCE_AND_ENERGYPLUS "Package Radiance and EnergyPlus" OFF)
-mark_as_advanced(FORCE PACKAGE_RADIANCE_AND_ENERGYPLUS)
-
-if(PACKAGE_RADIANCE_AND_ENERGYPLUS)
-  message(WARNING "Packaging of Radiance and EnergyPlus is intended for internal use and deployment only")
-  set(ENERGYPLUS_LOCATION "" CACHE PATH "Location of EnergyPlus to Package")
-  set(RADIANCE_LOCATION "" CACHE PATH "Location of Radiance to Package")
-endif()
+find_package(EnergyPlus "${ENERGYPLUS_VERSION}" REQUIRED)
 
 # Build Ruby gem
 option(BUILD_RUBY_GEM "Build Ruby Gem" OFF)
@@ -232,27 +222,15 @@ if(BUILD_RUBY_GEM)
 endif()
 
 if(MSVC)
-  # need to know if using the Express edition of Visual Studio, devenv is split into multiple programs
-  option(MSVC_IS_EXPRESS "using the Express editions of Visual Studio, must install both C++ and C# versions" FALSE)
-
   mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Use PCH
 option(USE_PCH "Use precompiled headers" OFF)
 
-if(MSVC AND MSVC_IS_EXPRESS)
-  if(CMAKE_CL_64)
-    list(APPEND CMAKE_LIBRARY_PATH "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um/x64/")
-  else()
-    list(APPEND CMAKE_LIBRARY_PATH "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um/x86/")
-    list(APPEND CMAKE_LIBRARY_PATH "C:/Program Files/Windows Kits/8.0/Lib/win8/um/x86/")
-  endif()
-endif()
-
 
 # Smart find qt location, looking for 64bit when appropriate
-# and prefering opengl installations
+# and preferring opengl installations
 if(MSVC)
   if(CMAKE_CL_64)
     set(COMPILER_ARCH_TAG "_64")
@@ -266,9 +244,9 @@ if(MSVC)
     set(COMPILER_VER_TAG "2014")
   endif()
 
-  file(GLOB_RECURSE QMAKE_LOCATIONS "c:/Qt/qmake.exe")
+  file(GLOB_RECURSE QMAKE_LOCATIONS "C:/Qt/qmake.exe")
 
-  message("Qt Locations: ${QMAKE_LOCATIONS}")
+  message(STATUS "Qt Locations: ${QMAKE_LOCATIONS}")
 
   if(QMAKE_LOCATIONS MATCHES ".*msvc${COMPILER_VER_TAG}${COMPILER_ARCH_TAG}_opengl.*")
     set(HAS_OPENGL_INSTALL TRUE)
@@ -293,7 +271,7 @@ if(MSVC)
     endif()
   endforeach()
 
-  # we want sort, this will do both a lexigraphical sort of the version numbers, putting the newest last and picking the 
+  # we want sort, this will do both a lexicographical sort of the version numbers, putting the newest last and picking the 
   # longest (aka opengl) last. Then we sort it in reverse to prefer the highest version numbers with opengl
   list(SORT QT_HINT_DIR)
   list(REVERSE QT_HINT_DIR)
@@ -301,12 +279,11 @@ else()
   set(QT_HINT_DIR "")
 endif()
 
+# set CMAKE_PREFIX_PATH to specify specific Qt version
 find_package(Qt5Widgets HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Widgets
 find_package(Qt5Sql HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Sql
 find_package(Qt5Network HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Network
 find_package(Qt5Xml HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Xml
-find_package(Qt5WebKit HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Network, Qt5WebKit
-find_package(Qt5WebKitWidgets HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Network, Qt5WebKit, Qt5WebKitWidgets, Qt5Widgets
 #find_package(Qt5WinExtras HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5WinExtras
 find_package(Qt5Concurrent HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Concurrent
 find_package(Qt5PrintSupport HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5PrintSupport, Qt5Widgets
@@ -326,8 +303,6 @@ mark_as_advanced(
   Qt5Quick_DIR
   Qt5Sensors_DIR
   Qt5Sql_DIR
-  Qt5WebKit_DIR
-  Qt5WebKitWidgets_DIR
   Qt5Widgets_DIR
   #Qt5WinExtras_DIR
   Qt5Xml_DIR
@@ -340,6 +315,15 @@ if(Qt5Widgets_DIR)
   if(${Qt5Widgets_VERSION} VERSION_LESS "5.2.1")
     message(FATAL_ERROR "Minimum supported Qt is v5.2.1")
   endif()
+  if(${Qt5Widgets_VERSION} VERSION_LESS "5.4.0")
+    find_package(Qt5WebKit HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Network, Qt5WebKit
+    find_package(Qt5WebKitWidgets HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Network, Qt5WebKit, Qt5WebKitWidgets, Qt5Widgets
+    mark_as_advanced(Qt5WebKit_DIR Qt5WebKitWidgets_DIR)
+  else()
+    find_package(Qt5WebEngine HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Network, Qt5Qml, Qt5Quick, Qt5WebEngine
+    find_package(Qt5WebEngineWidgets HINTS ${QT_HINT_DIR}) #Qt5Core, Qt5Gui, Qt5Network, Qt5Qml, Qt5Quick, Qt5WebEngine, Qt5WebEngineWidgets, Qt5Widgets
+    mark_as_advanced(Qt5WebEngine_DIR Qt5WebEngineWidgets_DIR)
+  endif()
 elseif(UNIX)
   option(BUILD_QT "Build Qt" ON)
 endif()
@@ -347,7 +331,7 @@ endif()
 include(ExternalProject)
 include(ProcessorCount)
 
-# set number of cores to be used when building boost and qt, idea is you will do make -jX so boost and qt will build in parralel
+# set number of cores to be used when building boost and qt, idea is you will do make -jX so boost and qt will build in parallel
 ProcessorCount(CPUCOUNT)
 if(CPUCOUNT EQUAL 0)
   set(CPUCOUNT 1)
@@ -442,10 +426,10 @@ mark_as_advanced(
   SWIG_VERSION
 )
 
-# Currently MacOS and/or V8 require special builds
-# as of 2014-06-04. This should be re-checked after swig > 3.0.2 is released.
+# Currently MacOS (with swig < 3.0.3) and V8 require special builds
+# as of 2015-02-05. This should be re-checked after swig > 3.0.5 is released.
 # 64-bit MSVC also requires BUILD_SWIG
-if(SWIG_FOUND AND NOT BUILD_V8_BINDINGS AND NOT APPLE AND NOT (WIN32 AND MSVC AND CMAKE_CL_64))
+if(SWIG_FOUND AND NOT BUILD_V8_BINDINGS AND NOT (APPLE AND ${SWIG_VERSION} VERSION_LESS "3.0.3") AND NOT (WIN32 AND MSVC AND CMAKE_CL_64))
   option(BUILD_SWIG "Build SWIG" OFF)
 else()
   option(BUILD_SWIG "Build SWIG" ON)
@@ -463,11 +447,6 @@ if(NOT WIN32)
     )
     find_package(Ruby 2.0)
   endif()
-endif()
-
-
-if(WIN32 AND MSVC AND CMAKE_CL_64)
-  message(WARNING "Treat Warnings As Errors is disabled for 64-bit Windows builds")
 endif()
 
 if(APPLE)
@@ -619,7 +598,7 @@ if(BUILD_BOOST)
       URL http://developer.nrel.gov/downloads/buildings/openstudio/src/boost_1_55_0.tar.gz
       URL_MD5 93780777cfbf999a600f62883bd54b17
       CONFIGURE_COMMAND cd ${CMAKE_BINARY_DIR}/Boost-prefix/src/Boost && ./bootstrap.sh
-      PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/dependencies/Boost/xcode_51.patch
+      PATCH_COMMAND ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/dependencies/Boost/xcode_51.patch && ${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/dependencies/Boost/fchmodat.patch 
       BUILD_COMMAND cd ${CMAKE_BINARY_DIR}/Boost-prefix/src/Boost && ./b2 toolset=clang cxxflags=${apple-flags} linkflags=${apple-flags} variant=debug,release define=BOOST_CHRONO_HEADER_ONLY --layout=tagged --with-filesystem --with-regex --with-program_options --with-system --with-thread --with-date_time --with-log --prefix=${CMAKE_BINARY_DIR}/Boost-prefix/src/Boost-install -j${BOOST_CPUCOUNT} install
       INSTALL_COMMAND ""
     )
@@ -695,8 +674,13 @@ if(BUILD_QT)
   set(Qt5Sql_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5Sql)
   set(Qt5Network_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5Network)
   set(Qt5Xml_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5Xml)
-  set(Qt5WebKit_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5WebKit)
-  set(Qt5WebKitWidgets_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5WebKitWidgets)
+  if(${Qt5Widgets_VERSION} VERSION_LESS "5.4.0")
+    set(Qt5WebKit_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5WebKit)
+    set(Qt5WebKitWidgets_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5WebKitWidgets)
+  else()
+    set(Qt5WebEngine_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5WebEngine)
+    set(Qt5WebEngineWidgets_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5WebEngineWidgets)
+  endif()
   set(Qt5Concurrent_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5Concurrent)
   set(Qt5PrintSupport_DIR ${CMAKE_BINARY_DIR}/Qt-prefix/src/Qt-install/lib/cmake/Qt5PrintSupport)
 
@@ -783,7 +767,10 @@ ExternalProject_Add(OSCore
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     -DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}
-    -DENERGYPLUS_VERSION:STRING=${ENERGYPLUS_VERSION}
+    -DENERGYPLUS_VERSION_MAJOR:STRING=${ENERGYPLUS_VERSION_MAJOR}
+    -DENERGYPLUS_VERSION_MINOR:STRING=${ENERGYPLUS_VERSION_MINOR}
+    -DENERGYPLUS_VERSION_PATCH:STRING=${ENERGYPLUS_VERSION_PATCH}
+    -DENERGYPLUS_BUILD_SHA:STRING=${ENERGYPLUS_BUILD_SHA}
     -DBUILD_DOCUMENTATION:BOOL=${BUILD_DOCUMENTATION}
     -DBUILD_CSHARP_BINDINGS:BOOL=${BUILD_CSHARP_BINDINGS}
     -DBUILD_JAVA_BINDINGS:BOOL=${BUILD_JAVA_BINDINGS}
@@ -797,7 +784,6 @@ ExternalProject_Add(OSCore
     -DBUILD_WITH_OPENSSL:BOOL=${BUILD_WITH_OPENSSL}
     -DBUILD_RUBY_GEM:BOOL=${BUILD_RUBY_GEM}
     -DBUILD_RUBY_GEM_WITH_LIBS:BOOL=${BUILD_RUBY_GEM_WITH_LIBS}
-    -DMSVC_IS_EXPRESS:BOOL=${MSVC_IS_EXPRESS}
     -DUSE_PCH:BOOL=${USE_PCH}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
@@ -820,6 +806,8 @@ ExternalProject_Add(OSCore
     -DQt5Xml_DIR:STRING=${Qt5Xml_DIR}
     -DQt5WebKit_DIR:STRING=${Qt5WebKit_DIR}
     -DQt5WebKitWidgets_DIR:STRING=${Qt5WebKitWidgets_DIR}
+    -DQt5WebEngine_DIR:STRING=${Qt5WebEngine_DIR}
+    -DQt5WebEngineWidgets_DIR:STRING=${Qt5WebEngineWidgets_DIR}
     #-DQt5WinExtras_DIR:STRING=${Qt5WinExtras_DIR}
     -DQt5Concurrent_DIR:STRING=${Qt5Concurrent_DIR}
     -DQt5PrintSupport_DIR:STRING=${Qt5PrintSupport_DIR}
@@ -831,9 +819,6 @@ ExternalProject_Add(OSCore
     -DRUBY_LIBRARY:STRING=${RUBY_LIBRARY}
     -DDOXYGEN_EXECUTABLE:STRING=${DOXYGEN_EXECUTABLE}
     -DDOXYGEN_DOT_EXECUTABLE:STRING=${DOXYGEN_DOT_EXECUTABLE}
-    -DPACKAGE_RADIANCE_AND_ENERGYPLUS:BOOL=${PACKAGE_RADIANCE_AND_ENERGYPLUS}
-    -DENERGYPLUS_LOCATION:PATH=${ENERGYPLUS_LOCATION}
-    -DRADIANCE_LOCATION:PATH=${RADIANCE_LOCATION}
     -DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}
     -DPATCH_EXE:PATH=${PATCH_EXE}
     -DMAXIMIZE_CPU_USAGE:BOOL=${MAXIMIZE_CPU_USAGE}
@@ -913,3 +898,26 @@ if(BUILD_PACKAGE)
   include(OpenStudioCPack.cmake)
 endif()
 ###############################################################################
+
+
+if (BUILD_REGRESSIONS)
+  ExternalProject_Add(Regressions
+    DEPENDS OSCore
+    GIT_REPOSITORY git://github.com/NREL/OpenStudio-resources
+    GIT_TAG develop
+    CMAKE_CACHE_ARGS
+      -DOPENSTUDIO_BUILD_DIR:PATH=${CMAKE_BINARY_DIR}
+      -DQt5Widgets_DIR:STRING=${Qt5Widgets_DIR}
+      -DQt5Sql_DIR:STRING=${Qt5Sql_DIR}
+      -DQt5Network_DIR:STRING=${Qt5Network_DIR}
+      -DQt5Xml_DIR:STRING=${Qt5Xml_DIR}
+      -DQt5WebKit_DIR:STRING=${Qt5WebKit_DIR}
+      -DQt5WebKitWidgets_DIR:STRING=${Qt5WebKitWidgets_DIR}
+      -DQt5WebEngine_DIR:STRING=${Qt5WebEngine_DIR}
+      -DQt5WebEngineWidgets_DIR:STRING=${Qt5WebEngineWidgets_DIR}
+      #-DQt5WinExtras_DIR:STRING=${Qt5WinExtras_DIR}
+      -DQt5Concurrent_DIR:STRING=${Qt5Concurrent_DIR}
+      -DQt5PrintSupport_DIR:STRING=${Qt5PrintSupport_DIR}
+    INSTALL_COMMAND ""
+    )
+endif()

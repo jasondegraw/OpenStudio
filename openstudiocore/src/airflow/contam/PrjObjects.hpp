@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef CONTAM_PRJOBJECTS_HPP
-#define CONTAM_PRJOBJECTS_HPP
+#ifndef AIRFLOW_CONTAM_PRJOBJECTS_HPP
+#define AIRFLOW_CONTAM_PRJOBJECTS_HPP
 
 #include "PrjDefines.hpp"
 #include "PrjObjectsImpl.hpp"
@@ -173,7 +173,7 @@ public:
   /** Returns the CFD zone name. */
   std::string cfdname() const;
   /** Sets the CFD zone name. */
-  void setCfdname(const std::string cfdname);
+  void setCfdname(const std::string &cfdname);
   /** Returns the X coordinate of one end of the cdaxis. */
   double X1() const;
   /** Sets the X coordinate of one end of the cdaxis. */
@@ -1563,7 +1563,7 @@ public:
   /** Write the object to a string. */
   virtual std::string write()=0;
   /** Convert an input string into a control node type enum. */
-  static Type convertTag(std::string string);
+  static Type convertTag(std::string &string);
   /** Read a control node element from a Reader object. */
   static ControlNode* readElement(Reader &input);
   // virtual void recompute(){}

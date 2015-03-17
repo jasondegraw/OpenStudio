@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,36 +19,38 @@
 
 #include "Model.hpp"
 #include "Model_Impl.hpp"
+
 #include "Component.hpp"
 #include "ComponentWatcher_Impl.hpp"
+#include "Connection.hpp"
 #include "ModelObject.hpp"
 #include "ModelObject_Impl.hpp"
 #include "ResourceObject.hpp"
 #include "ResourceObject_Impl.hpp"
-#include "Connection.hpp"
 
 // central list of all concrete ModelObject header files (_Impl and non-_Impl)
 // needed here for ::createObject
 #include "ConcreteModelObjects.hpp"
 
-#include "../utilities/idf/IdfFile.hpp"
-
-#include "../utilities/idd/IddEnums.hpp"
-#include <utilities/idd/OS_Version_FieldEnums.hxx>
 #include <utilities/idd/IddEnums.hxx>
-#include <utilities/idf/Workspace_Impl.hpp> // needed for serialization
-#include "../utilities/idd/IddObject_Impl.hpp"
-#include "../utilities/idd/IddField_Impl.hpp"
-#include "../utilities/idd/IddFile_Impl.hpp"
-
-#include "../utilities/plot/ProgressBar.hpp"
-
-#include "../utilities/math/FloatCompare.hpp"
-
-#include "../utilities/sql/SqlFile.hpp"
+#include <utilities/idd/OS_Version_FieldEnums.hxx>
 
 #include "../utilities/core/Assert.hpp"
 #include "../utilities/core/PathHelpers.hpp"
+
+#include "../utilities/idd/IddEnums.hpp"
+#include "../utilities/idd/IddObject_Impl.hpp"
+#include "../utilities/idd/IddField_Impl.hpp"
+#include "../utilities/idd/IddFile_Impl.hpp"
+#include "../utilities/idf/Workspace_Impl.hpp" // needed for serialization
+
+#include "../utilities/idf/IdfFile.hpp"
+
+#include "../utilities/math/FloatCompare.hpp"
+
+#include "../utilities/plot/ProgressBar.hpp"
+
+#include "../utilities/sql/SqlFile.hpp"
 
 #include <boost/regex.hpp>
 
@@ -423,6 +425,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(StandardGlazing);
     REGISTER_CONSTRUCTOR(StandardOpaqueMaterial);
     REGISTER_CONSTRUCTOR(StandardsInformationConstruction);
+    REGISTER_CONSTRUCTOR(StandardsInformationMaterial);
     REGISTER_CONSTRUCTOR(SteamEquipment);
     REGISTER_CONSTRUCTOR(SteamEquipmentDefinition);
     REGISTER_CONSTRUCTOR(SubSurface);
@@ -431,7 +434,6 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(ThermochromicGlazing);
     REGISTER_CONSTRUCTOR(ThermostatSetpointDualSetpoint);
     REGISTER_CONSTRUCTOR(ThermalZone);
-    REGISTER_CONSTRUCTOR(TimeDependentValuation);
     REGISTER_CONSTRUCTOR(Timestep);
     REGISTER_CONSTRUCTOR(UtilityBill);
     REGISTER_CONSTRUCTOR(UtilityCost_Charge_Block);
@@ -450,6 +452,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(WeatherFileConditionType);
     REGISTER_CONSTRUCTOR(WeatherFileDays);
     REGISTER_CONSTRUCTOR(WindowDataFile);
+    REGISTER_CONSTRUCTOR(WindowPropertyFrameAndDivider);
     REGISTER_CONSTRUCTOR(YearDescription);
     REGISTER_CONSTRUCTOR(ZoneAirContaminantBalance);
     REGISTER_CONSTRUCTOR(ZoneAirHeatBalanceAlgorithm);
@@ -742,6 +745,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(StandardGlazing);
     REGISTER_COPYCONSTRUCTORS(StandardOpaqueMaterial);
     REGISTER_COPYCONSTRUCTORS(StandardsInformationConstruction);
+    REGISTER_COPYCONSTRUCTORS(StandardsInformationMaterial);
     REGISTER_COPYCONSTRUCTORS(SteamEquipment);
     REGISTER_COPYCONSTRUCTORS(SteamEquipmentDefinition);
     REGISTER_COPYCONSTRUCTORS(SubSurface);
@@ -750,7 +754,6 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(ThermochromicGlazing);
     REGISTER_COPYCONSTRUCTORS(ThermostatSetpointDualSetpoint);
     REGISTER_COPYCONSTRUCTORS(ThermalZone);
-    REGISTER_COPYCONSTRUCTORS(TimeDependentValuation);
     REGISTER_COPYCONSTRUCTORS(Timestep);
     REGISTER_COPYCONSTRUCTORS(UtilityBill);
     REGISTER_COPYCONSTRUCTORS(UtilityCost_Charge_Block);
@@ -769,6 +772,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(WeatherFileConditionType);
     REGISTER_COPYCONSTRUCTORS(WeatherFileDays);
     REGISTER_COPYCONSTRUCTORS(WindowDataFile);
+    REGISTER_COPYCONSTRUCTORS(WindowPropertyFrameAndDivider);
     REGISTER_COPYCONSTRUCTORS(YearDescription);
     REGISTER_COPYCONSTRUCTORS(ZoneAirContaminantBalance);
     REGISTER_COPYCONSTRUCTORS(ZoneAirHeatBalanceAlgorithm);
@@ -937,6 +941,8 @@ if (_className::iddObjectType() == typeToCreate) { \
 
     ScheduleTypeLimits limits(model());
 
+    limits.setName("OnOff");
+
     limits.setNumericType("Discrete");
 
     limits.setUnitType("Availability");
@@ -1038,7 +1044,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     IdfObjectVector removedObjects;
     for (ResourceObject& resource : resources) {
       // test for initialized first in case earlier .remove() got this one already
-      if ((resource.initialized()) && (resource.nonResourceObjectUseCount() == 0)) {
+      if ((resource.initialized()) && (resource.nonResourceObjectUseCount(true) == 0)) {
         IdfObjectVector thisCallRemoved = resource.remove();
         removedObjects.insert(removedObjects.end(),thisCallRemoved.begin(),thisCallRemoved.end());
       }
@@ -1052,7 +1058,7 @@ if (_className::iddObjectType() == typeToCreate) { \
       boost::optional<ResourceObject> resource = workspaceObject.optionalCast<ResourceObject>();
       if (resource){
         // test for initialized first in case earlier .remove() got this one already
-        if ((resource->initialized()) && (resource->directUseCount() == 0)) {
+        if ((resource->initialized()) && (resource->directUseCount(true) == 0)) {
           IdfObjectVector thisCallRemoved = resource->remove();
           removedObjects.insert(removedObjects.end(),thisCallRemoved.begin(),thisCallRemoved.end());
         }

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -84,7 +84,8 @@ namespace detail {
   Schedule AvailabilityManagerScheduled_Impl::schedule() const {
     boost::optional<Schedule> value = optionalSchedule();
     if (!value) {
-      LOG_AND_THROW(briefDescription() << " does not have an Schedule attached.");
+      LOG(Info,briefDescription() << " does not have an Schedule attached.  Returning always on.");
+      return model().alwaysOnDiscreteSchedule();
     }
     return value.get();
   }

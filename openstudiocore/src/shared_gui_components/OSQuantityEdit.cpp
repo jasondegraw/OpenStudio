@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -29,8 +29,9 @@
 #include "../utilities/core/Assert.hpp"
 #include "../utilities/core/StringHelpers.hpp"
 
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QBoxLayout>
+#include <QDoubleValidator>
+#include <QFocusEvent>
 
 #include <iomanip>
 
@@ -40,14 +41,16 @@ namespace openstudio {
 
 OSQuantityEdit2::OSQuantityEdit2(const std::string& modelUnits, const std::string& siUnits, 
                                  const std::string& ipUnits, bool isIP, QWidget * parent)
-  : m_lineEdit(new QLineEdit(parent)),
-    m_units(new QLabel("",parent)),
+  : m_lineEdit(new QuantityLineEdit()),
+    m_units(new QLabel()),
     m_isIP(isIP),
     m_modelUnits(modelUnits),
     m_siUnits(siUnits),
     m_ipUnits(ipUnits),
     m_isScientific(false)
 {
+  connect(m_lineEdit, &QuantityLineEdit::inFocus, this, &OSQuantityEdit2::inFocus);
+
   // do a test conversion to make sure units are ok
   boost::optional<double> test = convert(1.0, modelUnits, ipUnits);
   OS_ASSERT(test);
@@ -64,9 +67,14 @@ OSQuantityEdit2::OSQuantityEdit2(const std::string& modelUnits, const std::strin
   hLayout->addWidget(m_lineEdit);
   hLayout->addWidget(m_units);
 
-  m_lineEdit->setFixedWidth(90);
+  m_doubleValidator = new QDoubleValidator();
+  m_lineEdit->setValidator(m_doubleValidator);
 
-  setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
+  m_lineEdit->setMinimumWidth(60);
+
+  setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+  m_units->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+  m_lineEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
 }
 
 void OSQuantityEdit2::bind(bool isIP,
@@ -419,6 +427,47 @@ void OSQuantityEdit2::setPrecision(const std::string& str) {
   }
 }
 
+void OSQuantityEdit2::enableClickFocus()
+{
+  m_lineEdit->enableClickFocus();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+QuantityLineEdit::QuantityLineEdit(QWidget * parent)
+  : QLineEdit(parent)
+{
+}
+
+void QuantityLineEdit::focusInEvent(QFocusEvent * e)
+{
+  if (e->reason() == Qt::MouseFocusReason && m_hasClickFocus)
+  {
+    QString style("QLineEdit { background: #ffc627; }");
+    setStyleSheet(style);
+
+    auto hasData = true; // TODO
+    emit inFocus(true, hasData);
+  }
+
+  QLineEdit::focusInEvent(e);
+}
+
+void QuantityLineEdit::focusOutEvent(QFocusEvent * e)
+{
+  if (e->reason() == Qt::MouseFocusReason && m_hasClickFocus)
+  {
+    QString style("QLineEdit { background: white; }");
+    setStyleSheet(style);
+
+    emit inFocus(false, false);
+  }
+
+  QLineEdit::focusOutEvent(e);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 OSQuantityEdit::OSQuantityEdit(bool isIP, QWidget * parent)
   : m_lineEdit(new QLineEdit(parent)),
     m_units(new QLabel("",parent)),
@@ -434,6 +483,9 @@ OSQuantityEdit::OSQuantityEdit(bool isIP, QWidget * parent)
   hLayout->setContentsMargins(0,0,0,0);
   hLayout->addWidget(m_lineEdit);
   hLayout->addWidget(m_units);
+
+  m_doubleValidator = new QDoubleValidator();
+  m_lineEdit->setValidator(m_doubleValidator);
 
   m_lineEdit->setFixedWidth(90);
 

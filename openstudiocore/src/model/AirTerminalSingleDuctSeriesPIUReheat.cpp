@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -21,6 +21,12 @@
 #include "AirTerminalSingleDuctSeriesPIUReheat_Impl.hpp"
 #include "AirLoopHVACReturnPlenum.hpp"
 #include "AirLoopHVACReturnPlenum_Impl.hpp"
+#include "FanVariableVolume.hpp"
+#include "FanVariableVolume_Impl.hpp"
+#include "FanConstantVolume.hpp"
+#include "FanConstantVolume_Impl.hpp"
+#include "FanOnOff.hpp"
+#include "FanOnOff_Impl.hpp"
 #include "Model.hpp"
 #include "Model_Impl.hpp"
 #include "PortList.hpp"
@@ -377,6 +383,11 @@ namespace detail {
                 thermalZone->addEquipment(mo);
               }
 
+              if( auto airLoopHVAC = node.airLoopHVAC() ) {
+                auto schedule = airLoopHVAC->availabilitySchedule();
+                setFanAvailabilitySchedule(schedule);
+              }
+
               return true; 
             }
           }
@@ -462,6 +473,17 @@ namespace detail {
 
     return result;
   }
+
+  void AirTerminalSingleDuctSeriesPIUReheat_Impl::setFanAvailabilitySchedule(Schedule & schedule) {
+    auto component = fan();
+    if( auto constantFan = component.optionalCast<FanConstantVolume>() ) {
+      constantFan->setAvailabilitySchedule(schedule);
+    } else if(  auto onOffFan = component.optionalCast<FanOnOff>() ) {
+      onOffFan->setAvailabilitySchedule(schedule);
+    } else if( auto variableFan = component.optionalCast<FanVariableVolume>() ) {
+      variableFan->setAvailabilitySchedule(schedule);
+    }
+  };
 
 } // detail
 

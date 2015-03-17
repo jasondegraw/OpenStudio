@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -489,6 +489,14 @@ ScheduleRuleset::ScheduleRuleset(const Model& model)
 {
   OS_ASSERT(getImpl<detail::ScheduleRuleset_Impl>());
   ScheduleDay defaultDaySchedule(model);
+  getImpl<detail::ScheduleRuleset_Impl>()->setPointer(OS_Schedule_RulesetFields::DefaultDayScheduleName, defaultDaySchedule.handle());
+}
+
+ScheduleRuleset::ScheduleRuleset(const Model& model, double value)
+  : Schedule(ScheduleRuleset::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::ScheduleRuleset_Impl>());
+  ScheduleDay defaultDaySchedule(model, value);
   getImpl<detail::ScheduleRuleset_Impl>()->setPointer(OS_Schedule_RulesetFields::DefaultDayScheduleName, defaultDaySchedule.handle());
 }
 

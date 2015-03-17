@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -233,6 +233,7 @@ class Version;
 class WaterHeaterMixed;
 class WaterUseConnections;
 class WaterUseEquipment;
+class WindowPropertyFrameAndDivider;
 class ZoneAirHeatBalanceAlgorithm;
 class ZoneControlHumidistat;
 class ZoneControlThermostatStagedDualSetpoint;
@@ -259,7 +260,7 @@ namespace detail
   struct ForwardTranslatorInitializer;
 };
 
-#define ENERGYPLUS_VERSION "8.1"
+#define ENERGYPLUS_VERSION "8.2"
 
 class ENERGYPLUS_API ForwardTranslator {
  public:
@@ -719,6 +720,8 @@ class ENERGYPLUS_API ForwardTranslator {
 
   boost::optional<IdfObject> translateWaterUseEquipment( model::WaterUseEquipment & modelObject );
 
+  boost::optional<IdfObject> translateWindowPropertyFrameAndDivider(model::WindowPropertyFrameAndDivider & modelObject);
+
   boost::optional<IdfObject> translateZoneAirHeatBalanceAlgorithm( model::ZoneAirHeatBalanceAlgorithm & modelObject );
 
   boost::optional<IdfObject> translateZoneControlHumidistat( model::ZoneControlHumidistat& modelObject );
@@ -792,6 +795,10 @@ class ENERGYPLUS_API ForwardTranslator {
   // resolve conflicts about constructions in matched surfaces
   void resolveMatchedSurfaceConstructionConflicts(model::Model& model);
   void resolveMatchedSubSurfaceConstructionConflicts(model::Model& model);
+
+  // ugly hack to fix upstream mixed air setpoint managers that have internal fans
+  // This should be used by the various translateUnitaryFoo methods.
+  void fixSPMsForUnitarySystem(const model::HVACComponent & unitary,const std::string & fanInletNodeName, const std::string & FanOutletNodeName);
 
   void createStandardOutputRequests();
 

@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -66,6 +66,8 @@
 #include "../model/Schedule_Impl.hpp"
 #include "../model/ScheduleConstant.hpp"
 #include "../model/ScheduleConstant_Impl.hpp"
+#include "../model/ScheduleRuleset.hpp"
+#include "../model/ScheduleRuleset_Impl.hpp"
 #include "../model/ScheduleTypeLimits.hpp"
 #include "../model/ScheduleTypeLimits_Impl.hpp"
 #include "../model/PlantLoop.hpp"
@@ -77,6 +79,8 @@
 #include "../model/WaterUseEquipmentDefinition.hpp"
 #include "../model/WaterUseEquipmentDefinition_Impl.hpp"
 #include "../model/ThermostatSetpointDualSetpoint.hpp"
+#include "../model/AirLoopHVAC.hpp"
+#include "../model/AirLoopHVAC_Impl.hpp"
 
 #include "../utilities/geometry/Transformation.hpp"
 #include "../utilities/geometry/Geometry.hpp"
@@ -213,14 +217,14 @@ namespace sdd {
 
     // remove unused CFactor constructions
     for (model::CFactorUndergroundWallConstruction cFactorConstruction : model.getConcreteModelObjects<model::CFactorUndergroundWallConstruction>()){
-      if (cFactorConstruction.directUseCount() == 0){
+      if (cFactorConstruction.directUseCount(true) == 0){
         cFactorConstruction.remove();
       }
     }
 
     // remove unused FFactor constructions
     for (model::FFactorGroundFloorConstruction fFactorConstruction : model.getConcreteModelObjects<model::FFactorGroundFloorConstruction>()){
-      if (fFactorConstruction.directUseCount() == 0){
+      if (fFactorConstruction.directUseCount(true) == 0){
         fFactorConstruction.remove();
       }
     }
@@ -477,9 +481,8 @@ namespace sdd {
           people.setSpace(space);
 
           // activity schedule
-          openstudio::model::ScheduleConstant activitySchedule(model);
+          openstudio::model::ScheduleRuleset activitySchedule(model, totalHeatRateSI);
           activitySchedule.setName(name + " People Activity Level");
-          activitySchedule.setValue(totalHeatRateSI);
 
           //boost::optional<model::ScheduleTypeLimits> scheduleTypeLimits = model.getModelObjectByName<model::ScheduleTypeLimits>("Activity Level");
           //if (!scheduleTypeLimits){
@@ -1425,18 +1428,51 @@ namespace sdd {
       model::ConstructionBase construction = shadingConstruction(model, solRefl, visRefl);
       shadingSurface.setConstruction(construction);
 
-      QDomElement scheduleReferenceElement = element.firstChildElement("TransSchRef");
-      if(!scheduleReferenceElement.isNull()){
-        std::string scheduleName = escapeName(scheduleReferenceElement.text());
-        boost::optional<model::Schedule> schedule = model.getModelObjectByName<model::Schedule>(scheduleName);
-        if(schedule){
+      QDomElement transOptionElement = element.firstChildElement("TransOption");
+      if (!transOptionElement.isNull()){
+
+        boost::optional<model::Schedule> schedule;
+        std::string scheduleName;
+
+        // constant transmittance
+        if (transOptionElement.text().compare("Constant", Qt::CaseInsensitive) == 0){
+
+          QDomElement transElement = element.firstChildElement("Trans");
+          if (!transElement.isNull()){
+            schedule = shadingSchedule(model, transElement.text().toDouble());
+            OS_ASSERT(schedule);
+            scheduleName = schedule->name().get();
+          } else {
+            LOG(Error, "Cannot find shading transmittance for shading surface '" << name << "'");
+          }
+
+          // transmittance schedule
+        } else if (transOptionElement.text().compare("Scheduled", Qt::CaseInsensitive) == 0){
+
+          QDomElement scheduleReferenceElement = element.firstChildElement("TransSchRef");
+          if (!scheduleReferenceElement.isNull()){
+            scheduleName = escapeName(scheduleReferenceElement.text());
+            schedule = model.getModelObjectByName<model::Schedule>(scheduleName);
+            if (!schedule){
+              LOG(Error, "Cannot find shading schedule '" << scheduleName << "' for shading surface '" << name << "'");
+            }
+          } else{
+            LOG(Error, "Cannot find shading schedule for shading surface '" << name << "'");
+          }
+
+        } else{
+          LOG(Error, "Unknown TransOption value for shading surface '" << name << "'");
+        }
+
+        if (schedule){
           bool test = shadingSurface.setTransmittanceSchedule(*schedule);
           if (!test){
-            LOG(Error, "Failed to assign schedule '" << scheduleName << "' to shading surface '" << name << "'");
+            LOG(Error, "Failed to assign shading schedule '" << scheduleName << "' to shading surface '" << name << "'");
           }
-        }else{
-          LOG(Error, "Cannot find schedule '" << scheduleName << "'");
+        } else {
+          // DLM: could warn here
         }
+
       }
 
     }else{  
@@ -1484,6 +1520,24 @@ namespace sdd {
     return construction;
   }
 
+  model::Schedule ReverseTranslator::shadingSchedule(openstudio::model::Model& model, double trans)
+  {
+    auto it = m_shadingScheduleMap.find(trans);
+    if (it != m_shadingScheduleMap.end()){
+      return it->second;
+    }
+
+    std::string description = boost::lexical_cast<std::string>(trans);
+    std::string scheduleName = "Shading Schedule " + description;
+
+    // create a schedule with these properties
+    model::ScheduleRuleset schedule(model, trans);
+    schedule.setName(scheduleName);
+
+    m_shadingScheduleMap.insert(std::make_pair(trans, schedule));
+    return schedule;
+  }
+
   boost::optional<QDomElement> ForwardTranslator::translateBuilding(const openstudio::model::Building& building, QDomDocument& doc)
   {
     QDomElement result = doc.createElement("Bldg");
@@ -1495,18 +1549,41 @@ namespace sdd {
     result.appendChild(nameElement);
     nameElement.appendChild(doc.createTextNode(escapeName(name)));
 
-    double buildingAzimuth = fixAngle(building.northAxis());
-    double northAngle = 360.0 - buildingAzimuth;
-
-    // north angle
-    QDomElement northAngleElement = doc.createElement("NAng");
-    result.appendChild(northAngleElement);
-    northAngleElement.appendChild(doc.createTextNode(QString::number(northAngle)));
+    // SDD:
+    // FuncClassMthd - optional, ignore 
+    // RelocPubSchoolBldg - optional, in progress
+    // WholeBldgModeled - required, need to add
+    // BldgAz - required, done
+    // TotStoryCnt - required, in progress
+    // TotStoryCntNew - optional, need to add?
+    // TotStoryCntExisting - optional, need to add?
+    // TotStoryCntAltered - optional, need to add?
+    // AboveGrdStoryCnt - required, in progress
+    // AboveGrdStoryCntNew - optional, need to add?
+    // AboveGrdStoryCntExisting  - optional, need to add?
+    // AboveGrdStoryCntAltered - optional, need to add?
+    // LivingUnitCnt - defaulted, in progress
+    // LivingUnitCntNew - optional, need to add?
+    // LivingUnitCntExisting - optional, need to add?
+    // LivingUnitCntAltered - optional, need to add?
+    // TotFlrArea - defaulted, ignore 
+    // NonResFlrArea - defaulted, ignore 
+    // ResFlrArea - defaulted, ignore 
+    // TotCondVol - defaulted, ignore 
+    // PlantClgCap - defaulted, ignore
+    // PlantHtgCap - defaulted, ignore
+    // CoilClgCap - defaulted, ignore
+    // CoilHtgCap - defaulted, ignore
 
     // building azimuth
+    double buildingAzimuth = fixAngle(building.northAxis());
     QDomElement buildingAzimuthElement = doc.createElement("BldgAz");
     result.appendChild(buildingAzimuthElement);
     buildingAzimuthElement.appendChild(doc.createTextNode(QString::number(buildingAzimuth)));
+
+    // TotStoryCnt - required, Standards Number of Stories
+    // AboveGrdStoryCnt - required, Standards Number of Above Ground Stories
+    // LivingUnitCnt - defaulted, Standards Number of Living Units
 
     // translate storys
     std::vector<model::BuildingStory> buildingStories = building.model().getConcreteModelObjects<model::BuildingStory>();
@@ -1515,7 +1592,7 @@ namespace sdd {
     if (m_progressBar){
       m_progressBar->setWindowTitle(toString("Translating Building Stories"));
       m_progressBar->setMinimum(0);
-      m_progressBar->setMaximum(buildingStories.size());
+      m_progressBar->setMaximum((int)buildingStories.size());
       m_progressBar->setValue(0);
     }
 
@@ -1542,7 +1619,7 @@ namespace sdd {
     if (m_progressBar){
       m_progressBar->setWindowTitle(toString("Translating Building Shading"));
       m_progressBar->setMinimum(0);
-      m_progressBar->setMaximum(shadingSurfaceGroups.size()); 
+      m_progressBar->setMaximum((int)shadingSurfaceGroups.size()); 
       m_progressBar->setValue(0);
     }
 
@@ -1598,6 +1675,7 @@ namespace sdd {
 
     if (spacesWithoutZone.size() > 0){
       // DLM: desired workflow is to assign thermal zones in cbecc
+      // DLM: Kyle, we will have to think about if we want to warn about this or not
       //Do not want this logged, http://code.google.com/p/cbecc/issues/detail?id=695
       //spacesWithoutZone.pop_back();
       //LOG(Warn, "Model contains spaces which are not assigned to a thermal zone, these have not been translated:" << spacesWithoutZone);
@@ -1640,7 +1718,7 @@ namespace sdd {
     if (m_progressBar){
       m_progressBar->setWindowTitle(toString("Translating Thermal Zones"));
       m_progressBar->setMinimum(0);
-      m_progressBar->setMaximum(thermalZones.size());
+      m_progressBar->setMaximum((int)thermalZones.size());
       m_progressBar->setValue(0);
     }
 
@@ -1649,6 +1727,28 @@ namespace sdd {
       boost::optional<QDomElement> thermalZoneElement = translateThermalZone(thermalZone, doc);
       if (thermalZoneElement){
         result.appendChild(*thermalZoneElement);
+      }
+
+      if (m_progressBar){
+        m_progressBar->setValue(m_progressBar->value() + 1);
+      }
+    }
+
+    // translate AirLoopHVAC systems
+    auto airLoops = building.model().getConcreteModelObjects<model::AirLoopHVAC>();
+    std::sort(airLoops.begin(),airLoops.end(),WorkspaceObjectNameLess());
+
+    if (m_progressBar) {
+      m_progressBar->setWindowTitle(toString("Translating AirLoopHVAC Systems"));
+      m_progressBar->setMinimum(0);
+      m_progressBar->setMaximum((int)airLoops.size());
+      m_progressBar->setValue(0);
+    }
+
+    for (const auto & airLoop : airLoops) {
+      auto airLoopElement = translateAirLoopHVAC(airLoop,doc);
+      if (airLoopElement) {
+        result.appendChild(*airLoopElement);
       }
 
       if (m_progressBar){
@@ -1669,6 +1769,12 @@ namespace sdd {
     QDomElement nameElement = doc.createElement("Name");
     result.appendChild(nameElement);
     nameElement.appendChild(doc.createTextNode(escapeName(name)));
+
+    // SDD:
+    // Mult - defaulted, ignore (OS doesn't have this)
+    // Z - only for simple geometry, ignore
+    // FlrToFlrHgt - only for simple geometry, ignore
+    // FlrToCeilingHgt - only for simple geometry, ignore
 
     // translate spaces
     std::vector<model::Space> spaces = buildingStory.spaces();
@@ -1698,6 +1804,129 @@ namespace sdd {
     result.appendChild(nameElement);
     nameElement.appendChild(doc.createTextNode(escapeName(name)));
 
+    // SDD:
+    // Status - required, need to add
+    // CondgType - required, in progress
+    // SupPlenumSpcRef - optional, in progress
+    // RetPlenumSpcRef - optional, in progress
+    // ThrmlZnRef - required, done
+    // Area - only for simple geometry, done, can we remove?
+    // FlrArea - optional, do we need this?
+    // FlrZ - optional, do we need this?
+    // FlrToCeilingHgt - optional, do we need this?
+    // Vol - required, done, can we remove?
+    // SpcFuncDefaultsRef - optional, do with space types
+    // SpcFunc - compulsory, do with space types
+    // FuncSchGrp - optional, do with space types
+    // OccDens - optional, do with space types
+    // OccSensHtRt - optional, do with space types
+    // OccLatHtRt - optional, do with space types
+    // OccSchRef - optional, do with space types
+    // InfMthd - defaulted, do with space types
+    // DsgnInfRt - defaulted, do with space types
+    // InfSchRef - defaulted, do with space types
+    // InfModelCoefA - required, do with space types
+    // InfModelCoefB - required, do with space types
+    // InfModelCoefC - required, do with space types
+    // InfModelCoefD - required, do with space types
+    // EnvStatus - optional, do with space types
+    // LtgStatus - optional, do with space types
+    // IntLtgSpecMthd - required, do with space types
+    // IntLPDReg - optional, do with space types
+    // IntLtgRegSchRef - optional, do with space types
+    // IntLtgRegHtGnSpcFrac - optional, do with space types
+    // IntLtgRegHtGnRadFrac - optional, do with space types
+    // IntLPDNonReg - optional, do with space types
+    // IntLtgNonRegSchRef - optional, do with space types
+    // IntLtgNonRegHtGnSpcFrac - optional, do with space types
+    // IntLtgNonRegHtGnRadFrac - optional, do with space types
+    // SkylitDayltgInstalledLtgPwr - optional, do we need this?
+    // PriSideDayltgInstalledLtgPwr - optional, do we need this?
+    // SecSideDayltgInstalledLtgPwr - optional, do we need this?
+    // Skylit100PctControlled - optional, do we need this?
+    // PriSide100PctControlled - optional, do we need this?
+    // SecSide100PctControlled - optional, do we need this?
+    // SkylitDayltgRefPtCoord - optional, do we need this?
+    // SkylitDayltgCtrlLtgPwr - optional, do we need this?
+    // SkylitDayltgCtrlLtgFrac - optional, do we need this?
+    // SkylitDayltgIllumSetpt - optional, do we need this?
+    // PriSideDayltgRefPtCoord - optional, do we need this?
+    // PriSideDayltgCtrlLtgPwr - optional, do we need this?
+    // PriSideDayltgCtrlLtgFrac - optional, do we need this?
+    // PriSideDayltgIllumSetpt - optional, do we need this?
+    // SecSideDayltgRefPtCoord - optional, do we need this?
+    // SecSideDayltgCtrlLtgPwr - optional, do we need this?
+    // SecSideDayltgCtrlLtgFrac - optional, do we need this?
+    // SecSideDayltgIllumSetpt - optional, do we need this?
+    // DayltgCtrlType - optional, do we need this?
+    // MinDimLtgFrac - optional, do we need this?
+    // MinDimPwrFrac - optional, do we need this?
+    // NumOfCtrlSteps - optional, do we need this?
+    // GlrAz - optional, do we need this?
+    // MaxGlrIdx - optional, do we need this?
+    // SkyltReqExcpt - optional, do we need this?
+    // SkyltReqExcptArea - optional, do we need this?
+    // SkyltReqExcptFrac - optional, do we need this?
+    // RecptPwrDens - defaulted, do with space types
+    // RecptSchRef - defaulted, do with space types
+    // RecptRadFrac - defaulted, do with space types
+    // RecptLatFrac - defaulted, do with space types
+    // RecptLostFrac - defaulted, do with space types
+    // GasEqpPwrDens - defaulted, do with space types
+    // GasEqpSchRef - defaulted, do with space types
+    // GasEqpRadFrac - defaulted, do with space types
+    // GasEqpLatFrac - defaulted, do with space types
+    // GasEqpLostFrac - defaulted, do with space types
+    // ProcElecPwrDens - optional, do with space types
+    // ProcElecSchRef - optional, do with space types
+    // ProcElecRadFrac - optional, do with space types
+    // ProcElecLatFrac - optional, do with space types
+    // ProcElecLostFrac - optional, do with space types
+    // ProcGasPwrDens - optional, do with space types
+    // ProcGasSchRef - optional, do with space types
+    // ProcGasRadFrac - optional, do with space types
+    // ProcGasLatFrac - optional, do with space types
+    // ProcGasLostFrac - optional, do with space types
+    // CommRfrgEPD - defaulted, do with space types
+    // CommRfrgEqpSchRef - defaulted, do with space types
+    // CommRfrgRadFrac - defaulted, do with space types
+    // CommRfrgLatFrac - defaulted, do with space types
+    // CommRfrgLostFrac - defaulted, do with space types
+    // ElevCnt - optional, do with space types
+    // ElevPwr - optional, do with space types
+    // ElevSchRef - defaulted, do with space types
+    // ElevRadFrac - optional, do with space types
+    // ElevLatFrac - optional, do with space types
+    // ElevLostFrac - optional, do with space types
+    // EscalCnt - optional, do with space types
+    // EscalPwr - optional, do with space types
+    // EscalSchRef - defaulted, do with space types
+    // EscalRadFrac - optional, do with space types
+    // EscalLatFrac - optional, do with space types
+    // EscalLostFrac - optional, do with space types
+    // SHWFluidSegRef - optional, do with space types
+    // RecircDHWSysRef - optional, do with space types
+    // HotWtrHtgRt - defaulted, do with space types
+    // RecircHotWtrHtgRt - optional, do with space types
+    // HotWtrHtgSchRef - optional, do with space types
+    // VentPerPerson - defaulted, do with space types
+    // VentPerArea - defaulted, do with space types
+    // VentACH - optional, do with space types
+    // VentPerSpc - optional, do with space types
+    // ExhPerArea - optional, do we need this?
+    // ExhACH - optional, do we need this?
+    // ExhPerSpc - optional, do we need this?
+    // KitExhHoodLen - optional, do we need this?
+    // KitExhHoodStyle - optional, do we need this?
+    // KitExhHoodDuty - optional, do we need this?
+    // KitExhHoodFlow - optional, do we need this?
+    // LabExhRtType - optional, do we need this?
+    // IntLPDPrescrip - optional, do we need this?
+    // IsPlenumRet - optional, do we need this?
+    // HighRiseResInt - optional, do we need this?
+    // HighRiseResCondFlrArea - optional, do we need this?
+
+
     // volume
     double volume = space.volume();
     Quantity volumeSI(volume, SIUnit(SIExpnt(0,3,0)));
@@ -1713,7 +1942,7 @@ namespace sdd {
       LOG(Warn, "Space '" << name << "' has zero volume.");
     }
 
-    // floorArea
+    // area
     double floorArea = space.floorArea();
     Quantity floorAreaSI(floorArea, SIUnit(SIExpnt(0,2,0)));
     OptionalQuantity floorAreaIP = QuantityConverter::instance().convert(floorAreaSI, ipSys);
@@ -1773,6 +2002,11 @@ namespace sdd {
       QDomElement thermalZoneElement = doc.createElement("ThrmlZnRef");
       result.appendChild(thermalZoneElement);
       thermalZoneElement.appendChild(doc.createTextNode(escapeName(thermalZoneName)));
+
+      // CondgType - required
+      // SupPlenumSpcRef - optional
+      // RetPlenumSpcRef - optional
+      // ThrmlZnRef - required
     }
 
     // translate space shading
@@ -1882,6 +2116,31 @@ namespace sdd {
     QDomElement nameElement = doc.createElement("Name");
     result->appendChild(nameElement);
     nameElement.appendChild(doc.createTextNode(escapeName(name)));
+
+    // SDD:
+    // Status - required (ExtFlr, ExtWall, IntWall, Roof, UndgrFlr, UndgrWall), need to add
+    // ConsAssmRef - optional (Ceiling, ExtFlr, ExtWall, IntFlr, IntWall, Roof, UndgrFlr, UndgrWall), done
+    // AdjacentSpcRef - optional (Ceiling, IntFlr, IntWall), done
+    // Area - simplified geometry only (Ceiling, ExtFlr, ExtWall, IntFlr, IntWall, Roof, UndgrFlr, UndgrWall), ignore
+    // Hgt - optional (UndgrWall), done, requires unique CFactor construction per surface
+    // PerimExposed - optional (UndgrFlr), done requires unique FFactor construction per surface
+    // DisplayPerim - optional (ExtWall), need to add?
+    // Az - simplified geometry only (ExtWall, Roof), ignore
+    // Tilt - simplified geometry only (Roof), ignore
+    // ExtSolAbs - required (Ceiling, ExtFlr, ExtWall, IntWall), ignore, do at construction level
+    // ExtThrmlAbs - required (Ceiling, ExtFlr, ExtWall, IntWall), ignore, do at construction level
+    // ExtVisAbs - required (Ceiling, ExtFlr, ExtWall, IntWall), ignore, do at construction level
+    // IntSolAbs - optional (Ceiling, ExtFlr, ExtWall, IntFlr, IntWall, Roof, UndgrFlr, UndgrWall), ignore, do at construction level
+    // IntThrmlAbs - optional (Ceiling, ExtFlr, ExtWall, IntFlr, IntWall, Roof, UndgrFlr, UndgrWall), ignore, do at construction level
+    // IntVisAbs - optional (Ceiling, ExtFlr, ExtWall, IntFlr, IntWall, Roof, UndgrFlr, UndgrWall), ignore, do at construction level
+    // FieldAppliedCoating - optional (Roof), ignore, do at construction level
+    // CRRCInitialRefl - optional (Roof), ignore, do at construction level
+    // CRRCAgedRefl - optional (Roof), ignore, do at construction level
+    // CRRCInitialEmittance - optional (Roof)), ignore, do at construction level
+    // CRRCAgedEmittance - optional (Roof), ignore, do at construction level
+    // CRRCInitialSRI - optional (Roof), ignore, do at construction level
+    // CRRCAgedSRI - optional (Roof), ignore, do at construction level
+    // CRRCProdID - optional (Roof), ignore, do at construction level
 
     // adjacent surface
     boost::optional<model::Surface> adjacentSurface = surface.adjacentSurface();
@@ -2079,6 +2338,13 @@ namespace sdd {
     result->appendChild(nameElement);
     nameElement.appendChild(doc.createTextNode(escapeName(name)));
 
+    // SDD:
+    // Status - required (Win, Skylt, Dr), need to add
+    // FenConsRef - optional (Win, Skylt), done
+    // DrConsRef - optional (Dr), done
+    // Oper - optional (Dr), in progress
+    // Area - simple geometry only (Win, Skylt, Dr), ignore
+
     // construction
     boost::optional<model::ConstructionBase> construction = subSurface.construction();
     if (construction){
@@ -2182,6 +2448,12 @@ namespace sdd {
     QDomElement nameElement = doc.createElement("Name");
     result->appendChild(nameElement);
     nameElement.appendChild(doc.createTextNode(escapeName(name)));
+
+    // SDD:
+    // Status - required, need to add
+    // TransSchRef - optional, in progress
+    // SolRefl - optional, done
+    // VisRefl - optional, done
 
     // schedule
     boost::optional<model::Schedule> transmittanceSchedule = shadingSurface.transmittanceSchedule();
@@ -2332,11 +2604,11 @@ namespace sdd {
     result.appendChild(typeElement);
     typeElement.appendChild(doc.createTextNode(toQString(type)));
 
-
+    // DLM: Not input
     // Mult
-    QDomElement multElement = doc.createElement("Mult");
-    result.appendChild(multElement);
-    multElement.appendChild(doc.createTextNode(QString::number(thermalZone.multiplier())));
+    //QDomElement multElement = doc.createElement("Mult");
+    //result.appendChild(multElement);
+    //multElement.appendChild(doc.createTextNode(QString::number(thermalZone.multiplier())));
 
     return result;
   }

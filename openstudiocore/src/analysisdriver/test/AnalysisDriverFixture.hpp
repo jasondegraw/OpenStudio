@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -115,6 +115,8 @@ class AnalysisDriverFixture : public ::testing::Test {
 
   static openstudio::analysisdriver::AnalysisRunOptions standardRunOptions(
       const openstudio::path& workingDirectory);
+
+  static openstudio::model::Model fastExampleModel();
 
   /// set up logging
   REGISTER_LOGGER("AnalysisDriverFixture");

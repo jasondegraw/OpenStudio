@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -329,6 +329,8 @@ boost::optional<IdfObject> ForwardTranslator::translateAirLoopHVACUnitaryHeatPum
       _fan->setString(Fan_OnOffFields::AirOutletNodeName,fanOutletNodeName);
     }
   }
+
+  fixSPMsForUnitarySystem(modelObject,fanInletNodeName,fanOutletNodeName);
 
   if( _coolingCoil ) {
     if( _coolingCoil->iddObject().type() == IddObjectType::Coil_Cooling_DX_MultiSpeed ) {

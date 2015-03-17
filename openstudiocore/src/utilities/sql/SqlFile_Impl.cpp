@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,6 +19,7 @@
 
 #include "SqlFile_Impl.hpp"
 #include "SqlFileTimeSeriesQuery.hpp"
+#include "OpenStudio.hxx"
 
 #include "../core/String.hpp"
 #include "../time/Calendar.hpp"
@@ -292,7 +293,7 @@ namespace openstudio{
 
 
       insertSimulation << "insert into simulations (SimulationIndex, EnergyPlusVersion, TimeStamp, NumTimestepsPerHour, Completed, CompletedSuccessfully) values ("
-        << nextSimulationIndex << ", 'EnergyPlus, VERSION 8.1, (OpenStudio) YMD=" << timeStamp.str() << "', '" << timeStamp.str() << "', 6, 1, 1);";
+        << nextSimulationIndex << ", 'EnergyPlus, VERSION " << energyPlusVersionMajor() << "." << energyPlusVersionMinor() << ", (OpenStudio) YMD=" << timeStamp.str() << "', '" << timeStamp.str() << "', 6, 1, 1);";
 
       execAndThrowOnError(insertSimulation.str());
 
@@ -443,28 +444,29 @@ namespace openstudio{
       int code = -1;
       if (m_db) {
         sqlite3_stmt* sqlStmtPtr;
-        sqlite3_prepare_v2(m_db,"SELECT * FROM Simulations WHERE EnergyPlusVersion LIKE '%7.0%' OR EnergyPlusVersion LIKE '%7.1%' OR EnergyPlusVersion LIKE '%7.2%' OR EnergyPlusVersion LIKE '%8.0%' OR EnergyPlusVersion LIKE '%8.1%'",-1,&sqlStmtPtr,nullptr);
+        sqlite3_prepare_v2(m_db,"SELECT EnergyPlusVersion FROM Simulations",-1,&sqlStmtPtr,nullptr);
         code = sqlite3_step(sqlStmtPtr);
+        if(code == SQLITE_ROW) {
+          // in 8.1 this is 'EnergyPlus-Windows-32 8.1.0.008, YMD=2014.11.08 22:49'
+          // in 8.2 this is 'EnergyPlus, Version 8.2.0-8397c2e30b, YMD=2015.01.09 08:37'
+          // radiance script is writing 'EnergyPlus, VERSION 8.2, (OpenStudio) YMD=2015.1.9 08:35:36'
+          boost::regex version_regex("\\d\\.\\d[\\.\\d]*");
+          std::string version_line = columnText(sqlite3_column_text(sqlStmtPtr,0));
+          boost::smatch version_match;
+          
+          if (boost::regex_search(version_line, version_match, version_regex)){
+            VersionString version(version_match[0].str());
+            if (version >= VersionString(7, 0) && version <= VersionString(energyPlusVersionMajor(), energyPlusVersionMinor())) {
+              m_supportedVersion = true;
+            } else {
+              m_supportedVersion = false;
+              LOG(Warn, "Using unsupported EnergyPlus version " << version.str());
+            }
+          } else{
+            LOG(Warn, "Using unknown EnergyPlus version");
+          }
+        }
         sqlite3_finalize(sqlStmtPtr);
-        m_supportedVersion = true;
-
-        // use this code block to try to support EnergyPlus versions before they are released
-        if (code != SQLITE_ROW){
-          LOG(Warn, "Trying unsupported EnergyPlus version 8.2");
-          sqlite3_prepare_v2(m_db,"SELECT * FROM Simulations WHERE EnergyPlusVersion LIKE '%8.2%'",-1,&sqlStmtPtr,nullptr);
-          code = sqlite3_step(sqlStmtPtr);
-          sqlite3_finalize(sqlStmtPtr);
-          m_supportedVersion = false;
-        }
-
-        // use this code block to try to support EnergyPlus versions before they are released
-        if (code != SQLITE_ROW){
-          LOG(Warn, "Trying unsupported EnergyPlus version 6.0");
-          sqlite3_prepare_v2(m_db,"SELECT * FROM Simulations WHERE EnergyPlusVersion LIKE '%6.0%'",-1,&sqlStmtPtr,nullptr);
-          code = sqlite3_step(sqlStmtPtr);
-          sqlite3_finalize(sqlStmtPtr);
-          m_supportedVersion = false;
-        }
       }
       return (code == SQLITE_ROW);
     }

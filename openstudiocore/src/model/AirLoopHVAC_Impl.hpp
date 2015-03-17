@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -124,6 +124,12 @@ class MODEL_API AirLoopHVAC_Impl : public Loop_Impl {
 
   Mixer demandMixer();
 
+  boost::optional<HVACComponent> supplyFan() const;
+
+  boost::optional<HVACComponent> returnFan() const;
+
+  boost::optional<HVACComponent> reliefFan() const;
+
   bool addBranchForZone(openstudio::model::ThermalZone & thermalZone);
 
   bool addBranchForZone(ThermalZone & thermalZone, StraightComponent & airTerminal);
@@ -150,7 +156,7 @@ class MODEL_API AirLoopHVAC_Impl : public Loop_Impl {
 
   SizingSystem sizingSystem() const;
 
-  std::vector<ThermalZone> thermalZones();
+  std::vector<ThermalZone> thermalZones() const;
 
   std::vector<ModelObject> children() const;
 

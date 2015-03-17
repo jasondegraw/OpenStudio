@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -461,23 +461,36 @@ void OpenStudioApp::importIdf()
         
         QMessageBox messageBox; // (parent); ETH: ... but is hidden, so don't actually use
         messageBox.setText("Some portions of the idf file were not imported.");
+        messageBox.setInformativeText("Only geometry, constructions, loads, thermal zones, and schedules are supported by the OpenStudio IDF import feature.");
 
         QString log;
 
-        std::vector<LogMessage> messages = trans.errors();
-
-        for( const auto & message : messages )
-        {
+        for( const auto & message : trans.errors() ) {
+          log.append("\n");
+          log.append("\n");
           log.append(QString::fromStdString(message.logMessage()));
           log.append("\n");
           log.append("\n");
         }
 
-        messages = trans.warnings();
-
-        for( const auto & message : messages )
-        {
+        for( const auto & message : trans.warnings() ) {
           log.append(QString::fromStdString(message.logMessage()));
+          log.append("\n");
+          log.append("\n");
+        }
+
+        log.append("The following idf objects were not imported.");
+        log.append("\n");
+        log.append("\n");
+
+        for( const auto & idfObject : trans.untranslatedIdfObjects() ) {
+          std::string message;
+          if( auto name = idfObject.name() ) {
+            message = idfObject.iddObject().name() + " named " + name.get();
+          } else {
+            message = "Unammed " + idfObject.iddObject().name();
+          }
+          log.append(QString::fromStdString(message)); 
           log.append("\n");
           log.append("\n");
         }
@@ -849,7 +862,25 @@ bool OpenStudioApp::notify(QObject* receiver, QEvent* event)
   if (event->type() == QEvent::FileOpen) {
     return openFile(static_cast<QFileOpenEvent *>(event)->file());
   }
-  return QApplication::notify(receiver, event);
+  // Note: the original call below bypasses OSAppBase, OpenStudioApp's base class
+  //return QApplication::notify(receiver, event);
+  return OSAppBase::notify(receiver, event);
+}
+
+bool OpenStudioApp::event(QEvent * e)
+{
+  // Put a breakpoint inside this conditional after the app boots
+  if (e->type() != QEvent::ApplicationActivate && e->type() != QEvent::ApplicationDeactivate && e->type() != QEvent::ApplicationStateChange) {
+    // Look for something interesting in here
+    auto type = e->type();
+  }
+
+  return OSAppBase::event(e);
+}
+
+void OpenStudioApp::childEvent(QChildEvent * e)
+{
+  OSAppBase::childEvent(e);
 }
 
 void OpenStudioApp::versionUpdateMessageBox(const osversion::VersionTranslator& translator, 

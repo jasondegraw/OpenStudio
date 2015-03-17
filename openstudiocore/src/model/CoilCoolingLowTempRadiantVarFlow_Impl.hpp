@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -32,8 +32,6 @@ namespace detail {
 
 /** CoilCoolingLowTempRadiantVarFlow_Impl is a StraightComponent_Impl that is the implementation class for CoilCoolingLowTempRadiantVarFlow.*/
 class MODEL_API CoilCoolingLowTempRadiantVarFlow_Impl : public StraightComponent_Impl {
-   
-    Q_OBJECT
 
    public:
     /** @name Constructors and Destructors */

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,12 +31,14 @@
 #include <QMouseEvent>
 #include <QGraphicsItem>
 
+class QBoxLayout;
 class QDropEvent;
 class QDragEnterEvent;
 class QDragLeaveEvent;
-class QBoxLayout;
-class QScrollArea;
+class QFocusEvent;
 class QPushButton;
+class QScrollArea;
+class QLabel;
 
 namespace openstudio {
 
@@ -54,7 +56,12 @@ class OSDropZone2 : public QWidget
 public:
 
   OSDropZone2();
+
   ~OSDropZone2() {}
+
+  void enableClickFocus() { this->setFocusPolicy(Qt::ClickFocus); }
+  void setDeleteObject(bool deleteObject) { m_deleteObject = deleteObject; }
+  bool deleteObject() { return m_deleteObject; }
 
   void bind(model::ModelObject & modelObject,
             OptionalModelObjectGetter get,
@@ -66,13 +73,15 @@ public:
 signals:
 
   void itemClicked(OSItem* item);
-
   void objectRemoved(boost::optional<model::ParentObject> parent);
+  void inFocus(bool inFocus, bool hasData);
 
 protected:
 
   void paintEvent ( QPaintEvent * event );
   void mouseReleaseEvent(QMouseEvent* event);
+  virtual void focusInEvent(QFocusEvent * e);
+  virtual void focusOutEvent(QFocusEvent * e);
 
 private slots:
 
@@ -87,9 +96,10 @@ private:
   boost::optional<ModelObjectSetter> m_set;
   boost::optional<NoFailAction> m_reset;
   boost::optional<model::ModelObject> m_modelObject;
-  QString m_text;
+  //QString m_text;
   OSItem * m_item = nullptr;
-
+  bool m_deleteObject = false;
+  QLabel * m_label;
 };
 
 class OSDropZone : public QWidget

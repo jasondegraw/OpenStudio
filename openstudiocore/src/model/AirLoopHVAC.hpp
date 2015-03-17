@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -79,28 +79,28 @@ class MODEL_API AirLoopHVAC : public Loop
 
 
   /** Returns the supply inlet node. */
-  Node supplyInletNode();
+  Node supplyInletNode() const;
 
   /** Returns the supply outlet nodes.
    * Currently only one supply outlet node is supported, but EnergyPlus allows
    * up to two for dual duct systems.
    */
-  std::vector<Node> supplyOutletNodes();
+  std::vector<Node> supplyOutletNodes() const;
 
   /** Returns the first supply outlet Node. */
-  Node supplyOutletNode();
+  Node supplyOutletNode() const;
 
   /** Returns the demand inlet nodes.
    * Currently only one demand inlet node is supported, but EnergyPlus allows
    * up to two for dual duct systems.
    */
-  std::vector<Node> demandInletNodes();
+  std::vector<Node> demandInletNodes() const;
 
   /** Returns the first demand inlet Node. */
-  Node demandInletNode();
+  Node demandInletNode() const;
 
   /** Returns the demand outlet node */
-  Node demandOutletNode();
+  Node demandOutletNode() const;
 
   /** Returns the outdoor air node.  This is the outermost node from which
    * outdoor air is introduced into the air loop.  This node only exists if there
@@ -195,6 +195,21 @@ class MODEL_API AirLoopHVAC : public Loop
    */
   boost::optional<AirLoopHVACOutdoorAirSystem> airLoopHVACOutdoorAirSystem() const;
 
+  /** Returns the fan in the mixed air stream (after outdoor air system) of the air system.
+   *  If there is no outdoor air system or there are multiple fans in the mixed air stream, 
+   *  then the fan closest to the supply outlet node will be returned.
+   */
+  boost::optional<HVACComponent> supplyFan() const;
+
+  /** Returns the fan in the return air stream (before the outdoor air system.
+   *  If there is no outdoor air system then this method will return false.
+   *  If there are multiple fans, then return the fan nearest the oa system.
+   */
+  boost::optional<HVACComponent> returnFan() const;
+
+  /** Returns the most outboard fan on the relief air stream of the outdoor air system */
+  boost::optional<HVACComponent> reliefFan() const;
+
   /** Adds a new branch on the demand side of the air loop for a zone labeled zoneLabel
    * and returns true if the operation was successful. The method will return false if the Zone
    * is already connected to an air loop.
@@ -223,7 +238,7 @@ class MODEL_API AirLoopHVAC : public Loop
   SizingSystem sizingSystem() const;
 
   /** Returns the ThermalZone objects attached to this air loop. **/
-  std::vector<ThermalZone> thermalZones();
+  std::vector<ThermalZone> thermalZones() const;
 
   /** Returns the availability schedule when this system is allowed to run. **/
   Schedule availabilitySchedule() const;

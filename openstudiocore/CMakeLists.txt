@@ -19,7 +19,20 @@ set(OPENSTUDIO_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VE
 set(OPENSTUDIO_LONG_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.${CMAKE_VERSION_BUILD}")
 
 # EnergyPlus Idd version
-set(ENERGYPLUS_VERSION "8.1" CACHE INTERNAL "EnergyPlus Version")
+if( NOT ENERGYPLUS_VERSION_MAJOR )
+  set(ENERGYPLUS_VERSION_MAJOR 8)
+endif()
+if( NOT ENERGYPLUS_VERSION_MINOR )
+  set(ENERGYPLUS_VERSION_MINOR 2)
+endif()
+if( NOT ENERGYPLUS_VERSION_PATCH )
+  set(ENERGYPLUS_VERSION_PATCH 0)
+endif()
+set(ENERGYPLUS_VERSION "${ENERGYPLUS_VERSION_MAJOR}.${ENERGYPLUS_VERSION_MINOR}.${ENERGYPLUS_VERSION_PATCH}")
+# Build SHA is not required to have a value, but if it does OpenStudio will require this build.
+if( NOT ENERGYPLUS_BUILD_SHA )
+  set(ENERGYPLUS_BUILD_SHA "8397c2e30b")
+endif()
 
 # configure file with version information
 configure_file(${CMAKE_SOURCE_DIR}/OpenStudio.in ${CMAKE_BINARY_DIR}/src/OpenStudio.hxx)
@@ -28,7 +41,16 @@ configure_file(${CMAKE_SOURCE_DIR}/OpenStudio.in ${CMAKE_BINARY_DIR}/src/OpenStu
 if(APPLE)
   set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${OPENSTUDIO_VERSION}")
   set(MACOSX_BUNDLE_BUNDLE_VERSION "${CMAKE_VERSION_BUILD}")
-  set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2014 National Renewable Energy Laboratory")
+  set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2015 National Renewable Energy Laboratory")
+endif()
+
+# compiler id for about boxes
+if(MSVC)
+  set(ABOUT_COMPILER "${CMAKE_GENERATOR}")
+elseif(APPLE)
+  set(ABOUT_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_OSX_ARCHITECTURES} - OSX ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+else()
+  set(ABOUT_COMPILER "${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 ###############################################################################
@@ -82,6 +104,11 @@ option(BUILD_R "Build R package" OFF)
 # Build Ruby gem
 option(BUILD_RUBY_GEM "Build Ruby Gem" OFF)
 
+if( BUILD_PACKAGE )
+  option(PACKAGE_RADIANCE "Package Radiance" OFF)
+  option(PACKAGE_ENERGYPLUS "Package EnergyPlus" ON)
+endif()
+
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   add_definitions(-Qunused-arguments)
@@ -114,6 +141,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
   mark_as_advanced(ENABLE_THREAD_SANITIZER ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_SANITIZER)
 
+endif()
+
+if(UNIX AND NOT APPLE AND BUILD_TESTING)
+  # Enable libgtest linking
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread")
 endif()
 
 
@@ -275,13 +307,18 @@ if(MSVC)
   # be linked against the same runtime
   add_definitions(/wd4251)
   
-  if(NOT CMAKE_CL_64)
-    # treat warnings as errors
-    add_definitions(/WX)
-  else()
-    add_definitions(/bigobj)
-  endif()
+  if(CMAKE_CL_64)
 
+    add_definitions(/bigobj)
+    
+    # ignore conversion from size_t to int for now
+    add_definitions(/wd4267)  
+
+  endif()
+  
+  # treat warnings as errors
+  add_definitions(/WX)
+    
   # ignore warnings about the stl being insecure
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 
@@ -301,15 +338,7 @@ endif()
 # Dependencies
 
 # EnergyPlus
-find_package(EnergyPlus "${ENERGYPLUS_VERSION}")
-if(NOT ${EnergyPlus_FOUND})
-  message(FATAL_ERROR "EnergyPlus ${ENERGYPLUS_VERSION} could not be found")
-endif()
-mark_as_advanced(
-  ENERGYPLUS_EXE
-  ENERGYPLUS_IDD
-  ENERGYPLUS_WEATHER_DIR
-)
+find_package(EnergyPlus "${ENERGYPLUS_VERSION}" REQUIRED)
 
 # Ruby
 find_program(RUBY_EXECUTABLE NAMES ruby PATHS $ENV{CMAKE_RUBY_PATH} NO_SYSTEM_ENVIRONMENT_PATH)
@@ -328,17 +357,6 @@ endif()
 set(RUBY_MODULE_DIR "Ruby")
 
 set(RUBY_MODULE_ARCH_DIR "Ruby/openstudio")
-
-if(WIN32)
-  if(MSVC AND CMAKE_CL_64)
-    message(WARNING "Treat Warnings As Errors is disabled for 64-bit Windows builds")
-  endif()
-
-  if(NOT "${RUBY_VERSION_MAJOR}" EQUAL "2")
-    message(SEND_ERROR "64bit Windows support requires Ruby >= 2.0.0")
-  endif()
-endif()
-
 
 #We want to use the site_ruby folder if this is intended for /usr/local install
 #If it is intended for /usr install, we want to use the main ruby module folder
@@ -590,21 +608,10 @@ add_definitions(-DSQLITE_THREADSAFE=1) # 1 is default, serial access
 #--------------------------------------------------------------------------------
 # Qt
 
-if(MSVC AND MSVC_IS_EXPRESS)
-  if(CMAKE_CL_64)
-    list(APPEND CMAKE_LIBRARY_PATH "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um/x64/")
-  else()
-    list(APPEND CMAKE_LIBRARY_PATH "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um/x86/")
-    list(APPEND CMAKE_LIBRARY_PATH "C:/Program Files/Windows Kits/8.0/Lib/win8/um/x86/")
-  endif()
-endif()
-
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Sql REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Xml REQUIRED)
-find_package(Qt5WebKit REQUIRED)
-find_package(Qt5WebKitWidgets REQUIRED)
 #find_package(Qt5WinExtras)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
@@ -624,12 +631,20 @@ mark_as_advanced(
   Qt5Quick_DIR
   Qt5Sensors_DIR
   Qt5Sql_DIR
-  Qt5WebKit_DIR
-  Qt5WebKitWidgets_DIR
   Qt5Widgets_DIR
   #Qt5WinExtras_DIR
   Qt5Xml_DIR
 )
+
+if(${Qt5Widgets_VERSION} VERSION_LESS "5.4.0")
+  find_package(Qt5WebKit REQUIRED)
+  find_package(Qt5WebKitWidgets REQUIRED)
+  mark_as_advanced(Qt5WebKit_DIR Qt5WebKitWidgets_DIR)
+else()
+  find_package(Qt5WebEngine REQUIRED)
+  find_package(Qt5WebEngineWidgets REQUIRED)
+  mark_as_advanced(Qt5WebEngine_DIR Qt5WebEngineWidgets_DIR)
+endif()
 
 set(CMAKE_AUTOMOC OFF)
 
@@ -638,8 +653,13 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${Qt5Sql_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 include_directories(${Qt5Xml_INCLUDE_DIRS})
-include_directories(${Qt5WebKit_INCLUDE_DIRS})
-include_directories(${Qt5WebKitWidgets_INCLUDE_DIRS})
+if(${Qt5Widgets_VERSION} VERSION_LESS "5.4.0")
+  include_directories(${Qt5WebKit_INCLUDE_DIRS})
+  include_directories(${Qt5WebKitWidgets_INCLUDE_DIRS})
+else()
+  include_directories(${Qt5WebEngine_INCLUDE_DIRS})
+  include_directories(${Qt5WebEngineWidgets_INCLUDE_DIRS})
+endif()
 #include_directories(${Qt5WinExtras_INCLUDE_DIRS})
 include_directories(${Qt5Concurrent_INCLUDE_DIRS})
 include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
@@ -654,8 +674,13 @@ list(APPEND QT_LIBS ${Qt5Widgets_LIBRARIES})
 list(APPEND QT_LIBS ${Qt5Sql_LIBRARIES})
 list(APPEND QT_LIBS ${Qt5Network_LIBRARIES})
 list(APPEND QT_LIBS ${Qt5Xml_LIBRARIES})
-list(APPEND QT_LIBS ${Qt5WebKit_LIBRARIES})
-list(APPEND QT_LIBS ${Qt5WebKitWidgets_LIBRARIES})
+if(${Qt5Widgets_VERSION} VERSION_LESS "5.4.0")
+  list(APPEND QT_LIBS ${Qt5WebKit_LIBRARIES})
+  list(APPEND QT_LIBS ${Qt5WebKitWidgets_LIBRARIES})
+else()
+  list(APPEND QT_LIBS ${Qt5WebEngine_LIBRARIES})
+  list(APPEND QT_LIBS ${Qt5WebEngineWidgets_LIBRARIES})
+endif()
 #list(APPEND QT_LIBS ${Qt5WinExtras_LIBRARIES})
 list(APPEND QT_LIBS ${Qt5Concurrent_LIBRARIES})
 list(APPEND QT_LIBS ${Qt5PrintSupport_LIBRARIES})
@@ -722,13 +747,13 @@ if(UNIX)
     set(AWS_RUBY_PATH ruby-2.0.0-aws-Darwin)
     set(AWS_RUBY_DESTINATION ".")
     set(AWS_RUBY_URL http://developer.nrel.gov/downloads/buildings/openstudio/src/ruby-2.0.0p594-aws-Darwin.tar.bz2)
-    set(AWS_RUBY_CHECKSUM f73fe011d09d6b82901288e83fe45bbf)
+    set(AWS_RUBY_CHECKSUM 580550e0f6027820b4dfb12a186f6fcc)
 
   elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     set(AWS_RUBY_PATH ruby-2.0.0-aws-Linux-x86_64)
     set(AWS_RUBY_DESTINATION "lib/openstudio-${OPENSTUDIO_VERSION}")
     set(AWS_RUBY_URL http://developer.nrel.gov/downloads/buildings/openstudio/src/ruby-2.0.0p594-aws-Linux-x86_64.tar.bz2)
-    set(AWS_RUBY_CHECKSUM d3cdb36ba3dbe167461d94633c4b3ba7)
+    set(AWS_RUBY_CHECKSUM c1b0fa5588b71d94ba557f32b73b9af1)
   endif()
 
   file(DOWNLOAD ${AWS_RUBY_URL} "${CMAKE_BINARY_DIR}/${AWS_RUBY_PATH}.tar.bz2" TIMEOUT 120 INACTIVITY_TIMEOUT 120)
@@ -751,7 +776,6 @@ endforeach()
 add_dependencies(ResultsViewer ResultsViewer_resources)
 
 # ruby, after loading projects
-add_subdirectory(src/ruby_cpp)
 add_subdirectory(ruby)
 
 if(UNIX AND NOT APPLE)
@@ -917,7 +941,7 @@ set(all_lib_targets
   openstudio_airflow
   ${QTWINMIGRATE_EXPORT}
   zkexpat
-  zkqwt
+  qwt
   miniziplib
   sqlite
   litesql
@@ -934,7 +958,6 @@ set(all_exe_targets
   GenerateIddFactory
   gbXMLToIdf
   OpenStudio
-  ruby_cpp
   litesql-gen
   ResultsViewer
   Pat
@@ -967,7 +990,7 @@ install(FILES "${CMAKE_SOURCE_DIR}/resources/resultsviewer/SmallOffice/SmallOffi
 
 
 # Install additional Documents, such as release notes
-install(FILES "${CMAKE_SOURCE_DIR}/../doc/ReleaseNotes/OpenStudio_Release_Notes_1_5_0_20140926.pdf" DESTINATION .)
+install(FILES "${CMAKE_SOURCE_DIR}/../doc/ReleaseNotes/OpenStudio_Release_Notes_1_6_0_20150122.pdf" DESTINATION .)
 
 ###############################################################################
 
@@ -1008,22 +1031,28 @@ if(NOT UNIX)
   endif()
 endif()
 
-
-
-
-if(PACKAGE_RADIANCE_AND_ENERGYPLUS)
-  set(ENERGYPLUS_LOCATION "" CACHE PATH "Location of EnergyPlus to Package")
+if(PACKAGE_RADIANCE)
   set(RADIANCE_LOCATION "" CACHE PATH "Location of Radiance to Package")
 
-  file(COPY "${ENERGYPLUS_LOCATION}" DESTINATION "${CMAKE_BINARY_DIR}/EnergyPlus/")
-  file(COPY "${RADIANCE_LOCATION}" DESTINATION "${CMAKE_BINARY_DIR}/Radiance/")
+  if(APPLE)
+    install(DIRECTORY "${RADIANCE_LOCATION}" DESTINATION "sharedresources" USE_SOURCE_PERMISSIONS)
+  else()
+    install(DIRECTORY "${RADIANCE_LOCATION}" DESTINATION "share/openstudio-${OPENSTUDIO_VERSION}" USE_SOURCE_PERMISSIONS)
+  endif()
+endif()
+
+if(PACKAGE_ENERGYPLUS)
+  get_filename_component(ENERGYPLUS_DIR "${ENERGYPLUS_EXE}" PATH)
 
   if(APPLE)
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/EnergyPlus/" DESTINATION "sharedresources" USE_SOURCE_PERMISSIONS)
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/Radiance/" DESTINATION "sharedresources" USE_SOURCE_PERMISSIONS)
+    install(DIRECTORY "${ENERGYPLUS_DIR}" DESTINATION "sharedresources" USE_SOURCE_PERMISSIONS)
+  elseif(MSVC)
+    install(DIRECTORY "${ENERGYPLUS_DIR}" DESTINATION "share/openstudio" USE_SOURCE_PERMISSIONS)
   else()
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/EnergyPlus/" DESTINATION "share/openstudio-${OPENSTUDIO_VERSION}" USE_SOURCE_PERMISSIONS)
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/Radiance/" DESTINATION "share/openstudio-${OPENSTUDIO_VERSION}" USE_SOURCE_PERMISSIONS)
+    install(DIRECTORY "${ENERGYPLUS_DIR}" DESTINATION "share/openstudio-${OPENSTUDIO_VERSION}" USE_SOURCE_PERMISSIONS)
   endif()
-
 endif()
+
+
+
+

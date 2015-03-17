@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -32,6 +32,7 @@ class ShadingSurface;
 class ShadingControl;
 class ShadingSurfaceGroup;
 class DaylightingDeviceShelf;
+class WindowPropertyFrameAndDivider;
 
 namespace detail {
 
@@ -148,6 +149,10 @@ namespace detail {
 
     boost::optional<ShadingControl> shadingControl() const;
 
+    bool allowWindowPropertyFrameAndDivider() const;
+
+    boost::optional<WindowPropertyFrameAndDivider> windowPropertyFrameAndDivider() const;
+
     double multiplier() const;
 
     bool isMultiplierDefaulted() const;
@@ -175,6 +180,10 @@ namespace detail {
     bool setShadingControl(const ShadingControl& shadingControl);
 
     void resetShadingControl();
+
+    bool setWindowPropertyFrameAndDivider(const WindowPropertyFrameAndDivider& windowPropertyFrameAndDivider);
+
+    void resetWindowPropertyFrameAndDivider();
 
     bool setMultiplier(double multiplier);
 

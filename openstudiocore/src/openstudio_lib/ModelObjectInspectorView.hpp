@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -50,6 +50,11 @@ class ModelObjectInspectorView : public OSInspectorView
 
     virtual ~ModelObjectInspectorView() {}
 
+    // override if your implementation supports multiple object selection
+    // (eg, via GridView)
+    virtual bool supportsMultipleObjectSelection() const { return false; }
+    virtual std::vector<model::ModelObject> selectedObjects() const;
+
   signals:
 
     void toggleUnitsClicked(bool displayIP);
@@ -63,6 +68,7 @@ class ModelObjectInspectorView : public OSInspectorView
     void gridRowSelected(OSItem * item);
 
     void dropZoneItemClicked(OSItem* item);
+
 
   public slots:
 

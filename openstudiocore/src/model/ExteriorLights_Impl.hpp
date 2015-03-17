@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -82,7 +82,7 @@ namespace detail {
 
     ExteriorLightsDefinition exteriorLightsDefinition() const;
 
-    Schedule schedule() const;
+    boost::optional<Schedule> schedule() const;
 
     std::string controlOption() const;
 
@@ -104,6 +104,7 @@ namespace detail {
 
     bool setSchedule(Schedule& schedule);
 
+    void resetSchedule();
     bool setControlOption(std::string controlOption);
 
     void resetControlOption();

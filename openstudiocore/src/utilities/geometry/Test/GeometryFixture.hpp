@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
 *  All rights reserved.
 *  
 *  This library is free software; you can redistribute it and/or
@@ -35,6 +35,10 @@ bool pointEqual(const openstudio::Point3d& a, const openstudio::Point3d& b);
 bool pointsEqual(const std::vector<openstudio::Point3d>& a, const std::vector<openstudio::Point3d>& b);
 
 bool vectorEqual(const openstudio::Vector3d& a, const openstudio::Vector3d& b);
+
+double totalArea(const std::vector<std::vector<openstudio::Point3d> >& polygons);
+
+bool checkNormals(const openstudio::Vector3d& normal, const std::vector<std::vector<openstudio::Point3d> >& polygons);
 
 class GeometryFixture : public ::testing::Test {
 protected:

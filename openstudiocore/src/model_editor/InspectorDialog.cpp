@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -573,6 +573,7 @@ void InspectorDialog::init(InspectorDialogClient client)
       m_typesToDisplay.insert(IddObjectType::OS_DesignSpecification_OutdoorAir);
       m_typesToDisplay.insert(IddObjectType::OS_SpaceType);
       m_typesToDisplay.insert(IddObjectType::OS_ShadingControl);
+      m_typesToDisplay.insert(IddObjectType::OS_WindowProperty_FrameAndDivider);
 
       m_typesToDisplay.insert(IddObjectType::OS_Material);
       m_typesToDisplay.insert(IddObjectType::OS_Material_AirGap);
@@ -589,7 +590,7 @@ void InspectorDialog::init(InspectorDialogClient client)
       m_typesToDisplay.insert(IddObjectType::OS_WindowMaterial_Screen);
       m_typesToDisplay.insert(IddObjectType::OS_WindowMaterial_Shade);
       m_typesToDisplay.insert(IddObjectType::OS_WindowMaterial_SimpleGlazingSystem);
-
+      
       m_typesToDisplay.insert(IddObjectType::OS_Construction);
       m_typesToDisplay.insert(IddObjectType::OS_Construction_CfactorUndergroundWall);
       m_typesToDisplay.insert(IddObjectType::OS_Construction_FfactorGroundFloor);

@@ -232,6 +232,8 @@ set(${target_name}_SRC
   RunTabController.hpp
   RunTabView.cpp
   RunTabView.hpp
+  ScheduleDayView.cpp
+  ScheduleDayView.hpp  
   ScheduleDialog.cpp
   ScheduleDialog.hpp
   ScheduleSetInspectorView.cpp
@@ -288,6 +290,10 @@ set(${target_name}_SRC
   SpaceTypesView.hpp
   StandardOpaqueMaterialInspectorView.cpp
   StandardOpaqueMaterialInspectorView.hpp
+  StandardsInformationConstructionWidget.cpp
+  StandardsInformationConstructionWidget.hpp
+  StandardsInformationMaterialWidget.cpp
+  StandardsInformationMaterialWidget.hpp
   SteamEquipmentInspectorView.cpp
   SteamEquipmentInspectorView.hpp
   SubSurfaceInspectorView.cpp
@@ -571,6 +577,7 @@ set(${target_name}_moc
   ResultsTabView.hpp
   RunTabController.hpp
   RunTabView.hpp
+  ScheduleDayView.hpp
   ScheduleDialog.hpp
   ScheduleSetInspectorView.hpp
   ScheduleSetsController.hpp
@@ -599,6 +606,8 @@ set(${target_name}_moc
   SpaceTypesTabView.hpp
   SpaceTypesView.hpp
   StandardOpaqueMaterialInspectorView.hpp
+  StandardsInformationConstructionWidget.hpp
+  StandardsInformationMaterialWidget.hpp
   SteamEquipmentInspectorView.hpp
   SubSurfaceInspectorView.hpp
   SubTabController.hpp
@@ -683,6 +692,12 @@ set(${target_name}_moc
   ../shared_gui_components/NetworkProxyDialog.hpp
 
 )
+
+if(${Qt5Widgets_VERSION} VERSION_LESS "5.4.0")
+  list(APPEND ${target_name}_moc ResultsWebView.hpp)
+else()
+  list(APPEND ${target_name}_moc ResultsWebEngineView.hpp)
+endif()
 
 # resource files
 set(${target_name}_qrc

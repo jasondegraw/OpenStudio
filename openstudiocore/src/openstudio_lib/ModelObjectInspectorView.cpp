@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -83,6 +83,12 @@ void ModelObjectInspectorView::onSelectItem(OSItem *item)
   ModelObjectItem* modelObjectItem = qobject_cast<ModelObjectItem*>(item);
   OS_ASSERT(modelObjectItem);
   selectModelObject(modelObjectItem->modelObject());
+}
+
+std::vector<model::ModelObject> ModelObjectInspectorView::selectedObjects() const
+{
+  // Default implementation. The tabs with grid views need to do their own thing here
+  return std::vector<model::ModelObject>();
 }
 
 boost::optional<openstudio::model::ModelObject> ModelObjectInspectorView::modelObject() const

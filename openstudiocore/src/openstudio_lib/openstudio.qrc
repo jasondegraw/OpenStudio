@@ -224,10 +224,15 @@
     <file>images/thermostat.png</file>
     <file>images/toggle_arrow.png</file>
     <file>images/toggle_arrow_closed.png</file>
+    <file>images/toggle_arrow_closed2.png</file>
     <file>images/toggle_off.png</file>
     <file>images/toggle_off_over.png</file>
     <file>images/toggle_on.png</file>
     <file>images/toggle_on_over.png</file>
+    <file>images/toggle_false.png</file>
+    <file>images/toggle_false_over.png</file>
+    <file>images/toggle_true.png</file>
+    <file>images/toggle_true_over.png</file>
     <file>images/unitary_system.png</file>
     <file>images/utility_calibration_warning.png</file>
     <file>images/vav-reheat.png</file>
@@ -285,7 +290,7 @@
     <file>images/mini_icons/construct_inter_source.png</file>
     <file>images/mini_icons/coilheatingwater_baseboard_mini.png</file>
     <file>images/mini_icons/coil_ht_dx_singlespeed_mini.png</file>
-    <file>images/mini_icons/coilcoolingchilledbeam_mini.png</file>	
+    <file>images/mini_icons/coilcoolingchilledbeam_mini.png</file>
     <file>images/mini_icons/cool_coil.png</file>
     <file>images/mini_icons/coilcoolinglowtemprad_constflow.png</file>   
     <file>images/mini_icons/coilcoolinglowtemprad_varflow.png</file>     

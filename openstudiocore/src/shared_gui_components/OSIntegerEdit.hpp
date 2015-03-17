@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -29,6 +29,9 @@
 
 #include <QLineEdit>
 #include <QString>
+#include <QValidator>
+
+class QFocusEvent;
 
 namespace openstudio {
 
@@ -40,6 +43,10 @@ class OSIntegerEdit2: public QLineEdit {
   OSIntegerEdit2(QWidget * parent = nullptr);
 
   virtual ~OSIntegerEdit2() {}
+
+  void enableClickFocus() { this->m_hasClickFocus = true; }
+
+  QIntValidator * intValidator() { return m_intValidator; }
 
   void bind(model::ModelObject& modelObject,
             IntGetter get,
@@ -83,6 +90,16 @@ class OSIntegerEdit2: public QLineEdit {
 
   void unbind();
 
+ protected:
+
+  virtual void focusInEvent(QFocusEvent * e);
+
+  virtual void focusOutEvent(QFocusEvent * e);
+
+ signals:
+
+  void inFocus(bool inFocus, bool hasData);
+
  private slots:
 
   void onEditingFinished();
@@ -105,8 +122,10 @@ class OSIntegerEdit2: public QLineEdit {
   boost::optional<BasicQuery> m_isAutocalculated;
 
   bool m_isScientific;
+  bool m_hasClickFocus = false;
   boost::optional<int> m_precision;
   QString m_text = "UNINITIALIZED";
+  QIntValidator * m_intValidator = nullptr;
 
   void refreshTextAndLabel();
 
@@ -125,6 +144,8 @@ class OSIntegerEdit: public QLineEdit {
   OSIntegerEdit(QWidget * parent = nullptr);
 
   virtual ~OSIntegerEdit() {}
+
+  QIntValidator * intValidator() { return m_intValidator; }
 
   void bind(model::ModelObject& modelObject,
             const char* property,
@@ -151,6 +172,7 @@ class OSIntegerEdit: public QLineEdit {
 
   bool m_isScientific;
   boost::optional<int> m_precision;
+  QIntValidator * m_intValidator = nullptr;
 
   void refreshTextAndLabel();
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -50,6 +50,10 @@ class MODEL_API ScheduleRuleset : public Schedule {
   /** Constructs a new ScheduleRuleset, and also constructs a new ScheduleDay and assigns it to 
    *  be the defaultDaySchedule(). */
   explicit ScheduleRuleset(const Model& model);
+
+  /** Constructs a new ScheduleRuleset, constructs a new ScheduleDay with value at all times 
+  *  and assigns it to be the defaultDaySchedule(). */
+  ScheduleRuleset(const Model& model, double value);
 
   virtual ~ScheduleRuleset() {}
 

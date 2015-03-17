@@ -102,8 +102,6 @@ set(data_src
 set(filetypes_src
   filetypes/EpwFile.hpp
   filetypes/EpwFile.cpp
-  filetypes/TimeDependentValuationFile.hpp
-  filetypes/TimeDependentValuationFile.cpp
 )
 
 set(geometry_src
@@ -133,17 +131,6 @@ set(math_src
 )
 
 set(plot_src
-  plot/AnnotatedTimeline.hpp
-  plot/AnnotatedTimeline.cpp
-  plot/Chart.hpp
-  plot/BarChart.hpp
-  plot/PieChart.hpp
-  plot/FloodPlot.hpp
-  plot/FloodPlot.cpp
-  plot/LinePlot.hpp
-  plot/LinePlot.cpp
-  plot/Plot2D.hpp
-  plot/Plot2D.cpp
   plot/ProgressBar.hpp
   plot/ProgressBar.cpp
 )
@@ -174,8 +161,6 @@ set(bcl_src
   bcl/BCLXML.cpp
   bcl/LocalBCL.hpp
   bcl/LocalBCL.cpp
-  bcl/OnDemandGenerator.hpp
-  bcl/OnDemandGenerator.cpp
   bcl/RemoteBCL.hpp
   bcl/RemoteBCL.cpp
 )
@@ -209,7 +194,6 @@ set(economics_src
 )
 
 set(${target_name}_depends
-  zkqwt
   sqlite
   litesql
   litesql-util
@@ -222,6 +206,7 @@ set(${target_name}_depends
 
 if(WIN32)
   list(APPEND ${target_name}_depends qtwinmigrate)
+  list(APPEND ${target_name}_depends mpr)
 endif()
 
 # moc files
@@ -257,9 +242,6 @@ set(data_moc
 )
 
 set(plot_moc
-  plot/Plot2D.hpp
-  plot/FloodPlot.hpp
-  plot/LinePlot.hpp
   plot/ProgressBar.hpp
 )
 
@@ -391,7 +373,6 @@ set(${target_name}_test_src
   data/Test/Vector_GTest.cpp
   economics/test/Economics_GTest.cpp
   filetypes/test/EpwFile_GTest.cpp
-  filetypes/test/TimeDependentValuationFile_GTest.cpp
   geometry/Test/BoundingBox_GTest.cpp
   geometry/Test/GeometryFixture.hpp
   geometry/Test/GeometryFixture.cpp
@@ -402,11 +383,6 @@ set(${target_name}_test_src
   math/test/FloatCompare_GTest.cpp
   math/test/Permutation_GTest.cpp
   math/test/Primes_GTest.cpp
-  plot/Test/AnnotatedTimeline_GTest.cpp
-  plot/Test/BarChart_GTest.cpp
-  plot/Test/FloodPlot_GTest.cpp
-  plot/Test/LinePlot_GTest.cpp
-  plot/Test/PieChart_GTest.cpp
   plot/Test/ProgressBar_GTest.cpp
   time/Test/Calendar_GTest.cpp
   time/Test/Date_GTest.cpp
@@ -437,7 +413,6 @@ set(${target_name}_test_src
   bcl/test/BCLComponent_GTest.cpp
   bcl/test/BCLFileReference_GTest.cpp
   bcl/test/BCLMeasure_GTest.cpp
-  bcl/test/OnDemandGenerator_GTest.cpp
 )
 
 set(${target_name}_swig_src
@@ -485,10 +460,6 @@ set(${target_name}_swig_src
   data/TimeSeries.i
   data/Vector.i
   plot/Plot.i
-  plot/AnnotatedTimeline.i
-  plot/FloodPlot.i
-  plot/LinePlot.i
-  plot/Plot2D.i
   plot/ProgressBar.i
   units/Scale.i
   units/ScaleFactory.i

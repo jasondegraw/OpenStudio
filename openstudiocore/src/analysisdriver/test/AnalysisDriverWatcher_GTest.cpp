@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -105,7 +105,7 @@ TEST_F(AnalysisDriverFixture,AnalysisDriverWatcher_OneAnalysis) {
   analysis.setProblem(problem);
 
   // SET SEED
-  model::Model model = model::exampleModel();
+  model::Model model = fastExampleModel();
   openstudio::path p = toPath("./example.osm");
   model.save(p,true);
   FileReference seedModel(p);

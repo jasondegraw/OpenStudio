@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -254,6 +254,8 @@ class ENERGYPLUS_API ReverseTranslator {
   boost::optional<model::ModelObject> translateWindowMaterialGlazing(const WorkspaceObject & workspaceObject);
 
   boost::optional<model::ModelObject> translateWindowMaterialSimpleGlazingSystem(const WorkspaceObject & workspaceObject);
+
+  boost::optional<model::ModelObject> translateWindowPropertyFrameAndDivider(const WorkspaceObject & workspaceObject);
 
   boost::optional<model::ModelObject> translateZoneAirHeatBalanceAlgorithm(const WorkspaceObject & workspaceObject);
 

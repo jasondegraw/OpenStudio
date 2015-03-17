@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@
 
 class QPushButton;
 class QVBoxLayout;
+class QHBoxLayout;
 
 namespace openstudio {
 
@@ -115,6 +116,7 @@ class OSItemSelectorButtons : public QWidget
 
     QPushButton* m_openLibDlgButton;
 
+    QHBoxLayout * m_dropZoneLayout;
 };
 
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -94,6 +94,12 @@ class OpenStudioApp : public OSAppBase
   openstudio::path resourcesPath() const; 
 
   virtual bool notify(QObject* receiver, QEvent* event);
+
+ protected:
+
+  virtual bool event(QEvent * e);
+
+  virtual void childEvent(QChildEvent * e);
 
  signals:
 

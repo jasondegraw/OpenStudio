@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -62,11 +62,9 @@
 #include <utilities/idd/Output_SQLite_FieldEnums.hxx>
 #include <utilities/idd/ProgramControl_FieldEnums.hxx>
 #include <utilities/idd/LifeCycleCost_NonrecurringCost_FieldEnums.hxx>
+#include <utilities/idd/SetpointManager_MixedAir_FieldEnums.hxx>
 
 #include "../utilities/idd/IddEnums.hpp"
-#include <utilities/idd/IddEnums.hxx>
-#include <utilities/idd/IddFactory.hxx>
-#include "../utilities/plot/ProgressBar.hpp"
 
 #include <QFile>
 #include <QTextStream>
@@ -616,6 +614,11 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateChillerElectricEIR(chiller);
       break;
     }
+  case openstudio::IddObjectType::OS_ClimateZones:
+  {
+    // no-op
+    return retVal;
+  }
   case openstudio::IddObjectType::OS_Construction_CfactorUndergroundWall :
     {
       model::CFactorUndergroundWallConstruction construction = modelObject.cast<CFactorUndergroundWallConstruction>();
@@ -1744,6 +1747,12 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateStandardGlazing(glazing);
       break;
     }
+  case  openstudio::IddObjectType::OS_WindowProperty_FrameAndDivider:
+  {
+    model::WindowPropertyFrameAndDivider frameAndDivider = modelObject.cast<WindowPropertyFrameAndDivider>();
+    retVal = translateWindowPropertyFrameAndDivider(frameAndDivider);
+    break;
+  }
   case openstudio::IddObjectType::OS_ZoneAirContaminantBalance :
     {
       // no-op
@@ -1869,7 +1878,7 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
     m_map.insert(make_pair(modelObject.handle(),retVal.get()));
 
     if (m_progressBar){
-      m_progressBar->setValue(m_map.size());
+      m_progressBar->setValue((int)m_map.size());
     }
   }
 
@@ -2090,6 +2099,7 @@ void ForwardTranslator::translateConstructions(const model::Model & model)
   iddObjectTypes.push_back(IddObjectType::OS_WindowMaterial_Screen);
   iddObjectTypes.push_back(IddObjectType::OS_WindowMaterial_Shade);
   iddObjectTypes.push_back(IddObjectType::OS_WindowMaterial_SimpleGlazingSystem);
+  iddObjectTypes.push_back(IddObjectType::OS_WindowProperty_FrameAndDivider);
   iddObjectTypes.push_back(IddObjectType::OS_ShadingControl);
 
   iddObjectTypes.push_back(IddObjectType::OS_Construction);
@@ -2953,6 +2963,47 @@ boost::optional<IdfObject> ForwardTranslator::createSimpleSchedule(const std::st
   m_idfObjects.push_back(idfObject);
 
   return idfObject;
+}
+
+
+void ForwardTranslator::fixSPMsForUnitarySystem(const model::HVACComponent & unitary,const std::string & fanInletNodeName, const std::string & fanOutletNodeName)
+{
+  if( auto airSystem = unitary.airLoopHVAC() ) {
+    auto supplyComponents = airSystem->supplyComponents(airSystem->supplyInletNode(),unitary);
+    auto oaSystems = subsetCastVector<model::AirLoopHVACOutdoorAirSystem>(supplyComponents);
+    if( ! oaSystems.empty() ) {
+      auto reliefComponents = oaSystems.back().oaComponents();
+      supplyComponents.insert(supplyComponents.end(),reliefComponents.begin(),reliefComponents.end());
+    } 
+    auto upstreamNodes = subsetCastVector<model::Node>(supplyComponents);
+  
+    for( const auto & node : upstreamNodes ) {
+      auto spms = subsetCastVector<model::SetpointManagerMixedAir>(node.setpointManagers());
+      for( auto & spm : spms ) {
+        auto pred = [&spm](IdfObject & idfObject) {
+          if( idfObject.iddObject().type() == IddObjectType::SetpointManager_MixedAir ) {
+            auto idfName = idfObject.name();
+            auto osName = spm.name();
+            if( idfName && osName && (osName.get() == idfName.get()) ) {
+              return true;
+            }
+          }
+          return false;
+        };
+        auto spm_idf = std::find_if(m_idfObjects.begin(),m_idfObjects.end(),pred);
+        if( spm_idf != m_idfObjects.end() ) {
+          auto result = spm_idf->getString(SetpointManager_MixedAirFields::FanInletNodeName);
+          if( ! result || result->empty() ) {
+            spm_idf->setString(SetpointManager_MixedAirFields::FanInletNodeName,fanInletNodeName);
+          }
+          result = spm_idf->getString(SetpointManager_MixedAirFields::FanOutletNodeName);
+          if( ! result || result->empty() ) {
+            spm_idf->setString(SetpointManager_MixedAirFields::FanOutletNodeName,fanOutletNodeName);
+          }
+        }
+      }
+    }
+  }
 }
 
 } // energyplus

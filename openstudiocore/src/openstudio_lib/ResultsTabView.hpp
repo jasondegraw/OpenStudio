@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -28,7 +28,11 @@
 #include "../runmanager/lib/RunManager.hpp"
 
 #include <QWidget>
+#if QT_VERSION >= 0x050400
+#include <QWebEngineView>
+#else
 #include <QWebView>
+#endif
 
 class QComboBox;
 class QPushButton;
@@ -69,7 +73,11 @@ namespace openstudio {
       openstudio::path m_sqlFilePath;
       openstudio::path m_radianceResultsPath;
 
+#if QT_VERSION >= 0x050400
+      QWebEngineView * m_view;
+#else
       QWebView * m_view;
+#endif
       QComboBox * m_comboBox;
   };
 
@@ -100,17 +108,6 @@ namespace openstudio {
     private:
       ResultsView * m_resultsView;
       REGISTER_LOGGER("openstudio::ResultsTabView");
-  };
-
-  class ResultsWebView : public QWebView
-  {
-    Q_OBJECT;
-
-    public:
-
-      ResultsWebView(QWidget * parent = 0);
-      
-      QSize sizeHint() const;
   };
 
 } // openstudio

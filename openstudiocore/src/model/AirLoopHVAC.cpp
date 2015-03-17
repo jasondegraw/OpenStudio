@@ -1,5 +1,5 @@
 /**********************************************************************
-*  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+*  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
 *  All rights reserved.
 *
 *  This library is free software; you can redistribute it and/or
@@ -23,6 +23,16 @@
 #include "AirLoopHVACSupplyPlenum_Impl.hpp"
 #include "AirLoopHVACReturnPlenum.hpp"
 #include "AirLoopHVACReturnPlenum_Impl.hpp"
+#include "AirTerminalSingleDuctSeriesPIUReheat.hpp"
+#include "AirTerminalSingleDuctSeriesPIUReheat_Impl.hpp"
+#include "AirTerminalSingleDuctParallelPIUReheat.hpp"
+#include "AirTerminalSingleDuctParallelPIUReheat_Impl.hpp"
+#include "FanConstantVolume.hpp"
+#include "FanConstantVolume_Impl.hpp"
+#include "FanVariableVolume.hpp"
+#include "FanVariableVolume_Impl.hpp"
+#include "FanOnOff.hpp"
+#include "FanOnOff_Impl.hpp"
 #include "SizingSystem.hpp"
 #include "SizingSystem_Impl.hpp"
 #include "Node.hpp"
@@ -794,7 +804,7 @@ namespace detail {
     }
   }
 
-  std::vector<ThermalZone> AirLoopHVAC_Impl::thermalZones()
+  std::vector<ThermalZone> AirLoopHVAC_Impl::thermalZones() const
   {
     std::vector<ModelObject> objects = demandComponents(IddObjectType::OS_ThermalZone);
     //std::vector<ModelObject> v = this->demandComponents( IddObjectType::OS_AirLoopHVAC_ZoneSplitter );
@@ -883,6 +893,16 @@ namespace detail {
   void AirLoopHVAC_Impl::setAvailabilitySchedule(Schedule & schedule)
   {
     availabilityManagerAssignmentList().availabilityManagerScheduled().setSchedule(schedule);
+
+    auto seriesPIUs = subsetCastVector<AirTerminalSingleDuctSeriesPIUReheat>(demandComponents(AirTerminalSingleDuctSeriesPIUReheat::iddObjectType()));
+    for( auto & piu : seriesPIUs ) {
+      piu.getImpl<detail::AirTerminalSingleDuctSeriesPIUReheat_Impl>()->setFanAvailabilitySchedule(schedule);
+    }
+
+    auto parallelPIUs = subsetCastVector<AirTerminalSingleDuctParallelPIUReheat>(demandComponents(AirTerminalSingleDuctParallelPIUReheat::iddObjectType()));
+    for( auto & piu : parallelPIUs ) {
+      piu.getImpl<detail::AirTerminalSingleDuctParallelPIUReheat_Impl>()->setFanAvailabilitySchedule(schedule);
+    }
   }
   
   bool AirLoopHVAC_Impl::setNightCycleControlType(std::string controlType)
@@ -914,6 +934,68 @@ namespace detail {
       {
         result = mo->optionalCast<Node>();
       }
+    }
+
+    return result;
+  }
+
+  boost::optional<HVACComponent> lastFan(const std::vector<ModelObject> & comps)
+  {
+    boost::optional<HVACComponent> result;
+
+    auto constantVolumeFans = subsetCastVector<FanConstantVolume>(comps);
+    if( ! constantVolumeFans.empty() ) {
+      result = constantVolumeFans.back();      
+    } else {
+      auto variableVolumeFans = subsetCastVector<FanVariableVolume>(comps);
+      if( ! variableVolumeFans.empty() ) {
+        result = variableVolumeFans.back();
+      }
+    }
+
+    return result;
+  }
+
+  boost::optional<HVACComponent> AirLoopHVAC_Impl::supplyFan() const
+  {
+    boost::optional<HVACComponent> result;
+
+    boost::optional<HVACComponent> start = supplyInletNode();
+    if( auto oaSystem = airLoopHVACOutdoorAirSystem() ) {
+      start = oaSystem.get();
+    }
+    OS_ASSERT(start);
+    auto end = supplyOutletNode();
+
+    auto t_supplyComponents = supplyComponents(start.get(),end);
+    result = lastFan(t_supplyComponents);
+
+    return result;
+  }
+
+  boost::optional<HVACComponent> AirLoopHVAC_Impl::returnFan() const
+  {
+    boost::optional<HVACComponent> result;
+
+    auto start = supplyInletNode();
+    auto end = airLoopHVACOutdoorAirSystem();
+
+    if( end ) {
+      auto t_supplyComponents = supplyComponents(start,end.get());
+      result = lastFan(t_supplyComponents);
+    }
+
+    return result;
+  }
+
+  boost::optional<HVACComponent> AirLoopHVAC_Impl::reliefFan() const
+  {
+    boost::optional<HVACComponent> result;
+
+    if( auto oaSystem = airLoopHVACOutdoorAirSystem() )
+    {
+      auto t_reliefComponents = oaSystem->reliefComponents();
+      result = lastFan(t_reliefComponents);
     }
 
     return result;
@@ -980,22 +1062,22 @@ AirLoopHVAC::AirLoopHVAC(std::shared_ptr<detail::AirLoopHVAC_Impl> impl)
   : Loop(impl)
 {}
 
-Node AirLoopHVAC::supplyInletNode()
+Node AirLoopHVAC::supplyInletNode() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->supplyInletNode();
 }
 
-std::vector<Node> AirLoopHVAC::supplyOutletNodes()
+std::vector<Node> AirLoopHVAC::supplyOutletNodes() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->supplyOutletNodes();
 }
 
-std::vector<Node> AirLoopHVAC::demandInletNodes()
+std::vector<Node> AirLoopHVAC::demandInletNodes() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->demandInletNodes();
 }
 
-Node AirLoopHVAC::demandOutletNode()
+Node AirLoopHVAC::demandOutletNode() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->demandOutletNode();
 }
@@ -1107,12 +1189,12 @@ boost::optional<Node> AirLoopHVAC::supplyMixerOutletNode() {
   LOG_AND_THROW("Not implemented.");
 }
 
-Node AirLoopHVAC::supplyOutletNode()
+Node AirLoopHVAC::supplyOutletNode() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->supplyOutletNode();
 }
 
-Node AirLoopHVAC::demandInletNode()
+Node AirLoopHVAC::demandInletNode() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->demandInletNode();
 }
@@ -1147,7 +1229,7 @@ SizingSystem AirLoopHVAC::sizingSystem() const
   return getImpl<detail::AirLoopHVAC_Impl>()->sizingSystem();
 }
 
-std::vector<ThermalZone> AirLoopHVAC::thermalZones()
+std::vector<ThermalZone> AirLoopHVAC::thermalZones() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->thermalZones();
 }
@@ -1198,6 +1280,21 @@ bool AirLoopHVAC::setNightCycleControlType(std::string controlType)
 std::string AirLoopHVAC::nightCycleControlType() const
 {
   return getImpl<detail::AirLoopHVAC_Impl>()->nightCycleControlType();
+}
+
+boost::optional<HVACComponent> AirLoopHVAC::supplyFan() const
+{
+  return getImpl<detail::AirLoopHVAC_Impl>()->supplyFan();
+}
+
+boost::optional<HVACComponent> AirLoopHVAC::returnFan() const
+{
+  return getImpl<detail::AirLoopHVAC_Impl>()->returnFan();
+}
+
+boost::optional<HVACComponent> AirLoopHVAC::reliefFan() const
+{
+  return getImpl<detail::AirLoopHVAC_Impl>()->reliefFan();
 }
 
 } // model

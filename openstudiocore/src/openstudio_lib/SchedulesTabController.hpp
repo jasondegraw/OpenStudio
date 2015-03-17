@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
 #include "../model/ScheduleRuleset_Impl.hpp"
 #include "../model/YearDescription.hpp"
 #include "../model/YearDescription_Impl.hpp"
+#include "../utilities/core/UUID.hpp"
 #include <boost/smart_ptr.hpp>
 #include <QObject>
 
@@ -80,15 +81,17 @@ class SchedulesTabController : public MainTabController
 
   void addScheduleRuleset();
 
+  void copySelectedSchedule();
+
   void removeSelectedSchedule();
 
   void purgeUnusedScheduleRulesets();
 
-  void addRule(model::ScheduleRuleset & scheduleRuleset);
+  void addRule(model::ScheduleRuleset & scheduleRuleset, UUID scheduleDayHandle);
 
-  void addSummerProfile(model::ScheduleRuleset & scheduleRuleset);
+  void addSummerProfile(model::ScheduleRuleset & scheduleRuleset, UUID scheduleDayHandle);
 
-  void addWinterProfile(model::ScheduleRuleset & scheduleRuleset);
+  void addWinterProfile(model::ScheduleRuleset & scheduleRuleset, UUID scheduleDayHandle);
 
   void removeScheduleRule(model::ScheduleRule & scheduleRule);
 

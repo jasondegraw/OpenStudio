@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,10 +38,7 @@ namespace detail {
 
     Q_PROPERTY(boost::optional<openstudio::model::ModelObject> availabilitySchedule READ availabilityScheduleAsModelObject WRITE setAvailabilityScheduleAsModelObject);
 
-  Q_PROPERTY(double gasBurnerEfficiency READ gasBurnerEfficiency WRITE setGasBurnerEfficiency);
-  Q_PROPERTY(boost::optional<double> nominalCapacity READ nominalCapacity WRITE setNominalCapacity);
-  Q_PROPERTY(double parasiticElectricLoad READ parasiticElectricLoad WRITE setParasiticElectricLoad);
-  Q_PROPERTY(double parasiticGasLoad READ parasiticGasLoad WRITE setParasiticGasLoad);
+    Q_PROPERTY(boost::optional<double> nominalCapacity READ nominalCapacity WRITE setNominalCapacity);
   public:
     /** @name Constructors and Destructors */
     //2{
@@ -87,19 +84,19 @@ namespace detail {
     bool setAvailabilitySchedule(Schedule& schedule);
 
     // Get GasBurnerEfficiency
-    double gasBurnerEfficiency();
+    double gasBurnerEfficiency() const;
 
     // Set GasBurnerEfficiency
     void setGasBurnerEfficiency(double val);
 
     // Get ParasiticElectricLoad
-    double parasiticElectricLoad();
+    double parasiticElectricLoad() const;
 
     // Set parasiticElectricLoad
     void setParasiticElectricLoad(double val);
 
     // Get ParasiticGasLoad
-    double parasiticGasLoad();
+    double parasiticGasLoad() const;
 
     // Set parasiticGasLoad
     void setParasiticGasLoad(double val);

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -103,6 +103,8 @@ class OSComboBox2 : public QComboBox {
 
   virtual ~OSComboBox2() {}
 
+  void enableClickFocus() { this->setFocusPolicy(Qt::ClickFocus); }
+
   // interface for direct bind
   template<typename ChoiceType>
   void bind(model::ModelObject& modelObject,
@@ -163,6 +165,10 @@ class OSComboBox2 : public QComboBox {
  protected:
 
   bool event( QEvent * e );
+
+ signals:
+
+  void inFocus(bool inFocus, bool hasData);
 
  private slots:
 

@@ -829,6 +829,9 @@ set(${target_name}_src
   StandardsInformationConstruction.hpp
   StandardsInformationConstruction_Impl.hpp
   StandardsInformationConstruction.cpp
+  StandardsInformationMaterial.hpp
+  StandardsInformationMaterial_Impl.hpp
+  StandardsInformationMaterial.cpp
   SteamEquipment.hpp
   SteamEquipment_Impl.hpp
   SteamEquipment.cpp
@@ -862,9 +865,6 @@ set(${target_name}_src
   ZoneControlThermostatStagedDualSetpoint.hpp
   ZoneControlThermostatStagedDualSetpoint_Impl.hpp
   ZoneControlThermostatStagedDualSetpoint.cpp
-  TimeDependentValuation.hpp
-  TimeDependentValuation_Impl.hpp
-  TimeDependentValuation.cpp
   Timestep.hpp
   Timestep_Impl.hpp
   Timestep.cpp
@@ -925,6 +925,9 @@ set(${target_name}_src
   WindowDataFile.hpp
   WindowDataFile_Impl.hpp
   WindowDataFile.cpp
+  WindowPropertyFrameAndDivider.hpp
+  WindowPropertyFrameAndDivider_Impl.hpp
+  WindowPropertyFrameAndDivider.cpp
   YearDescription.hpp
   YearDescription_Impl.hpp
   YearDescription.cpp
@@ -997,13 +1000,14 @@ set(${target_name}_swig_src
   ModelHVAC.i
 )
 
+# Only need to moc files that have Q_OBJECT macro
+# Only files with signals, slots, or Q_PROPERTY need to have Q_OBJECT macro
+# We want the number of files moc'd to decrease over time, run CheckForQObject.rb to remove unnecessary moc's
 set(${target_name}_moc
   Model_Impl.hpp
   Component_Impl.hpp
   ComponentWatcher_Impl.hpp
   ModelObject_Impl.hpp
-
-  AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp
@@ -1029,12 +1033,8 @@ set(${target_name}_moc
   CFactorUndergroundWallConstruction_Impl.hpp
   ChillerElectricEIR_Impl.hpp
   CoilCoolingDXSingleSpeed_Impl.hpp
-  CoilCoolingDXVariableRefrigerantFlow_Impl.hpp
-  CoilCoolingLowTempRadiantVarFlow_Impl.hpp
   CoilCoolingWater_Impl.hpp
-  CoilCoolingWaterToAirHeatPumpEquationFit_Impl.hpp
   CoilHeatingDXSingleSpeed_Impl.hpp
-  CoilHeatingDXVariableRefrigerantFlow_Impl.hpp
   CoilHeatingElectric_Impl.hpp
   CoilHeatingGas_Impl.hpp
   CoilHeatingWater_Impl.hpp
@@ -1044,10 +1044,7 @@ set(${target_name}_moc
   ControllerMechanicalVentilation_Impl.hpp
   ControllerWaterCoil_Impl.hpp
   ConvergenceLimits_Impl.hpp
-  CoolingTowerPerformanceCoolTools_Impl.hpp
-  CoolingTowerPerformanceYorkCalc_Impl.hpp
   CoolingTowerSingleSpeed_Impl.hpp
-  CoolingTowerVariableSpeed_Impl.hpp
   Curve_Impl.hpp
   CurveBicubic_Impl.hpp
   CurveBiquadratic_Impl.hpp
@@ -1171,7 +1168,6 @@ set(${target_name}_moc
   Surface_Impl.hpp
   ThermalZone_Impl.hpp
   ThermostatSetpointDualSetpoint_Impl.hpp
-  TimeDependentValuation_Impl.hpp
   Timestep_Impl.hpp
   WaterHeaterMixed_Impl.hpp
   WaterUseConnections_Impl.hpp
@@ -1185,8 +1181,6 @@ set(${target_name}_moc
   ZoneHVACBaseboardConvectiveElectric_Impl.hpp
   ZoneHVACIdealLoadsAirSystem_Impl.hpp
   ZoneHVACFourPipeFanCoil_Impl.hpp
-  ZoneHVACTerminalUnitVariableRefrigerantFlow_Impl.hpp
-  ZoneHVACLowTempRadiantVarFlow_Impl.hpp
   ZoneHVACPackagedTerminalHeatPump_Impl.hpp
   ZoneHVACPackagedTerminalAirConditioner_Impl.hpp
 )
@@ -1329,6 +1323,7 @@ set(${target_name}_test_src
   test/Lights_GTest.cpp
   test/Luminaire_GTest.cpp
   test/MasslessOpaqueMaterial_GTest.cpp
+  test/Material_GTest.cpp
   test/Meter_GTest.cpp
   test/ModelFixture.cpp
   test/ModelFixture.hpp
@@ -1343,6 +1338,7 @@ set(${target_name}_test_src
   test/OutputVariable_GTest.cpp
   test/ParentObject_GTest.cpp
   test/People_GTest.cpp
+  test/PeopleDefinition_GTest.cpp
   test/PipeAdiabatic_GTest.cpp
   test/PlanarSurface_GTest.cpp
   test/PlantLoop_GTest.cpp
@@ -1414,12 +1410,12 @@ set(${target_name}_test_src
   test/Surface_GTest.cpp
   test/TableMultiVariableLookup_GTest.cpp
   test/ThermalZone_GTest.cpp
-  test/TimeDependentValuation_GTest.cpp
   test/UtilityBill_GTest.cpp
   test/WaterHeaterMixed_GTest.cpp
   test/WaterUseConnections_GTest.cpp
   test/WaterUseEquipment_GTest.cpp
   test/WeatherFile_GTest.cpp
+  test/WindowPropertyFrameAndDivider_GTest.cpp
   test/YearDescription_GTest.cpp
   test/ZoneCapacitanceMultiplierResearchSpecial_GTest.cpp
   test/ZoneHVACBaseboardConvectiveElectric_GTest.cpp

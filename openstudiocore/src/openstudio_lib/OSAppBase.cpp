@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,18 +33,28 @@
 #include "../analysisdriver/SimpleProject.hpp"
 
 #include "../utilities/bcl/LocalBCL.hpp"
+#include "../utilities/core/PathHelpers.hpp"
 
 #include <QDir>
+#include <QEvent>
 #include <QMessageBox>
+#include <QTimer>
 
 namespace openstudio {
 
 OSAppBase::OSAppBase( int & argc, char ** argv, const QSharedPointer<MeasureManager> &t_measureManager )
   : QApplication(argc, argv), m_measureManager(t_measureManager)
 {
-  LOG(Debug, "Measures dir: " << openstudio::toString(BCLMeasure::userMeasuresDir()));
-  if (!QDir().exists(toQString(BCLMeasure::userMeasuresDir()))){
-    BCLMeasure::setUserMeasuresDir(BCLMeasure::userMeasuresDir());
+  openstudio::path userMeasuresDir = BCLMeasure::userMeasuresDir();
+
+  if (isNetworkPath(userMeasuresDir) && !isNetworkPathAvailable(userMeasuresDir)) {
+    QTimer::singleShot(0, this, SLOT(showMeasureUpdateDlg()));
+  }
+  else {
+    LOG(Debug, "Measures dir: " << openstudio::toString(userMeasuresDir));
+    if (!QDir().exists(toQString(userMeasuresDir))){
+      BCLMeasure::setUserMeasuresDir(userMeasuresDir);
+    }
   }
 
   m_measureManager->updateMeasuresLists();
@@ -56,11 +66,36 @@ OSAppBase::~OSAppBase()
 {
 }
 
+bool OSAppBase::notify(QObject * receiver, QEvent * e)
+{
+  return QApplication::notify(receiver, e);
+}
+
+bool OSAppBase::event(QEvent * e)
+{
+  // Put a breakpoint inside this conditional after the app boots
+  if (e->type() != QEvent::ApplicationActivate && e->type() != QEvent::ApplicationDeactivate && e->type() != QEvent::ApplicationStateChange) {
+    // Look for something interesting in here
+    auto type = e->type();
+  }
+
+  return QApplication::event(e);
+}
+
+void OSAppBase::childEvent(QChildEvent * e)
+{
+  QApplication::childEvent(e);
+}
+
 OSAppBase * OSAppBase::instance()
 {
   return qobject_cast<OSAppBase *>(QApplication::instance());
 }
 
+void OSAppBase::showMeasureUpdateDlg()
+{
+  QMessageBox::information(this->mainWidget(), "Cannot Update User Measures", "Your My Measures Directory appears to be on a network drive that is not currently available.\nYou can change your specified My Measures Directory using 'Preferences->Change My Measures Directory'.", QMessageBox::Ok);
+}
 
 boost::optional<openstudio::analysisdriver::SimpleProject> OSAppBase::project()
 {

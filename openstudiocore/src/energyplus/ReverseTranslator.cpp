@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -818,6 +818,11 @@ boost::optional<ModelObject> ReverseTranslator::translateAndMapWorkspaceObject(c
       modelObject = translateWindowMaterialSimpleGlazingSystem(workspaceObject);
       break;
     }
+  case openstudio::IddObjectType::WindowProperty_FrameAndDivider:
+  {
+    modelObject = translateWindowPropertyFrameAndDivider(workspaceObject);
+    break;
+  }
   case openstudio::IddObjectType::Zone:
     {
       modelObject = translateZone(workspaceObject);

@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.  
+ *  Copyright (c) 2008-2015, Alliance for Sustainable Energy.  
  *  All rights reserved.
  *  
  *  This library is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@
 
 #include <QTimer>
 
+class QFocusEvent;
 class QMouseEvent;
 
 namespace openstudio {
@@ -42,6 +43,10 @@ class OSLineEdit2 : public QLineEdit {
   OSLineEdit2(QWidget * parent = nullptr);
 
   virtual ~OSLineEdit2() {}
+
+  void enableClickFocus() { this->m_hasClickFocus = true; }
+  void setDeleteObject(bool deleteObject) { m_deleteObject = deleteObject;  }
+  bool deleteObject() { return m_deleteObject; }
 
   void bind(model::ModelObject& modelObject,
             StringGetter get,
@@ -67,11 +72,17 @@ protected:
 
   void mouseReleaseEvent(QMouseEvent* event);
 
+  virtual void focusInEvent(QFocusEvent * e);
+
+  virtual void focusOutEvent(QFocusEvent * e);
+
 signals:
 
   void itemClicked(OSItem* item);
 
   void objectRemoved(boost::optional<model::ParentObject> parent);
+
+  void inFocus(bool inFocus, bool hasData);
 
  private slots:
 
@@ -105,6 +116,10 @@ signals:
   std::string m_text = "";
 
   QTimer m_timer;
+
+  bool m_hasClickFocus = false;
+
+  bool m_deleteObject = false;
 };
 
 class OSLineEdit : public QLineEdit
