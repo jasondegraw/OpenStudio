@@ -21,7 +21,6 @@
 #define MODEL_CONCRETEMODELOBJECTS_HPP
 
 #include "AirConditionerVariableRefrigerantFlow.hpp"
-#include "AirflowNetworkMultiZoneComponentDetailedOpening.hpp"
 #include "AirflowNetworkMultiZoneComponentHorizontalOpening.hpp"
 #include "AirflowNetworkMultiZoneComponentSimpleOpening.hpp"
 #include "AirflowNetworkMultiZoneReferenceCrackConditions.hpp"
@@ -309,7 +308,6 @@
 
 // include all concrete ModelObject Impls too
 #include "AirConditionerVariableRefrigerantFlow_Impl.hpp"
-#include "AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp"
 #include "AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp"
 #include "AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp"
 #include "AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp"

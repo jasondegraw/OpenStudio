@@ -35,9 +35,6 @@ set(${target_name}_src
   AirConditionerVariableRefrigerantFlow.hpp
   AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirConditionerVariableRefrigerantFlow.cpp
-  AirflowNetworkMultiZoneComponentDetailedOpening.hpp
-  AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp
-  AirflowNetworkMultiZoneComponentDetailedOpening.cpp
   AirflowNetworkMultiZoneComponentHorizontalOpening.hpp
   AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentHorizontalOpening.cpp
@@ -1008,7 +1005,6 @@ set(${target_name}_moc
   Component_Impl.hpp
   ComponentWatcher_Impl.hpp
   ModelObject_Impl.hpp
-  AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp
   AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp
@@ -1221,7 +1217,6 @@ endif()
 
 set(${target_name}_test_src
   test/AirConditionerVariableRefrigerantFlow_GTest.cpp
-  test/AirflowNetworkMultiZoneComponentDetailedOpening_GTest.cpp
   test/AirflowNetworkMultiZoneComponentHorizontalOpening_GTest.cpp
   test/AirflowNetworkMultiZoneComponentSimpleOpening_GTest.cpp
   test/AirflowNetworkMultiZoneReferenceCrackConditions_GTest.cpp
