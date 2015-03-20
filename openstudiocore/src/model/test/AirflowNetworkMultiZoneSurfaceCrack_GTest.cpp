@@ -23,7 +23,6 @@
 
 #include <model/AirflowNetworkMultiZoneSurfaceCrack.hpp>
 #include <model/AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp>
-//#include <model/AirflowNetworkMultiZoneReferenceCrackConditions.hpp>
 
 TEST_F(ModelFixture, Crack)
 {
@@ -35,30 +34,28 @@ TEST_F(ModelFixture, Crack)
   // Check that everything is as it should be
   EXPECT_EQ(0.0006, crack.airMassFlowCoefficientatReferenceConditions());
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
-  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted()); // No reference conditions available
-  //EXPECT_FALSE(crack.referenceCrackConditions());
+  EXPECT_TRUE(crack.isReferenceTemperatureDefaulted());
+  EXPECT_TRUE(crack.isReferenceBarometricPressureDefaulted());
+  EXPECT_TRUE(crack.isReferenceHumidityRatioDefaulted());
 
-  // Create a reference conditions object
-  //openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds0(model, 25.75, 101425.7, 0.007);
+  // Set the reference conditions
+  crack.setReferenceTemperature(25.75);
+  EXPECT_FALSE(crack.isReferenceTemperatureDefaulted());
+  EXPECT_EQ(25.75, crack.referenceTemperature());
+  crack.resetReferenceTemperature();
+  EXPECT_TRUE(crack.isReferenceTemperatureDefaulted());
 
-  // Check that the reference conditions are no longer defaulted
-  //EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds0 implicitly
-  //EXPECT_FALSE(crack.referenceCrackConditions());
+  crack.setReferenceHumidityRatio(0.007);
+  EXPECT_FALSE(crack.isReferenceHumidityRatioDefaulted());
+  EXPECT_EQ(0.007, crack.referenceHumidityRatio());
+  crack.resetReferenceHumidityRatio();
+  EXPECT_TRUE(crack.isReferenceHumidityRatioDefaulted());
 
-  // Add in a second reference conditions object
-  //openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds1(model, 25.75, 101225.7, 0.007);
-
-  // Check that the reference conditions are no longer defaulted
-  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
-  //EXPECT_FALSE(crack.referenceCrackConditions());
-
-  // Explicitly set the reference conditions object
-  //EXPECT_TRUE(crack.setReferenceCrackConditions(refconds1));
-
-  // Check that the reference conditions are no longer defaulted
-  //EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds1 explicitly
-  //EXPECT_TRUE(crack.referenceCrackConditions());
-  //EXPECT_EQ(refconds1, crack.referenceCrackConditions());
+  crack.setReferenceBarometricPressure(101425.7);
+  EXPECT_FALSE(crack.isReferenceBarometricPressureDefaulted());
+  EXPECT_EQ(101425.7, crack.referenceBarometricPressure());
+  crack.resetReferenceBarometricPressure();
+  EXPECT_TRUE(crack.isReferenceBarometricPressureDefaulted());
 
   // Set the exponent
   EXPECT_TRUE(crack.setAirMassFlowExponent(0.66));
@@ -69,20 +66,21 @@ TEST_F(ModelFixture, Crack)
   EXPECT_FALSE(crack.isAirMassFlowExponentDefaulted());
   EXPECT_EQ(0.66, crack.airMassFlowExponent());
 
-  // Reset
-  //crack.resetReferenceCrackConditions();
+  // Reset and check that the reset worked
   crack.resetAirMassFlowExponent();
-
-  // Check that the reset worked
-  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
-  //EXPECT_FALSE(crack.referenceCrackConditions());
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
 
-  // Go backwards
-  //refconds1.remove();
-  //EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted());
-  //refconds0.remove();
-  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+  crack = openstudio::model::AirflowNetworkMultiZoneSurfaceCrack(model, 0.0006, 0.675, 25.75, 101425.7, 0.007);
+  EXPECT_EQ(0.0006, crack.airMassFlowCoefficientatReferenceConditions());
+  EXPECT_FALSE(crack.isAirMassFlowExponentDefaulted());
+  EXPECT_FALSE(crack.isReferenceTemperatureDefaulted());
+  EXPECT_FALSE(crack.isReferenceBarometricPressureDefaulted());
+  EXPECT_FALSE(crack.isReferenceHumidityRatioDefaulted());
+  EXPECT_EQ(0.675, crack.airMassFlowExponent());
+  EXPECT_EQ(25.75, crack.referenceTemperature());
+  EXPECT_EQ(101425.7, crack.referenceBarometricPressure());
+  EXPECT_EQ(0.007, crack.referenceHumidityRatio());
+
 
 }
 
