@@ -23,7 +23,7 @@
 
 #include <model/AirflowNetworkMultiZoneSurfaceCrack.hpp>
 #include <model/AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp>
-#include <model/AirflowNetworkMultiZoneReferenceCrackConditions.hpp>
+//#include <model/AirflowNetworkMultiZoneReferenceCrackConditions.hpp>
 
 TEST_F(ModelFixture, Crack)
 {
@@ -35,30 +35,30 @@ TEST_F(ModelFixture, Crack)
   // Check that everything is as it should be
   EXPECT_EQ(0.0006, crack.airMassFlowCoefficientatReferenceConditions());
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
-  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted()); // No reference conditions available
-  EXPECT_FALSE(crack.referenceCrackConditions());
+  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted()); // No reference conditions available
+  //EXPECT_FALSE(crack.referenceCrackConditions());
 
   // Create a reference conditions object
-  openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds0(model, 25.75, 101425.7, 0.007);
+  //openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds0(model, 25.75, 101425.7, 0.007);
 
   // Check that the reference conditions are no longer defaulted
-  EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds0 implicitly
-  EXPECT_FALSE(crack.referenceCrackConditions());
+  //EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds0 implicitly
+  //EXPECT_FALSE(crack.referenceCrackConditions());
 
   // Add in a second reference conditions object
-  openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds1(model, 25.75, 101225.7, 0.007);
+  //openstudio::model::AirflowNetworkMultiZoneReferenceCrackConditions refconds1(model, 25.75, 101225.7, 0.007);
 
   // Check that the reference conditions are no longer defaulted
-  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
-  EXPECT_FALSE(crack.referenceCrackConditions());
+  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+  //EXPECT_FALSE(crack.referenceCrackConditions());
 
   // Explicitly set the reference conditions object
-  EXPECT_TRUE(crack.setReferenceCrackConditions(refconds1));
+  //EXPECT_TRUE(crack.setReferenceCrackConditions(refconds1));
 
   // Check that the reference conditions are no longer defaulted
-  EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds1 explicitly
-  EXPECT_TRUE(crack.referenceCrackConditions());
-  EXPECT_EQ(refconds1, crack.referenceCrackConditions());
+  //EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted()); // Using refconds1 explicitly
+  //EXPECT_TRUE(crack.referenceCrackConditions());
+  //EXPECT_EQ(refconds1, crack.referenceCrackConditions());
 
   // Set the exponent
   EXPECT_TRUE(crack.setAirMassFlowExponent(0.66));
@@ -70,19 +70,19 @@ TEST_F(ModelFixture, Crack)
   EXPECT_EQ(0.66, crack.airMassFlowExponent());
 
   // Reset
-  crack.resetReferenceCrackConditions();
+  //crack.resetReferenceCrackConditions();
   crack.resetAirMassFlowExponent();
 
   // Check that the reset worked
-  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
-  EXPECT_FALSE(crack.referenceCrackConditions());
+  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+  //EXPECT_FALSE(crack.referenceCrackConditions());
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
 
   // Go backwards
-  refconds1.remove();
-  EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted());
-  refconds0.remove();
-  EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
+  //refconds1.remove();
+  //EXPECT_FALSE(crack.isReferenceCrackConditionsObjectDefaulted());
+  //refconds0.remove();
+  //EXPECT_TRUE(crack.isReferenceCrackConditionsObjectDefaulted());
 
 }
 

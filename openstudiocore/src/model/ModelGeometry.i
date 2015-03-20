@@ -123,7 +123,6 @@ MODELOBJECT_TEMPLATES(ExteriorLights);
 MODELOBJECT_TEMPLATES(LightingSimulationZone);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentHorizontalOpening);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentSimpleOpening);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneReferenceCrackConditions);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceCrack);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
 
@@ -164,7 +163,6 @@ SWIG_MODELOBJECT(ExteriorLights, 1);
 SWIG_MODELOBJECT(LightingSimulationZone, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentHorizontalOpening, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentSimpleOpening, 1);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneReferenceCrackConditions, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceCrack, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea, 1);
 

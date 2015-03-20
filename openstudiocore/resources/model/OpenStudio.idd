@@ -19005,36 +19005,6 @@ OS:Output:Variable,
        \object-list ScheduleNames
 
 \group OpenStudio Airflow Network
-OS:AirflowNetworkMultiZoneReferenceCrackConditions,
-       \min-fields 5
-       \memo This object specifies the conditions under which the air mass flow coefficient was measured.
-  A1, \field Handle
-       \type handle
-       \required-field
-  A2, \field Name
-       \required-field
-       \type alpha
-       \reference ReferenceCrackConditions
-       \note A unique name for this object.
-  N1, \field Reference Temperature
-       \type real
-       \units C
-       \default 20
-       \note The reference temperature under which the surface crack data were obtained.
-  N2, \field Reference Barometric Pressure
-       \type real
-       \units Pa
-       \default 101325
-       \minimum 31000
-       \maximum 120000
-       \ip-units inHg
-       \note The reference barometric pressure under which the surface crack data were obtained.
-  N3; \field Reference Humidity Ratio
-       \type real
-       \units kgWater/kgDryAir
-       \default 0
-       \note The reference humidity ratio under which the surface crack data were obtained.
-
 OS:AirflowNetworkMultiZoneSurfaceCrack,
        \min-fields 3
        \memo This object specifies the properties of airflow through a crack.
@@ -19061,11 +19031,24 @@ OS:AirflowNetworkMultiZoneSurfaceCrack,
        \maximum 1.0
        \default 0.65
        \note The air mass flow exponent for the surface crack.
-  A3; \field Reference Crack Conditions
-       \type object-list
-       \object-list ReferenceCrackConditions
-       \note The name of the AirflowNetwork:MultiZone:ReferenceCrackConditions object associated with
-       \note the air mass flow coefficient.
+  N3, \field Reference Temperature
+       \type real
+       \units C
+       \default 20
+       \note The reference temperature under which the surface crack data were obtained.
+  N4, \field Reference Barometric Pressure
+       \type real
+       \units Pa
+       \default 101325
+       \minimum 31000
+       \maximum 120000
+       \ip-units inHg
+       \note The reference barometric pressure under which the surface crack data were obtained.
+  N5; \field Reference Humidity Ratio
+       \type real
+       \units kgWater/kgDryAir
+       \default 0
+       \note The reference humidity ratio under which the surface crack data were obtained.
 
 OS:AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea,
        \min-fields 6

@@ -26,8 +26,6 @@
 namespace openstudio {
 namespace model {
 
-class AirflowNetworkMultiZoneReferenceCrackConditions;
-
 namespace detail {
 
 /** AirflowNetworkMultiZoneSurfaceCrack_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurfaceCrack.*/
@@ -70,9 +68,17 @@ public:
 
   bool isAirMassFlowExponentDefaulted() const;
 
-  boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
+  double referenceTemperature() const;
 
-  bool isReferenceCrackConditionsObjectDefaulted() const;
+  bool isReferenceTemperatureDefaulted() const;
+
+  double referenceBarometricPressure() const;
+
+  bool isReferenceBarometricPressureDefaulted() const;
+
+  double referenceHumidityRatio() const;
+
+  bool isReferenceHumidityRatioDefaulted() const;
 
   //@}
   /** @name Setters */
@@ -84,9 +90,17 @@ public:
 
   void resetAirMassFlowExponent();
 
-  bool setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions &referenceCrackConditions);
+  void setReferenceTemperature(double referenceTemperature);
 
-  void resetReferenceCrackConditions();
+  void resetReferenceTemperature();
+
+  bool setReferenceBarometricPressure(double referenceBarometricPressure);
+
+  void resetReferenceBarometricPressure();
+
+  void setReferenceHumidityRatio(double referenceHumidityRatio);
+
+  void resetReferenceHumidityRatio();
 
   //@}
 protected:
