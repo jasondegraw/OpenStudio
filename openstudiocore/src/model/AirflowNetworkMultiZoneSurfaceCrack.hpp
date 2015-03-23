@@ -57,7 +57,7 @@ public:
   /** @name Getters */
   //@{
   /** Returns the mass flow coefficient in kg/s at 1 Pa. */
-  double airMassFlowCoefficientatReferenceConditions() const;
+  double airMassFlowCoefficient() const;
   /** Returns the mass flow exponent. */
   double airMassFlowExponent() const;
   /** Returns true if the mass flow exponent is defaulted. */
@@ -79,7 +79,7 @@ public:
   /** @name Setters */
   //@{
   /** Sets the mass flow coefficient in kg/s at 1 Pa.  */
-  bool setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions);
+  bool setAirMassFlowCoefficient(double airMassFlowCoefficientatReferenceConditions);
   /** Sets the mass flow exponent. */
   bool setAirMassFlowExponent(double airMassFlowExponent);
   /** Returns the mass flow exponent to the default value. */

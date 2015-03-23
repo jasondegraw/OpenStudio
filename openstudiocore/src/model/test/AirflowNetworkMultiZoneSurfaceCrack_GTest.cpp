@@ -32,7 +32,7 @@ TEST_F(ModelFixture, Crack)
   openstudio::model::AirflowNetworkMultiZoneSurfaceCrack crack(model,0.0006);
 
   // Check that everything is as it should be
-  EXPECT_EQ(0.0006, crack.airMassFlowCoefficientatReferenceConditions());
+  EXPECT_EQ(0.0006, crack.airMassFlowCoefficient());
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
   EXPECT_TRUE(crack.isReferenceTemperatureDefaulted());
   EXPECT_TRUE(crack.isReferenceBarometricPressureDefaulted());
@@ -71,7 +71,7 @@ TEST_F(ModelFixture, Crack)
   EXPECT_TRUE(crack.isAirMassFlowExponentDefaulted());
 
   crack = openstudio::model::AirflowNetworkMultiZoneSurfaceCrack(model, 0.0006, 0.675, 25.75, 101425.7, 0.007);
-  EXPECT_EQ(0.0006, crack.airMassFlowCoefficientatReferenceConditions());
+  EXPECT_EQ(0.0006, crack.airMassFlowCoefficient());
   EXPECT_FALSE(crack.isAirMassFlowExponentDefaulted());
   EXPECT_FALSE(crack.isReferenceTemperatureDefaulted());
   EXPECT_FALSE(crack.isReferenceBarometricPressureDefaulted());

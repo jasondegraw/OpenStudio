@@ -68,7 +68,7 @@ IddObjectType AirflowNetworkMultiZoneSurfaceCrack_Impl::iddObjectType() const
   return AirflowNetworkMultiZoneSurfaceCrack::iddObjectType();
 }
 
-double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowCoefficientatReferenceConditions() const
+double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowCoefficient() const
 {
   boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, true);
   OS_ASSERT(value);
@@ -87,7 +87,7 @@ bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isAirMassFlowExponentDefaulted() 
   return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent);
 }
 
-bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions)
+bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowCoefficient(double airMassFlowCoefficientatReferenceConditions)
 {
   bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, airMassFlowCoefficientatReferenceConditions);
   return result;
@@ -186,7 +186,7 @@ AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const M
 
   // TODO: Appropriately handle the following required object-list fields.
   // OS_ASSERT(setHandle());
-  OS_ASSERT(setAirMassFlowCoefficientatReferenceConditions(massFlowCoefficient));
+  OS_ASSERT(setAirMassFlowCoefficient(massFlowCoefficient));
 }
 
 AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient,
@@ -197,7 +197,7 @@ AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const M
 
   // TODO: Appropriately handle the following required object-list fields.
   // OS_ASSERT(setHandle());
-  OS_ASSERT(setAirMassFlowCoefficientatReferenceConditions(massFlowCoefficient));
+  OS_ASSERT(setAirMassFlowCoefficient(massFlowCoefficient));
   OS_ASSERT(setAirMassFlowExponent(massFlowExponent));
 }
 
@@ -209,7 +209,7 @@ AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const M
 
   // TODO: Appropriately handle the following required object-list fields.
   // OS_ASSERT(setHandle());
-  OS_ASSERT(setAirMassFlowCoefficientatReferenceConditions(massFlowCoefficient));
+  OS_ASSERT(setAirMassFlowCoefficient(massFlowCoefficient));
   OS_ASSERT(setAirMassFlowExponent(massFlowExponent));
   setReferenceTemperature(referenceTemperature);
   OS_ASSERT(setReferenceBarometricPressure(referenceBarometricPressure));
@@ -221,9 +221,9 @@ IddObjectType AirflowNetworkMultiZoneSurfaceCrack::iddObjectType()
   return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneSurfaceCrack);
 }
 
-double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowCoefficientatReferenceConditions() const
+double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowCoefficient() const
 {
-  return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->airMassFlowCoefficientatReferenceConditions();
+  return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->airMassFlowCoefficient();
 }
 
 double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowExponent() const
@@ -236,9 +236,9 @@ bool AirflowNetworkMultiZoneSurfaceCrack::isAirMassFlowExponentDefaulted() const
   return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->isAirMassFlowExponentDefaulted();
 }
 
-bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions)
+bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowCoefficient(double airMassFlowCoefficientatReferenceConditions)
 {
-  return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->setAirMassFlowCoefficientatReferenceConditions(airMassFlowCoefficientatReferenceConditions);
+  return getImpl<detail::AirflowNetworkMultiZoneSurfaceCrack_Impl>()->setAirMassFlowCoefficient(airMassFlowCoefficientatReferenceConditions);
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack::setAirMassFlowExponent(double airMassFlowExponent)

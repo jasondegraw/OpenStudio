@@ -62,7 +62,7 @@ public:
   /** @name Getters */
   //@{
 
-  double airMassFlowCoefficientatReferenceConditions() const;
+  double airMassFlowCoefficient() const;
 
   double airMassFlowExponent() const;
 
@@ -84,7 +84,7 @@ public:
   /** @name Setters */
   //@{
 
-  bool setAirMassFlowCoefficientatReferenceConditions(double airMassFlowCoefficientatReferenceConditions);
+  bool setAirMassFlowCoefficient(double airMassFlowCoefficientatReferenceConditions);
 
   bool setAirMassFlowExponent(double airMassFlowExponent);
 
