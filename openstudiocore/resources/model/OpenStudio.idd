@@ -19005,6 +19005,132 @@ OS:Output:Variable,
        \object-list ScheduleNames
 
 \group OpenStudio Airflow Network
+
+OS:AirflowNetworkSimulationControl,
+      \min-fields 13
+      \unique-object
+ A1, \field Handle
+      \type handle
+      \required-field
+ A2 , \field Name
+      \required-field
+      \note Enter a unique name for this object.
+ A3 , \field AirflowNetwork Control
+      \type choice
+      \key MultizoneWithDistribution
+      \key MultizoneWithoutDistribution
+      \key MultizoneWithDistributionOnlyDuringFanOperation
+      \key NoMultizoneOrDistribution
+      \default NoMultizoneOrDistribution
+      \note NoMultizoneOrDistribution: Only perform Simple calculations (objects ZoneInfiltration:*,
+      \note ZoneVentilation:*, ZoneMixing, ZoneCrossMixing, ZoneRefrigerationDoorMixing,
+      \note ZoneAirBalance:OutdoorAir, ZoneEarthtube, ZoneThermalChimney, and ZoneCoolTower:Shower);
+      \note MultizoneWithoutDistribution: Use AirflowNetwork objects to simulate multizone
+      \note Airflows driven by wind during simulation time,
+      \note and objects of ZoneInfiltration:*, ZoneVentilation:*, ZoneMixing, ZoneCrossMixing
+      \note ZoneRefrigerationDoorMixing, ZoneAirBalance:OutdoorAir, ZoneEarthtube,
+      \note ZoneThermalChimney, and ZoneCoolTower:Shower are ignored;
+      \note MultizoneWithDistributionOnlyDuringFanOperation: Perform distribution system
+      \note calculations during system fan on time
+      \note and Simple calculations during system Fan off time;
+      \note MultizoneWithDistribution: Perform distribution system calculations during system
+      \note fan on time and multizone Airflow driven by wind during system fan off time.
+ A4 , \field Wind Pressure Coefficient Type
+      \type choice
+      \key Input
+      \key SurfaceAverageCalculation
+      \default SurfaceAverageCalculation
+      \note Input: User must enter AirflowNetwork:MultiZone:WindPressureCoefficientArray,
+      \note AirflowNetwork:MultiZone:ExternalNode, and
+      \note AirflowNetwork:MultiZone:WindPressureCoefficientValues objects.
+      \note SurfaceAverageCalculation: used only for rectangular buildings.
+      \note If SurfaceAverageCalculation is selected,
+      \note AirflowNetwork:MultiZone:WindPressureCoefficientArray, AirflowNetwork:MultiZone:ExternalNode,
+      \note and AirflowNetwork:MultiZone:WindPressureCoefficientValues objects are not used.
+ A5 , \field AirflowNetwork Wind Pressure Coefficient Array Name
+      \type object-list
+      \object-list WPCSetNames
+      \note Used only if Wind Pressure Coefficient Type = Input, otherwise this field may be left blank.
+ A6 , \field Height Selection for Local Wind Pressure Calculation
+      \type choice
+      \key ExternalNode
+      \key OpeningHeight
+      \default OpeningHeight
+      \note If ExternalNode is selected, the height given in the
+      \note AirflowNetwork:MultiZone:ExternalNode object will be used.
+      \note If OpeningHeight is selected, the surface opening height (centroid) will be used to
+      \note calculate local wind pressure
+      \note This field is ignored when the choice of the Wind Pressure Coefficient Type field is
+      \note SurfaceAverageCalculation.
+ A7 , \field Building Type
+      \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation,
+      \note otherwise this field may be left blank.
+      \type choice
+      \key LowRise
+      \key HighRise
+      \default LowRise
+ N1 , \field Maximum Number of Iterations
+      \type integer
+      \units dimensionless
+      \default 500
+      \minimum> 10
+      \maximum 30000
+      \note Determines the maximum number of iterations used to converge on a solution. If this limit
+      \note is exceeded, the program terminates.
+ A8 , \field Initialization Type
+      \type choice
+      \key LinearInitializationMethod
+      \key ZeroNodePressures
+      \default ZeroNodePressures
+ N2 , \field Relative Airflow Convergence Tolerance
+      \type real
+      \units dimensionless
+      \default 1.E-4
+      \minimum> 0
+      \note This tolerance is defined as the absolute value of the sum of the mass Flow Rates
+      \note divided by the sum of the absolute value of the mass Flow Rates. The mass Flow Rates
+      \note described here refer to the mass Flow Rates at all Nodes in the AirflowNetwork model.
+      \note The solution converges when both this tolerance and the tolerance in the next field
+      \note (Absolute Airflow Convergence Tolerance) are satisfied.
+ N3 , \field Absolute Airflow Convergence Tolerance
+      \type real
+      \units kg/s
+      \default 1.E-6
+      \minimum> 0
+      \note This tolerance is defined as the absolute value of the sum of the mass flow rates. The mass
+      \note flow rates described here refer to the mass flow rates at all nodes in the AirflowNetwork
+      \note model. The solution converges when both this tolerance and the tolerance in the previous
+      \note field (Relative Airflow Convergence Tolerance) are satisfied.
+ N4 , \field Convergence Acceleration Limit
+      \type real
+      \units dimensionless
+      \note Used only for AirflowNetwork:SimulationControl
+      \minimum -1
+      \maximum 1
+      \default -0.5
+ N5 , \field Azimuth Angle of Long Axis of Building
+      \type real
+      \units deg
+      \minimum 0.0
+      \maximum 180.0
+      \default 0.0
+      \note Degrees clockwise from true North.
+      \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
+ N6 , \field Ratio of Building Width Along Short Axis to Width Along Long Axis
+      \type real
+      \minimum> 0.0
+      \maximum 1.0
+      \default 1.0
+      \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
+ A9 ; \field Network Build Type
+      \type choice
+	  \key None
+	  \key Surfaces
+	  \key SurfacesAndSubSurfaces
+	  \key DoorsOnly
+	  \key WindowsOnly
+	  \default Surfaces
+
 OS:AirflowNetworkMultiZoneSurfaceCrack,
        \min-fields 3
        \memo This object specifies the properties of airflow through a crack.
