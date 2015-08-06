@@ -125,6 +125,7 @@ MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentHorizontalOpening);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentSimpleOpening);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceCrack);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
+MODELOBJECT_TEMPLATES(AirflowNetworkSimulationControl);
 
 SWIG_UNIQUEMODELOBJECT(Site);
 SWIG_UNIQUEMODELOBJECT(Facility);
@@ -165,6 +166,7 @@ SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentHorizontalOpening, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentSimpleOpening, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceCrack, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea, 1);
+SWIG_UNIQUEMODELOBJECT(AirflowNetworkSimulationControl);
 
 #if defined SWIGCSHARP || defined(SWIGJAVA)
 

@@ -193,6 +193,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentSimpleOpening);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurfaceCrack);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
+    REGISTER_CONSTRUCTOR(AirflowNetworkSimulationControl);
     REGISTER_CONSTRUCTOR(EvaporativeFluidCoolerSingleSpeed);
     REGISTER_CONSTRUCTOR(AirGap);
     REGISTER_CONSTRUCTOR(AirLoopHVAC);
@@ -511,6 +512,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentSimpleOpening);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurfaceCrack);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkSimulationControl);
     REGISTER_COPYCONSTRUCTORS(EvaporativeFluidCoolerSingleSpeed);
     REGISTER_COPYCONSTRUCTORS(AirGap);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVAC);

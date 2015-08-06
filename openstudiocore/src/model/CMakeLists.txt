@@ -47,6 +47,9 @@ set(${target_name}_src
   AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.hpp
   AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp
   AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.cpp
+  AirflowNetworkSimulationControl.hpp
+  AirflowNetworkSimulationControl_Impl.hpp
+  AirflowNetworkSimulationControl.cpp
   AirGap.hpp
   AirGap_Impl.hpp
   AirGap.cpp
@@ -1006,6 +1009,7 @@ set(${target_name}_moc
   AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp
   AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp
   AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp
+  AirflowNetworkSimulationControl_Impl.hpp
   AirGap_Impl.hpp
   AirLoopHVAC_Impl.hpp
   AirLoopHVACUnitaryHeatPumpAirToAir_Impl.hpp
@@ -1217,6 +1221,7 @@ set(${target_name}_test_src
   test/AirflowNetworkMultiZoneComponentSimpleOpening_GTest.cpp
   test/AirflowNetworkMultiZoneSurfaceCrack_GTest.cpp
   test/AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_GTest.cpp
+  test/AirflowNetworkSimulationControl_GTest.cpp
   test/AirGap_GTest.cpp
   test/AirLoopHVACOutdoorAirSystem_GTest.cpp
   test/AirLoopHVACUnitaryHeatPumpAirToAir_GTest.cpp
