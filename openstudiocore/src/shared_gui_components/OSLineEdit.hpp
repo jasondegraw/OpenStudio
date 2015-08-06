@@ -38,14 +38,15 @@ class OSItem;
 class OSLineEdit2 : public QLineEdit {
   Q_OBJECT
 
- public:
+public:
 
   OSLineEdit2(QWidget * parent = nullptr);
 
   virtual ~OSLineEdit2() {}
 
   void enableClickFocus() { this->m_hasClickFocus = true; }
-  void setDeleteObject(bool deleteObject) { m_deleteObject = deleteObject;  }
+  void setDeleteObject(bool deleteObject) { m_deleteObject = deleteObject; }
+  bool hasData() { return !this->text().isEmpty(); }
   bool deleteObject() { return m_deleteObject; }
 
   void bind(model::ModelObject& modelObject,
@@ -59,22 +60,28 @@ class OSLineEdit2 : public QLineEdit {
             boost::optional<StringSetter> set=boost::none,
             boost::optional<NoFailAction> reset=boost::none,
             boost::optional<BasicQuery> isDefaulted=boost::none);
-  
+
   void bind(model::ModelObject& modelObject,
             OptionalStringGetterBoolArg get,
             boost::optional<StringSetterOptionalStringReturn> set,
             boost::optional<NoFailAction> reset=boost::none,
             boost::optional<BasicQuery> isDefaulted=boost::none);
 
+  void bind(model::ModelObject& modelObject,
+    StringGetter get,
+    boost::optional<StringSetterVoidReturn> set = boost::none,
+    boost::optional<NoFailAction> reset = boost::none,
+    boost::optional<BasicQuery> isDefaulted = boost::none);
+
   void unbind();
 
 protected:
 
-  void mouseReleaseEvent(QMouseEvent* event);
+  void mouseReleaseEvent(QMouseEvent* event) override;
 
-  virtual void focusInEvent(QFocusEvent * e);
+  virtual void focusInEvent(QFocusEvent * e) override;
 
-  virtual void focusOutEvent(QFocusEvent * e);
+  virtual void focusOutEvent(QFocusEvent * e) override;
 
 signals:
 
@@ -84,15 +91,17 @@ signals:
 
   void inFocus(bool inFocus, bool hasData);
 
- private slots:
+  public slots:
+
+  void onItemRemoveClicked();
+
+  private slots :
 
   void onEditingFinished();
 
   void onModelObjectChange();
 
   void onModelObjectRemove(Handle handle);
-
-  void onItemRemoveClicked();
 
   void emitItemClicked();
 
@@ -108,6 +117,7 @@ signals:
   boost::optional<OptionalStringGetterBoolArg> m_getOptionalBoolArg;
   boost::optional<StringSetter> m_set;
   boost::optional<StringSetterOptionalStringReturn> m_setOptionalStringReturn;
+  boost::optional<StringSetterVoidReturn> m_setVoidReturn;
   boost::optional<NoFailAction> m_reset;
   boost::optional<BasicQuery> m_isDefaulted;
 

@@ -130,11 +130,11 @@ namespace resultsviewer{
     void refreshLegend();
 
   private:
-    void mouseMoveEvent(QMouseEvent *e);
-    void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
     void performDrag(QPoint pos);
 
-    void paintEvent(QPaintEvent *evt);
+    void paintEvent(QPaintEvent *evt) override;
     void addLegendItem(resultsviewer::LinePlotCurve *curve);
     void updateLegend();
     void clearLegend(QLayout *li);
@@ -185,7 +185,7 @@ namespace resultsviewer{
       m_plotType = plotType;
     }
 
-    virtual QwtText label(double fracDays) const
+    virtual QwtText label(double fracDays) const override
     {
       openstudio::Time timeFromFracDays(fracDays);
       //    openstudio::Date date = openstudio::Date::fromDayOfYear(timeFromFracDays.days()); Date issue with day 366 in year 2009
@@ -270,7 +270,7 @@ namespace resultsviewer{
     PlotViewToolbar(const QString &title, QWidget *parent = nullptr);
 
   protected:
-    void mouseDoubleClickEvent(QMouseEvent *evt);
+    void mouseDoubleClickEvent(QMouseEvent *evt) override;
 
 signals:
     void signalDoubleClick();
@@ -288,6 +288,7 @@ signals:
 
     PlotView(int plotType=RVPV_LINEPLOT, QWidget* parent=nullptr);
     PlotView(QString& path, int plotType=RVPV_LINEPLOT, QWidget* parent=nullptr);
+    virtual ~PlotView();
 
 
     // plot view data handler
@@ -373,7 +374,7 @@ signals:
 
     // send float or dock signal
     // void mouseDoubleClickEvent(QMouseEvent *evt);
-    void closeEvent(QCloseEvent *evt);
+    void closeEvent(QCloseEvent *evt) override;
     QwtPlot *m_plot;
     // menu and toolbar
     QMenuBar *m_menuBar;
@@ -523,11 +524,11 @@ signals:
 
   protected:
     /// drop target support for drag/drop operations
-    void dropEvent(QDropEvent *e);
+    void dropEvent(QDropEvent *e) override;
     /// drop target support for drag/drop operations
-    void dragEnterEvent(QDragEnterEvent *e) { e->accept(); };
+    void dragEnterEvent(QDragEnterEvent *e) override { e->accept(); };
     /// trac 1383 right mouse click for properties
-    void mousePressEvent(QMouseEvent *e);
+    void mousePressEvent(QMouseEvent *e) override;
 
   signals:
     void signalFloatOrDockMe(resultsviewer::PlotView *plotView);
@@ -583,7 +584,11 @@ signals:
       // docking
       void slotFloatOrDock();
 
+    private:
 
+      // apply proper spacing so that illuminance map data pixels are centered on data point
+      // DLM: don't do this for now, data outside the map just gets clipped
+      void bufferIlluminanceMapGridPoints(std::vector<double>& x, std::vector<double>& y);
   };
 
 

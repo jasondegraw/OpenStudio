@@ -41,7 +41,6 @@
 #include <QFocusEvent>
 #include <QGraphicsSceneDragDropEvent>
 #include <QGraphicsSceneMouseEvent>
-#include <QLabel>
 #include <QLayoutItem>
 #include <QMouseEvent>
 #include <QPainter>
@@ -72,7 +71,7 @@ OSDropZone::OSDropZone(OSVectorController* vectorController,
     m_text(text),
     m_size(size)
 {
-  QWidget * mainBox = new QWidget();
+  auto mainBox = new QWidget();
   mainBox->setObjectName("mainBox");
   mainBox->setStyleSheet("QWidget#mainBox { background: #CECECE; }");
 
@@ -270,7 +269,7 @@ void OSDropZone::onDrop(const OSItemId& itemId)
 void OSDropZone::setItemIds(const std::vector<OSItemId>& itemIds)
 {
   QLayoutItem* child;
-  while( (child = m_mainBoxLayout->takeAt(0)) != 0 ){
+  while( (child = m_mainBoxLayout->takeAt(0)) != nullptr ){
     QWidget* widget = child->widget();
     if (widget){
       delete widget;
@@ -325,7 +324,7 @@ void OSDropZone::setItemIds(const std::vector<OSItemId>& itemIds)
   }
 
   if (numItems < m_maxItems){
-    OSItemDropZone* dropZone = new OSItemDropZone(this->m_growsHorizontally, m_text, m_size);
+    auto dropZone = new OSItemDropZone(this->m_growsHorizontally, m_text, m_size);
     m_mainBoxLayout->addWidget(dropZone,0,Qt::AlignLeft);
 
     connect(dropZone, &OSItemDropZone::dropped, this, &OSDropZone::handleDrop);
@@ -398,7 +397,7 @@ OSItemDropZone::OSItemDropZone(bool growsHorizontally,
   mainLayout->setContentsMargins(10,10,10,10);
   setLayout(mainLayout);
 
-  QLabel * label = new QLabel();
+  auto label = new QLabel();
   label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   label->setText(text);
   label->setWordWrap(true);
@@ -607,6 +606,8 @@ void OSDropZone2::refresh()
       m_label->setText(temp);
     }
 
+    emit inFocus(true, hasData());
+
     //// Adjust the width to accommodate the text
     //QFont myFont;
     //QFontMetrics fm(myFont);
@@ -730,14 +731,15 @@ void OSDropZone2::focusInEvent(QFocusEvent * e)
 {
   if (e->reason() == Qt::MouseFocusReason)
   {
-    QString style("QWidget#OSDropZone {\
-                   background: #ffc627;\
-                   border: 2px dashed #808080;\
-                   border-radius: 10px; }");
-    setStyleSheet(style);
+    if (hasData()) {
+      QString style("QWidget#OSDropZone {\
+                     background: #ffc627;\
+                     border: 2px dashed #808080;\
+                     border-radius: 5px; }");
+      setStyleSheet(style);
+    }
 
-    auto hasData = true; // TODO
-    emit inFocus(true, hasData);
+    emit inFocus(true, hasData());
   }
 
   QWidget::focusInEvent(e);
@@ -750,7 +752,7 @@ void OSDropZone2::focusOutEvent(QFocusEvent * e)
     QString style("QWidget#OSDropZone {\
                    background: #CECECE;\
                    border: 2px dashed #808080;\
-                   border-radius: 10px; }");
+                   border-radius: 5px; }");
     setStyleSheet(style);
 
     emit inFocus(false, false);

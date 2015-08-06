@@ -175,7 +175,7 @@ void ThermalZonesController::addComponentToZone(model::ThermalZone & zone, Handl
 
     std::vector<model::ZoneHVACComponent> exisitngHVACComps;
 
-    for( std::vector<model::ModelObject>::iterator it = existingComps.begin();
+    for( auto it = existingComps.begin();
          it < existingComps.end();
          ++it )
     {
@@ -252,6 +252,12 @@ void ThermalZonesController::onSelectItem(OSItem *item)
 void ThermalZonesController::onAddObject(const openstudio::IddObjectType& iddObjectType)
 {
   OS_ASSERT(IddObjectType::OS_ThermalZone == iddObjectType.value());
+  openstudio::model::ThermalZone(this->model());
+}
+
+void ThermalZonesController::onAddObject(const openstudio::model::ModelObject& modelObject)
+{
+  OS_ASSERT(IddObjectType::OS_ThermalZone == modelObject.iddObjectType().value());
   openstudio::model::ThermalZone(this->model());
 }
 

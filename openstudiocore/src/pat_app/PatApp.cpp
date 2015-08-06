@@ -109,8 +109,11 @@ namespace pat {
 
 PatApp::PatApp( int & argc, char ** argv, const QSharedPointer<ruleset::RubyUserScriptInfoGetter> &t_infoGetter )
   : QApplication(argc, argv),
+    m_startupView(nullptr),
+    m_loadingProjectView(nullptr),
     m_onlineBclDialog(nullptr),
     m_cloudDialog(nullptr),
+    m_monitorUseDialog(nullptr),
     m_measureManager(t_infoGetter, this)
 {
   connect(this, &PatApp::userMeasuresDirChanged, &m_measureManager, static_cast<void (MeasureManager::*)(void)>(&MeasureManager::updateMeasuresLists));
@@ -267,6 +270,12 @@ PatApp::~PatApp()
   delete m_startupView;
 
   delete m_loadingProjectView;
+
+  delete m_onlineBclDialog;
+
+  delete m_cloudDialog;
+
+  delete m_monitorUseDialog;
 }
 
 PatApp * PatApp::instance()
@@ -671,7 +680,7 @@ void PatApp::on_closeMonitorUseDlg()
 
 void PatApp::showHelp()
 {
-  QDesktopServices::openUrl(QUrl("http://nrel.github.io/OpenStudio-user-documentation/comparative_analysis/parametric_studies/"));
+  QDesktopServices::openUrl(QUrl("http://nrel.github.io/OpenStudio-user-documentation/reference/parametric_studies/"));
 }
 
 void PatApp::showAbout()
@@ -1101,7 +1110,7 @@ void PatApp::exportXml()
 
   //make results.xml inside the project directory
   openstudio::path resultsXmlPath = projectPath / toPath("results.xml");
-  openstudio::analysis::exportxml::ExportXML newXMLdoc;
+  openstudio::pat::ExportXML newXMLdoc;
   if (!newXMLdoc.exportXML(*m_project, toQString(resultsXmlPath))) {
     // user canceled, stop the export process
     mainWindow->setEnabled(true);
@@ -1291,6 +1300,31 @@ bool PatApp::openFile(const QString& fileName)
     QDir dir = fileInfo.dir();
     QString dirAbsolutePath = dir.absolutePath();
     openstudio::path projectDir = openstudio::toPath(dirAbsolutePath);
+
+    // check if this is a simple project
+    if (!analysisdriver::SimpleProject::isExistingSimpleProject(projectDir)){
+      QMessageBox::warning(mainWindow,
+                           "Error Opening Project",
+                           QString("Unable to open project at '") + dirAbsolutePath + QString("'."));
+      //}
+      showStartupView();
+      return false;
+    }
+
+
+    // check if opening the project requires an update
+    if (analysisdriver::SimpleProject::requiresUpdate(projectDir)){
+      bool test = QMessageBox::question(mainWindow,
+                            "Project Requires Update",
+                            QString("Project at '") + dirAbsolutePath + QString("' requires update which may remove previous results."),
+                            QMessageBox::Ok | QMessageBox::Cancel,
+                            QMessageBox::Cancel);
+      if (!test){
+        showStartupView();
+        return false;
+      }
+    }
+
     openstudio::analysisdriver::SimpleProjectOptions options;
     options.setPauseRunManagerQueue(true); // do not start running when opening
     options.setInitializeRunManagerUI(false);
@@ -1314,6 +1348,11 @@ bool PatApp::openFile(const QString& fileName)
       }
 
       attachProject(project);
+
+      if (project->analysis().resultsAreInvalid()) {
+        project->clearAllResults();
+      }
+
       mainWindow->setWindowTitle("");
       mainWindow->setWindowFilePath(dir.absolutePath());
       if (m_project->analysis().isDirty())
@@ -1353,7 +1392,7 @@ bool PatApp::openFile(const QString& fileName)
         ss << std::endl << "Ensure that all measures are correctly located in the scripts directory.";
         LOG(Warn,ss.str());
         // DLM: which dialog should be parent?
-        QMessageBox::warning(0, 
+        QMessageBox::warning(nullptr, 
                              QString("Error opening measure and run data."),
                              toQString(ss.str()),
                              QMessageBox::Ok);

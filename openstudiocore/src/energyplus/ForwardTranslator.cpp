@@ -608,6 +608,18 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       // no-op
       return retVal;
     }
+  case openstudio::IddObjectType::OS_Chiller_Absorption :
+    {
+      auto mo = modelObject.cast<ChillerAbsorption>();
+      retVal = translateChillerAbsorption(mo);
+      break;
+    }
+  case openstudio::IddObjectType::OS_Chiller_Absorption_Indirect :
+    {
+      auto mo = modelObject.cast<ChillerAbsorptionIndirect>();
+      retVal = translateChillerAbsorptionIndirect(mo);
+      break;
+    }
   case openstudio::IddObjectType::OS_Chiller_Electric_EIR :
     {
       model::ChillerElectricEIR chiller = modelObject.cast<ChillerElectricEIR>();
@@ -658,6 +670,16 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
         retVal = translateCoilCoolingDXTwoSpeedWithoutUnitary(coil);
       } else {
         retVal = translateCoilCoolingDXTwoSpeed(coil);
+      }
+      break;
+    }
+  case openstudio::IddObjectType::OS_Coil_Cooling_DX_TwoStageWithHumidityControlMode :
+    {
+      auto coil = modelObject.cast<CoilCoolingDXTwoStageWithHumidityControlMode>();
+      if( this->isHVACComponentWithinUnitary(coil) ) {
+        retVal = translateCoilCoolingDXTwoStageWithHumidityControlModeWithoutUnitary(coil);
+      } else {
+        retVal = translateCoilCoolingDXTwoStageWithHumidityControlMode(coil);
       }
       break;
     }
@@ -756,10 +778,34 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateCoilHeatingWaterToAirHeatPumpEquationFit(coil);
       break;
     }
+  case openstudio::IddObjectType::OS_CoilPerformance_DX_Cooling :
+    {
+      auto mo = modelObject.cast<CoilPerformanceDXCooling>();
+      retVal = translateCoilPerformanceDXCooling(mo);
+      break;
+    }
+  case openstudio::IddObjectType::OS_CoilSystem_Cooling_Water_HeatExchangerAssisted :
+    {
+      auto mo = modelObject.cast<CoilSystemCoolingWaterHeatExchangerAssisted>();
+      retVal = translateCoilSystemCoolingWaterHeatExchangerAssisted(mo);
+      break;
+    }
+  case openstudio::IddObjectType::OS_CoilSystem_Cooling_DX_HeatExchangerAssisted :
+    {
+      auto mo = modelObject.cast<CoilSystemCoolingDXHeatExchangerAssisted>();
+      retVal = translateCoilSystemCoolingDXHeatExchangerAssisted(mo);
+      break;
+    }
   case openstudio::IddObjectType::OS_Coil_WaterHeating_Desuperheater :
     {
       model::CoilWaterHeatingDesuperheater coil = modelObject.cast<CoilWaterHeatingDesuperheater>();
       retVal = translateCoilWaterHeatingDesuperheater(coil);
+      break;
+    }
+  case openstudio::IddObjectType::OS_Coil_WaterHeating_AirToWaterHeatPump :
+    {
+      auto mo = modelObject.cast<CoilWaterHeatingAirToWaterHeatPump>();
+      retVal = translateCoilWaterHeatingAirToWaterHeatPump(mo);
       break;
     }
   case openstudio::IddObjectType::OS_ComponentData :
@@ -1097,10 +1143,28 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       break;
     }
     
+  case openstudio::IddObjectType::OS_GroundHeatExchanger_HorizontalTrench :
+    {
+      auto mo = modelObject.cast<GroundHeatExchangerHorizontalTrench>();
+      retVal = translateGroundHeatExchangerHorizontalTrench(mo);
+      break;
+    }
   case openstudio::IddObjectType::OS_GroundHeatExchanger_Vertical :
     {
       model::GroundHeatExchangerVertical groundHeatExchangerVertical = modelObject.cast<GroundHeatExchangerVertical>();
       retVal = translateGroundHeatExchangerVertical(groundHeatExchangerVertical);
+      break;
+    }
+  case openstudio::IddObjectType::OS_HeaderedPumps_ConstantSpeed :
+    {
+      auto mo = modelObject.cast<HeaderedPumpsConstantSpeed>();
+      retVal = translateHeaderedPumpsConstantSpeed(mo);
+      break;
+    }
+  case openstudio::IddObjectType::OS_HeaderedPumps_VariableSpeed :
+    {
+      auto mo = modelObject.cast<HeaderedPumpsVariableSpeed>();
+      retVal = translateHeaderedPumpsVariableSpeed(mo);
       break;
     }
   case openstudio::IddObjectType::OS_HeatBalanceAlgorithm :
@@ -1173,6 +1237,17 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
     {
       model::WaterHeaterMixed waterHeaterMixed = modelObject.cast<WaterHeaterMixed>();
       retVal = translateWaterHeaterMixed(waterHeaterMixed);
+      break;
+    }
+  case openstudio::IddObjectType::OS_WaterHeater_HeatPump :
+    {
+      auto mo = modelObject.cast<WaterHeaterHeatPump>();
+      retVal = translateWaterHeaterHeatPump(mo);
+    }
+  case openstudio::IddObjectType::OS_WaterHeater_Stratified :
+    {
+      model::WaterHeaterStratified waterHeaterStratified = modelObject.cast<WaterHeaterStratified>();
+      retVal = translateWaterHeaterStratified(waterHeaterStratified);
       break;
     }
   case openstudio::IddObjectType::OS_WaterUse_Connections :
@@ -1682,10 +1757,22 @@ boost::optional<IdfObject> ForwardTranslator::translateAndMapModelObject(ModelOb
       retVal = translateTableMultiVariableLookup(table);
       break;
     }
+  case openstudio::IddObjectType::OS_TemperingValve :
+    {
+      auto mo = modelObject.cast<TemperingValve>();
+      retVal = translateTemperingValve(mo);
+      break;
+    }
   case openstudio::IddObjectType::OS_ThermalZone :
     {
       model::ThermalZone zone = modelObject.cast<ThermalZone>();
       retVal = translateThermalZone(zone);
+      break;
+    }
+  case openstudio::IddObjectType::OS_ThermalStorage_Ice_Detailed :
+    {
+      auto mo = modelObject.cast<ThermalStorageIceDetailed>();
+      retVal = translateThermalStorageIceDetailed(mo);
       break;
     }
   case openstudio::IddObjectType::OS_ThermostatSetpoint_DualSetpoint :
@@ -2840,7 +2927,7 @@ boost::optional<IdfObject> ForwardTranslator::createSimpleSchedule(const std::st
     eg = idfObject.pushExtensibleGroup(values);
     OS_ASSERT(!eg.empty());
 
-    for( std::vector< std::pair<openstudio::Time, double> >::const_iterator it = summerDesignDay.begin();
+    for( auto it = summerDesignDay.begin();
          it != summerDesignDay.end();
          ++it )
     {
@@ -2881,7 +2968,7 @@ boost::optional<IdfObject> ForwardTranslator::createSimpleSchedule(const std::st
     eg = idfObject.pushExtensibleGroup(values);
     OS_ASSERT(!eg.empty());
 
-    for( std::vector< std::pair<openstudio::Time, double> >::const_iterator it = winterDesignDay.begin();
+    for( auto it = winterDesignDay.begin();
          it != winterDesignDay.end();
          ++it )
     {
@@ -2927,7 +3014,7 @@ boost::optional<IdfObject> ForwardTranslator::createSimpleSchedule(const std::st
 
   bool hasEndTime = false;
   double endTimeValue;
-  for( std::vector< std::pair<openstudio::Time, double> >::const_iterator it = defaultDay.begin();
+  for( auto it = defaultDay.begin();
          it != defaultDay.end();
          ++it )
     {

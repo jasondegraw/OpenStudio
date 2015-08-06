@@ -41,10 +41,13 @@ set(${target_name}_src
   ForwardTranslator/ForwardTranslateBoilerSteam.cpp
   ForwardTranslator/ForwardTranslateBuilding.cpp
   ForwardTranslator/ForwardTranslateCFactorUndergroundWallConstruction.cpp
+  ForwardTranslator/ForwardTranslateChillerAbsorption.cpp
+  ForwardTranslator/ForwardTranslateChillerAbsorptionIndirect.cpp
   ForwardTranslator/ForwardTranslateChillerElectricEIR.cpp
   ForwardTranslator/ForwardTranslateCoilCoolingDXMultiSpeed.cpp
   ForwardTranslator/ForwardTranslateCoilCoolingDXSingleSpeed.cpp
   ForwardTranslator/ForwardTranslateCoilCoolingDXTwoSpeed.cpp
+  ForwardTranslator/ForwardTranslateCoilCoolingDXTwoStageWithHumidityControlMode.cpp
   ForwardTranslator/ForwardTranslateCoilCoolingDXVariableRefrigerantFlow.cpp
   ForwardTranslator/ForwardTranslateCoilCoolingWater.cpp
   ForwardTranslator/ForwardTranslateCoilCoolingWaterToAirHeatPumpEquationFit.cpp
@@ -56,7 +59,11 @@ set(${target_name}_src
   ForwardTranslator/ForwardTranslateCoilHeatingGasMultiStage.cpp
   ForwardTranslator/ForwardTranslateCoilHeatingWater.cpp
   ForwardTranslator/ForwardTranslateCoilHeatingWaterToAirHeatPumpEquationFit.cpp
+  ForwardTranslator/ForwardTranslateCoilPerformanceDXCooling.cpp
+  ForwardTranslator/ForwardTranslateCoilSystemCoolingDXHeatExchangerAssisted.cpp
+  ForwardTranslator/ForwardTranslateCoilSystemCoolingWaterHeatExchangerAssisted.cpp
   ForwardTranslator/ForwardTranslateCoilWaterHeatingDesuperheater.cpp
+  ForwardTranslator/ForwardTranslateCoilWaterHeatingAirToWaterHeatPump.cpp
   ForwardTranslator/ForwardTranslateConstruction.cpp
   ForwardTranslator/ForwardTranslateConstructionWithInternalSource.cpp
   ForwardTranslator/ForwardTranslateConvergenceLimits.cpp
@@ -105,7 +112,10 @@ set(${target_name}_src
   ForwardTranslator/ForwardTranslateGas.cpp
   ForwardTranslator/ForwardTranslateGasEquipment.cpp
   ForwardTranslator/ForwardTranslateGasMixture.cpp
+  ForwardTranslator/ForwardTranslateGroundHeatExchangerHorizontalTrench.cpp
   ForwardTranslator/ForwardTranslateGroundHeatExchangerVertical.cpp
+  ForwardTranslator/ForwardTranslateHeaderedPumpsConstantSpeed.cpp
+  ForwardTranslator/ForwardTranslateHeaderedPumpsVariableSpeed.cpp
   ForwardTranslator/ForwardTranslateHeatBalanceAlgorithm.cpp
   ForwardTranslator/ForwardTranslateHeatExchangerAirToAirSensibleAndLatent.cpp
   ForwardTranslator/ForwardTranslateHeatExchangerFluidToFluid.cpp
@@ -201,11 +211,15 @@ set(${target_name}_src
   ForwardTranslator/ForwardTranslateSubSurface.cpp
   ForwardTranslator/ForwardTranslateSurface.cpp
   ForwardTranslator/ForwardTranslateTableMultiVariableLookup.cpp
+  ForwardTranslator/ForwardTranslateTemperingValve.cpp
+  ForwardTranslator/ForwardTranslateThermalStorageIceDetailed.cpp
   ForwardTranslator/ForwardTranslateThermalZone.cpp
   ForwardTranslator/ForwardTranslateThermostatSetpointDualSetpoint.cpp
   ForwardTranslator/ForwardTranslateTimestep.cpp
   ForwardTranslator/ForwardTranslateVersion.cpp
   ForwardTranslator/ForwardTranslateWaterHeaterMixed.cpp
+  ForwardTranslator/ForwardTranslateWaterHeaterHeatPump.cpp
+  ForwardTranslator/ForwardTranslateWaterHeaterStratified.cpp
   ForwardTranslator/ForwardTranslateWaterUseConnections.cpp
   ForwardTranslator/ForwardTranslateWaterUseEquipment.cpp
   ForwardTranslator/ForwardTranslateWindowPropertyFrameAndDivider.cpp  

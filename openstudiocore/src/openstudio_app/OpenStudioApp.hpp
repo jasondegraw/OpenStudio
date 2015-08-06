@@ -83,7 +83,7 @@ class OpenStudioApp : public OSAppBase
 
   virtual ~OpenStudioApp() {}
 
-  virtual std::shared_ptr<OSDocument> currentDocument() const;
+  virtual std::shared_ptr<OSDocument> currentDocument() const override;
 
   static OpenStudioApp * instance();
 
@@ -93,13 +93,13 @@ class OpenStudioApp : public OSAppBase
 
   openstudio::path resourcesPath() const; 
 
-  virtual bool notify(QObject* receiver, QEvent* event);
+  virtual bool notify(QObject* receiver, QEvent* event) override;
 
  protected:
 
-  virtual bool event(QEvent * e);
+  virtual bool event(QEvent * e) override;
 
-  virtual void childEvent(QChildEvent * e);
+  virtual void childEvent(QChildEvent * e) override;
 
  signals:
 
@@ -112,6 +112,8 @@ class OpenStudioApp : public OSAppBase
   void importgbXML(); 
 
   void importSDD(); 
+  
+  void importIFC();
 
   void open();
 
@@ -123,7 +125,7 @@ class OpenStudioApp : public OSAppBase
 
   void showAbout();
 
-  virtual void reloadFile(const QString& fileToLoad, bool modified, bool saveCurrentTabs);
+  virtual void reloadFile(const QString& fileToLoad, bool modified, bool saveCurrentTabs) override;
 
   void revertToSaved();
 
@@ -160,6 +162,8 @@ class OpenStudioApp : public OSAppBase
   QString lastPath() const;
 
   void setLastPath(const QString& t_lastPath);
+
+  void connectOSDocumentSignals();
 
   QSharedPointer<ruleset::RubyUserScriptInfoGetter> m_infoGetter;
 

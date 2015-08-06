@@ -38,7 +38,7 @@
 namespace openstudio {
 
 ScriptsTabView::ScriptsTabView(QWidget * parent)
-  : MainTabView("Measures",false,parent)
+  : MainTabView("Measures", MainTabView::MAIN_TAB, parent)
 {
   //setTitle("Organize and Edit Measures for Project");
 
@@ -46,7 +46,7 @@ ScriptsTabView::ScriptsTabView(QWidget * parent)
 
   mainContent = new QWidget();
 
-  QVBoxLayout * mainContentVLayout = new QVBoxLayout();
+  auto mainContentVLayout = new QVBoxLayout();
   mainContentVLayout->setContentsMargins(0,0,0,0);
   mainContentVLayout->setSpacing(0);
   mainContentVLayout->setAlignment(Qt::AlignTop);
@@ -65,12 +65,12 @@ ScriptsTabView::ScriptsTabView(QWidget * parent)
   style.append("background-color: qlineargradient(x1:0,y1:0,x2:0,y2:1,stop: 0 #B6B5B6, stop: 1 #737172); ");
   style.append("}");
 
-  QWidget * footer = new QWidget();
+  auto footer = new QWidget();
   footer->setObjectName("Footer");
   footer->setStyleSheet(style);
   mainContentVLayout->addWidget(footer);
 
-  QHBoxLayout * layout = new QHBoxLayout();
+  auto layout = new QHBoxLayout();
   layout->setSpacing(0);
   footer->setLayout(layout);
 
@@ -87,13 +87,18 @@ void ScriptsTabView::showEvent(QShowEvent *e)
 {
   MainTabView::showEvent(e);
   auto app = OSAppBase::instance();
+  auto doc = app->currentDocument();
 
+  // updateMeasures will need the model and idf workspace (in MeasureManager::getArguments
+  // , so we use the app/doc as a cache and manage its update here.
   if( auto project = app->project() ) {
     if( auto model = app->currentModel() ) {
       ProgressBar progress(app->mainWidget()); 
       energyplus::ForwardTranslator translator;
       auto workspace = translator.translateModel(model.get(),&progress);
-      OSAppBase::instance()->measureManager().updateMeasures(*project, project->measures(), false, model, workspace);
+      doc->setWorkspace(workspace);
+        
+      OSAppBase::instance()->measureManager().updateMeasures(*project, project->measures(), false);
     }
   }
   variableGroupListView->refreshAllViews();

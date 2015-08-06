@@ -199,7 +199,9 @@ class ObjectSelector : public QObject
     void setObjectSelection(const model::ModelObject &t_obj, bool t_selected);
     bool getObjectSelection(const model::ModelObject &t_obj) const;
     boost::optional<const model::ModelObject &> getObject(const int t_row, const int t_column, const boost::optional<int> &t_subrow);
+    QWidget * getWidget(const int t_row, const int t_column, const boost::optional<int> &t_subrow);
     std::set<model::ModelObject> getSelectedObjects() const;
+    std::vector<QWidget *> getColumnsSelectedWidgets(int column);
     void clear();
     void objectRemoved(const openstudio::model::ModelObject &t_obj);
     void setObjectFilter(const std::function<bool (const model::ModelObject &)> &t_filter);
@@ -207,6 +209,11 @@ class ObjectSelector : public QObject
     bool containsObject(const openstudio::model::ModelObject &t_obj) const;
     void selectAll();
     void clearSelection();
+    void updateWidgets();
+
+    std::set<model::ModelObject> m_selectedObjects;
+    std::set<model::ModelObject> m_selectorObjects;
+    std::set<model::ModelObject> m_filteredObjects;
 
   signals:
     void inFocus(bool inFocus, bool hasData, int row, int column, boost::optional<int> subrow);
@@ -215,15 +222,13 @@ class ObjectSelector : public QObject
     void widgetDestroyed(QObject *t_obj);
 
   private:
-    void updateWidgets();
     void updateWidgets(const model::ModelObject &t_obj);
+    void ObjectSelector::updateWidgets(const model::ModelObject &t_obj, const bool t_objectVisible);
     void updateWidgets(const int t_row, const boost::optional<int> &t_subrow, bool t_selected, bool t_visible);
     static std::function<bool (const model::ModelObject &)> getDefaultFilter();
 
     OSGridController *m_grid;
     std::multimap<boost::optional<model::ModelObject>, WidgetLocation *> m_widgetMap;
-    std::set<model::ModelObject> m_selectedObjects;
-    std::set<model::ModelObject> m_selectorObjects;
     std::function<bool (const model::ModelObject &)> m_objectFilter;
 };
 
@@ -246,6 +251,8 @@ public:
     std::vector<model::ModelObject> modelObjects);
 
   virtual ~OSGridController();
+
+  std::vector<model::ModelObject> selectedObjects() const;
 
   static QSharedPointer<BaseConcept> makeDataSourceAdapter(const QSharedPointer<BaseConcept> &t_inner,
       const boost::optional<DataSource> &t_source)
@@ -286,6 +293,16 @@ public:
                          const boost::optional<DataSource> &t_source = boost::none)
   {
     m_baseConcepts.push_back(makeDataSourceAdapter(QSharedPointer<CheckBoxConcept>(new CheckBoxConceptImpl<DataSourceType>(heading,tooltip,t_getter,t_setter)), t_source));
+  }
+
+  template<typename DataSourceType>
+  void addCheckBoxColumn(const Heading &heading,
+    const std::string & tooltip,
+    std::function<bool(DataSourceType *)>  t_getter,
+    std::function<bool(DataSourceType *, bool)> t_setter,
+    const boost::optional<DataSource> &t_source = boost::none)
+  {
+    m_baseConcepts.push_back(makeDataSourceAdapter(QSharedPointer<CheckBoxConceptBoolReturn>(new CheckBoxConceptBoolReturnImpl<DataSourceType>(heading, tooltip, t_getter, t_setter)), t_source));
   }
 
   template<typename ChoiceType, typename DataSourceType>
@@ -547,7 +564,7 @@ public:
 
   // Return a new widget at a "top level" row and column specified by arguments.
   // There might be sub rows within the specified location.
-  // In that case a QWidget with sub rows (innner grid layout) will be returned.
+  // In that case a QWidget with sub rows (inner grid layout) will be returned.
   QWidget * widgetAt(int row, int column);
 
   // Call this function on a model update
@@ -558,6 +575,14 @@ public:
   void disconnectFromModel();
 
   std::shared_ptr<ObjectSelector> getObjectSelector() const { return m_objectSelector; }
+
+  IddObjectType m_iddObjectType;
+
+  std::vector<model::ModelObject> m_modelObjects;
+
+  model::Model & model() { return m_model; }
+
+  OSGridView * gridView();
 
 protected:
 
@@ -609,10 +634,6 @@ protected:
 
   bool m_isIP;
 
-  std::vector<model::ModelObject> m_modelObjects;
-
-  IddObjectType m_iddObjectType;
-
   REGISTER_LOGGER("openstudio.OSGridController");
 
 private:
@@ -632,13 +653,13 @@ private:
 
   QString cellStyle(int rowIndex, int columnIndex, bool isSelected, bool isSubRow);
 
-  OSGridView * gridView();
-
   OSItem * getSelectedItemFromModelSubTabView();
 
   bool getRowIndexByItem(OSItem * item, int & rowIndex);
 
   void setConceptValue(model::ModelObject t_setterMO, model::ModelObject t_getterMO, const QSharedPointer<BaseConcept> &t_baseConcept);
+
+  void resetConceptValue(model::ModelObject t_resetMO, const QSharedPointer<BaseConcept> &t_baseConcept);
 
   void setConceptValue(model::ModelObject t_setterMO, model::ModelObject t_getterMO, const QSharedPointer<BaseConcept> &t_setterBaseConcept, const QSharedPointer<BaseConcept> &t_getterBaseConcept);
 
@@ -652,7 +673,7 @@ private:
 
   std::tuple<int, int, boost::optional<int>> m_selectedCellLocation = std::make_tuple(-1, -1, -1);
 
-  std::vector <std::pair<QPushButton *, bool> > m_applyToButtonStates = std::vector < std::pair<QPushButton *, bool> >();
+  std::vector <std::pair<int, bool> > m_applyToButtonStates = std::vector < std::pair<int, bool> >();
 
 signals:
 
@@ -660,8 +681,6 @@ signals:
   void modelReset();
 
   void toggleUnitsClicked(bool displayIP);
-
-  void gridRowSelected(OSItem*);
 
 public slots:
 
@@ -688,8 +707,6 @@ protected slots:
 private slots:
 
   void horizontalHeaderChecked(int index);
-
-  void onDropZoneItemClicked(OSItem* item);
 
   void onRemoveWorkspaceObject(const WorkspaceObject& object, const openstudio::IddObjectType& iddObjectType, const openstudio::UUID& handle);
 
@@ -720,9 +737,11 @@ public:
 
   virtual ~Holder();
 
+  QWidget * widget = nullptr;
+
 protected:
 
-  void paintEvent(QPaintEvent * event);
+  void paintEvent(QPaintEvent * event) override;
 
 signals:
 
@@ -743,9 +762,9 @@ public:
 
 protected:
 
-  virtual void focusInEvent(QFocusEvent * e);
+  virtual void focusInEvent(QFocusEvent * e) override;
 
-  virtual void focusOutEvent(QFocusEvent * e);
+  virtual void focusOutEvent(QFocusEvent * e) override;
 
 signals:
 
@@ -785,7 +804,7 @@ class GridViewDropZoneVectorController : public OSVectorController
 {
   protected:
 
-  virtual std::vector<OSItemId> makeVector() { return std::vector<OSItemId>(); }
+  virtual std::vector<OSItemId> makeVector() override { return std::vector<OSItemId>(); }
 };
 
 } // openstudio
