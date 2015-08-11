@@ -207,12 +207,12 @@ AirState::AirState()
   double pw = m_phi * m_psat; // Relative humidity, eqn 24
   m_W = 0.621945 * pw / (m_pressure - pw); // Humidity ratio, eqn 22
   m_h = 1.006*m_drybulb + m_W*(2501 + 1.86*m_drybulb); // Moist air specific enthalpy, eqn 32
-  m_v = 0.287042*(m_drybulb + 273.15)*(1 + 1.607858*m_W) / m_pressure; // Specific volume, eqn 28
-  // Compute the dew point temperature here
+  m_v = 287.042*(m_drybulb + 273.15)*(1 + 1.607858*m_W) / m_pressure; // Specific volume, eqn 28
+  // Compute the dew point temperature
   boost::optional<double> dewpoint = solveForDewPoint(m_drybulb, pw, 1e-4, 100);
   OS_ASSERT(dewpoint);
   m_dewpoint = dewpoint.get();
-  // Compute the wet bulb temperature here
+  // Compute the wet bulb temperature
   boost::optional<double> wetbulb = solveForWetBulb(m_drybulb, m_pressure, m_W, 1e-4, 100);
   OS_ASSERT(wetbulb);
   m_wetbulb = wetbulb.get();
@@ -239,8 +239,8 @@ boost::optional<AirState> AirState::fromDryBulbDewPointPressure(double drybulb, 
   //double Ws = 0.621945 * state.m_psat / (pressure - state.m_psat);
   state.m_phi = pw / state.m_psat; // Relative humidity, eqn 24
   state.m_h = 1.006*drybulb + state.m_W*(2501 + 1.86*drybulb); // Moist air specific enthalpy, eqn 32
-  state.m_v = 0.287042*(drybulb + 273.15)*(1 + 1.607858*state.m_W) / pressure; // Specific volume, eqn 28
-  // Compute the wet bulb temperature here
+  state.m_v = 287.042*(drybulb + 273.15)*(1 + 1.607858*state.m_W) / pressure; // Specific volume, eqn 28
+  // Compute the wet bulb temperature
   boost::optional<double> wetbulb = solveForWetBulb(drybulb, pressure, state.m_W, 1e-4, 100);
   if (!wetbulb) {
     return boost::none;
@@ -269,13 +269,13 @@ boost::optional<AirState> AirState::fromDryBulbRelativeHumidityPressure(double d
   state.m_W = 0.621945 * pw / (pressure - pw); // Humidity ratio, eqn 22
   state.m_h = 1.006*drybulb + state.m_W*(2501 + 1.86*drybulb); // Moist air specific enthalpy, eqn 32
   state.m_v = 0.287042*(drybulb + 273.15)*(1 + 1.607858*state.m_W) / pressure; // Specific volume, eqn 28
-  // Compute the dew point temperature here
+  // Compute the dew point temperature
   boost::optional<double> dewpoint = solveForDewPoint(drybulb, pw, 1e-4, 100);
   if (!dewpoint) {
     return boost::none;
   }
   state.m_dewpoint = dewpoint.get();
-  // Compute the wet bulb temperature here
+  // Compute the wet bulb temperature
   boost::optional<double> wetbulb = solveForWetBulb(drybulb, pressure, state.m_W, 1e-4, 100);
   if (!wetbulb) {
     return boost::none;
