@@ -2661,6 +2661,40 @@ bool EpwFile::minutesMatch() const
     return m_minutesMatch;
 }
 
+boost::optional<double> EpwFile::heatingDegreeDays(double Tbase)
+{
+  double DD = 0;
+  boost::optional<TimeSeries> ts = getTimeSeries("Dry Bulb Temperature");
+  if (!ts) {
+    return boost::none;
+  }
+  TimeSeries dailyT = ts->apply(TimeSeries::middle, Time(1, 0));
+  for (double T : dailyT.values()) {
+    double deltaT = Tbase - T;
+    if (deltaT > 0) {
+      DD += deltaT;
+    }
+  }
+  return boost::optional<double>(DD);
+}
+
+boost::optional<double> EpwFile::coolingDegreeDays(double Tbase)
+{
+  double DD = 0;
+  boost::optional<TimeSeries> ts = getTimeSeries("Dry Bulb Temperature");
+  if (!ts) {
+    return boost::none;
+  }
+  TimeSeries dailyT = ts->apply(TimeSeries::middle, Time(1, 0));
+  for (double T : dailyT.values()) {
+    double deltaT = Tbase - T;
+    if (deltaT < 0) {
+      DD -= deltaT;
+    }
+  }
+  return boost::optional<double>(DD);
+}
+
 IdfObject toIdfObject(const EpwFile& epwFile) {
   IdfObject result(IddObjectType::OS_WeatherFile);
 

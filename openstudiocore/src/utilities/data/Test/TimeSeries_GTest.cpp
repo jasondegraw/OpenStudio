@@ -1222,3 +1222,169 @@ TEST_F(DataFixture, TimeSeries_Monthly)
   // Check computations
   EXPECT_EQ(205804800, startTimeSeries.integrate());
 }
+
+double minFunction(long, double value, bool startOfInterval)
+{
+  static double currentValue = 0;
+  if (startOfInterval) {
+    currentValue = value;
+  } else {
+    currentValue = std::min(value, currentValue);
+  }
+  return currentValue;
+}
+
+TEST_F(DataFixture, TimeSeries_IntervalConstructor_8760)
+{
+  std::string units = "W";
+  Vector values = linspace(1, 8760, 8760);
+
+  // start date and time
+  Date startDate(MonthOfYear(MonthOfYear::Jan), 1);
+  DateTime startDateTime(startDate);
+
+  DateTimeVector dateTimes;
+  for (unsigned i = 0; i < 8760; ++i) {
+    dateTimes.push_back(startDate + Time(0,i + 1, 0, 0));
+  }
+
+  // interval
+  Time interval = Time(0, 1, 0, 0);
+  DateTime firstReportDateTime(startDate, interval);
+
+  // create timeSeries
+  TimeSeries timeSeries(startDate, interval, values, units);
+  ASSERT_EQ(8760u, timeSeries.values().size());
+
+  // check interval
+  ASSERT_TRUE(timeSeries.intervalLength());
+  EXPECT_EQ(interval, timeSeries.intervalLength().get());
+
+  // check first report date and time
+  DateTime firstDateTime = timeSeries.firstReportDateTime();
+  EXPECT_EQ(firstReportDateTime, firstDateTime);
+
+  // check values
+  for (unsigned i = 0; i < values.size(); ++i) {
+    DateTime dateTime = dateTimes[i];
+    //EXPECT_EQ(i, timeSeries.value(dateTime)) << dateTime;
+  }
+
+  // Check computations
+  EXPECT_EQ(138143448000, timeSeries.integrate());
+  EXPECT_EQ(4380.5, timeSeries.averageValue());
+
+  // Check various re-workings
+
+  // Get a daily time series of minimum values
+  TimeSeries dailyMin = timeSeries.intervalMin(Time(1, 0, 0));
+  ASSERT_EQ(365, dailyMin.values().size());
+  ASSERT_TRUE(dailyMin.intervalLength());
+  EXPECT_EQ(Time(1, 0), dailyMin.intervalLength().get());
+  for (int i = 0; i < 365; i++) {
+    EXPECT_EQ(24 * i + 1, dailyMin.values(i));
+  }
+
+  // Get another daily time series of minimum values
+  dailyMin = timeSeries.apply(minFunction, Time(1, 0, 0));
+  ASSERT_EQ(365, dailyMin.values().size());
+  ASSERT_TRUE(dailyMin.intervalLength());
+  EXPECT_EQ(Time(1, 0), dailyMin.intervalLength().get());
+  for (int i = 0; i < 365; i++) {
+    EXPECT_EQ(24 * i + 1, dailyMin.values(i));
+  }
+
+  // Get yet another daily time series of minimum values
+  dailyMin = timeSeries.apply(TimeSeries::minimum, Time(1, 0, 0));
+  ASSERT_EQ(365, dailyMin.values().size());
+  ASSERT_TRUE(dailyMin.intervalLength());
+  EXPECT_EQ(Time(1, 0), dailyMin.intervalLength().get());
+  for (int i = 0; i < 365; i++) {
+    EXPECT_EQ(24 * i + 1, dailyMin.values(i));
+  }
+
+  // Get a daily time series of maximum values
+  dailyMin = timeSeries.apply(TimeSeries::maximum, Time(1, 0, 0));
+  ASSERT_EQ(365, dailyMin.values().size());
+  ASSERT_TRUE(dailyMin.intervalLength());
+  EXPECT_EQ(Time(1, 0), dailyMin.intervalLength().get());
+  for (int i = 0; i < 365; i++) {
+    EXPECT_EQ(24 * i + 24, dailyMin.values(i));
+  }
+
+  // Get an hourly time series of "minimum" values
+  TimeSeries hourlyMin = timeSeries.intervalMin(Time(0, 1));
+  ASSERT_EQ(8760, hourlyMin.values().size());
+  ASSERT_TRUE(hourlyMin.intervalLength());
+  EXPECT_EQ(Time(0, 1), hourlyMin.intervalLength().get());
+  for (int i = 0; i < 8760; i++) {
+    EXPECT_EQ(i+1, hourlyMin.values(i));
+  }
+
+  // Get a half-hourly time series of "minimum" values
+  TimeSeries halfhourlyMin = timeSeries.intervalMin(Time(0, 0, 30));
+  ASSERT_EQ(17520, halfhourlyMin.values().size());
+  ASSERT_TRUE(halfhourlyMin.intervalLength());
+  EXPECT_EQ(Time(0, 0, 30), halfhourlyMin.intervalLength().get());
+  for (int i = 0; i < 17520; i++) {
+    int value = 0.5*i+1;
+    EXPECT_EQ(value, halfhourlyMin.values(i));
+  }
+
+  // Get another half-hourly time series of "minimum" values
+  halfhourlyMin = timeSeries.apply(TimeSeries::minimum, Time(0, 0, 30));
+  ASSERT_EQ(17520, halfhourlyMin.values().size());
+  ASSERT_TRUE(halfhourlyMin.intervalLength());
+  EXPECT_EQ(Time(0, 0, 30), halfhourlyMin.intervalLength().get());
+  for (int i = 0; i < 17520; i++) {
+    int value = 0.5*i + 1;
+    EXPECT_EQ(value, halfhourlyMin.values(i));
+  }
+
+  // Get another half-hourly time series of "maximum" values
+  TimeSeries halfhourlyMax = timeSeries.apply(TimeSeries::maximum, Time(0, 0, 30));
+  ASSERT_EQ(17520, halfhourlyMax.values().size());
+  ASSERT_TRUE(halfhourlyMax.intervalLength());
+  EXPECT_EQ(Time(0, 0, 30), halfhourlyMax.intervalLength().get());
+  for (int i = 0; i < 17520; i++) {
+    int value = 0.5*i + 1;
+    EXPECT_EQ(value, halfhourlyMax.values(i));
+  }
+
+  // Get an hourly time series of "maximum" values
+  TimeSeries hourlyMax = timeSeries.apply(TimeSeries::maximum, Time(0, 1));
+  ASSERT_EQ(8760, hourlyMax.values().size());
+  ASSERT_TRUE(hourlyMin.intervalLength());
+  EXPECT_EQ(Time(0, 1), hourlyMax.intervalLength().get());
+  for (int i = 0; i < 8760; i++) {
+    EXPECT_EQ(i + 1, hourlyMax.values(i));
+  }
+
+  // Get a daily time series of the difference between the maximum and minimum values
+  TimeSeries deltas = timeSeries.apply(TimeSeries::delta, Time(1, 0, 0));
+  ASSERT_EQ(365, deltas.values().size());
+  ASSERT_TRUE(deltas.intervalLength());
+  EXPECT_EQ(Time(1, 0), deltas.intervalLength().get());
+  for (int i = 0; i < 365; i++) {
+    EXPECT_EQ(23, deltas.values(i));
+  }
+
+  // Get a daily time series of the average of the maximum and minimum values
+  TimeSeries mids = timeSeries.apply(TimeSeries::middle, Time(1, 0, 0));
+  ASSERT_EQ(365, mids.values().size());
+  ASSERT_TRUE(mids.intervalLength());
+  EXPECT_EQ(Time(1, 0), mids.intervalLength().get());
+  for (int i = 0; i < 365; i++) {
+    EXPECT_EQ(24 * i + 1 + 11.5, mids.values(i));
+  }
+
+  // Get a daily time series of the average value
+  TimeSeries dailyAvg = timeSeries.apply(TimeSeries::integrand, Time(1, 0, 0)) / (double)Time(1, 0, 0).totalSeconds();
+  ASSERT_EQ(365, dailyAvg.values().size());
+  ASSERT_TRUE(dailyAvg.intervalLength());
+  EXPECT_EQ(Time(1, 0), dailyAvg.intervalLength().get());
+  for (int i = 0; i < 2; i++) {
+    EXPECT_EQ((24 * i + 1 + 11.5), dailyAvg.values(i));
+  }
+
+}

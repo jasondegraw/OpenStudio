@@ -108,6 +108,44 @@ TimeSeries_Impl::TimeSeries_Impl(const DateTime& firstReportDateTime, const Time
   }
 }
 
+TimeSeries_Impl::TimeSeries_Impl(const DateTime& firstReportDateTime, const Time& intervalLength, const std::vector<double>& values, const std::string& units)
+  : m_secondsFromFirstReport(values.size()), m_secondsFromStart(values.size()), m_units(units), m_intervalLength(intervalLength), m_outOfRangeValue(0.0), m_wrapAround(false)
+{
+  m_values = createVector(values);
+  if (values.empty()) {
+    LOG(Warn, "Creating empty timeseries");
+  }
+
+  // length of interval in seconds
+  int secondsPerInterval = intervalLength.totalSeconds();
+
+  // DLM: startDate may or may not have baseYear defined
+  m_firstReportDateTime = DateTime(firstReportDateTime.date(), firstReportDateTime.time());
+
+  m_startDateTime = m_firstReportDateTime - intervalLength;
+
+  for (unsigned i = 0; i < values.size(); ++i) {
+    m_secondsFromFirstReport[i] = i*secondsPerInterval;
+    m_secondsFromStart[i] = (i + 1)*secondsPerInterval;
+  }
+  m_secondsFromFirstReportAsVector = createVector(m_secondsFromFirstReport);
+
+  long durationSeconds = 0;
+  if (!m_secondsFromFirstReport.empty()) {
+    durationSeconds = m_secondsFromFirstReport.back();
+  }
+
+  // check for wrap around
+  boost::optional<int> calendarYear = m_firstReportDateTime.date().baseYear();
+  if (!calendarYear) {
+    DateTime lastDateTime = m_firstReportDateTime + Time(0, 0, 0, durationSeconds);
+    Date lastDate(lastDateTime.date().monthOfYear(), lastDateTime.date().dayOfMonth());
+    if ((durationSeconds > Time(366.0).totalSeconds()) || (lastDate < m_firstReportDateTime.date())) {
+      m_wrapAround = true;
+    }
+  }
+}
+
 TimeSeries_Impl::TimeSeries_Impl(const DateTime& firstReportDateTime, const Vector& timeInDays, const Vector& values, const std::string& units)
   : m_secondsFromFirstReport(values.size()), m_secondsFromStart(values.size()), m_values(values), m_units(units), m_outOfRangeValue(0.0), m_wrapAround(false)
 {
@@ -356,6 +394,70 @@ TimeSeries_Impl::TimeSeries_Impl(const DateTimeVector& inDateTimes, const Vector
 TimeSeries_Impl::TimeSeries_Impl(const DateTime& firstReportDateTime, const std::vector<long>& timeInSeconds, const Vector& values, const std::string& units)
   : m_secondsFromFirstReport(values.size()), m_secondsFromStart(values.size()), m_values(values), m_units(units), m_outOfRangeValue(0.0), m_wrapAround(false)
 {
+  if (timeInSeconds.size() != values.size()) {
+    LOG_AND_THROW("Length of values (" << values.size() << ") must match length of times (" << timeInSeconds.size() << ")");
+  }
+  if (values.empty() || timeInSeconds.empty()) {
+    LOG(Warn, "Creating empty timeseries");
+    m_startDateTime = firstReportDateTime;
+    m_firstReportDateTime = firstReportDateTime;
+  } else {
+    // Check that seconds are monotonic
+    for (unsigned i = 1; i < timeInSeconds.size(); ++i) {
+      if (timeInSeconds[i] < timeInSeconds[i - 1]) {
+        LOG_AND_THROW("Seconds from first report/start of series must be monotonically increasing");
+      }
+    }
+
+    if (timeInSeconds[0] == 0) { // This is the old, BROKEN way
+      if (firstReportDateTime.time().totalSeconds() == 0) {
+        LOG_AND_THROW("Cannot calculate the series start date for first report at the beginning of a day");
+      }
+      LOG(Warn, "Assuming time series begins at the start of the day of first report. This behavior is deprecated and will instead be an error in the future.");
+      m_startDateTime = DateTime(firstReportDateTime.date());
+      m_firstReportDateTime = firstReportDateTime;
+      int firstIntervalSeconds = m_firstReportDateTime.time().totalSeconds();
+      m_secondsFromStart = timeInSeconds;
+      for (unsigned i = 0; i < m_secondsFromStart.size(); i++) {
+        m_secondsFromStart[i] += firstIntervalSeconds;
+      }
+      m_secondsFromFirstReport = timeInSeconds;
+
+    } else { // This is the new behavior
+      m_startDateTime = firstReportDateTime - Time(0, 0, 0, timeInSeconds[0]);
+      m_firstReportDateTime = firstReportDateTime;
+      m_secondsFromStart = timeInSeconds;
+
+      // Get rid of this later
+      m_secondsFromFirstReport[0] = 0;
+      for (unsigned i = 1; i < values.size(); ++i) {
+        m_secondsFromFirstReport[i] = timeInSeconds[i] - timeInSeconds[0];
+      }
+    }
+  }
+
+  m_secondsFromFirstReportAsVector = createVector(m_secondsFromFirstReport);
+
+  long durationSeconds = 0;
+  if (!m_secondsFromFirstReport.empty()) {
+    durationSeconds = m_secondsFromFirstReport.back();
+  }
+
+  // check for wrap around
+  boost::optional<int> calendarYear = m_firstReportDateTime.date().baseYear();
+  if (!calendarYear) {
+    DateTime lastDateTime = m_firstReportDateTime + Time(0, 0, 0, durationSeconds);
+    Date lastDate(lastDateTime.date().monthOfYear(), lastDateTime.date().dayOfMonth());
+    if ((durationSeconds > Time(366.0).totalSeconds()) || (lastDate < m_firstReportDateTime.date())) {
+      m_wrapAround = true;
+    }
+  }
+}
+
+TimeSeries_Impl::TimeSeries_Impl(const DateTime& firstReportDateTime, const std::vector<long>& timeInSeconds, const std::vector<double>& values, const std::string& units)
+  : m_secondsFromFirstReport(values.size()), m_secondsFromStart(values.size()), m_units(units), m_outOfRangeValue(0.0), m_wrapAround(false)
+{
+  m_values = createVector(values);
   if (timeInSeconds.size() != values.size()) {
     LOG_AND_THROW("Length of values (" << values.size() << ") must match length of times (" << timeInSeconds.size() << ")");
   }
@@ -792,6 +894,87 @@ double TimeSeries_Impl::averageValue() const
   return 0;
 }
 
+std::shared_ptr<TimeSeries_Impl> TimeSeries_Impl::intervalMin(Time interval) const
+{
+  std::shared_ptr<TimeSeries_Impl> result(new TimeSeries_Impl());
+  // Make sure there are values to work with
+  if (!m_values.size()) {
+    return std::shared_ptr<TimeSeries_Impl>(new TimeSeries_Impl());
+  }
+  // Set up for looping
+  long intervalSeconds = interval.totalSeconds();
+  long endOfInterval = 0;
+  long lastTime = m_secondsFromStart.back();
+  std::vector<double> values;
+  // Loop and operate on values
+  unsigned index = 0;
+  double runningValue;
+  // The outer loop updates the end of the current interval
+  while (index < m_secondsFromStart.size()) {
+    runningValue = m_values[index];
+    endOfInterval += intervalSeconds;
+    // Only shift the index if it is needed
+    if (m_secondsFromStart[index] <= endOfInterval) {
+      index++;
+    }
+    // The inner loop adds values to the value vector
+    while (index < m_secondsFromStart.size()) {
+      if (m_secondsFromStart[index] > endOfInterval) {
+        values.push_back(runningValue);
+        //std::cout << endOfInterval << " " << runningValue << std::endl;
+        break;
+      }
+      runningValue = std::min(m_values[index], runningValue);
+      index++;
+    }
+  }
+  // Add in one more value to get the last interval
+  values.push_back(runningValue);
+  //std::cout << endOfInterval << " " << runningValue << "**" << std::endl;
+  return std::shared_ptr<TimeSeries_Impl>(new TimeSeries_Impl(m_firstReportDateTime, interval, values,""));
+}
+
+std::shared_ptr<TimeSeries_Impl> TimeSeries_Impl::apply(std::function<double(long, double, bool)> f, Time interval) const
+{
+  std::shared_ptr<TimeSeries_Impl> result(new TimeSeries_Impl());
+  // Make sure there are values to work with
+  if (!m_values.size()) {
+    return std::shared_ptr<TimeSeries_Impl>(new TimeSeries_Impl());
+  }
+  // Set up for looping
+  long intervalSeconds = interval.totalSeconds();
+  long endOfInterval = 0;
+  long lastTime = m_secondsFromStart.back();
+  std::vector<double> values;
+  // Loop and operate on values
+  unsigned index = 0;
+  double runningValue;
+  // The outer loop updates the end of the current interval
+  while (index < m_secondsFromStart.size()) {
+    endOfInterval += intervalSeconds;
+    long firstTime = std::min(m_secondsFromStart[index], endOfInterval);
+    runningValue = f(firstTime, m_values[index], true);
+    // Only shift the index if it is needed
+    if (m_secondsFromStart[index] <= endOfInterval) {
+      index++;
+    }
+    // The inner loop adds values to the value vector
+    while (index < m_secondsFromStart.size()) {
+      if (m_secondsFromStart[index] > endOfInterval) {
+        values.push_back(runningValue);
+        //std::cout << endOfInterval << " " << runningValue << std::endl;
+        break;
+      }
+      runningValue = f(m_secondsFromStart[index], m_values[index], false);
+      index++;
+    }
+  }
+  // Add in one more value to get the last interval
+  values.push_back(runningValue);
+  //std::cout << endOfInterval << " " << runningValue << "**" << std::endl;
+  return std::shared_ptr<TimeSeries_Impl>(new TimeSeries_Impl(m_firstReportDateTime, interval, values, ""));
+}
+
 } // detail
 
 TimeSeries::TimeSeries() :
@@ -934,6 +1117,79 @@ double TimeSeries::integrate() const
 double TimeSeries::averageValue() const
 {
   return m_impl->averageValue();
+}
+
+TimeSeries TimeSeries::intervalMin(Time interval) const
+{
+  std::shared_ptr<detail::TimeSeries_Impl> impl = m_impl->intervalMin(interval);
+  return TimeSeries(impl);
+}
+
+double TimeSeries::minimum(long, double value, bool startOfInterval)
+{
+  static double currentValue = 0;
+  if (startOfInterval) {
+    currentValue = value;
+  } else {
+    currentValue = std::min(value, currentValue);
+  }
+  return currentValue;
+}
+
+double TimeSeries::maximum(long, double value, bool startOfInterval)
+{
+  static double currentValue = 0;
+  if (startOfInterval) {
+    currentValue = value;
+  } else {
+    currentValue = std::max(value, currentValue);
+  }
+  return currentValue;
+}
+
+double TimeSeries::delta(long, double value, bool startOfInterval)
+{
+  static double currentMin = 0;
+  static double currentMax = 0;
+  if (startOfInterval) {
+    currentMin = currentMax = value;
+  } else {
+    currentMax = std::max(value, currentMax);
+    currentMin = std::min(value, currentMin);
+  }
+  return currentMax - currentMin;
+}
+
+double TimeSeries::middle(long, double value, bool startOfInterval)
+{
+  static double currentMin = 0;
+  static double currentMax = 0;
+  if (startOfInterval) {
+    currentMin = currentMax = value;
+  } else {
+    currentMax = std::max(value, currentMax);
+    currentMin = std::min(value, currentMin);
+  }
+  return 0.5*(currentMax + currentMin);
+}
+
+double TimeSeries::integrand(long seconds, double value, bool startOfInterval)
+{
+  static double currentValue = 0;
+  static long lastSeconds = 0;
+  if (startOfInterval) {
+    currentValue = value*(seconds - lastSeconds);
+  } else {
+    currentValue += value*(seconds - lastSeconds);
+  }
+  lastSeconds = seconds;
+  return currentValue;
+}
+
+TimeSeries TimeSeries::apply(std::function<double(long, double, bool)> f, Time interval) const
+{
+  std::shared_ptr<detail::TimeSeries_Impl> impl = m_impl->apply(f, interval);
+  return TimeSeries(impl);
 }
 
 TimeSeries::TimeSeries(std::shared_ptr<detail::TimeSeries_Impl> impl)

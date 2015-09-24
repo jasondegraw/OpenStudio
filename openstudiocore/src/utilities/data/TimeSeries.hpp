@@ -30,9 +30,13 @@
 #include <boost/optional.hpp>
 #include <boost/function.hpp>
 
+#include <functional>
+
 #include <vector>
 
 namespace openstudio{
+
+class TimeSeries;
 
 namespace detail{
 
@@ -46,6 +50,8 @@ public:
 
   TimeSeries_Impl(const DateTime& firstReportDateTime, const Time& intervalLength, const Vector& values, const std::string& units);
 
+  TimeSeries_Impl(const DateTime& firstReportDateTime, const Time& intervalLength, const std::vector<double>& values, const std::string& units);
+
   TimeSeries_Impl(const DateTime& firstReportDateTime, const Vector& timeInDays, const Vector& values, const std::string& units);
 
   TimeSeries_Impl(const DateTime& firstReportDateTime, const std::vector<double>& timeInDays, const std::vector<double>& values, const std::string& units);
@@ -53,6 +59,8 @@ public:
   TimeSeries_Impl(const DateTimeVector& dateTimes, const Vector& values, const std::string& units);
 
   TimeSeries_Impl(const DateTime& firstReportDateTime, const std::vector<long>& timeInSeconds, const Vector& values, const std::string& units);
+
+  TimeSeries_Impl(const DateTime& firstReportDateTime, const std::vector<long>& timeInSeconds, const std::vector<double>& values, const std::string& units);
 
   ~TimeSeries_Impl() {}
 
@@ -99,6 +107,10 @@ public:
   double integrate() const;
 
   double averageValue() const;
+
+  std::shared_ptr<TimeSeries_Impl> intervalMin(Time interval) const;
+
+  std::shared_ptr<TimeSeries_Impl> apply(std::function<double(long, double, bool)> f, Time interval) const;
 
 private:
 
@@ -288,6 +300,31 @@ public:
 
   /** Compute the time series average value */
   double averageValue() const;
+
+  /** Compute a new time series with integration-type application of a function */
+  TimeSeries intervalMin(Time interval) const;
+
+  /** Compute a new time series with integration-type application of a function */
+  TimeSeries apply(std::function<double(long, double, bool)> f, Time interval) const;
+
+  //@}
+  /** @name Static Analysis Functions */
+  //@{
+
+  /** Minimum function for use with apply */
+  static double minimum(long seconds, double value, bool startOfInterval);
+
+  /** Maximum function for use with apply */
+  static double maximum(long seconds, double value, bool startOfInterval);
+
+  /** Largest difference function for use with apply */
+  static double delta(long seconds, double value, bool startOfInterval);
+
+  /** Half-difference function for use with apply */
+  static double middle(long seconds, double value, bool startOfInterval);
+
+  /** Integration function for use with apply */
+  static double integrand(long seconds, double value, bool startOfInterval);
 
   //@}
 private:

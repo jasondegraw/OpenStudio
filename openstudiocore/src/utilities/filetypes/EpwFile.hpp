@@ -479,6 +479,12 @@ public:
   /// Returns true if the data period "records per hour" input matches the data point values
   bool minutesMatch() const;
 
+  // get the heating degree days
+  boost::optional<double> heatingDegreeDays(double Tbase = 18.3);
+
+  // get the heating degree days
+  boost::optional<double> coolingDegreeDays(double Tbase = 18.3);
+
 private:
 
   bool parse(bool storeData=false);
