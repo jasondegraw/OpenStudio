@@ -170,25 +170,6 @@ namespace openstudio {
         }
         );
 
-        std::function<std::vector<boost::optional<model::ModelObject> >(const model::Space &)> allOutsideBoundaryConditionObjects(
-          [allSurfaces](const model::Space &t_space) {
-          std::vector<boost::optional<model::ModelObject> > allModelObjects;
-          std::vector<boost::optional<model::Surface> > allAdjacentSurfaces;
-          for (auto surface : allSurfaces(t_space)) {
-            auto adjacentSurface = surface.cast<model::Surface>().adjacentSurface();
-            if (adjacentSurface) {
-              allAdjacentSurfaces.push_back(adjacentSurface);
-            }
-            else {
-              allAdjacentSurfaces.push_back(boost::optional<model::Surface>());
-            }
-          }
-          allModelObjects.insert(allModelObjects.end(), allAdjacentSurfaces.begin(), allAdjacentSurfaces.end());
-
-          return allModelObjects;
-        }
-        );
-
         if (field == SELECTED) {
         auto checkbox = QSharedPointer<QCheckBox>(new QCheckBox());
         checkbox->setToolTip("Check to select all rows");
@@ -269,12 +250,12 @@ namespace openstudio {
           }
           );
 
-          addDropZoneColumn(Heading(QString(OUTSIDEBOUNDARYCONDITIONOBJECT)),
+          addDropZoneColumn(Heading(QString(OUTSIDEBOUNDARYCONDITIONOBJECT), true, false),
             CastNullAdapter<model::Surface>(&model::Surface::adjacentSurface),
             setter,
             boost::optional<std::function<void(model::Surface*)> >(NullAdapter(&model::Surface::resetAdjacentSurface)),
             DataSource(
-            allOutsideBoundaryConditionObjects,
+            allSurfaces,
             true
             )
             );

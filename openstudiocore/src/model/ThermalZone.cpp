@@ -83,6 +83,8 @@
 #include "LifeCycleCost_Impl.hpp"
 #include "SetpointManagerSingleZoneReheat.hpp"
 #include "SetpointManagerSingleZoneReheat_Impl.hpp"
+#include "ZoneMixing.hpp"
+#include "ZoneMixing_Impl.hpp"
 
 #include <utilities/idd/IddFactory.hxx>
 
@@ -141,7 +143,13 @@ namespace detail {
     // Sizing Zone object
     SizingZone sizingZone = this->sizingZone();
     result.push_back(sizingZone);
-    
+
+    // DLM: temporarily add supplyZoneMixing as children so we can see them in IG
+    // remove once we have gridview for these
+    for (const auto& mixing : supplyZoneMixing()){
+      result.push_back(mixing);
+    }
+
     return result;
   }
 
@@ -157,6 +165,7 @@ namespace detail {
   std::vector<IddObjectType> ThermalZone_Impl::allowableChildTypes() const
   {
     std::vector<IddObjectType> result;
+    // DLM: this does not seem to agree with implementation of children()
     result.push_back(IddObjectType::OS_ThermostatSetpoint_DualSetpoint);
     result.push_back(IddObjectType::OS_ZoneControl_Thermostat_StagedDualSetpoint);
     return result;
@@ -1430,6 +1439,15 @@ namespace detail {
       
     zoneHVACEquipmentList().remove();
 
+    // remove ZoneMixing objects
+
+    // DLM: these removed objects are not being returned in the result
+    for (auto mixing : this->zoneMixing()){
+      mixing.remove();
+      //std::vector<IdfObject> temp = mixing.remove();
+      //result.insert(result.end(), temp.begin(), temp.end());
+    }
+
     //turn the object back on and proceed  
     this->blockSignals(false);
 
@@ -1682,7 +1700,9 @@ namespace detail {
 
     std::vector<SizingZone> sizingObjects;
     
-    sizingObjects = model().getConcreteModelObjects<SizingZone>();
+    //sizingObjects = model().getConcreteModelObjects<SizingZone>();
+
+    sizingObjects = getObject<ModelObject>().getModelObjectSources<SizingZone>(SizingZone::iddObjectType());
 
     for( const auto & sizingObject : sizingObjects )
     {
@@ -1828,7 +1848,9 @@ namespace detail {
   {
     boost::optional<ZoneHVACEquipmentList> result;
 
-    std::vector<ZoneHVACEquipmentList> list = model().getConcreteModelObjects<ZoneHVACEquipmentList>();
+    std::vector<ZoneHVACEquipmentList> list = getObject<ModelObject>().getModelObjectSources<ZoneHVACEquipmentList>(ZoneHVACEquipmentList::iddObjectType());
+
+    //std::vector<ZoneHVACEquipmentList> list = model().getConcreteModelObjects<ZoneHVACEquipmentList>();
 
     for( const auto & elem : list )
     {
@@ -1838,9 +1860,13 @@ namespace detail {
       }
     }
 
-    OS_ASSERT(result);
-
-    return result.get();
+    if (result)
+    {
+      return result.get();
+    } else
+    {
+      LOG_AND_THROW("ThermalZone missing ZoneHVAC:EquipmentList object");
+    }
   }
 
   void ThermalZone_Impl::addEquipment(const ModelObject & equipment)
@@ -1911,6 +1937,8 @@ namespace detail {
       tz.setZoneControlHumidistat(humidistatClone);
     }
 
+    // DLM: do not clone zone mixing objects
+
     return tz;
   }
 
@@ -1977,7 +2005,7 @@ namespace detail {
     return result;
   }
 
-  bool ThermalZone_Impl::setSupplyPlenum(const ThermalZone & plenumZone)
+  bool ThermalZone_Impl::setSupplyPlenum(const ThermalZone & plenumZone, unsigned branchIndex)
   {
     bool result = true;
 
@@ -2024,11 +2052,22 @@ namespace detail {
       }
     }
 
+    boost::optional<AirLoopHVACZoneSplitter> zoneSplitter;
+
+    if( result ) {
+      auto zoneSplitters = t_airLoopHVAC->zoneSplitters();
+      if( branchIndex < zoneSplitters.size() ) {
+        zoneSplitter = zoneSplitters[branchIndex];
+      }
+    }
+
+    if( ! zoneSplitter ) result = false; 
+
     if( result )
     {
       removeSupplyPlenum();
 
-      model::ModelObject mo = t_airLoopHVAC->demandComponents(t_airLoopHVAC->zoneSplitter(),getObject<ThermalZone>(),Node::iddObjectType()).front();
+      model::ModelObject mo = t_airLoopHVAC->demandComponents(zoneSplitter.get(),getObject<ThermalZone>(),Node::iddObjectType()).front();
       Node node = mo.cast<Node>();
 
       OS_ASSERT(plenum);
@@ -2038,41 +2077,59 @@ namespace detail {
     return result;
   }
 
-  void ThermalZone_Impl::removeSupplyPlenum()
+  bool ThermalZone_Impl::setSupplyPlenum(const ThermalZone & plenumZone)
+  {
+    return setSupplyPlenum(plenumZone,0u);
+  }
+
+  void ThermalZone_Impl::removeSupplyPlenum(unsigned branchIndex)
   {
     Model t_model = model();
     boost::optional<AirLoopHVAC> t_airLoopHVAC = airLoopHVAC();
 
     if( t_airLoopHVAC )
     {
-      AirLoopHVACZoneSplitter zoneSplitter = t_airLoopHVAC->zoneSplitter();
-      std::vector<ModelObject> modelObjects = t_airLoopHVAC->demandComponents(zoneSplitter,getObject<ThermalZone>());
-      std::vector<AirLoopHVACSupplyPlenum> plenums = subsetCastVector<AirLoopHVACSupplyPlenum>(modelObjects);
-      boost::optional<AirLoopHVACSupplyPlenum> plenum;
-
-      if( ! plenums.empty() )
-      {
-        plenum = plenums.front();
+      boost::optional<AirLoopHVACZoneSplitter> zoneSplitter;
+      auto zoneSplitters = t_airLoopHVAC->zoneSplitters();
+      if( branchIndex < zoneSplitters.size() ) {
+        zoneSplitter = zoneSplitters[branchIndex];
       }
 
-      if( plenum )
-      {
-        if( plenum->outletModelObjects().size() == 1u )
+      if( zoneSplitter ) {
+        std::vector<ModelObject> modelObjects = t_airLoopHVAC->demandComponents(zoneSplitter.get(),getObject<ThermalZone>());
+        std::vector<AirLoopHVACSupplyPlenum> plenums = subsetCastVector<AirLoopHVACSupplyPlenum>(modelObjects);
+        boost::optional<AirLoopHVACSupplyPlenum> plenum;
+
+        if( ! plenums.empty() )
         {
-          plenum->remove();
+          plenum = plenums.front();
         }
-        else
+
+        if( plenum )
         {
-          auto it = std::find(modelObjects.begin(),modelObjects.end(),plenum.get());
-          ModelObject plenumOutletModelObject = *(it + 1);
-          unsigned branchIndex = plenum->branchIndexForOutletModelObject(plenumOutletModelObject);
-          unsigned port = plenum->connectedObjectPort(plenum->outletPort(branchIndex)).get();
-          plenum->removePortForBranch(branchIndex);
-          t_model.connect(zoneSplitter,zoneSplitter.nextOutletPort(),plenumOutletModelObject,port);
+          if( plenum->outletModelObjects().size() == 1u )
+          {
+            plenum->remove();
+          }
+          else
+          {
+            auto it = std::find(modelObjects.begin(),modelObjects.end(),plenum.get());
+            ModelObject plenumOutletModelObject = *(it + 1);
+            unsigned branchIndex = plenum->branchIndexForOutletModelObject(plenumOutletModelObject);
+            unsigned port = plenum->connectedObjectPort(plenum->outletPort(branchIndex)).get();
+            plenum->removePortForBranch(branchIndex);
+            t_model.connect(zoneSplitter.get(),zoneSplitter->nextOutletPort(),plenumOutletModelObject,port);
+          }
         }
       }
     }
   }
+
+  void ThermalZone_Impl::removeSupplyPlenum()
+  {
+    return removeSupplyPlenum(0u);
+  }
+
   bool ThermalZone_Impl::setReturnPlenum(const ThermalZone & plenumZone)
   {
     bool result = true;
@@ -2169,6 +2226,36 @@ namespace detail {
       }
     }
   }
+
+  std::vector<ZoneMixing> ThermalZone_Impl::zoneMixing() const
+  {
+    return getObject<ModelObject>().getModelObjectSources<ZoneMixing>();
+  }
+
+  std::vector<ZoneMixing> ThermalZone_Impl::supplyZoneMixing() const
+  {
+    std::vector<ZoneMixing> result = this->zoneMixing();
+
+    Handle handle = this->handle();
+    auto new_end = std::remove_if(result.begin(), result.end(),
+                                  [&](const ZoneMixing& mixing){ return (mixing.zone().handle() != handle); });
+
+    result.erase(new_end, result.end());
+    return result;
+  }
+
+  std::vector<ZoneMixing> ThermalZone_Impl::exhaustZoneMixing() const
+  {
+    std::vector<ZoneMixing> result = this->zoneMixing();
+
+    Handle handle = this->handle();
+    auto new_end = std::remove_if(result.begin(), result.end(),
+                                  [&](const ZoneMixing& mixing){ return (!mixing.sourceZone() || (mixing.sourceZone()->handle() != handle)); });
+
+    result.erase(new_end, result.end());
+    return result;
+  }
+
 
 } // detail
 
@@ -2701,9 +2788,19 @@ bool ThermalZone::setSupplyPlenum(const ThermalZone & plenumZone)
   return getImpl<detail::ThermalZone_Impl>()->setSupplyPlenum(plenumZone);
 }
 
+bool ThermalZone::setSupplyPlenum(const ThermalZone & plenumZone, unsigned branchIndex)
+{
+  return getImpl<detail::ThermalZone_Impl>()->setSupplyPlenum(plenumZone,branchIndex);
+}
+
 void ThermalZone::removeSupplyPlenum()
 {
   getImpl<detail::ThermalZone_Impl>()->removeSupplyPlenum();
+}
+
+void ThermalZone::removeSupplyPlenum(unsigned branchIndex)
+{
+  getImpl<detail::ThermalZone_Impl>()->removeSupplyPlenum(branchIndex);
 }
 
 bool ThermalZone::setReturnPlenum(const ThermalZone & plenumZone)
@@ -2714,6 +2811,21 @@ bool ThermalZone::setReturnPlenum(const ThermalZone & plenumZone)
 void ThermalZone::removeReturnPlenum()
 {
   getImpl<detail::ThermalZone_Impl>()->removeReturnPlenum();
+}
+
+std::vector<ZoneMixing> ThermalZone::zoneMixing() const
+{
+  return getImpl<detail::ThermalZone_Impl>()->zoneMixing();
+}
+
+std::vector<ZoneMixing> ThermalZone::supplyZoneMixing() const
+{
+  return getImpl<detail::ThermalZone_Impl>()->supplyZoneMixing();
+}
+
+std::vector<ZoneMixing> ThermalZone::exhaustZoneMixing() const
+{
+  return getImpl<detail::ThermalZone_Impl>()->exhaustZoneMixing();
 }
 
 /// @cond

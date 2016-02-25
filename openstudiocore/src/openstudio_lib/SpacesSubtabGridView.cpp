@@ -55,6 +55,8 @@
 #include "../model/Space_Impl.hpp"
 #include "../model/SteamEquipment.hpp"
 #include "../model/SteamEquipment_Impl.hpp"
+#include "../model/SubSurface.hpp"
+#include "../model/SubSurface_Impl.hpp"
 #include "../model/Surface.hpp"
 #include "../model/Surface_Impl.hpp"
 #include "../model/ThermalZone.hpp"
@@ -116,8 +118,6 @@ namespace openstudio {
     // Filters
 
     QLabel * label = nullptr;
-
-    QVBoxLayout * layout = nullptr;
 
     m_filterGridLayout = new QGridLayout();
     m_filterGridLayout->setContentsMargins(7, 4, 0, 8);
@@ -326,6 +326,7 @@ namespace openstudio {
     m_storyFilter->addItem(ALL);
     m_storyFilter->addItem(UNASSIGNED);
     auto buildingStories = this->m_model.getModelObjects<model::BuildingStory>(true);
+    std::sort(buildingStories.begin(), buildingStories.end(), ModelObjectNameSorter());
     for (auto bd : buildingStories)
     {
       QString temp("unnamed");
@@ -342,6 +343,7 @@ namespace openstudio {
     m_thermalZoneFilter->addItem(ALL);
     m_thermalZoneFilter->addItem(UNASSIGNED);
     auto thermalZones = this->m_model.getModelObjects<model::ThermalZone>(true);
+    std::sort(thermalZones.begin(), thermalZones.end(), ModelObjectNameSorter());
     for (auto tz : thermalZones)
     {
       QString temp("unnamed");
@@ -357,6 +359,7 @@ namespace openstudio {
     m_spaceTypeFilter->clear();
     m_spaceTypeFilter->addItem(ALL);
     auto spacetypes = this->m_model.getModelObjects<model::SpaceType>(true);
+    std::sort(spacetypes.begin(), spacetypes.end(), ModelObjectNameSorter());
     for (auto st : spacetypes)
     {
       QString temp("unnamed");
@@ -471,6 +474,7 @@ namespace openstudio {
     m_interiorPartitionGroupFilter->clear();
     m_interiorPartitionGroupFilter->addItem(ALL);
     auto interiorPartitions = this->m_model.getModelObjects<model::InteriorPartitionSurface>(true);
+    std::sort(interiorPartitions.begin(), interiorPartitions.end(), ModelObjectNameSorter());
     for (auto ip : interiorPartitions)
     {
       QString temp("unnamed");
@@ -491,7 +495,7 @@ namespace openstudio {
     else if (text == UNASSIGNED) {
       for (auto obj : this->m_gridController->m_modelObjects) {
         if (obj.cast<model::Space>().buildingStory()) {
-          m_objectsFilteredByStory.insert(obj).second;
+          m_objectsFilteredByStory.insert(obj);
         }
       }
     }
@@ -499,7 +503,7 @@ namespace openstudio {
       for (auto obj : this->m_gridController->m_modelObjects) {
         auto buildingStory = obj.cast<model::Space>().buildingStory();
         if (!buildingStory || !buildingStory->name() || (buildingStory && buildingStory->name() && buildingStory->name().get().c_str() != text)) {
-          m_objectsFilteredByStory.insert(obj).second;
+          m_objectsFilteredByStory.insert(obj);
         }
       }
     }
@@ -508,7 +512,7 @@ namespace openstudio {
   }
 
   void SpacesSubtabGridView::thermalZoneFilterChanged(const QString& text)
-  { 
+  {
     m_objectsFilteredByThermalZone.clear();
 
     if (text == ALL) {
@@ -517,7 +521,7 @@ namespace openstudio {
     else if (text == UNASSIGNED) {
       for (auto obj : this->m_gridController->m_modelObjects) {
         if (obj.cast<model::Space>().thermalZone()) {
-          m_objectsFilteredByThermalZone.insert(obj).second;
+          m_objectsFilteredByThermalZone.insert(obj);
         }
       }
     }
@@ -525,7 +529,7 @@ namespace openstudio {
       for (auto obj : this->m_gridController->m_modelObjects) {
         auto thermalZone = obj.cast<model::Space>().thermalZone();
         if (!thermalZone || !thermalZone->name() || (thermalZone && thermalZone->name() && thermalZone->name().get().c_str() != text)) {
-          m_objectsFilteredByThermalZone.insert(obj).second;
+          m_objectsFilteredByThermalZone.insert(obj);
         }
       }
     }
@@ -543,7 +547,7 @@ namespace openstudio {
     else if (text == UNASSIGNED) {
       for (auto obj : this->m_gridController->m_modelObjects) {
         if (obj.cast<model::Space>().spaceType()) {
-          m_objectsFilterdBySpaceType.insert(obj).second;
+          m_objectsFilterdBySpaceType.insert(obj);
         }
       }
     }
@@ -551,7 +555,7 @@ namespace openstudio {
       for (auto obj : this->m_gridController->m_modelObjects) {
         auto spaceType = obj.cast<model::Space>().spaceType();
         if (!spaceType || !spaceType->name() || (spaceType && spaceType->name() && spaceType->name().get().c_str() != text)) {
-          m_objectsFilterdBySpaceType.insert(obj).second;
+          m_objectsFilterdBySpaceType.insert(obj);
         }
       }
     }
@@ -570,7 +574,7 @@ namespace openstudio {
       for (auto obj : this->m_gridController->m_modelObjects) {
         QString objName(obj.name().get().c_str());
         if (!objName.contains(m_spaceNameFilter->text(), Qt::CaseInsensitive)) {
-          m_objectsFilteredBySpaceName.insert(obj).second;
+          m_objectsFilteredBySpaceName.insert(obj);
         }
       }
     }
@@ -653,12 +657,12 @@ namespace openstudio {
       // nothing to filter
     }
     else {
-      for (auto obj : this->m_gridController->m_modelObjects) {
+      for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
         auto surface = obj.optionalCast<model::Surface>();
         if (surface) {
           QString  windExposure = surface->windExposure().c_str();
           if (windExposure.isEmpty() || windExposure != text) {
-            m_objectsFilteredByWindExposure.insert(obj).second;
+            m_objectsFilteredByWindExposure.insert(obj);
           }
         }
       }
@@ -675,12 +679,12 @@ namespace openstudio {
       // nothing to filter
     }
     else {
-      for (auto obj : this->m_gridController->m_modelObjects) {
+      for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
         auto surface = obj.optionalCast<model::Surface>();
         if (surface) {
           QString sunExposure = surface->sunExposure().c_str();
           if (sunExposure.isEmpty() || sunExposure != text) {
-            m_objectsFilteredBySunExposure.insert(obj).second;
+            m_objectsFilteredBySunExposure.insert(obj);
           }
         }
       }
@@ -697,12 +701,19 @@ namespace openstudio {
       // nothing to filter
     }
     else {
-      for (auto obj : this->m_gridController->m_modelObjects) {
+      for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
         auto surface = obj.optionalCast<model::Surface>();
+        auto subSurface = obj.optionalCast<model::SubSurface>();
         if (surface) {
           QString outsideBoundaryCondition = surface->outsideBoundaryCondition().c_str();
           if (outsideBoundaryCondition.isEmpty() || outsideBoundaryCondition != text) {
-            m_objectsFilteredByOutsideBoundaryCondition.insert(obj).second;
+            m_objectsFilteredByOutsideBoundaryCondition.insert(obj);
+          }
+        }
+        else if (subSurface) {
+          QString outsideBoundaryCondition = subSurface->outsideBoundaryCondition().c_str();
+          if (outsideBoundaryCondition.isEmpty() || outsideBoundaryCondition != text) {
+            m_objectsFilteredByOutsideBoundaryCondition.insert(obj);
           }
         }
       }
@@ -719,11 +730,12 @@ namespace openstudio {
       // nothing to filter
     }
     else {
-      for (auto obj : this->m_gridController->m_modelObjects) {
+      for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
         auto surface = obj.optionalCast<model::Surface>();
         if (surface) {
-          if (!surface->name() || (surface->name() && surface->name().get().c_str() != text)) {
-            m_objectsFilteredBySurfaceType.insert(obj).second;
+          QString surfaceType(surface->surfaceType().c_str());
+          if (surfaceType != text) {
+            m_objectsFilteredBySurfaceType.insert(obj);
           }
         }
       }
@@ -740,11 +752,11 @@ namespace openstudio {
       // nothing to filter
     }
     else {
-      for (auto obj : this->m_gridController->m_modelObjects) {
+      for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
         auto interiorPartitionSurfaceGroup = obj.optionalCast<model::InteriorPartitionSurfaceGroup>();
         if (interiorPartitionSurfaceGroup) {
           if (!interiorPartitionSurfaceGroup->name() || (interiorPartitionSurfaceGroup->name() && interiorPartitionSurfaceGroup->name().get().c_str() != text)) {
-            m_objectsFilteredByInteriorPartitionGroup.insert(obj).second;
+            m_objectsFilteredByInteriorPartitionGroup.insert(obj);
           }
         }
       }
@@ -759,49 +771,49 @@ namespace openstudio {
 
     for (auto obj : m_objectsFilteredByThermalZone) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilterdBySpaceType) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredBySpaceName) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredByWindExposure) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredBySunExposure) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredByOutsideBoundaryCondition) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredBySurfaceType) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredByInteriorPartitionGroup) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 

@@ -94,7 +94,8 @@ VersionTranslator::VersionTranslator()
   m_updateMethods[VersionString("1.5.4")] = &VersionTranslator::update_1_5_3_to_1_5_4;
   m_updateMethods[VersionString("1.7.2")] = &VersionTranslator::update_1_7_1_to_1_7_2;
   m_updateMethods[VersionString("1.7.5")] = &VersionTranslator::update_1_7_4_to_1_7_5;
-  m_updateMethods[VersionString("1.8.3")] = &VersionTranslator::defaultUpdate;
+  m_updateMethods[VersionString("1.8.4")] = &VersionTranslator::update_1_8_3_to_1_8_4;
+  m_updateMethods[VersionString("1.8.5")] = &VersionTranslator::defaultUpdate;
 
   // List of previous versions that may be updated to this one.
   //   - To increment the translator, add an entry for the version just released (branched for
@@ -179,6 +180,8 @@ VersionTranslator::VersionTranslator()
   m_startVersions.push_back(VersionString("1.8.0"));
   m_startVersions.push_back(VersionString("1.8.1"));
   m_startVersions.push_back(VersionString("1.8.2"));
+  m_startVersions.push_back(VersionString("1.8.3"));
+  m_startVersions.push_back(VersionString("1.8.4"));
 }
 
 boost::optional<model::Model> VersionTranslator::loadModel(const openstudio::path& pathToOldOsm, 
@@ -2539,6 +2542,117 @@ std::string VersionTranslator::update_1_7_4_to_1_7_5(const IdfFile& idf_1_7_4, c
 
       m_refactored.push_back( std::pair<IdfObject,IdfObject>(object,newObject) );
       ss << newObject;
+    } else {
+      ss << object;
+    }
+  }
+
+  return ss.str();
+}
+
+std::string VersionTranslator::update_1_8_3_to_1_8_4(const IdfFile& idf_1_8_3, const IddFileAndFactoryWrapper& idd_1_8_4)
+{
+  std::stringstream ss;
+
+  ss << idf_1_8_3.header() << std::endl << std::endl;
+
+  // new version object
+  IdfFile targetIdf(idd_1_8_4.iddFile());
+  ss << targetIdf.versionObject().get();
+
+  for (const IdfObject& object : idf_1_8_3.objects()) {
+    auto iddname = object.iddObject().name();
+    if (iddname == "OS:PlantLoop") {
+      auto iddObject = idd_1_8_4.getObject("OS:PlantLoop");
+      OS_ASSERT(iddObject);
+      IdfObject newObject(iddObject.get());
+
+      for( size_t i = 0; i < 4; ++i ) {
+        if( auto s = object.getString(i) ) {
+          newObject.setString(i,s.get());
+        }
+      }
+
+      for( size_t i = 5; i < 23; ++i ) {
+        if( auto s = object.getString(i) ) {
+          newObject.setString(i + 2,s.get());
+        }
+      }
+
+      m_refactored.push_back( std::pair<IdfObject,IdfObject>(object,newObject) );
+      ss << newObject;
+    } else if (iddname == "OS:AirLoopHVAC") {
+      auto iddObject = idd_1_8_4.getObject("OS:AirLoopHVAC");
+      OS_ASSERT(iddObject);
+      IdfObject newObject(iddObject.get());
+
+      // Handle
+      if( auto value = object.getString(0) ) {
+        newObject.setString(0,value.get());
+      }
+
+      // Name
+      if( auto value = object.getString(1) ) {
+        newObject.setString(1,value.get());
+      }
+
+      // Controller List Name
+      // Not used
+
+      // AvailabilityManagerAssignmentList
+      auto availabilityManagerListHandle = object.getString(3);
+      OS_ASSERT(availabilityManagerListHandle);
+      auto availabilityManagerList = idf_1_8_3.getObject(toUUID(availabilityManagerListHandle.get()));
+      OS_ASSERT(availabilityManagerList);
+
+      auto availabilityManagerScheduledHandle = availabilityManagerList->getString(2);
+      OS_ASSERT(availabilityManagerScheduledHandle);
+      auto availabilityManagerScheduled = idf_1_8_3.getObject(toUUID(availabilityManagerScheduledHandle.get()));
+      OS_ASSERT(availabilityManagerScheduled);
+
+      auto availabilityScheduleHandle = availabilityManagerScheduled->getString(2);
+      OS_ASSERT(availabilityScheduleHandle);
+      auto availabilitySchedule = idf_1_8_3.getObject(toUUID(availabilityScheduleHandle.get()));
+      OS_ASSERT(availabilitySchedule);
+
+      auto availabilityManagerNightCycleHandle = availabilityManagerList->getString(3);
+      OS_ASSERT(availabilityManagerNightCycleHandle);
+      auto availabilityManagerNightCycle = idf_1_8_3.getObject(toUUID(availabilityManagerNightCycleHandle.get()));
+      OS_ASSERT(availabilityManagerNightCycle);
+
+      auto controlType = availabilityManagerNightCycle->getString(4);
+
+      // Availability Schedule
+      newObject.setString(3,toString(availabilitySchedule->handle()));
+
+      // Availability Manager
+      if( controlType && (istringEqual("CycleOnAny",controlType.get()) || istringEqual("CycleOnControlZone",controlType.get()) || istringEqual("CycleOnAnyZoneFansOnly",controlType.get())) ) {
+        newObject.setString(4,toString(availabilityManagerNightCycle->handle()));
+      }
+
+      // All the remaining fields are unchanged but shifted down one to account for new field
+      for( size_t i = 4; i < 15; ++i ) {
+        if( auto value = object.getString(i) ) {
+          newObject.setString(i + 1,value.get());
+        }
+      }
+
+      m_refactored.push_back( std::pair<IdfObject,IdfObject>(object,newObject) );
+      ss << newObject;
+    } else if(iddname == "OS:AvailabilityManager:Scheduled") {
+      m_untranslated.push_back(object);
+      continue;
+    } else if(iddname == "OS:AvailabilityManagerAssignmentList") {
+      m_untranslated.push_back(object);
+      continue;
+    } else if(iddname == "OS:AvailabilityManager:NightCycle") {
+      auto controlType = object.getString(4);
+      if( controlType && (istringEqual("CycleOnAny",controlType.get()) || istringEqual("CycleOnControlZone",controlType.get()) || istringEqual("CycleOnAnyZoneFansOnly",controlType.get())) ) {
+        ss << object;
+      } else {
+        continue;
+        m_untranslated.push_back(object);
+      } 
     } else {
       ss << object;
     }

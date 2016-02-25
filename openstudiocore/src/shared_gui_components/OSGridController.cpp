@@ -328,7 +328,7 @@ namespace openstudio {
     ++range.first;
     while (range.first != range.second)
     {
-      assert(row == std::make_tuple(range.first->second->row, range.first->second->subrow));
+      //assert(row == std::make_tuple(range.first->second->row, range.first->second->subrow));
       ++range.first;
     }
 #endif
@@ -341,9 +341,32 @@ namespace openstudio {
         // We have a matched sub row
         auto parent = t_obj.parent();
         if (parent) {
+          // Check if we are filtering on the sub row's parent object
           if (m_filteredObjects.count(*parent) != 0) {
             objectVisible = false;
           }
+
+          if (objectVisible) {
+            // We still haven't matched the sub row, let's look up 1 more level
+            auto parentsParent = parent->parent();
+            // Evan's note:
+            //   in the case of SpacesSubsurfacesGridView,
+            //   t_obj.parent() returns Surface,
+            //   but our common currency is Space.
+            //   t_obj.parent()->parent() returns Space
+
+            if (parentsParent) {
+              // Check if we are filtering on the sub row's parent's parent object
+              if (m_filteredObjects.count(*parentsParent) != 0) {
+                objectVisible = false;
+              }
+            }
+          }
+        }
+        // Hmmm, still no match, let's check if we
+        // are filtering on the sub row's object
+        if (objectVisible && m_filteredObjects.count(t_obj) != 0) {
+          objectVisible = false;
         }
       }
       else{
@@ -371,6 +394,8 @@ namespace openstudio {
     model::Model model,
     std::vector<model::ModelObject> modelObjects)
     : QObject(),
+    m_iddObjectType(iddObjectType),
+    m_modelObjects(modelObjects),
     m_categoriesAndFields(std::vector<std::pair<QString, std::vector<QString> > >()),
     m_baseConcepts(std::vector<QSharedPointer<BaseConcept> >()),
     m_horizontalHeader(std::vector<QWidget *>()),
@@ -381,8 +406,6 @@ namespace openstudio {
     m_customFields(std::vector<QString>()),
     m_model(model),
     m_isIP(isIP),
-    m_modelObjects(modelObjects),
-    m_iddObjectType(iddObjectType),
     m_horizontalHeaderBtnGrp(nullptr),
     m_headerText(headerText),
     m_objectSelector(std::make_shared<ObjectSelector>(this))

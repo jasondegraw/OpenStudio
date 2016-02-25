@@ -48,19 +48,23 @@ namespace openstudio{
 
     QLineEdit *  m_nameFilter = nullptr;
 
-    QLineEdit *  m_tiltFilter = nullptr;
+    QLineEdit *  m_tiltGreaterThanFilter = nullptr;
+
+    QLineEdit *  m_tiltLessThanFilter = nullptr;
 
     QComboBox *  m_typeFilter = nullptr;
 
-    QComboBox *  m_orientationFilter = nullptr;
+    QLineEdit *  m_orientationGreaterThanFilter = nullptr;
+
+    QLineEdit *  m_orientationLessThanFilter = nullptr;
 
   private:
 
     REGISTER_LOGGER("openstudio.FacilityShadingGridView");
 
-    virtual void addObject(const openstudio::IddObjectType& iddObjectType);
+    virtual void addObject(const openstudio::IddObjectType& iddObjectType) override;
 
-    virtual void purgeObjects(const openstudio::IddObjectType& iddObjectType);
+    virtual void purgeObjects(const openstudio::IddObjectType& iddObjectType) override;
 
     void filterChanged();
 
@@ -82,7 +86,7 @@ namespace openstudio{
 
     void tiltFilterChanged();
 
-    void orientationFilterChanged(const QString & text);
+    void orientationFilterChanged();
 
     void nameFilterChanged();
 

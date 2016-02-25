@@ -44,6 +44,7 @@
 #include "../utilities/idd/OS_ShadingSurface_FieldEnums.hxx"
 #include "../utilities/idd/OS_ShadingSurfaceGroup_FieldEnums.hxx"
 #include "../utilities/idd/OS_WindowMaterial_Blind_FieldEnums.hxx"
+#include "../utilities/units/QuantityConverter.hpp"
 
 #include <QBoxLayout>
 #include <QCheckBox>
@@ -67,8 +68,10 @@
 // FILTERS
 #define SHADINGSURFACETYPE "Shading Surface Type"
 #define SHADINGSURFACEGROUPNAME "Shading Surface Group Name"
-#define ORIENTATION "Orientation"
-#define TILT "Tilt"
+#define ORIENTATIONGREATERTHAN "Degrees Orientation >"
+#define ORIENTATIONLESSTHAN "Degrees Orientation <"
+#define TILTGREATERTHAN "Degrees Tilt >"
+#define TILTLESSTHAN "Degrees Tilt <"
 
 namespace openstudio {
 
@@ -138,8 +141,9 @@ namespace openstudio {
     layout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
 
     m_typeFilter = new QComboBox();
-    m_typeFilter->addItem("Building");
     m_typeFilter->addItem("Site");
+    m_typeFilter->addItem("Building");
+    m_typeFilter->addItem("Space");
     m_typeFilter->setFixedWidth(OSItem::ITEM_WIDTH);
     connect(m_typeFilter, &QComboBox::currentTextChanged, this, &openstudio::FacilityShadingGridView::typeFilterChanged);
 
@@ -147,53 +151,87 @@ namespace openstudio {
     layout->addStretch();
     filterGridLayout->addLayout(layout, filterGridLayout->rowCount() - 1, filterGridLayout->columnCount());
 
-    // ORIENTATION
+    // TILTGREATERTHAN
 
     layout = new QVBoxLayout();
 
     label = new QLabel();
-    label->setText(ORIENTATION);
+    label->setText(TILTGREATERTHAN);
     label->setObjectName("H3");
     layout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
 
-    m_orientationFilter = new QComboBox();
-    m_orientationFilter->addItem("Horizontal");
-    m_orientationFilter->addItem("Vertical");
-    m_orientationFilter->setFixedWidth(OSItem::ITEM_WIDTH);
-    connect(m_orientationFilter, &QComboBox::currentTextChanged, this, &openstudio::FacilityShadingGridView::orientationFilterChanged);
-
-    layout->addWidget(m_orientationFilter, Qt::AlignTop | Qt::AlignLeft);
-    layout->addStretch();
-    filterGridLayout->addLayout(layout, filterGridLayout->rowCount() - 1, filterGridLayout->columnCount());
-
-    // TILT
-
-    layout = new QVBoxLayout();
-
-    label = new QLabel();
-    label->setText(TILT);
-    label->setObjectName("H3");
-    layout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
-
-    m_tiltFilter = new QLineEdit();
-    m_tiltFilter->setFixedWidth(0.7 * OSItem::ITEM_WIDTH);
-        // Evan note: there are issues with using the signal textChanged or textEdited, related to the design and updating of the gridview (loss of focus, and updates per key stroke)
-    connect(m_tiltFilter, &QLineEdit::editingFinished, this, &openstudio::FacilityShadingGridView::tiltFilterChanged);
+    m_tiltGreaterThanFilter = new QLineEdit();
+    m_tiltGreaterThanFilter->setFixedWidth(OSItem::ITEM_WIDTH);
+    connect(m_tiltGreaterThanFilter, &QLineEdit::editingFinished, this, &openstudio::FacilityShadingGridView::tiltFilterChanged);
 
     QRegExp regex("^(-?\\d*\\.?\\d+)?$");
     auto validator = new QRegExpValidator(regex, this);
-    m_tiltFilter->setValidator(validator);
+    m_tiltGreaterThanFilter->setValidator(validator);
+
+    layout->addWidget(m_tiltGreaterThanFilter, Qt::AlignTop | Qt::AlignLeft);
+    layout->addStretch();
+    filterGridLayout->addLayout(layout, filterGridLayout->rowCount() - 1, filterGridLayout->columnCount());
+
+    //TILTLESSTHAN
+
+    layout = new QVBoxLayout();
 
     label = new QLabel();
-    label->setText("rad");
+    label->setText(TILTLESSTHAN);
     label->setObjectName("H3");
+    layout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
 
-    auto hLayout = new QHBoxLayout();
-    hLayout->addWidget(m_tiltFilter, Qt::AlignTop | Qt::AlignLeft);
-    hLayout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
-    hLayout->addStretch();
-    layout->addLayout(hLayout, Qt::AlignTop | Qt::AlignLeft);
+    m_tiltLessThanFilter = new QLineEdit();
+    m_tiltLessThanFilter->setFixedWidth(OSItem::ITEM_WIDTH);
+    // Evan note: there are issues with using the signal textChanged or textEdited, related to the design and updating of the gridview (loss of focus, and updates per key stroke)
+    connect(m_tiltLessThanFilter, &QLineEdit::editingFinished, this, &openstudio::FacilityShadingGridView::tiltFilterChanged);
 
+    validator = new QRegExpValidator(regex, this);
+    m_tiltLessThanFilter->setValidator(validator);
+
+    layout->addWidget(m_tiltLessThanFilter, Qt::AlignTop | Qt::AlignLeft);
+    layout->addStretch();
+    filterGridLayout->addLayout(layout, filterGridLayout->rowCount() - 1, filterGridLayout->columnCount());
+
+    // ORIENTATIONGREATERTHAN
+
+    layout = new QVBoxLayout();
+
+    label = new QLabel();
+    label->setText(ORIENTATIONGREATERTHAN);
+    label->setObjectName("H3");
+    layout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
+
+    m_orientationGreaterThanFilter = new QLineEdit();
+    m_orientationGreaterThanFilter->setFixedWidth(OSItem::ITEM_WIDTH);
+    connect(m_orientationGreaterThanFilter, &QLineEdit::editingFinished, this, &openstudio::FacilityShadingGridView::orientationFilterChanged);
+
+    validator = new QRegExpValidator(regex, this);
+    m_orientationGreaterThanFilter->setValidator(validator);
+
+    layout->addWidget(m_orientationGreaterThanFilter, Qt::AlignTop | Qt::AlignLeft);
+    layout->addStretch();
+    filterGridLayout->addLayout(layout, filterGridLayout->rowCount() - 1, filterGridLayout->columnCount());
+
+    // ORIENTATIONLESSTHAN
+
+    layout = new QVBoxLayout();
+
+    label = new QLabel();
+    label->setText(ORIENTATIONLESSTHAN);
+    label->setObjectName("H3");
+    layout->addWidget(label, Qt::AlignTop | Qt::AlignLeft);
+
+    m_orientationLessThanFilter = new QLineEdit();
+    m_orientationLessThanFilter->setFixedWidth(OSItem::ITEM_WIDTH);
+    // Evan note: there are issues with using the signal textChanged or textEdited, related to the design and updating of the gridview (loss of focus, and updates per key stroke)
+    connect(m_orientationLessThanFilter, &QLineEdit::editingFinished, this, &openstudio::FacilityShadingGridView::orientationFilterChanged);
+
+    validator = new QRegExpValidator(regex, this);
+    m_orientationLessThanFilter->setValidator(validator);
+
+    layout->addWidget(m_orientationLessThanFilter, Qt::AlignTop | Qt::AlignLeft);
+    layout->addStretch();
     filterGridLayout->addLayout(layout, filterGridLayout->rowCount() - 1, filterGridLayout->columnCount());
 
     filterGridLayout->setRowStretch(filterGridLayout->rowCount(), 100);
@@ -215,7 +253,7 @@ namespace openstudio {
       for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
         QString objName(obj.name().get().c_str());
         if (!objName.contains(m_nameFilter->text(), Qt::CaseInsensitive)) {
-          m_objectsFilteredByName.insert(obj).second;
+          m_objectsFilteredByName.insert(obj);
         }
       }
     }
@@ -228,9 +266,12 @@ namespace openstudio {
     m_objectsFilterdByType.clear();
 
     for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
-      if (obj.iddObjectType() == IddObjectType::OS_ShadingSurfaceGroup){
-        if (m_typeFilter->currentText() == obj.cast<model::ShadingSurfaceGroup>().shadingSurfaceType().c_str()) {
-          m_objectsFilterdByType.insert(obj).second;
+      auto parent = obj.parent();
+      if (parent && parent->iddObjectType() == IddObjectType::OS_ShadingSurfaceGroup){
+        if (m_typeFilter->currentText() != parent->cast<model::ShadingSurfaceGroup>().shadingSurfaceType().c_str()) {
+          if (m_objectsFilterdByType.count(obj) == 0) {
+            m_objectsFilterdByType.insert(obj);
+          }
         }
       }
     }
@@ -238,36 +279,89 @@ namespace openstudio {
     filterChanged();
   }
 
-  void FacilityShadingGridView::orientationFilterChanged(const QString& text)
+  void FacilityShadingGridView::orientationFilterChanged()
   {
     m_objectsFilteredByOrientation.clear();
 
+    auto objectSelector = this->m_gridController->getObjectSelector();
+
+    auto upperLimit = std::numeric_limits<double>::max();
+    auto lowerLimit = std::numeric_limits<double>::min();
+
+    if (!this->m_orientationLessThanFilter->text().isEmpty()) {
+      upperLimit = this->m_orientationLessThanFilter->text().toDouble();
+    }
+
+    if (!this->m_orientationGreaterThanFilter->text().isEmpty()) {
+      lowerLimit = this->m_orientationGreaterThanFilter->text().toDouble();
+    }
+
+    auto convertedValue = convert(upperLimit, "deg", "rad");
+    OS_ASSERT(convertedValue);
+    upperLimit = *convertedValue;
+
+    convertedValue = convert(lowerLimit, "deg", "rad");
+    OS_ASSERT(convertedValue);
+    lowerLimit = *convertedValue;
+
+    objectSelector->m_filteredObjects.clear();
+
+
     for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
-      if (obj.iddObjectType() == IddObjectType::OS_WindowMaterial_Blind){
-        if (m_orientationFilter->currentText() == obj.cast<model::Blind>().slatOrientation().c_str()) {
-          m_objectsFilteredByOrientation.insert(obj).second;
+      if (obj.iddObjectType() == IddObjectType::OS_ShadingSurfaceGroup){
+        for (auto shadingSurface : obj.cast<model::ShadingSurfaceGroup>().shadingSurfaces()) {
+          auto orientation = shadingSurface.azimuth();
+          if (orientation >= upperLimit || orientation <= lowerLimit) {
+            m_objectsFilteredByOrientation.insert(obj);
+          }
         }
       }
     }
 
+    this->m_gridView->requestRefreshAll();
+
     filterChanged();
   }
-
+  
   void FacilityShadingGridView::tiltFilterChanged()
   {
     m_objectsFilteredByTilt.clear();
 
-    if (m_tiltFilter->text().isEmpty()) {
-      // nothing to filter
+    auto objectSelector = this->m_gridController->getObjectSelector();
+
+    auto upperLimit = std::numeric_limits<double>::max();
+    auto lowerLimit = std::numeric_limits<double>::min();
+
+    if (!this->m_tiltLessThanFilter->text().isEmpty()) {
+      upperLimit = this->m_tiltLessThanFilter->text().toDouble();
     }
-    else {
-      for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
-        QString objName(obj.name().get().c_str());
-        if (!objName.contains(m_tiltFilter->text(), Qt::CaseInsensitive)) {
-          m_objectsFilteredByTilt.insert(obj).second;
+
+    if (!this->m_tiltGreaterThanFilter->text().isEmpty()) {
+      lowerLimit = this->m_tiltGreaterThanFilter->text().toDouble();
+    }
+
+    auto convertedValue = convert(upperLimit, "deg", "rad");
+    OS_ASSERT(convertedValue);
+    upperLimit = *convertedValue;
+
+    convertedValue = convert(lowerLimit, "deg", "rad");
+    OS_ASSERT(convertedValue);
+    lowerLimit = *convertedValue;
+
+    objectSelector->m_filteredObjects.clear();
+
+    for (auto obj : this->m_gridController->getObjectSelector()->m_selectorObjects) {
+      if (obj.iddObjectType() == IddObjectType::OS_ShadingSurfaceGroup){
+        for (auto shadingSurface : obj.cast<model::ShadingSurfaceGroup>().shadingSurfaces()) {
+          auto tilt = shadingSurface.tilt();
+          if (tilt >= upperLimit || tilt <= lowerLimit) {
+            m_objectsFilteredByOrientation.insert(obj);
+          }
         }
       }
     }
+
+    this->m_gridView->requestRefreshAll();
 
     filterChanged();
   }
@@ -278,19 +372,19 @@ namespace openstudio {
 
     for (auto obj : m_objectsFilteredByTilt) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilterdByType) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
     for (auto obj : m_objectsFilteredByOrientation) {
       if (allFilteredObjects.count(obj) == 0) {
-        allFilteredObjects.insert(obj).second;
+        allFilteredObjects.insert(obj);
       }
     }
 
@@ -299,7 +393,6 @@ namespace openstudio {
     this->m_gridView->requestRefreshAll();
 
     onClearSelection();
-
   }
 
   void FacilityShadingGridView::addObject(const IddObjectType& iddObjectType)
@@ -347,7 +440,6 @@ namespace openstudio {
     {
       std::vector<QString> fields;
       fields.push_back(SHADINGSURFACENAME);
-      fields.push_back(TYPE);
       fields.push_back(TRANSMITTANCESCHEDULENAME);
       fields.push_back(CONSTRUCTIONNAME);
       std::pair<QString, std::vector<QString> > categoryAndFields = std::make_pair(QString("General"), fields);
@@ -365,7 +457,8 @@ namespace openstudio {
   void FacilityShadingGridController::addColumns(const QString &category, std::vector<QString> & fields)
   {
     // always show name and selected columns
-    fields.insert(fields.begin(), { NAME, SELECTED });
+    // show type next to name, since it comes from the groups
+    fields.insert(fields.begin(), { NAME, TYPE, SELECTED });
 
     m_baseConcepts.clear();
 
@@ -379,6 +472,25 @@ namespace openstudio {
           CastNullAdapter<model::ShadingSurfaceGroup>(&model::ShadingSurfaceGroup::setName)
           );
       }
+      // Evan note: TODO to correctly use this column we need a new control --
+      // a dropzone for spaces, and a combo box with site and building as choices
+      else if (field == TYPE) {
+        std::function<std::vector<std::string>()> choices(
+          []() {
+          std::vector<std::string> choices{  "Site", "Building", "Space" };
+          return choices;
+        }
+        );
+
+        addComboBoxColumn(Heading(QString(TYPE)),
+          std::function<std::string(const std::string &)>(static_cast<std::string(*)(const std::string&)>(&openstudio::toString)),
+          choices,
+          CastNullAdapter<model::ShadingSurfaceGroup>(&model::ShadingSurfaceGroup::shadingSurfaceType),
+          CastNullAdapter<model::ShadingSurfaceGroup>(&model::ShadingSurfaceGroup::setShadingSurfaceType),
+          boost::optional<std::function<void(model::ShadingSurfaceGroup*)>>(),
+          boost::optional<std::function<bool(model::ShadingSurfaceGroup*)>>()
+          );
+      }
       else {
 
         std::function<std::vector<model::ModelObject>(const model::ShadingSurfaceGroup &)> allShadingSurfaces(
@@ -386,55 +498,6 @@ namespace openstudio {
           std::vector<model::ModelObject> allModelObjects;
           auto shadingSurfaces = t_shadingSurfaceGroup.shadingSurfaces();
           allModelObjects.insert(allModelObjects.end(), shadingSurfaces.begin(), shadingSurfaces.end());
-          return allModelObjects;
-        }
-        );
-
-        std::function<std::vector<std::string>(const model::ShadingSurfaceGroup &)> allTypes(
-          [](const model::ShadingSurfaceGroup &t_shadingSurfaceGroup) {
-          std::vector<std::string> allTypes;
-          auto shadingSurfaceType = t_shadingSurfaceGroup.shadingSurfaceType();
-          auto shadingSurfaces = t_shadingSurfaceGroup.shadingSurfaces();
-          for (auto shadingSurface : shadingSurfaces) {
-            allTypes.push_back(shadingSurfaceType);
-          }
-          return allTypes;
-        }
-        );
-
-        std::function<std::vector<boost::optional<model::ModelObject>>(const model::ShadingSurfaceGroup &)> allTransmittanceSchedules(
-          [](const model::ShadingSurfaceGroup &t_shadingSurfaceGroup) {
-          std::vector<boost::optional<model::ModelObject>> allModelObjects;
-          auto shadingSurfaces = t_shadingSurfaceGroup.shadingSurfaces();
-          for (auto shadingSurface : shadingSurfaces) {
-            auto transmittanceSchedule = shadingSurface.transmittanceSchedule();
-            if (transmittanceSchedule)
-            {
-              allModelObjects.push_back(transmittanceSchedule.get());
-            }
-            else {
-              allModelObjects.push_back(boost::optional<model::ModelObject>());
-            }
-          }
-          return allModelObjects;
-        }
-        );
-
-        std::function<std::vector<boost::optional<model::ModelObject> >(const model::ShadingSurfaceGroup &)> allConstructions(
-          [allShadingSurfaces](const model::ShadingSurfaceGroup &t_shadingSurfaceGroup) {
-          std::vector<boost::optional<model::ModelObject> > allModelObjects;
-          std::vector<boost::optional<model::ConstructionBase> > allConstructions;
-          for (auto shadingSurface : allShadingSurfaces(t_shadingSurfaceGroup)) {
-            auto construction = shadingSurface.cast<model::ShadingSurface>().construction();
-            if (construction) {
-              allConstructions.push_back(construction);
-            }
-            else {
-              allConstructions.push_back(boost::optional<model::ConstructionBase>());
-            }
-          }
-          allModelObjects.insert(allModelObjects.end(), allConstructions.begin(), allConstructions.end());
-
           return allModelObjects;
         }
         );
@@ -448,27 +511,6 @@ namespace openstudio {
           addSelectColumn(Heading(QString(SELECTED), false, false, checkbox), "Check to select this row",
             DataSource(
             allShadingSurfaces,
-            true
-            )
-            );
-        }
-        else if (field == TYPE) {
-          std::function<std::vector<std::string>()> choices(
-            []() {
-            std::vector<std::string> choices{"Building","Site"};
-            return choices;
-          }
-          );
-
-          addComboBoxColumn(Heading(QString(TYPE)),
-            std::function<std::string(const std::string &)>(static_cast<std::string(*)(const std::string&)>(&openstudio::toString)),
-            choices,
-            CastNullAdapter<model::ShadingSurfaceGroup>(&model::ShadingSurfaceGroup::shadingSurfaceType),
-            CastNullAdapter<model::ShadingSurfaceGroup>(&model::ShadingSurfaceGroup::setShadingSurfaceType),
-            boost::optional<std::function<void(model::ShadingSurfaceGroup*)>>(),
-            boost::optional<std::function<bool(model::ShadingSurfaceGroup*)>>(),
-            DataSource(
-            allTypes,
             true
             )
             );
@@ -497,7 +539,7 @@ namespace openstudio {
             CastNullAdapter<model::ShadingSurface>(&model::ShadingSurface::setConstruction),
             boost::optional<std::function<void(model::ShadingSurface*)> >(NullAdapter(&model::ShadingSurface::resetConstruction)),
             DataSource(
-            allConstructions,
+            allShadingSurfaces,
             true
             )
             );
@@ -515,7 +557,7 @@ namespace openstudio {
             setter,
             boost::optional<std::function<void(model::ShadingSurface*)>>(CastNullAdapter<model::ShadingSurface>(&model::ShadingSurface::resetTransmittanceSchedule)),
             DataSource(
-            allTransmittanceSchedules,
+            allShadingSurfaces,
             true
             )
             );

@@ -774,9 +774,9 @@ bool PatApp::setSeed(const FileReference& currentSeedLocation) {
       }
 
       // DLM: TODO check imported model to see what this should do
-      if (projectHasRadiance(*m_project)){
-        removeRadianceFromProject(*m_project);
-      }
+      //if (projectHasRadiance(*m_project)){
+      //  removeRadianceFromProject(*m_project);
+      //}
       
       // get new number of variables and report out how many fixed measures were added
       int nvarsAdded = m_project->analysis().problem().numVariables() - nvars;
@@ -1314,12 +1314,12 @@ bool PatApp::openFile(const QString& fileName)
 
     // check if opening the project requires an update
     if (analysisdriver::SimpleProject::requiresUpdate(projectDir)){
-      bool test = QMessageBox::question(mainWindow,
+      QMessageBox::StandardButton test = QMessageBox::question(mainWindow,
                             "Project Requires Update",
                             QString("Project at '") + dirAbsolutePath + QString("' requires update which may remove previous results."),
                             QMessageBox::Ok | QMessageBox::Cancel,
                             QMessageBox::Cancel);
-      if (!test){
+      if (test != QMessageBox::Ok){
         showStartupView();
         return false;
       }
@@ -1444,7 +1444,7 @@ void PatApp::attachProject(boost::optional<analysisdriver::SimpleProject> projec
     // and use that. Call this original version when the run button is hit.
 
     // update built in measures that may have changed if we upgraded versions
-    m_measureManager.updatePatApplicationMeasures(*m_project);
+    m_measureManager.updateOpenStudioMeasures(*m_project);
 
     // cache the seed models here
     m_project->seedModel();

@@ -41,6 +41,12 @@
 #include "../HVACTemplates.hpp"
 #include "../AirLoopHVAC.hpp"
 #include "../AirLoopHVAC_Impl.hpp"
+#include "../PlantEquipmentOperationCoolingLoad.hpp"
+#include "../PlantEquipmentOperationCoolingLoad_Impl.hpp"
+#include "../PlantEquipmentOperationHeatingLoad.hpp"
+#include "../PlantEquipmentOperationHeatingLoad_Impl.hpp"
+#include "../PlantEquipmentOperationOutdoorDryBulb.hpp"
+#include "../PlantEquipmentOperationOutdoorDryBulb_Impl.hpp"
 
 #include <utilities/idd/IddEnums.hxx>
 
@@ -116,6 +122,19 @@ TEST_F(ModelFixture,PlantLoop_supplyComponents)
 
   ASSERT_TRUE(plantLoop.removeSupplyBranchWithComponent(chiller2));
   ASSERT_EQ( 7u,plantLoop.supplyComponents().size() );
+}
+
+TEST_F(ModelFixture,PlantLoop_demandComponent)
+{
+  Model m; 
+  PlantLoop plantLoop(m); 
+
+  ASSERT_EQ( 1u,plantLoop.demandInletNodes().size() );
+
+  auto demandInletNode = plantLoop.demandInletNode();
+  auto mo = plantLoop.demandComponent(demandInletNode.handle());
+  ASSERT_TRUE(mo);
+  EXPECT_EQ( demandInletNode,mo.get() );
 }
 
 TEST_F(ModelFixture,PlantLoop_demandComponents)
@@ -358,5 +377,36 @@ TEST_F(ModelFixture, PlantLoop_removeBranchWithComponent)
 
   plantDemandComps = plant.demandComponents(splitter,mixer);
   EXPECT_EQ(5u,plantDemandComps.size());
+}
+
+TEST_F(ModelFixture, PlantLoop_OperationSchemes)
+{
+  Model m;
+  PlantLoop plant(m);
+
+  PlantEquipmentOperationCoolingLoad plantEquipmentOperationCoolingLoad(m);
+  EXPECT_TRUE(plant.setPlantEquipmentOperationCoolingLoad(plantEquipmentOperationCoolingLoad));
+  auto coolingLoad = plant.plantEquipmentOperationCoolingLoad();
+  EXPECT_TRUE(coolingLoad);
+  if( coolingLoad ) {
+    EXPECT_EQ(plantEquipmentOperationCoolingLoad,coolingLoad.get());
+  }
+
+  PlantEquipmentOperationHeatingLoad plantEquipmentOperationHeatingLoad(m);
+  EXPECT_TRUE(plant.setPlantEquipmentOperationHeatingLoad(plantEquipmentOperationHeatingLoad));
+  auto heatingLoad = plant.plantEquipmentOperationHeatingLoad();
+  EXPECT_TRUE(heatingLoad);
+  if( heatingLoad ) {
+    EXPECT_EQ(plantEquipmentOperationHeatingLoad,heatingLoad.get());
+  }
+
+  PlantEquipmentOperationOutdoorDryBulb plantEquipmentOperationOutdoorDryBulb(m);
+  EXPECT_TRUE(plant.setPrimaryPlantEquipmentOperationScheme(plantEquipmentOperationOutdoorDryBulb));
+  auto dryBulb = plant.primaryPlantEquipmentOperationScheme();
+  EXPECT_TRUE(dryBulb);
+  if( dryBulb ) {
+    EXPECT_EQ(plantEquipmentOperationOutdoorDryBulb,dryBulb.get());
+  }
+  
 }
 

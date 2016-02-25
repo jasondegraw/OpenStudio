@@ -20,8 +20,8 @@
 #ifndef MODEL_COILPERFORMANCEDXCOOLING_IMPL_HPP
 #define MODEL_COILPERFORMANCEDXCOOLING_IMPL_HPP
 
-#include <model/ModelAPI.hpp>
-#include <model/ParentObject_Impl.hpp>
+#include "ModelAPI.hpp"
+#include "ParentObject_Impl.hpp"
 
 namespace openstudio {
 namespace model {
@@ -55,9 +55,9 @@ namespace detail {
     /** @name Virtual Methods */
     //@{
 
-    virtual const std::vector<std::string>& outputVariableNames() const;
+    virtual const std::vector<std::string>& outputVariableNames() const override;
 
-    virtual IddObjectType iddObjectType() const;
+    virtual IddObjectType iddObjectType() const override;
 
     //@}
     /** @name Getters */
@@ -180,8 +180,8 @@ namespace detail {
     //@}
     /** @name Other */
     //@{
-    ModelObject clone(Model model) const;
-    std::vector<ModelObject> children() const;
+    ModelObject clone(Model model) const override;
+    std::vector<ModelObject> children() const override;
 
     //@}
    protected:

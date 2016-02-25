@@ -20,8 +20,8 @@
 #ifndef MODEL_COILWATERHEATINGAIRTOWATERHEATPUMP_IMPL_HPP
 #define MODEL_COILWATERHEATINGAIRTOWATERHEATPUMP_IMPL_HPP
 
-#include <model/ModelAPI.hpp>
-#include <model/HVACComponent_Impl.hpp>
+#include "ModelAPI.hpp"
+#include "HVACComponent_Impl.hpp"
 
 namespace openstudio {
 namespace model {
@@ -54,9 +54,9 @@ namespace detail {
     /** @name Virtual Methods */
     //@{
 
-    virtual const std::vector<std::string>& outputVariableNames() const;
+    virtual const std::vector<std::string>& outputVariableNames() const override;
 
-    virtual IddObjectType iddObjectType() const;
+    virtual IddObjectType iddObjectType() const override;
 
     //@}
     /** @name Getters */
@@ -170,8 +170,8 @@ namespace detail {
     /** @name Other */
     //@{
 
-    std::vector<ModelObject> children() const;
-    ModelObject clone(Model model) const;
+    std::vector<ModelObject> children() const override;
+    ModelObject clone(Model model) const override;
 
     //@}
    protected:
