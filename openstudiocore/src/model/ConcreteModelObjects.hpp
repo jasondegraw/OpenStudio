@@ -22,6 +22,12 @@
 
 #include "AirConditionerVariableRefrigerantFlow.hpp"
 #include "AirGap.hpp"
+#include "AirflowNetworkMultiZoneComponentDetailedOpening.hpp"
+#include "AirflowNetworkMultiZoneComponentHorizontalOpening.hpp"
+#include "AirflowNetworkMultiZoneComponentSimpleOpening.hpp"
+#include "AirflowNetworkMultiZoneSurfaceCrack.hpp"
+#include "AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.hpp"
+#include "AirflowNetworkSimulationControl.hpp"
 #include "AirLoopHVAC.hpp"
 #include "AirLoopHVACOutdoorAirSystem.hpp"
 #include "AirLoopHVACUnitaryHeatPumpAirToAir.hpp"
@@ -390,6 +396,12 @@
 
 // include all concrete ModelObject Impls too
 #include "AirConditionerVariableRefrigerantFlow_Impl.hpp"
+#include "AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp"
+#include "AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp"
+#include "AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp"
+#include "AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp"
+#include "AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp"
+#include "AirflowNetworkSimulationControl_Impl.hpp"
 #include "AirGap_Impl.hpp"
 #include "AirLoopHVAC_Impl.hpp"
 #include "AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass_Impl.hpp"

@@ -190,6 +190,12 @@ if (_className::iddObjectType() == typeToCreate) { \
 
     REGISTER_CONSTRUCTOR(AirConditionerVariableRefrigerantFlow);
     REGISTER_CONSTRUCTOR(AirGap);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentDetailedOpening);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentHorizontalOpening);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentSimpleOpening);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurfaceCrack);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
+    REGISTER_CONSTRUCTOR(AirflowNetworkSimulationControl);
     REGISTER_CONSTRUCTOR(AirLoopHVAC);
     REGISTER_CONSTRUCTOR(AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass);
     REGISTER_CONSTRUCTOR(AirLoopHVACUnitaryHeatPumpAirToAirMultiSpeed);
@@ -591,6 +597,12 @@ if (_className::iddObjectType() == typeToCreate) { \
 
     REGISTER_COPYCONSTRUCTORS(AirConditionerVariableRefrigerantFlow);
     REGISTER_COPYCONSTRUCTORS(AirGap);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentDetailedOpening);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentHorizontalOpening);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentSimpleOpening);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurfaceCrack);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkSimulationControl);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVAC);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass);
     REGISTER_COPYCONSTRUCTORS(AirLoopHVACUnitaryHeatPumpAirToAir);

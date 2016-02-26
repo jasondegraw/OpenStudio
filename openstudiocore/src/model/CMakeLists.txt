@@ -35,6 +35,24 @@ set(${target_name}_src
   AirConditionerVariableRefrigerantFlow.hpp
   AirConditionerVariableRefrigerantFlow_Impl.hpp
   AirConditionerVariableRefrigerantFlow.cpp
+  AirflowNetworkMultiZoneComponentDetailedOpening.hpp
+  AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp
+  AirflowNetworkMultiZoneComponentDetailedOpening.cpp
+  AirflowNetworkMultiZoneComponentHorizontalOpening.hpp
+  AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp
+  AirflowNetworkMultiZoneComponentHorizontalOpening.cpp
+  AirflowNetworkMultiZoneComponentSimpleOpening.hpp
+  AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp
+  AirflowNetworkMultiZoneComponentSimpleOpening.cpp
+  AirflowNetworkMultiZoneSurfaceCrack.hpp
+  AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp
+  AirflowNetworkMultiZoneSurfaceCrack.cpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.hpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp
+  AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea.cpp
+  AirflowNetworkSimulationControl.hpp
+  AirflowNetworkSimulationControl_Impl.hpp
+  AirflowNetworkSimulationControl.cpp
   AirGap.hpp
   AirGap_Impl.hpp
   AirGap.cpp
