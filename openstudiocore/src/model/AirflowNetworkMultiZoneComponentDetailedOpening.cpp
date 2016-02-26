@@ -31,6 +31,76 @@
 namespace openstudio {
 namespace model {
 
+DetailedOpeningFactorData::DetailedOpeningFactorData(double openingFactor, double dischargeCoefficient, double widthFactor,
+  double heightFactor, double startHeightFactor) : m_openingFactor(openingFactor), m_dischargeCoefficient(dischargeCoefficient),
+  m_widthFactor(widthFactor), m_heightFactor(heightFactor), m_startHeightFactor(startHeightFactor)
+{}
+
+double DetailedOpeningFactorData::openingFactor() const
+{
+  return m_openingFactor;
+}
+
+double DetailedOpeningFactorData::dischargeCoefficient() const
+{
+  return m_dischargeCoefficient;
+}
+
+double DetailedOpeningFactorData::widthFactor() const
+{
+  return m_widthFactor;
+};
+
+double DetailedOpeningFactorData::heightFactor() const
+{
+  return m_heightFactor;
+}
+
+double DetailedOpeningFactorData::startHeightFactor() const
+{
+  return m_startHeightFactor;
+}
+
+bool DetailedOpeningFactorData::setOpeningFactor(double openingFactor)
+{
+  if (openingFactor >= 0.0 && openingFactor <= 1.0) {
+    m_openingFactor = openingFactor;
+  }
+  return false;
+}
+
+bool DetailedOpeningFactorData::setDischargeCoefficient(double dischargeCoefficient)
+{
+  if (dischargeCoefficient >= 0.0 && dischargeCoefficient <= 1.0) {
+    m_dischargeCoefficient = dischargeCoefficient;
+  }
+  return false;
+}
+
+bool DetailedOpeningFactorData::setWidthFactor(double widthFactor)
+{
+  if (widthFactor >= 0.0 && widthFactor <= 1.0) {
+    m_widthFactor = widthFactor;
+  }
+  return false;
+}
+
+bool DetailedOpeningFactorData::setHeightFactor(double heightFactor)
+{
+  if (heightFactor >= 0.0 && heightFactor <= 1.0) {
+    m_heightFactor = heightFactor;
+  }
+  return false;
+}
+
+bool DetailedOpeningFactorData::setStartHeightFactor(double startHeightFactor)
+{
+  if (startHeightFactor >= 0.0 && startHeightFactor <= 1.0) {
+    m_startHeightFactor = startHeightFactor;
+  }
+  return false;
+}
+
 namespace detail {
 
 AirflowNetworkMultiZoneComponentDetailedOpening_Impl::AirflowNetworkMultiZoneComponentDetailedOpening_Impl(const IdfObject& idfObject,
@@ -87,16 +157,16 @@ bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::isAirMassFlowExponent
   return isEmpty(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::AirMassFlowExponentWhenOpeningisClosed);
 }
 
-std::string AirflowNetworkMultiZoneComponentDetailedOpening_Impl::typeofRectangulerLargeVerticalOpening() const
+std::string AirflowNetworkMultiZoneComponentDetailedOpening_Impl::typeofRectangularLargeVerticalOpening() const
 {
-  boost::optional<std::string> value = getString(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangulerLargeVerticalOpening, true);
+  boost::optional<std::string> value = getString(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangularLargeVerticalOpening, true);
   OS_ASSERT(value);
   return value.get();
 }
 
-bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::isTypeofRectangulerLargeVerticalOpeningDefaulted() const
+bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::isTypeofRectangularLargeVerticalOpeningDefaulted() const
 {
-  return isEmpty(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangulerLargeVerticalOpening);
+  return isEmpty(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangularLargeVerticalOpening);
 }
 
 double AirflowNetworkMultiZoneComponentDetailedOpening_Impl::extraCrackLengthorHeightofPivotingAxis() const
@@ -357,15 +427,15 @@ void AirflowNetworkMultiZoneComponentDetailedOpening_Impl::resetAirMassFlowExpon
   OS_ASSERT(result);
 }
 
-bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::setTypeofRectangulerLargeVerticalOpening(std::string typeofRectangulerLargeVerticalOpening)
+bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::setTypeofRectangularLargeVerticalOpening(std::string typeofRectangularLargeVerticalOpening)
 {
-  bool result = setString(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangulerLargeVerticalOpening, typeofRectangulerLargeVerticalOpening);
+  bool result = setString(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangularLargeVerticalOpening, typeofRectangularLargeVerticalOpening);
   return result;
 }
 
-void AirflowNetworkMultiZoneComponentDetailedOpening_Impl::resetTypeofRectangulerLargeVerticalOpening()
+void AirflowNetworkMultiZoneComponentDetailedOpening_Impl::resetTypeofRectangularLargeVerticalOpening()
 {
-  bool result = setString(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangulerLargeVerticalOpening, "");
+  bool result = setString(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangularLargeVerticalOpening, "");
   OS_ASSERT(result);
 }
 
@@ -389,6 +459,9 @@ bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::setNumberofSetsofOpen
 
 bool AirflowNetworkMultiZoneComponentDetailedOpening_Impl::setOpeningFactor1(double openingFactor1)
 {
+  if (openingFactor1 != 0) {
+    return false;
+  }
   bool result = setDouble(OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::OpeningFactor1, openingFactor1);
   return result;
 }
@@ -638,7 +711,7 @@ void AirflowNetworkMultiZoneComponentDetailedOpening_Impl::resetStartHeightFacto
 AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
   double massFlowCoefficientWhenOpeningisClosed,
   double massFlowExponentWhenOpeningisClosed,
-  std::string typeofRectangulerLargeVerticalOpening,
+  std::string typeofRectangularLargeVerticalOpening,
   double extraCrackLengthorHeightofPivotingAxis,
   double openingFactor1,
   double dischargeCoefficientforOpeningFactor1,
@@ -657,7 +730,7 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
   // OS_ASSERT(setHandle());
   OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
   OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
-  OS_ASSERT(setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening));
+  OS_ASSERT(setTypeofRectangularLargeVerticalOpening(typeofRectangularLargeVerticalOpening));
   OS_ASSERT(setNumberofSetsofOpeningFactorData(2));
   // Set 1
   OS_ASSERT(setOpeningFactor1(openingFactor1));
@@ -676,7 +749,7 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
 AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
   double massFlowCoefficientWhenOpeningisClosed,
   double massFlowExponentWhenOpeningisClosed,
-  std::string typeofRectangulerLargeVerticalOpening,
+  std::string typeofRectangularLargeVerticalOpening,
   double extraCrackLengthorHeightofPivotingAxis,
   double openingFactor1,
   double dischargeCoefficientforOpeningFactor1,
@@ -700,7 +773,7 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
   // OS_ASSERT(setHandle());
   OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
   OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
-  OS_ASSERT(setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening));
+  OS_ASSERT(setTypeofRectangularLargeVerticalOpening(typeofRectangularLargeVerticalOpening));
   OS_ASSERT(setNumberofSetsofOpeningFactorData(3));
   // Set 1
   OS_ASSERT(setOpeningFactor1(openingFactor1));
@@ -725,7 +798,7 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
 AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
   double massFlowCoefficientWhenOpeningisClosed,
   double massFlowExponentWhenOpeningisClosed,
-  std::string typeofRectangulerLargeVerticalOpening,
+  std::string typeofRectangularLargeVerticalOpening,
   double extraCrackLengthorHeightofPivotingAxis,
   double openingFactor1,
   double dischargeCoefficientforOpeningFactor1,
@@ -754,7 +827,7 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
   // OS_ASSERT(setHandle());
   OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
   OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
-  OS_ASSERT(setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening));
+  OS_ASSERT(setTypeofRectangularLargeVerticalOpening(typeofRectangularLargeVerticalOpening));
   OS_ASSERT(setNumberofSetsofOpeningFactorData(4));
   // Set 1
   OS_ASSERT(setOpeningFactor1(openingFactor1));
@@ -782,15 +855,66 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
   OS_ASSERT(setStartHeightFactorforOpeningFactor4(startHeightFactorforOpeningFactor4));
 }
 
+AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
+  double massFlowCoefficientWhenOpeningisClosed,
+  double massFlowExponentWhenOpeningisClosed,
+  std::string typeofRectangularLargeVerticalOpening,
+  double extraCrackLengthorHeightofPivotingAxis,
+  std::vector<DetailedOpeningFactorData> data)
+  : ModelObject(AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType(), model)
+{
+  OS_ASSERT(getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>());
+
+  // OS_ASSERT(setHandle());
+  OS_ASSERT(setAirMassFlowCoefficientWhenOpeningisClosed(massFlowCoefficientWhenOpeningisClosed));
+  OS_ASSERT(setAirMassFlowExponentWhenOpeningisClosed(massFlowExponentWhenOpeningisClosed));
+  OS_ASSERT(setTypeofRectangularLargeVerticalOpening(typeofRectangularLargeVerticalOpening));
+  OS_ASSERT(setNumberofSetsofOpeningFactorData(4));
+  size_t n = data.size();
+  OS_ASSERT(n > 1);
+  // Set 1
+  OS_ASSERT(setOpeningFactor1(data[0].openingFactor()));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor1(data[0].dischargeCoefficient()));
+  OS_ASSERT(setWidthFactorforOpeningFactor1(data[0].widthFactor()));
+  OS_ASSERT(setHeightFactorforOpeningFactor1(data[0].heightFactor()));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor1(data[0].startHeightFactor()));
+  // Set 2
+  OS_ASSERT(setOpeningFactor2(data[1].openingFactor()));
+  OS_ASSERT(setDischargeCoefficientforOpeningFactor2(data[1].dischargeCoefficient()));
+  OS_ASSERT(setWidthFactorforOpeningFactor2(data[1].widthFactor()));
+  OS_ASSERT(setHeightFactorforOpeningFactor2(data[1].heightFactor()));
+  OS_ASSERT(setStartHeightFactorforOpeningFactor2(data[1].startHeightFactor()));
+  // Set 3
+  if (n > 2) {
+    OS_ASSERT(setOpeningFactor3(data[2].openingFactor()));
+    OS_ASSERT(setDischargeCoefficientforOpeningFactor3(data[2].dischargeCoefficient()));
+    OS_ASSERT(setWidthFactorforOpeningFactor3(data[2].widthFactor()));
+    OS_ASSERT(setHeightFactorforOpeningFactor3(data[2].heightFactor()));
+    OS_ASSERT(setStartHeightFactorforOpeningFactor3(data[2].startHeightFactor()));
+    if (n > 3) {
+      // Set 4
+      OS_ASSERT(setOpeningFactor4(data[3].openingFactor()));
+      OS_ASSERT(setDischargeCoefficientforOpeningFactor4(data[3].dischargeCoefficient()));
+      OS_ASSERT(setWidthFactorforOpeningFactor4(data[3].widthFactor()));
+      OS_ASSERT(setHeightFactorforOpeningFactor4(data[3].heightFactor()));
+      OS_ASSERT(setStartHeightFactorforOpeningFactor4(data[3].startHeightFactor()));
+    }
+    if (n > 4) {
+      // Warn about truncation, or assert?
+    }
+  }
+}
+
+
 IddObjectType AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType()
 {
   return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneComponentDetailedOpening);
 }
 
-std::vector<std::string> AirflowNetworkMultiZoneComponentDetailedOpening::typeofRectangulerLargeVerticalOpeningValues()
+std::vector<std::string> AirflowNetworkMultiZoneComponentDetailedOpening::typeofRectangularLargeVerticalOpeningValues()
 {
   return getIddKeyNames(IddFactory::instance().getObject(iddObjectType()).get(),
-    OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangulerLargeVerticalOpening);
+    OS_AirflowNetworkMultiZoneComponentDetailedOpeningFields::TypeofRectangularLargeVerticalOpening);
 }
 
 double AirflowNetworkMultiZoneComponentDetailedOpening::airMassFlowCoefficientWhenOpeningisClosed() const
@@ -808,14 +932,14 @@ bool AirflowNetworkMultiZoneComponentDetailedOpening::isAirMassFlowExponentWhenO
   return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->isAirMassFlowExponentWhenOpeningisClosedDefaulted();
 }
 
-std::string AirflowNetworkMultiZoneComponentDetailedOpening::typeofRectangulerLargeVerticalOpening() const
+std::string AirflowNetworkMultiZoneComponentDetailedOpening::typeofRectangularLargeVerticalOpening() const
 {
-  return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->typeofRectangulerLargeVerticalOpening();
+  return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->typeofRectangularLargeVerticalOpening();
 }
 
-bool AirflowNetworkMultiZoneComponentDetailedOpening::isTypeofRectangulerLargeVerticalOpeningDefaulted() const
+bool AirflowNetworkMultiZoneComponentDetailedOpening::isTypeofRectangularLargeVerticalOpeningDefaulted() const
 {
-  return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->isTypeofRectangulerLargeVerticalOpeningDefaulted();
+  return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->isTypeofRectangularLargeVerticalOpeningDefaulted();
 }
 
 double AirflowNetworkMultiZoneComponentDetailedOpening::extraCrackLengthorHeightofPivotingAxis() const
@@ -1033,14 +1157,14 @@ void AirflowNetworkMultiZoneComponentDetailedOpening::resetAirMassFlowExponentWh
   getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->resetAirMassFlowExponentWhenOpeningisClosed();
 }
 
-bool AirflowNetworkMultiZoneComponentDetailedOpening::setTypeofRectangulerLargeVerticalOpening(std::string typeofRectangulerLargeVerticalOpening)
+bool AirflowNetworkMultiZoneComponentDetailedOpening::setTypeofRectangularLargeVerticalOpening(std::string typeofRectangularLargeVerticalOpening)
 {
-  return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->setTypeofRectangulerLargeVerticalOpening(typeofRectangulerLargeVerticalOpening);
+  return getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->setTypeofRectangularLargeVerticalOpening(typeofRectangularLargeVerticalOpening);
 }
 
-void AirflowNetworkMultiZoneComponentDetailedOpening::resetTypeofRectangulerLargeVerticalOpening()
+void AirflowNetworkMultiZoneComponentDetailedOpening::resetTypeofRectangularLargeVerticalOpening()
 {
-  getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->resetTypeofRectangulerLargeVerticalOpening();
+  getImpl<detail::AirflowNetworkMultiZoneComponentDetailedOpening_Impl>()->resetTypeofRectangularLargeVerticalOpening();
 }
 
 bool AirflowNetworkMultiZoneComponentDetailedOpening::setExtraCrackLengthorHeightofPivotingAxis(double extraCrackLengthorHeightofPivotingAxis)

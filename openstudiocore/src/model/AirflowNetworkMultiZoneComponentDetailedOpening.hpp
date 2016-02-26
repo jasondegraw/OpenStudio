@@ -27,6 +27,61 @@ namespace openstudio {
 
 namespace model {
 
+class MODEL_API DetailedOpeningFactorData
+{
+public:
+  /** @name Constructor */
+  //@{
+  DetailedOpeningFactorData(double openingFactor, double dischargeCoefficient, double widthFactor, double heightFactor,
+    double startHeightFactor);
+
+  //@}
+  /** @name Getters */
+  //@{
+  /** For a rectangular non-pivoted window or door (LVO Type 1), the opening factor corresponds to the fraction of the 
+   * window or door that is opened. For rectangular horizontally-pivoted windows (LVO Type 2), the opening factor is
+   * the angular fraction that window is open. For example, an opening angle of 45 degrees corresponds to an opening
+   * factor of 0.50 since the maximum opening angle is 90 degrees.
+   */
+  double openingFactor() const;
+  /** The discharge coefficient indicates the fractional effectiveness for air flow through a window or door at
+   * that Opening Factor.
+   */
+  double dischargeCoefficient() const;
+  /** The width factor is the opening width divided by the window or door width. */
+  double widthFactor() const;
+  /** The height factor is the opening height divided by the window or door height. */
+  double heightFactor() const;
+  /** The start height factor is the start height divided by the window or door height.
+   * Start height is the distance between the bottom of the window or door and the
+   * bottom of the window or door opening. The sum of the height factor and the start height
+   * factor must be less than 1.0 in order to have the opening within the window or door dimensions.
+   */
+  double startHeightFactor() const;
+
+  //@}
+  /** @name Setters */
+  //@{
+  /** Sets the opening factor. */
+  bool setOpeningFactor(double openingFactor);
+  /** Sets the discharge coefficient. */
+  bool setDischargeCoefficient(double dischargeCoefficient);
+  /** Sets the width factor. */
+  bool setWidthFactor(double widthFactor);
+  /** Sets the height factor. */
+  bool setHeightFactor(double heightFactor);
+  /** Sets the start height factor. */
+  bool setStartHeightFactor(double startHeightFactor);
+  //@}
+private:
+  double m_openingFactor;
+  double m_dischargeCoefficient;
+  double m_widthFactor;
+  double m_heightFactor;
+  double m_startHeightFactor;
+
+};
+
 namespace detail {
 
 class AirflowNetworkMultiZoneComponentDetailedOpening_Impl;
@@ -43,7 +98,7 @@ public:
   AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
     double massFlowCoefficientWhenOpeningisClosed,
     double massFlowExponentWhenOpeningisClosed,
-    std::string typeofRectangulerLargeVerticalOpening,
+    std::string typeofRectangularLargeVerticalOpening,
     double extraCrackLengthorHeightofPivotingAxis,
     double openingFactor1,
     double dischargeCoefficientforOpeningFactor1,
@@ -59,7 +114,7 @@ public:
   AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
     double massFlowCoefficientWhenOpeningisClosed,
     double massFlowExponentWhenOpeningisClosed,
-    std::string typeofRectangulerLargeVerticalOpening,
+    std::string typeofRectangularLargeVerticalOpening,
     double extraCrackLengthorHeightofPivotingAxis,
     double openingFactor1,
     double dischargeCoefficientforOpeningFactor1,
@@ -80,7 +135,7 @@ public:
   AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
     double massFlowCoefficientWhenOpeningisClosed,
     double massFlowExponentWhenOpeningisClosed,
-    std::string typeofRectangulerLargeVerticalOpening,
+    std::string typeofRectangularLargeVerticalOpening,
     double extraCrackLengthorHeightofPivotingAxis,
     double openingFactor1,
     double dischargeCoefficientforOpeningFactor1,
@@ -103,13 +158,20 @@ public:
     double heightFactorforOpeningFactor4,
     double startHeightFactorforOpeningFactor4);
 
+  AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
+    double massFlowCoefficientWhenOpeningisClosed,
+    double massFlowExponentWhenOpeningisClosed,
+    std::string typeofRectangularLargeVerticalOpening,
+    double extraCrackLengthorHeightofPivotingAxis,
+    std::vector<DetailedOpeningFactorData> data);
+
   virtual ~AirflowNetworkMultiZoneComponentDetailedOpening() {}
 
   //@}
 
   static IddObjectType iddObjectType();
 
-  static std::vector<std::string> typeofRectangulerLargeVerticalOpeningValues();
+  static std::vector<std::string> typeofRectangularLargeVerticalOpeningValues();
 
   /** @name Getters */
   //@{
@@ -120,9 +182,9 @@ public:
 
   bool isAirMassFlowExponentWhenOpeningisClosedDefaulted() const;
 
-  std::string typeofRectangulerLargeVerticalOpening() const;
+  std::string typeofRectangularLargeVerticalOpening() const;
 
-  bool isTypeofRectangulerLargeVerticalOpeningDefaulted() const;
+  bool isTypeofRectangularLargeVerticalOpeningDefaulted() const;
 
   double extraCrackLengthorHeightofPivotingAxis() const;
 
@@ -214,9 +276,9 @@ public:
 
   void resetAirMassFlowExponentWhenOpeningisClosed();
 
-  bool setTypeofRectangulerLargeVerticalOpening(std::string typeofRectangulerLargeVerticalOpening);
+  bool setTypeofRectangularLargeVerticalOpening(std::string typeofRectangularLargeVerticalOpening);
 
-  void resetTypeofRectangulerLargeVerticalOpening();
+  void resetTypeofRectangularLargeVerticalOpening();
 
   bool setExtraCrackLengthorHeightofPivotingAxis(double extraCrackLengthorHeightofPivotingAxis);
 

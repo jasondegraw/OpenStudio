@@ -26,6 +26,8 @@
 namespace openstudio {
 namespace model {
 
+class DetailedOpeningFactorData;
+
 namespace detail {
 
 /** AirflowNetworkMultiZoneComponentDetailedOpening_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneComponentDetailedOpening.*/
@@ -67,9 +69,9 @@ public:
 
   bool isAirMassFlowExponentWhenOpeningisClosedDefaulted() const;
 
-  std::string typeofRectangulerLargeVerticalOpening() const;
+  std::string typeofRectangularLargeVerticalOpening() const;
 
-  bool isTypeofRectangulerLargeVerticalOpeningDefaulted() const;
+  bool isTypeofRectangularLargeVerticalOpeningDefaulted() const;
 
   double extraCrackLengthorHeightofPivotingAxis() const;
 
@@ -161,9 +163,9 @@ public:
 
   void resetAirMassFlowExponentWhenOpeningisClosed();
 
-  bool setTypeofRectangulerLargeVerticalOpening(std::string typeofRectangulerLargeVerticalOpening);
+  bool setTypeofRectangularLargeVerticalOpening(std::string typeofRectangularLargeVerticalOpening);
 
-  void resetTypeofRectangulerLargeVerticalOpening();
+  void resetTypeofRectangularLargeVerticalOpening();
 
   bool setExtraCrackLengthorHeightofPivotingAxis(double extraCrackLengthorHeightofPivotingAxis);
 

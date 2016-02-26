@@ -25860,7 +25860,7 @@ OS:AirflowNetworkMultiZoneComponentDetailedOpening,
        \note Enter the exponent used in the following equation:
        \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
        \note Used only when opening (window or door) is closed.
-  A3, \field Type of Rectanguler Large Vertical Opening
+  A3, \field Type of Rectangular Large Vertical Opening
        \type choice
        \key NonPivoted
        \key HorizontallyPivoted
