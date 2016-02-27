@@ -1,5 +1,5 @@
 /**********************************************************************
- *  Copyright (c) 2008-2014, Alliance for Sustainable Energy.
+ *  Copyright (c) 2008-2016, Alliance for Sustainable Energy.
  *  All rights reserved.
  *
  *  This library is free software; you can redistribute it and/or
@@ -100,70 +100,7 @@ public:
     double massFlowExponentWhenOpeningisClosed,
     std::string typeofRectangularLargeVerticalOpening,
     double extraCrackLengthorHeightofPivotingAxis,
-    double openingFactor1,
-    double dischargeCoefficientforOpeningFactor1,
-    double widthFactorforOpeningFactor1,
-    double heightFactorforOpeningFactor1,
-    double startHeightFactorforOpeningFactor1,
-    double openingFactor2,
-    double dischargeCoefficientforOpeningFactor2,
-    double widthFactorforOpeningFactor2,
-    double heightFactorforOpeningFactor2,
-    double startHeightFactorforOpeningFactor2);
-
-  AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
-    double massFlowCoefficientWhenOpeningisClosed,
-    double massFlowExponentWhenOpeningisClosed,
-    std::string typeofRectangularLargeVerticalOpening,
-    double extraCrackLengthorHeightofPivotingAxis,
-    double openingFactor1,
-    double dischargeCoefficientforOpeningFactor1,
-    double widthFactorforOpeningFactor1,
-    double heightFactorforOpeningFactor1,
-    double startHeightFactorforOpeningFactor1,
-    double openingFactor2,
-    double dischargeCoefficientforOpeningFactor2,
-    double widthFactorforOpeningFactor2,
-    double heightFactorforOpeningFactor2,
-    double startHeightFactorforOpeningFactor2,
-    double openingFactor3,
-    double dischargeCoefficientforOpeningFactor3,
-    double widthFactorforOpeningFactor3,
-    double heightFactorforOpeningFactor3,
-    double startHeightFactorforOpeningFactor3);
-
-  AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
-    double massFlowCoefficientWhenOpeningisClosed,
-    double massFlowExponentWhenOpeningisClosed,
-    std::string typeofRectangularLargeVerticalOpening,
-    double extraCrackLengthorHeightofPivotingAxis,
-    double openingFactor1,
-    double dischargeCoefficientforOpeningFactor1,
-    double widthFactorforOpeningFactor1,
-    double heightFactorforOpeningFactor1,
-    double startHeightFactorforOpeningFactor1,
-    double openingFactor2,
-    double dischargeCoefficientforOpeningFactor2,
-    double widthFactorforOpeningFactor2,
-    double heightFactorforOpeningFactor2,
-    double startHeightFactorforOpeningFactor2,
-    double openingFactor3,
-    double dischargeCoefficientforOpeningFactor3,
-    double widthFactorforOpeningFactor3,
-    double heightFactorforOpeningFactor3,
-    double startHeightFactorforOpeningFactor3,
-    double openingFactor4,
-    double dischargeCoefficientforOpeningFactor4,
-    double widthFactorforOpeningFactor4,
-    double heightFactorforOpeningFactor4,
-    double startHeightFactorforOpeningFactor4);
-
-  AirflowNetworkMultiZoneComponentDetailedOpening(const Model& model,
-    double massFlowCoefficientWhenOpeningisClosed,
-    double massFlowExponentWhenOpeningisClosed,
-    std::string typeofRectangularLargeVerticalOpening,
-    double extraCrackLengthorHeightofPivotingAxis,
-    std::vector<DetailedOpeningFactorData> data);
+    std::vector<DetailedOpeningFactorData>& openingFactors);
 
   virtual ~AirflowNetworkMultiZoneComponentDetailedOpening() {}
 
@@ -190,81 +127,7 @@ public:
 
   bool isExtraCrackLengthorHeightofPivotingAxisDefaulted() const;
 
-  int numberofSetsofOpeningFactorData() const;
-
-  double openingFactor1() const;
-
-  bool isOpeningFactor1Defaulted() const;
-
-  double dischargeCoefficientforOpeningFactor1() const;
-
-  bool isDischargeCoefficientforOpeningFactor1Defaulted() const;
-
-  double widthFactorforOpeningFactor1() const;
-
-  bool isWidthFactorforOpeningFactor1Defaulted() const;
-
-  double heightFactorforOpeningFactor1() const;
-
-  bool isHeightFactorforOpeningFactor1Defaulted() const;
-
-  double startHeightFactorforOpeningFactor1() const;
-
-  bool isStartHeightFactorforOpeningFactor1Defaulted() const;
-
-  double openingFactor2() const;
-
-  double dischargeCoefficientforOpeningFactor2() const;
-
-  bool isDischargeCoefficientforOpeningFactor2Defaulted() const;
-
-  double widthFactorforOpeningFactor2() const;
-
-  bool isWidthFactorforOpeningFactor2Defaulted() const;
-
-  double heightFactorforOpeningFactor2() const;
-
-  bool isHeightFactorforOpeningFactor2Defaulted() const;
-
-  double startHeightFactorforOpeningFactor2() const;
-
-  bool isStartHeightFactorforOpeningFactor2Defaulted() const;
-
-  boost::optional<double> openingFactor3() const;
-
-  double dischargeCoefficientforOpeningFactor3() const;
-
-  bool isDischargeCoefficientforOpeningFactor3Defaulted() const;
-
-  double widthFactorforOpeningFactor3() const;
-
-  bool isWidthFactorforOpeningFactor3Defaulted() const;
-
-  double heightFactorforOpeningFactor3() const;
-
-  bool isHeightFactorforOpeningFactor3Defaulted() const;
-
-  double startHeightFactorforOpeningFactor3() const;
-
-  bool isStartHeightFactorforOpeningFactor3Defaulted() const;
-
-  boost::optional<double> openingFactor4() const;
-
-  double dischargeCoefficientforOpeningFactor4() const;
-
-  bool isDischargeCoefficientforOpeningFactor4Defaulted() const;
-
-  double widthFactorforOpeningFactor4() const;
-
-  bool isWidthFactorforOpeningFactor4Defaulted() const;
-
-  double heightFactorforOpeningFactor4() const;
-
-  bool isHeightFactorforOpeningFactor4Defaulted() const;
-
-  double startHeightFactorforOpeningFactor4() const;
-
-  bool isStartHeightFactorforOpeningFactor4Defaulted() const;
+  std::vector<DetailedOpeningFactorData> openingFactors() const;
 
   //@}
   /** @name Setters */
@@ -284,85 +147,7 @@ public:
 
   void resetExtraCrackLengthorHeightofPivotingAxis();
 
-  bool setNumberofSetsofOpeningFactorData(int numberofSetsofOpeningFactorData);
-
-  bool setOpeningFactor1(double openingFactor1);
-
-  void resetOpeningFactor1();
-
-  bool setDischargeCoefficientforOpeningFactor1(double dischargeCoefficientforOpeningFactor1);
-
-  void resetDischargeCoefficientforOpeningFactor1();
-
-  bool setWidthFactorforOpeningFactor1(double widthFactorforOpeningFactor1);
-
-  void resetWidthFactorforOpeningFactor1();
-
-  bool setHeightFactorforOpeningFactor1(double heightFactorforOpeningFactor1);
-
-  void resetHeightFactorforOpeningFactor1();
-
-  bool setStartHeightFactorforOpeningFactor1(double startHeightFactorforOpeningFactor1);
-
-  void resetStartHeightFactorforOpeningFactor1();
-
-  bool setOpeningFactor2(double openingFactor2);
-
-  bool setDischargeCoefficientforOpeningFactor2(double dischargeCoefficientforOpeningFactor2);
-
-  void resetDischargeCoefficientforOpeningFactor2();
-
-  bool setWidthFactorforOpeningFactor2(double widthFactorforOpeningFactor2);
-
-  void resetWidthFactorforOpeningFactor2();
-
-  bool setHeightFactorforOpeningFactor2(double heightFactorforOpeningFactor2);
-
-  void resetHeightFactorforOpeningFactor2();
-
-  bool setStartHeightFactorforOpeningFactor2(double startHeightFactorforOpeningFactor2);
-
-  void resetStartHeightFactorforOpeningFactor2();
-
-  bool setOpeningFactor3(double openingFactor3);
-
-  void resetOpeningFactor3();
-
-  bool setDischargeCoefficientforOpeningFactor3(double dischargeCoefficientforOpeningFactor3);
-
-  void resetDischargeCoefficientforOpeningFactor3();
-
-  bool setWidthFactorforOpeningFactor3(double widthFactorforOpeningFactor3);
-
-  void resetWidthFactorforOpeningFactor3();
-
-  bool setHeightFactorforOpeningFactor3(double heightFactorforOpeningFactor3);
-
-  void resetHeightFactorforOpeningFactor3();
-
-  bool setStartHeightFactorforOpeningFactor3(double startHeightFactorforOpeningFactor3);
-
-  void resetStartHeightFactorforOpeningFactor3();
-
-  bool setOpeningFactor4(double openingFactor4);
-
-  void resetOpeningFactor4();
-
-  bool setDischargeCoefficientforOpeningFactor4(double dischargeCoefficientforOpeningFactor4);
-
-  void resetDischargeCoefficientforOpeningFactor4();
-
-  bool setWidthFactorforOpeningFactor4(double widthFactorforOpeningFactor4);
-
-  void resetWidthFactorforOpeningFactor4();
-
-  bool setHeightFactorforOpeningFactor4(double heightFactorforOpeningFactor4);
-
-  void resetHeightFactorforOpeningFactor4();
-
-  bool setStartHeightFactorforOpeningFactor4(double startHeightFactorforOpeningFactor4);
-
-  void resetStartHeightFactorforOpeningFactor4();
+  bool setOpeningFactors(std::vector<DetailedOpeningFactorData>& factors);
 
   //@}
 protected:
