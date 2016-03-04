@@ -246,17 +246,17 @@ boost::optional<std::string> AirflowNetworkSimulationControl_Impl::airflowNetwor
   return getString(OS_AirflowNetworkSimulationControlFields::AirflowNetworkControl,true);
 }
 
-boost::optional<std::string> AirflowNetworkSimulationControl_Impl::windPressureCoefficientType() const
-{
-  return getString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType,true);
-}
+//boost::optional<std::string> AirflowNetworkSimulationControl_Impl::windPressureCoefficientType() const
+//{
+//  return getString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType,true);
+//}
 
 // Skipping AirflowNetworkWindPressureCoefficientArrayName
 
-boost::optional<std::string> AirflowNetworkSimulationControl_Impl::heightSelectionforLocalWindPressureCalculation() const
-{
-  return getString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation,true);
-}
+//boost::optional<std::string> AirflowNetworkSimulationControl_Impl::heightSelectionforLocalWindPressureCalculation() const
+//{
+//  return getString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation,true);
+//}
 
 boost::optional<std::string> AirflowNetworkSimulationControl_Impl::buildingType() const
 {
@@ -315,41 +315,41 @@ bool AirflowNetworkSimulationControl_Impl::setAirflowNetworkControl(std::string 
   return result;
 }
 
-bool AirflowNetworkSimulationControl_Impl::setWindPressureCoefficientType(boost::optional<std::string> type)
-{
-  bool result = false;
-  if (type) {
-    result = setString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType, type.get());
-  } else {
-    result = setString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType, "");
-  }
-  return result;
-}
+//bool AirflowNetworkSimulationControl_Impl::setWindPressureCoefficientType(boost::optional<std::string> type)
+//{
+//  bool result = false;
+//  if (type) {
+//    result = setString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType, type.get());
+//  } else {
+//    result = setString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType, "");
+//  }
+//  return result;
+//}
 
-bool AirflowNetworkSimulationControl_Impl::setWindPressureCoefficientType(std::string type)
-{
-  bool result = setString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType, type);
-  return result;
-}
+//bool AirflowNetworkSimulationControl_Impl::setWindPressureCoefficientType(std::string type)
+//{
+//  bool result = setString(OS_AirflowNetworkSimulationControlFields::WindPressureCoefficientType, type);
+//  return result;
+//}
 
 // Skipping AirflowNetworkWindPressureCoefficientArrayName
 
-bool AirflowNetworkSimulationControl_Impl::setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height)
-{
-  bool result = false;
-  if (height) {
-    result = setString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation, height.get());
-  } else {
-    result = setString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation, "");
-  }
-  return result;
-}
+//bool AirflowNetworkSimulationControl_Impl::setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height)
+//{
+//  bool result = false;
+//  if (height) {
+//    result = setString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation, height.get());
+//  } else {
+//    result = setString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation, "");
+//  }
+//  return result;
+//}
 
-bool AirflowNetworkSimulationControl_Impl::setHeightSelectionforLocalWindPressureCalculation(std::string height)
-{
-  bool result = setString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation, height);
-  return result;
-}
+//bool AirflowNetworkSimulationControl_Impl::setHeightSelectionforLocalWindPressureCalculation(std::string height)
+//{
+//  bool result = setString(OS_AirflowNetworkSimulationControlFields::HeightSelectionforLocalWindPressureCalculation, height);
+//  return result;
+//}
 
 bool AirflowNetworkSimulationControl_Impl::setBuildingType(boost::optional<std::string> type)
 {
@@ -558,17 +558,17 @@ boost::optional<std::string> AirflowNetworkSimulationControl::airflowNetworkCont
   return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->airflowNetworkControl();
 }
 
-boost::optional<std::string> AirflowNetworkSimulationControl::windPressureCoefficientType() const
-{
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->windPressureCoefficientType();
-}
+//boost::optional<std::string> AirflowNetworkSimulationControl::windPressureCoefficientType() const
+//{
+//  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->windPressureCoefficientType();
+//}
 
 // Skipping AirflowNetworkWindPressureCoefficientArrayName
 
-boost::optional<std::string> AirflowNetworkSimulationControl::heightSelectionforLocalWindPressureCalculation() const
-{
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->heightSelectionforLocalWindPressureCalculation();
-}
+//boost::optional<std::string> AirflowNetworkSimulationControl::heightSelectionforLocalWindPressureCalculation() const
+//{
+//  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->heightSelectionforLocalWindPressureCalculation();
+//}
 
 boost::optional<std::string> AirflowNetworkSimulationControl::buildingType() const
 {
@@ -620,27 +620,27 @@ bool AirflowNetworkSimulationControl::setAirflowNetworkControl(boost::optional<s
   return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setAirflowNetworkControl(airflowNetworkControl);
 }
 
-bool AirflowNetworkSimulationControl::setWindPressureCoefficientType(std::string type)
-{
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setWindPressureCoefficientType(type);
-}
+//bool AirflowNetworkSimulationControl::setWindPressureCoefficientType(std::string type)
+//{
+//  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setWindPressureCoefficientType(type);
+//}
 
-bool AirflowNetworkSimulationControl::setWindPressureCoefficientType(boost::optional<std::string> type)
-{
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setWindPressureCoefficientType(type);
-}
+//bool AirflowNetworkSimulationControl::setWindPressureCoefficientType(boost::optional<std::string> type)
+//{
+//  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setWindPressureCoefficientType(type);
+//}
 
 // Skipping AirflowNetworkWindPressureCoefficientArrayName
 
-bool AirflowNetworkSimulationControl::setHeightSelectionforLocalWindPressureCalculation(std::string height)
-{
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setHeightSelectionforLocalWindPressureCalculation(height);
-}
+//bool AirflowNetworkSimulationControl::setHeightSelectionforLocalWindPressureCalculation(std::string height)
+//{
+//  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setHeightSelectionforLocalWindPressureCalculation(height);
+//}
 
-bool AirflowNetworkSimulationControl::setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height)
-{
-  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setHeightSelectionforLocalWindPressureCalculation(height);
-}
+//bool AirflowNetworkSimulationControl::setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height)
+//{
+//  return getImpl<detail::AirflowNetworkSimulationControl_Impl>()->setHeightSelectionforLocalWindPressureCalculation(height);
+//}
 
 bool AirflowNetworkSimulationControl::setBuildingType(std::string type)
 {

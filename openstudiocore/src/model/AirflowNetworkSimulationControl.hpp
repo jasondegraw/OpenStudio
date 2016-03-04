@@ -86,7 +86,7 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
    */
   boost::optional<std::string> airflowNetworkControl() const;
 
-  /** Determines the wind pressure treatment used by AirflowNetork.
+  /* Determines the wind pressure treatment used by AirflowNetork.
    *
    *  Input: User must enter AirflowNetwork:MultiZone:WindPressureCoefficientArray,
    *  AirflowNetwork:MultiZone:ExternalNode, and AirflowNetwork:MultiZone:WindPressureCoefficientValues objects.
@@ -94,16 +94,16 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
    *  SurfaceAverageCalculation: used only for rectangular buildings. AirflowNetwork:MultiZone:WindPressureCoefficientArray, 
    *  AirflowNetwork:MultiZone:ExternalNode, and AirflowNetwork:MultiZone:WindPressureCoefficientValues objects are not used.
    */
-  boost::optional<std::string> windPressureCoefficientType() const;
+  //boost::optional<std::string> windPressureCoefficientType() const;
 
-  /** Determines how height is selected for wind pressure.
+  /* Determines how height is selected for wind pressure.
    *  If ExternalNode is selected, the height given in the AirflowNetwork:MultiZone:ExternalNode object will be used.
    *
    *  If OpeningHeight is selected, the surface opening height (centroid) will be used to calculate local wind pressure
    *
    *  This field is ignored when the choice of the Wind Pressure Coefficient Type field is SurfaceAverageCalculation.
    */
-  boost::optional<std::string> heightSelectionforLocalWindPressureCalculation() const;
+  //boost::optional<std::string> heightSelectionforLocalWindPressureCalculation() const;
 
   /** General build type, used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
    */
@@ -151,10 +151,10 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
 
   bool setAirflowNetworkControl(boost::optional<std::string> airflowNetworkControl);
   bool setAirflowNetworkControl(std::string airflowNetworkControl);
-  bool setWindPressureCoefficientType(boost::optional<std::string> type);
-  bool setWindPressureCoefficientType(std::string type);
-  bool setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height);
-  bool setHeightSelectionforLocalWindPressureCalculation(std::string height);
+  //bool setWindPressureCoefficientType(boost::optional<std::string> type);
+  //bool setWindPressureCoefficientType(std::string type);
+  //bool setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height);
+  //bool setHeightSelectionforLocalWindPressureCalculation(std::string height);
   bool setBuildingType(boost::optional<std::string> type);
   bool setBuildingType(std::string type);
   bool setMaximumNumberofIterations(boost::optional<int> number);

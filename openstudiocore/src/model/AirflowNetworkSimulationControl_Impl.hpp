@@ -81,9 +81,9 @@ public:
   virtual IddObjectType iddObjectType() const;
 
   boost::optional<std::string> airflowNetworkControl() const;
-  boost::optional<std::string> windPressureCoefficientType() const;
+  //boost::optional<std::string> windPressureCoefficientType() const;
   // Skipping AirflowNetworkWindPressureCoefficientArrayName
-  boost::optional<std::string> heightSelectionforLocalWindPressureCalculation() const;
+  //boost::optional<std::string> heightSelectionforLocalWindPressureCalculation() const;
   boost::optional<std::string> buildingType() const;
   boost::optional<int> maximumNumberofIterations() const;
   boost::optional<std::string> initializationType() const;
@@ -99,11 +99,11 @@ public:
 
   bool setAirflowNetworkControl(boost::optional<std::string> airflowNetworkControl);
   bool setAirflowNetworkControl(std::string airflowNetworkControl);
-  bool setWindPressureCoefficientType(boost::optional<std::string> type);
-  bool setWindPressureCoefficientType(std::string type);
-	// Skipping AirflowNetworkWindPressureCoefficientArrayName
-  bool setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height);
-  bool setHeightSelectionforLocalWindPressureCalculation(std::string height);
+  //bool setWindPressureCoefficientType(boost::optional<std::string> type);
+  //bool setWindPressureCoefficientType(std::string type);
+  // Skipping AirflowNetworkWindPressureCoefficientArrayName
+  //bool setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height);
+  //bool setHeightSelectionforLocalWindPressureCalculation(std::string height);
   bool setBuildingType(boost::optional<std::string> type);
   bool setBuildingType(std::string type);
   bool setMaximumNumberofIterations(boost::optional<int> number);

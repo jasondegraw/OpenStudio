@@ -25581,7 +25581,7 @@ OS:Output:Variable,
 \group OpenStudio Airflow Network
 
 OS:AirflowNetworkSimulationControl,
-       \min-fields 13
+       \min-fields 11
        \unique-object
   A1, \field Handle
        \type handle
@@ -25609,34 +25609,11 @@ OS:AirflowNetworkSimulationControl,
        \note and Simple calculations during system Fan off time;
        \note MultizoneWithDistribution: Perform distribution system calculations during system
        \note fan on time and multizone Airflow driven by wind during system fan off time.
-  A4, \field Wind Pressure Coefficient Type
-       \type choice
-       \key Input
-       \key SurfaceAverageCalculation
-       \default SurfaceAverageCalculation
-       \note Input: User must enter AirflowNetwork:MultiZone:WindPressureCoefficientArray,
-       \note AirflowNetwork:MultiZone:ExternalNode, and
-       \note AirflowNetwork:MultiZone:WindPressureCoefficientValues objects.
-       \note SurfaceAverageCalculation: used only for rectangular buildings.
-       \note If SurfaceAverageCalculation is selected,
-       \note AirflowNetwork:MultiZone:WindPressureCoefficientArray, AirflowNetwork:MultiZone:ExternalNode,
-       \note and AirflowNetwork:MultiZone:WindPressureCoefficientValues objects are not used.
-  A5, \field AirflowNetwork Wind Pressure Coefficient Array Name
+  A4, \field AirflowNetwork Wind Pressure Coefficient Array Name
        \type object-list
        \object-list WPCSetNames
        \note Used only if Wind Pressure Coefficient Type = Input, otherwise this field may be left blank.
-  A6, \field Height Selection for Local Wind Pressure Calculation
-       \type choice
-       \key ExternalNode
-       \key OpeningHeight
-       \default OpeningHeight
-       \note If ExternalNode is selected, the height given in the
-       \note AirflowNetwork:MultiZone:ExternalNode object will be used.
-       \note If OpeningHeight is selected, the surface opening height (centroid) will be used to
-       \note calculate local wind pressure
-       \note This field is ignored when the choice of the Wind Pressure Coefficient Type field is
-       \note SurfaceAverageCalculation.
-  A7, \field Building Type
+  A5, \field Building Type
        \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation,
        \note otherwise this field may be left blank.
        \type choice
@@ -25651,7 +25628,7 @@ OS:AirflowNetworkSimulationControl,
        \maximum 30000
        \note Determines the maximum number of iterations used to converge on a solution. If this limit
        \note is exceeded, the program terminates.
-  A8, \field Initialization Type
+  A6, \field Initialization Type
        \type choice
        \key LinearInitializationMethod
        \key ZeroNodePressures
