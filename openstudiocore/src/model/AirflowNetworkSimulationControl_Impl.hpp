@@ -81,46 +81,58 @@ public:
   virtual IddObjectType iddObjectType() const;
 
   boost::optional<std::string> airflowNetworkControl() const;
+  bool isAirflowNetworkControlDefaulted() const;
   //boost::optional<std::string> windPressureCoefficientType() const;
   // Skipping AirflowNetworkWindPressureCoefficientArrayName
   //boost::optional<std::string> heightSelectionforLocalWindPressureCalculation() const;
   boost::optional<std::string> buildingType() const;
+  bool isBuildingTypeDefaulted() const;
   boost::optional<int> maximumNumberofIterations() const;
+  bool isMaximumNumberofIterationsDefaulted() const;
   boost::optional<std::string> initializationType() const;
+  bool isInitializationTypeDefaulted() const;
   boost::optional<double> relativeAirflowConvergenceTolerance() const;
+  bool isRelativeAirflowConvergenceToleranceDefaulted() const;
   boost::optional<double> absoluteAirflowConvergenceTolerance() const;
+  bool isAbsoluteAirflowConvergenceToleranceDefaulted() const;
   boost::optional<double> convergenceAccelerationLimit() const;
+  bool isConvergenceAccelerationLimitDefaulted() const;
   boost::optional<double> azimuthAngleofLongAxisofBuilding() const;
-  boost::optional<double> ratioofBuildingWidthAlongShortAxistoWidthAlongLongAxis() const;
+  bool isAzimuthAngleofLongAxisofBuildingDefaulted() const;
+  boost::optional<double> buildingAspectRatio() const;
+  bool isBuildingAspectRatioDefaulted() const;
+  boost::optional<std::string> networkBuildType() const;
+  bool isNetworkBuildTypeDefaulted() const;
 
   //@}
   /** @name Setters */
   //@{
 
-  bool setAirflowNetworkControl(boost::optional<std::string> airflowNetworkControl);
   bool setAirflowNetworkControl(std::string airflowNetworkControl);
+  void resetAirflowNetworkControl();
   //bool setWindPressureCoefficientType(boost::optional<std::string> type);
   //bool setWindPressureCoefficientType(std::string type);
   // Skipping AirflowNetworkWindPressureCoefficientArrayName
   //bool setHeightSelectionforLocalWindPressureCalculation(boost::optional<std::string> height);
   //bool setHeightSelectionforLocalWindPressureCalculation(std::string height);
-  bool setBuildingType(boost::optional<std::string> type);
   bool setBuildingType(std::string type);
-  bool setMaximumNumberofIterations(boost::optional<int> number);
+  void resetBuildingType();
   bool setMaximumNumberofIterations(int number);
-  bool setInitializationType(boost::optional<std::string> type);
+  void resetMaximumNumberofIterations();
   bool setInitializationType(std::string type);
-  bool setRelativeAirflowConvergenceTolerance(boost::optional<double> tolerance);
+  void resetInitializationType();
   bool setRelativeAirflowConvergenceTolerance(double tolerance);
-  bool setAbsoluteAirflowConvergenceTolerance(boost::optional<double> tolerance);
+  void resetRelativeAirflowConvergenceTolerance();
   bool setAbsoluteAirflowConvergenceTolerance(double tolerance);
-  bool setConvergenceAccelerationLimit(boost::optional<double> limit);
+  void resetAbsoluteAirflowConvergenceTolerance();
   bool setConvergenceAccelerationLimit(double limit);
-  bool setAzimuthAngleofLongAxisofBuilding(boost::optional<double> angle);
+  void resetConvergenceAccelerationLimit();
   bool setAzimuthAngleofLongAxisofBuilding(double angle);
-  bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(boost::optional<double> ratio);
-  bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(double ratio);
-
+  void resetAzimuthAngleofLongAxisofBuilding();
+  bool setBuildingAspectRatio(double ratio);
+  void resetBuildingAspectRatio();
+  bool setNetworkBuildType(std::string type);
+  void resetNetworkBuildType();
   //@}
 
 private:

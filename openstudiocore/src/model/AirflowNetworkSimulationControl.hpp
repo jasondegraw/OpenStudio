@@ -117,10 +117,14 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
    *  is exceeded, the program terminates.
    */
   boost::optional<int> maximumNumberofIterations() const;
+  /** Returns true if the maximum number of iterations is defaulted. */
+  bool isMaximumNumberofIterationsDefaulted() const;
 
   /** Determines how the network equations are initialized.
    */
   boost::optional<std::string> initializationType() const;
+  /** Returns true if the initialization type is defaulted. */
+  bool isInitializationTypeDefaulted() const;
 
   /** This tolerance is defined as the absolute value of the sum of the mass flow rates divided by the sum of the absolute value 
    *  of the mass Flow Rates. The mass flow rates described here refer to the mass Flow Rates at all Nodes in the AirflowNetwork 
@@ -128,26 +132,44 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
    *  field are satisfied.
    */
   boost::optional<double> relativeAirflowConvergenceTolerance() const;
+  /** Returns true if the relative convergence tolerance is defaulted. */
+  bool isRelativeAirflowConvergenceToleranceDefaulted() const;
 
   /** This tolerance is defined as the absolute value of the sum of the mass flow rates. The mass flow rates described here refer
    *  to the mass flow rates at all nodes in the AirflowNetwork model. The solution converges when both this tolerance and the 
    *  tolerance in the previous field (Relative Airflow Convergence Tolerance) are satisfied.
    */
   boost::optional<double> absoluteAirflowConvergenceTolerance() const;
+  /** Returns true if the absolute convergence tolerance is defaulted. */
+  bool isAbsoluteAirflowConvergenceToleranceDefaulted() const;
 
   /** Used only for AirflowNetwork:SimulationControl
    */
   boost::optional<double> convergenceAccelerationLimit() const;
+  /** Returns true if the convergence acceleration limit is defaulted. */
+  bool isConvergenceAccelerationLimitDefaulted() const;
   
   /** Azimuth angle of long axis of building in degrees clockwise from true North.
    *  Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
    */
   boost::optional<double> azimuthAngleofLongAxisofBuilding() const;
-  
+  /** Returns true if the azimuth angle of long axis is defaulted. */
+  bool isAzimuthAngleofLongAxisofBuildingDefaulted() const;
+
   /** Ratio of building width along short axis to width along long axis.
    *  Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
    */
-  boost::optional<double> ratioofBuildingWidthAlongShortAxistoWidthAlongLongAxis() const;
+  boost::optional<double> buildingAspectRatio() const;
+  /** Returns true if the ratio of the building width to length is defaulted. */
+  bool isBuildingAspectRatioDefaulted() const;
+
+  /** The network build type controls whether a network is built at the time of 
+  *  forward translation or not. The default is "None", in which case nothing is
+  *  done.
+  */
+  boost::optional<std::string> networkBuildType() const;
+  /** Returns true if the ratio of the building width to length is defaulted. */
+  bool isNetworkBuildTypeDefaulted() const;
 
   //@}
   /** @name Setters */
@@ -165,18 +187,27 @@ class MODEL_API AirflowNetworkSimulationControl : public ParentObject {
   void resetBuildingType();
   //bool setMaximumNumberofIterations(boost::optional<int> number);
   bool setMaximumNumberofIterations(int number);
+  void resetMaximumNumberofIterations();
   //bool setInitializationType(boost::optional<std::string> type);
   bool setInitializationType(std::string type);
+  void resetInitializationType();
   //bool setRelativeAirflowConvergenceTolerance(boost::optional<double> tolerance);
   bool setRelativeAirflowConvergenceTolerance(double tolerance);
+  void resetRelativeAirflowConvergenceTolerance();
   //bool setAbsoluteAirflowConvergenceTolerance(boost::optional<double> tolerance);
   bool setAbsoluteAirflowConvergenceTolerance(double tolerance);
+  void resetAbsoluteAirflowConvergenceTolerance();
   //bool setConvergenceAccelerationLimit(boost::optional<double> limit);
   bool setConvergenceAccelerationLimit(double limit);
+  void resetConvergenceAccelerationLimit();
   //bool setAzimuthAngleofLongAxisofBuilding(boost::optional<double> angle);
   bool setAzimuthAngleofLongAxisofBuilding(double angle);
+  void resetAzimuthAngleofLongAxisofBuilding();
   //bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(boost::optional<double> ratio);
-  bool setRatioofBuildingWidthAlongShortAxistoWidthAlongLongAxis(double ratio);
+  bool setBuildingAspectRatio(double ratio);
+  void resetBuildingAspectRatio();
+  bool setNetworkBuildType(std::string type);
+  void resetNetworkBuildType();
 
   //@}
 
