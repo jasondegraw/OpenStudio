@@ -1,4 +1,4 @@
-!IDD_Version 1.10.6
+!IDD_Version 1.11.1
 ! *****************************************************************************
 ! This file is the Input Data Dictionary (IDD) for OpenStudio Model.
 !
@@ -13899,7 +13899,7 @@ OS:Coil:Cooling:Water,
        \key DetailedAnalysis
   A9; \field Heat Exchanger Configuration
        \type choice
-       \default CounterFlow
+       \default CrossFlow
        \key CrossFlow
        \key CounterFlow
 
