@@ -25582,7 +25582,7 @@ OS:Output:Variable,
 
 \group OpenStudio Airflow Network
 
-OS:AirflowNetworkSimulationControl,
+OS:AirflowNetwork:SimulationControl,
        \min-fields 11
        \unique-object
   A1, \field Handle
@@ -25684,7 +25684,222 @@ OS:AirflowNetworkSimulationControl,
        \key WindowsOnly
        \default Surfaces
 
-OS:AirflowNetworkMultiZoneSurfaceCrack,
+OS:AirflowNetwork:MultiZoneZone,
+      \min-fields 9
+      \memo This object is used to simultaneously control a thermal zone's window and door openings,
+      \memo both exterior and interior.
+  A1, \field Handle
+      \type handle
+      \required-field
+  A2, \field Zone Name
+      \required-field
+      \reference AirFlowNetworkMultizoneZones
+      \type object-list
+      \object-list ZoneNames
+      \note Enter the zone name where ventilation control is required.
+  A3, \field Ventilation Control Mode
+      \type choice
+      \key Temperature
+      \key Enthalpy
+      \key Constant
+      \key ASHRAE55Adaptive
+      \key CEN15251Adaptive
+      \key NoVent
+      \default NoVent
+      \note When Ventilation Control Mode = Temperature or Enthalpy, the following
+      \note fields are used to modulate the Ventilation Open Factor for all
+      \note window and door openings in the zone according to the zone's
+      \note indoor-outdoor temperature or enthalpy difference.
+      \note Constant: controlled by field Venting Schedule Name.
+      \note NoVent: control will not open window or door during simulation (Ventilation Open Factor = 0).
+  A4, \field Ventilation Control Zone Temperature Setpoint Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note Used only if Ventilation Control Mode = Temperature or Enthalpy.
+  N1, \field Minimum Venting Open Factor
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \maximum 1.0
+      \default 0.0
+      \note Used only if Ventilation Control Mode = Temperature or Enthalpy.
+  N2, \field Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+      \type real
+      \units deltaC
+      \minimum 0.0
+      \maximum< 100.0
+      \default 0.0
+      \note Applicable only if Ventilation Control Mode = Temperature.
+      \note This value must be less than the corresponding upper value (next field).
+  N3, \field Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+      \type real
+      \units deltaC
+      \minimum> 0.0
+      \default 100.0
+      \note Applicable only if Ventilation Control Mode = Temperature.
+      \note This value must be greater than the corresponding lower value (previous field).
+  N4, \field Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+      \type real
+      \units deltaJ/kg
+      \minimum 0.0
+      \maximum< 300000.0
+      \default 0.0
+      \note Applicable only if Ventilation Control Mode = Enthalpy.
+      \note This value must be less than the corresponding upper value (next field).
+  N5, \field Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+      \type real
+      \units deltaJ/kg
+      \minimum> 0.0
+      \default 300000.0
+      \note Applicable only if Ventilation Control Mode = Enthalpy.
+      \note This value must be greater than the corresponding lower value (previous field).
+  A5, \field Venting Availability Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note Non-zero Schedule value means venting is allowed if other venting control conditions are
+      \note satisfied. A zero (or negative) Schedule value means venting is not allowed under any
+      \note The Schedule values should be greater than or equal to 0 and less than or equal to 1.
+      \note circumstances. If this Schedule is not specified then venting is allowed if
+      \note other venting control conditions are satisfied.
+      \note Not used if Ventilation Control Mode = NoVent.
+  A6, \field Single Sided Wind Pressure Coefficient Algorithm
+      \type choice
+      \key Advanced
+      \key Standard
+      \default Standard
+      \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
+      \note to account for wind direction and turbulence effects on single sided ventilation rates.
+      \note Model is only valid for zones with 2 openings, both of which are on a single facade.
+  N6, \field Facade Width
+      \type real
+      \units m
+      \minimum 0.0
+      \default 10.0
+      \note This is the whole building width along the direction of the facade of this zone.
+  A7; \field Occupant Ventilation Control Name
+      \type object-list
+      \object-list AirflowNetworkOccupantVentilationControlNames
+      \note Enter the name where Occupancy Ventilation Control is required.
+
+OS:AirflowNetwork:MultiZoneSurface,
+      \min-fields 5
+      \memo This object specifies the properties of a surface linkage through which air flows.
+      \memo Airflow Report: Node 1 as an inside face zone;
+      \memo Node 2 as an outside face zone or external node.
+  A1, \field Handle
+      \type handle
+      \required-field
+  A2, \field Surface Name
+      \required-field
+      \type object-list
+      \object-list SurfAndSubSurfNames
+      \note Enter the name of a heat transfer surface.
+  A3, \field Leakage Component Name
+      \required-field
+      \type object-list
+      \object-list SurfaceAirflowLeakageNames
+      \note Enter the name of an Airflow Network leakage component. A leakage component is
+      \note one of the following AirflowNetwork:Multizone objects:
+      \note AirflowNetwork:MultiZone:Component:DetailedOpening,
+      \note AirflowNetwork:MultiZone:Component:SimpleOpening,
+      \note AirflowNetwork:MultiZone:Surface:Crack,
+      \note AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+      \note AirflowNetwork:MultiZone:Component:HorizontalOpening, or
+      \note AirflowNetwork:MultiZone:Component:ZoneExhaustFan.
+      \note When the zone exhaust fan name is entered, any surface control fields below A3 are
+      \note ignored when the zone exhaust fan turns on.
+  A4, \field External Node Name
+      \type object-list
+      \object-list ExternalNodeNames
+      \note Used if Wind Pressure Coefficient Type = Input in the AirflowNetwork:SimulationControl object,
+      \note otherwise this field may be left blank.
+  N1, \field Window/Door Opening Factor, or Crack Factor
+      \required-field
+      \type real
+      \units dimensionless
+      \minimum> 0.0
+      \maximum 1.0
+      \default 1.0
+      \note This field specifies a multiplier for a crack, window, or door.
+  A5, \field Ventilation Control Mode
+      \type choice
+      \key Temperature
+      \key Enthalpy
+      \key Constant
+      \key ASHRAE55Adaptive
+      \key CEN15251Adaptive
+      \key NoVent
+      \key ZoneLevel
+      \key AdjacentTemperature
+      \key AdjacentEnthalpy
+      \default ZoneLevel
+      \note When Ventilation Control Mode = Temperature or Enthalpy, the following
+      \note fields are used to modulate the Ventilation Open Factor for a
+      \note window or door opening according to the parent zone's
+      \note indoor-outdoor temperature or enthalpy difference.
+      \note When Ventilation Control Mode = AdjacentTemperature or AdjacentEnthalpy, the following
+      \note fields are used to modulate the Ventilation Open Factor for an interior
+      \note window or door opening according to temperature or enthalpy difference
+      \note between the parent zone and the adjacent zone.
+      \note Constant: controlled by field Venting Schedule Name.
+      \note NoVent: control will not open window or door during simulation (Ventilation Open Factor = 0).
+      \note ZoneLevel: control will be controlled by AirflowNetwork:MultiZone:Zone
+      \note Mode.
+  A6, \field Ventilation Control Zone Temperature Setpoint Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note Used only if Ventilation Control Mode = Temperature or Enthalpy.
+  N2, \field Minimum Venting Open Factor
+      \type real
+      \units dimensionless
+      \minimum 0.0
+      \maximum 1.0
+      \default 0.0
+      \note Used only if Ventilation Control Mode = Temperature or Enthalpy.
+  N3, \field Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+      \note Applicable only if Ventilation Control Mode = Temperature
+      \type real
+      \units deltaC
+      \minimum 0.0
+      \maximum< 100
+      \default 0.0
+  N4, \field Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+      \type real
+      \units deltaC
+      \minimum> 0.0
+      \default 100.0
+      \note Applicable only if Ventilation Control Mode = Temperature.
+      \note This value must be greater than the corresponding lower value (previous field).
+  N5, \field Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+      \type real
+      \units deltaJ/kg
+      \minimum 0.0
+      \maximum< 300000.0
+      \default 0.0
+      \note Applicable only if Ventilation Control Mode = Enthalpy.
+      \note This value must be less than the corresponding upper value (next field).
+  N6, \field Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+      \type real
+      \units deltaJ/kg
+      \minimum> 0.0
+      \default 300000.0
+      \note Applicable only if Ventilation Control Mode = Enthalpy.
+      \note This value must be greater than the corresponding lower value (previous field).
+  A7, \field Venting Availability Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note Non-zero schedule value means venting is allowed if other venting control conditions are
+      \note satisfied. A zero (or negative) schedule value means venting is not allowed under any
+      \note circumstances. The schedule values should be greater than or equal to 0 and less than or
+      \note equal to 1. If this schedule is not specified then venting is allowed if
+      \note other venting control conditions are satisfied.
+      \note Not used if Ventilation Control Mode = NoVent or ZoneLevel.
+  A8; \field Occupant Ventilation Control Name
+      \type object-list
+      \object-list AirflowNetworkOccupantVentilationControlNames
+      \note Enter the name where Occupancy Ventilation Control is required
+
+OS:AirflowNetwork:MultiZoneSurfaceCrack,
        \min-fields 3
        \memo This object specifies the properties of airflow through a crack.
   A1, \field Handle
@@ -25729,7 +25944,7 @@ OS:AirflowNetworkMultiZoneSurfaceCrack,
        \default 0
        \note The reference humidity ratio under which the surface crack data were obtained.
 
-OS:AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea,
+OS:AirflowNetwork:MultiZoneSurfaceEffectiveLeakageArea,
        \min-fields 6
        \memo This object is used to define surface air leakage.
   A1, \field Handle
@@ -25766,7 +25981,7 @@ OS:AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea,
        \maximum 1.0
        \note The exponent used in the air mass flow equation.
 
-OS:AirflowNetworkMultiZoneComponentSimpleOpening,
+OS:AirflowNetwork:MultiZoneComponentSimpleOpening,
        \min-fields 6
        \memo This object specifies the properties of air flow through windows and doors (window, door and
        \memo glass door heat transfer subsurfaces) when they are closed or open.
@@ -25809,7 +26024,7 @@ OS:AirflowNetworkMultiZoneComponentSimpleOpening,
        \note The Discharge Coefficient indicates the fractional effectiveness
        \note for air flow through a window or door at that Opening Factor
 
-OS:AirflowNetworkMultiZoneComponentDetailedOpening,
+OS:AirflowNetwork:MultiZoneComponentDetailedOpening,
        \min-fields 17
        \extensible:5
        \memo This object specifies the properties of airflow through windows and doors (window, door and
@@ -25901,7 +26116,7 @@ OS:AirflowNetworkMultiZoneComponentDetailedOpening,
        \note Factor must be less than 1.0 in order to have the opening within the window or door
        \note dimensions.
 
-OS:AirflowNetworkMultiZoneComponentHorizontalOpening,
+OS:AirflowNetwork:MultiZoneComponentHorizontalOpening,
       \min-fields 6
       \memo This object specifies the properties of air flow through a horizontal opening
   A1, \field Handle

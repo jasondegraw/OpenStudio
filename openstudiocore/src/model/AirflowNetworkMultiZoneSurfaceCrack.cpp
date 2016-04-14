@@ -218,7 +218,7 @@ AirflowNetworkMultiZoneSurfaceCrack::AirflowNetworkMultiZoneSurfaceCrack(const M
 
 IddObjectType AirflowNetworkMultiZoneSurfaceCrack::iddObjectType()
 {
-  return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneSurfaceCrack);
+  return IddObjectType(IddObjectType::OS_AirflowNetwork_MultiZoneSurfaceCrack);
 }
 
 double AirflowNetworkMultiZoneSurfaceCrack::airMassFlowCoefficient() const

@@ -161,7 +161,7 @@ AirflowNetworkMultiZoneComponentHorizontalOpening::AirflowNetworkMultiZoneCompon
 }
 
 IddObjectType AirflowNetworkMultiZoneComponentHorizontalOpening::iddObjectType() {
-  return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneComponentHorizontalOpening);
+  return IddObjectType(IddObjectType::OS_AirflowNetwork_MultiZoneComponentHorizontalOpening);
 }
 
 double AirflowNetworkMultiZoneComponentHorizontalOpening::airMassFlowCoefficientWhenOpeningisClosed() const {

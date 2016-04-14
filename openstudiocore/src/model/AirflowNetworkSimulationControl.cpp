@@ -480,7 +480,7 @@ AirflowNetworkSimulationControl::AirflowNetworkSimulationControl(std::shared_ptr
 {}
 
 IddObjectType AirflowNetworkSimulationControl::iddObjectType() {
-  return IddObjectType(IddObjectType::OS_AirflowNetworkSimulationControl);
+  return IddObjectType(IddObjectType::OS_AirflowNetwork_SimulationControl);
 }
 
 /*

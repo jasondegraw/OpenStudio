@@ -155,7 +155,7 @@ AirflowNetworkMultiZoneComponentSimpleOpening::AirflowNetworkMultiZoneComponentS
 
 
 IddObjectType AirflowNetworkMultiZoneComponentSimpleOpening::iddObjectType() {
-  return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneComponentSimpleOpening);
+  return IddObjectType(IddObjectType::OS_AirflowNetwork_MultiZoneComponentSimpleOpening);
 }
 
 double AirflowNetworkMultiZoneComponentSimpleOpening::airMassFlowCoefficientWhenOpeningisClosed() const {

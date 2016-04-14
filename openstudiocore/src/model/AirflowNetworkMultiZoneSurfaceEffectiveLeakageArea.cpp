@@ -181,7 +181,7 @@ AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::AirflowNetworkMultiZoneSurfa
 
 IddObjectType AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::iddObjectType()
 {
-  return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
+  return IddObjectType(IddObjectType::OS_AirflowNetwork_MultiZoneSurfaceEffectiveLeakageArea);
 }
 
 double AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea::effectiveLeakageArea() const

@@ -44,6 +44,9 @@ set(${target_name}_src
   AirflowNetworkMultiZoneComponentSimpleOpening.hpp
   AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentSimpleOpening.cpp
+  AirflowNetworkMultiZoneSurface.hpp
+  AirflowNetworkMultiZoneSurface_Impl.hpp
+  AirflowNetworkMultiZoneSurface.cpp
   AirflowNetworkMultiZoneSurfaceCrack.hpp
   AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp
   AirflowNetworkMultiZoneSurfaceCrack.cpp

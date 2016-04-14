@@ -310,7 +310,7 @@ AirflowNetworkMultiZoneComponentDetailedOpening::AirflowNetworkMultiZoneComponen
 
 IddObjectType AirflowNetworkMultiZoneComponentDetailedOpening::iddObjectType()
 {
-  return IddObjectType(IddObjectType::OS_AirflowNetworkMultiZoneComponentDetailedOpening);
+  return IddObjectType(IddObjectType::OS_AirflowNetwork_MultiZoneComponentDetailedOpening);
 }
 
 std::vector<std::string> AirflowNetworkMultiZoneComponentDetailedOpening::typeofRectangularLargeVerticalOpeningValues()
