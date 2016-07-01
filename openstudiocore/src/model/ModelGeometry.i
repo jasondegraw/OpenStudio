@@ -96,6 +96,7 @@ UNIQUEMODELOBJECT_TEMPLATES(Building);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentDetailedOpening);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentHorizontalOpening);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentSimpleOpening);
+MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurface);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceCrack);
 MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
 MODELOBJECT_TEMPLATES(BuildingStory);

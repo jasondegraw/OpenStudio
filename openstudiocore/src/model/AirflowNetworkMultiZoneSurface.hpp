@@ -28,11 +28,12 @@ namespace openstudio {
 namespace model {
 
 // TODO: Check the following class names against object getters and setters.
-class SurfAndSubSurf;
+//class SurfAndSubSurf;
+class Surface;
 class SurfaceAirflowLeakage;
 class ExternalNode;
 class Schedule;
-class Schedule;
+//class Schedule;
 class AirflowNetworkOccupantVentilationControl;
 
 namespace detail {
@@ -43,11 +44,11 @@ namespace detail {
 
 /** AirflowNetworkMultiZoneSurface is a ModelObject that wraps the OpenStudio IDD object 'OS:AirflowNetwork:MultiZoneSurface'. */
 class MODEL_API AirflowNetworkMultiZoneSurface : public ModelObject {
- public:
+public:
   /** @name Constructors and Destructors */
   //@{
 
-  explicit AirflowNetworkMultiZoneSurface(const Model& model);
+  AirflowNetworkMultiZoneSurface(const Model& model, const Surface &surface);
 
   virtual ~AirflowNetworkMultiZoneSurface() {}
 
@@ -61,13 +62,13 @@ class MODEL_API AirflowNetworkMultiZoneSurface : public ModelObject {
   //@{
 
   // TODO: Check return type. From object lists, some candidates are: SurfAndSubSurf.
-  SurfAndSubSurf surface() const;
+  Surface surface() const;
 
   // TODO: Check return type. From object lists, some candidates are: SurfaceAirflowLeakage.
   SurfaceAirflowLeakage leakageComponent() const;
 
   // TODO: Check return type. From object lists, some candidates are: ExternalNode.
-  boost::optional<ExternalNode> externalNode() const;
+  //boost::optional<ExternalNode> externalNode() const;
 
   double windowDoorOpeningFactorOrCrackFactor() const;
 
@@ -111,15 +112,15 @@ class MODEL_API AirflowNetworkMultiZoneSurface : public ModelObject {
   //@{
 
   // TODO: Check argument type. From object lists, some candidates are: SurfAndSubSurf.
-  bool setSurface(const SurfAndSubSurf& surfAndSubSurf);
+  bool setSurface(const Surface& surface);
 
   // TODO: Check argument type. From object lists, some candidates are: SurfaceAirflowLeakage.
   bool setLeakageComponent(const SurfaceAirflowLeakage& surfaceAirflowLeakage);
 
   // TODO: Check argument type. From object lists, some candidates are: ExternalNode.
-  bool setExternalNode(const ExternalNode& externalNode);
+  //bool setExternalNode(const ExternalNode& externalNode);
 
-  void resetExternalNode();
+  //void resetExternalNode();
 
   bool setWindowDoorOpeningFactorOrCrackFactor(double windowDoorOpeningFactorOrCrackFactor);
 
@@ -169,7 +170,7 @@ class MODEL_API AirflowNetworkMultiZoneSurface : public ModelObject {
   //@{
 
   //@}
- protected:
+protected:
   /// @cond
   typedef detail::AirflowNetworkMultiZoneSurface_Impl ImplType;
 
@@ -180,7 +181,7 @@ class MODEL_API AirflowNetworkMultiZoneSurface : public ModelObject {
   friend class IdfObject;
   friend class openstudio::detail::IdfObject_Impl;
   /// @endcond
- private:
+private:
   REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurface");
 };
 
