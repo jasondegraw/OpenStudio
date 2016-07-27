@@ -329,6 +329,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(ElectricLoadCenterDistribution);
     REGISTER_CONSTRUCTOR(ElectricLoadCenterInverterLookUpTable);
     REGISTER_CONSTRUCTOR(ElectricLoadCenterInverterSimple);
+    REGISTER_CONSTRUCTOR(ElectricLoadCenterStorageSimple);
     REGISTER_CONSTRUCTOR(EvaporativeCoolerDirectResearchSpecial);
     REGISTER_CONSTRUCTOR(EvaporativeCoolerIndirectResearchSpecial);
     REGISTER_CONSTRUCTOR(EvaporativeFluidCoolerSingleSpeed);
@@ -339,7 +340,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(FanConstantVolume);
     REGISTER_CONSTRUCTOR(FanOnOff);
     REGISTER_CONSTRUCTOR(FanVariableVolume);
-    REGISTER_CONSTRUCTOR(FanZoneExhaust);    
+    REGISTER_CONSTRUCTOR(FanZoneExhaust);
     REGISTER_CONSTRUCTOR(FFactorGroundFloorConstruction);
     REGISTER_CONSTRUCTOR(FluidCoolerSingleSpeed);
     REGISTER_CONSTRUCTOR(FluidCoolerTwoSpeed);
@@ -347,6 +348,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(GasEquipment);
     REGISTER_CONSTRUCTOR(GasEquipmentDefinition);
     REGISTER_CONSTRUCTOR(GasMixture);
+    REGISTER_CONSTRUCTOR(GeneratorMicroTurbine);
+    REGISTER_CONSTRUCTOR(GeneratorMicroTurbineHeatRecovery);
     REGISTER_CONSTRUCTOR(GeneratorPhotovoltaic);
     REGISTER_CONSTRUCTOR(GlareSensor);
     REGISTER_CONSTRUCTOR(GroundHeatExchangerHorizontalTrench);
@@ -379,13 +382,16 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(LightsDefinition)
     REGISTER_CONSTRUCTOR(Luminaire);
     REGISTER_CONSTRUCTOR(LuminaireDefinition);
+    REGISTER_CONSTRUCTOR(MaterialPropertyGlazingSpectralData);
     REGISTER_CONSTRUCTOR(MasslessOpaqueMaterial);
-    REGISTER_CONSTRUCTOR(Meter);
+    REGISTER_CONSTRUCTOR(MeterCustom);
+    REGISTER_CONSTRUCTOR(MeterCustomDecrement);
     REGISTER_CONSTRUCTOR(ModelObjectList);
     REGISTER_CONSTRUCTOR(Node);
     REGISTER_CONSTRUCTOR(OtherEquipment);
     REGISTER_CONSTRUCTOR(OtherEquipmentDefinition);
     REGISTER_CONSTRUCTOR(OutputControlReportingTolerances);
+    REGISTER_CONSTRUCTOR(OutputMeter);
     REGISTER_CONSTRUCTOR(OutputVariable);
     REGISTER_CONSTRUCTOR(OutsideSurfaceConvectionAlgorithm);
     REGISTER_CONSTRUCTOR(People);
@@ -476,6 +482,9 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(Site);
     REGISTER_CONSTRUCTOR(SiteGroundReflectance);
     REGISTER_CONSTRUCTOR(SiteGroundTemperatureBuildingSurface);
+    REGISTER_CONSTRUCTOR(SiteGroundTemperatureDeep);
+    REGISTER_CONSTRUCTOR(SiteGroundTemperatureShallow);
+    REGISTER_CONSTRUCTOR(SiteGroundTemperatureFCfactorMethod);
     REGISTER_CONSTRUCTOR(SiteWaterMainsTemperature);
     REGISTER_CONSTRUCTOR(SizingParameters);
     REGISTER_CONSTRUCTOR(SizingPlant);
@@ -540,8 +549,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(ZoneControlHumidistat);
     REGISTER_CONSTRUCTOR(ZoneControlThermostatStagedDualSetpoint);
     REGISTER_CONSTRUCTOR(ZoneHVACEquipmentList);
-    REGISTER_CONSTRUCTOR(ZoneHVACBaseboardConvectiveElectric);  
-    REGISTER_CONSTRUCTOR(ZoneHVACBaseboardConvectiveWater);  
+    REGISTER_CONSTRUCTOR(ZoneHVACBaseboardConvectiveElectric);
+    REGISTER_CONSTRUCTOR(ZoneHVACBaseboardConvectiveWater);
     REGISTER_CONSTRUCTOR(ZoneHVACIdealLoadsAirSystem);
     REGISTER_CONSTRUCTOR(ZoneHVACFourPipeFanCoil);
     REGISTER_CONSTRUCTOR(ZoneHVACHighTemperatureRadiant);
@@ -737,6 +746,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(ElectricLoadCenterDistribution);
     REGISTER_COPYCONSTRUCTORS(ElectricLoadCenterInverterLookUpTable);
     REGISTER_COPYCONSTRUCTORS(ElectricLoadCenterInverterSimple);
+    REGISTER_COPYCONSTRUCTORS(ElectricLoadCenterStorageSimple);
     REGISTER_COPYCONSTRUCTORS(EvaporativeCoolerDirectResearchSpecial);
     REGISTER_COPYCONSTRUCTORS(EvaporativeCoolerIndirectResearchSpecial);
     REGISTER_COPYCONSTRUCTORS(EvaporativeFluidCoolerSingleSpeed);
@@ -747,7 +757,7 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(FanConstantVolume);
     REGISTER_COPYCONSTRUCTORS(FanOnOff);
     REGISTER_COPYCONSTRUCTORS(FanVariableVolume);
-    REGISTER_COPYCONSTRUCTORS(FanZoneExhaust);    
+    REGISTER_COPYCONSTRUCTORS(FanZoneExhaust);
     REGISTER_COPYCONSTRUCTORS(FFactorGroundFloorConstruction);
     REGISTER_COPYCONSTRUCTORS(FluidCoolerSingleSpeed);
     REGISTER_COPYCONSTRUCTORS(FluidCoolerTwoSpeed);
@@ -755,6 +765,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(GasEquipment);
     REGISTER_COPYCONSTRUCTORS(GasEquipmentDefinition);
     REGISTER_COPYCONSTRUCTORS(GasMixture);
+    REGISTER_COPYCONSTRUCTORS(GeneratorMicroTurbine);
+    REGISTER_COPYCONSTRUCTORS(GeneratorMicroTurbineHeatRecovery);
     REGISTER_COPYCONSTRUCTORS(GeneratorPhotovoltaic);
     REGISTER_COPYCONSTRUCTORS(GlareSensor);
     REGISTER_COPYCONSTRUCTORS(GroundHeatExchangerHorizontalTrench);
@@ -787,13 +799,16 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(LightsDefinition);
     REGISTER_COPYCONSTRUCTORS(Luminaire);
     REGISTER_COPYCONSTRUCTORS(LuminaireDefinition);
+    REGISTER_COPYCONSTRUCTORS(MaterialPropertyGlazingSpectralData);
     REGISTER_COPYCONSTRUCTORS(MasslessOpaqueMaterial);
-    REGISTER_COPYCONSTRUCTORS(Meter);
+    REGISTER_COPYCONSTRUCTORS(MeterCustom);
+    REGISTER_COPYCONSTRUCTORS(MeterCustomDecrement);
     REGISTER_COPYCONSTRUCTORS(ModelObjectList);
     REGISTER_COPYCONSTRUCTORS(Node);
     REGISTER_COPYCONSTRUCTORS(OtherEquipment);
     REGISTER_COPYCONSTRUCTORS(OtherEquipmentDefinition);
     REGISTER_COPYCONSTRUCTORS(OutputControlReportingTolerances);
+    REGISTER_COPYCONSTRUCTORS(OutputMeter);
     REGISTER_COPYCONSTRUCTORS(OutputVariable);
     REGISTER_COPYCONSTRUCTORS(OutsideSurfaceConvectionAlgorithm);
     REGISTER_COPYCONSTRUCTORS(People);
@@ -884,6 +899,9 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(Site);
     REGISTER_COPYCONSTRUCTORS(SiteGroundReflectance);
     REGISTER_COPYCONSTRUCTORS(SiteGroundTemperatureBuildingSurface);
+    REGISTER_COPYCONSTRUCTORS(SiteGroundTemperatureDeep);
+    REGISTER_COPYCONSTRUCTORS(SiteGroundTemperatureShallow);
+    REGISTER_COPYCONSTRUCTORS(SiteGroundTemperatureFCfactorMethod);
     REGISTER_COPYCONSTRUCTORS(SiteWaterMainsTemperature);
     REGISTER_COPYCONSTRUCTORS(SizingParameters);
     REGISTER_COPYCONSTRUCTORS(SizingPlant);
@@ -1094,7 +1112,7 @@ if (_className::iddObjectType() == typeToCreate) { \
       {
         if( istringEqual(name.get(),alwaysOffName) )
         {
-          if( equal<double>(schedule.value(),1.0) )
+          if( equal<double>(schedule.value(),0.0) )
           {
             if( boost::optional<ScheduleTypeLimits> limits = schedule.scheduleTypeLimits() )
             {
@@ -1800,6 +1818,21 @@ void addExampleModelObjects(Model& model)
   groundTemp.setNovemberGroundTemperature(19.802);
   groundTemp.setDecemberGroundTemperature(19.633);
 
+  // add SiteGroundTemperatureDeep
+  SiteGroundTemperatureDeep groundTempDeep = model.getUniqueModelObject<SiteGroundTemperatureDeep>();
+  groundTempDeep.setJanuaryDeepGroundTemperature(19.527);
+  groundTempDeep.setFebruaryDeepGroundTemperature(19.502);
+  groundTempDeep.setMarchDeepGroundTemperature(19.536);
+  groundTempDeep.setAprilDeepGroundTemperature(19.598);
+  groundTempDeep.setMayDeepGroundTemperature(20.002);
+  groundTempDeep.setJuneDeepGroundTemperature(21.640);
+  groundTempDeep.setJulyDeepGroundTemperature(22.225);
+  groundTempDeep.setAugustDeepGroundTemperature(22.375);
+  groundTempDeep.setSeptemberDeepGroundTemperature(21.449);
+  groundTempDeep.setOctoberDeepGroundTemperature(20.121);
+  groundTempDeep.setNovemberDeepGroundTemperature(19.802);
+  groundTempDeep.setDecemberDeepGroundTemperature(19.633);
+
   // add SiteWaterMainsTemperature
   SiteWaterMainsTemperature waterTemp = model.getUniqueModelObject<SiteWaterMainsTemperature>();
   waterTemp.setAnnualAverageOutdoorAirTemperature(9.69);
@@ -2172,17 +2205,17 @@ void addExampleModelObjects(Model& model)
   }
 
   // add some meters
-  Meter electricityMeter(model);
+  OutputMeter electricityMeter(model);
   electricityMeter.setFuelType(FuelType(FuelType::Electricity));
   electricityMeter.setReportingFrequency(ReportingFrequency(ReportingFrequency::Hourly).valueName());
   electricityMeter.setInstallLocationType(InstallLocationType(InstallLocationType::Facility));
 
-  Meter gasMeter(model);
+  OutputMeter gasMeter(model);
   gasMeter.setFuelType(FuelType(FuelType::Gas));
   gasMeter.setReportingFrequency(ReportingFrequency(ReportingFrequency::Hourly).valueName());
   gasMeter.setInstallLocationType(InstallLocationType(InstallLocationType::Facility));
 
-  Meter propaneMeter(model);
+  OutputMeter propaneMeter(model);
   propaneMeter.setFuelType(FuelType(FuelType::Propane));
   propaneMeter.setReportingFrequency(ReportingFrequency(ReportingFrequency::Hourly).valueName());
   propaneMeter.setInstallLocationType(InstallLocationType(InstallLocationType::Facility));

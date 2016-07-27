@@ -452,6 +452,9 @@ set(${target_name}_src
   Duct.hpp
   Duct_Impl.hpp
   Duct.cpp
+  ElectricalStorage.hpp
+  ElectricalStorage_Impl.hpp
+  ElectricalStorage.cpp
   ElectricEquipment.hpp
   ElectricEquipment_Impl.hpp
   ElectricEquipment.cpp
@@ -467,6 +470,9 @@ set(${target_name}_src
   ElectricLoadCenterInverterSimple.hpp
   ElectricLoadCenterInverterSimple_Impl.hpp
   ElectricLoadCenterInverterSimple.cpp
+  ElectricLoadCenterStorageSimple.hpp
+  ElectricLoadCenterStorageSimple_Impl.hpp
+  ElectricLoadCenterStorageSimple.cpp
   EvaporativeCoolerDirectResearchSpecial.hpp
   EvaporativeCoolerDirectResearchSpecial_Impl.hpp
   EvaporativeCoolerDirectResearchSpecial.cpp
@@ -511,7 +517,7 @@ set(${target_name}_src
   FluidCoolerSingleSpeed.cpp
   FluidCoolerTwoSpeed.hpp
   FluidCoolerTwoSpeed_Impl.hpp
-  FluidCoolerTwoSpeed.cpp 
+  FluidCoolerTwoSpeed.cpp
   Gas.hpp
   Gas_Impl.hpp
   Gas.cpp
@@ -529,10 +535,16 @@ set(${target_name}_src
   GasMixture.cpp
   Generator.hpp
   Generator_Impl.hpp
-  Generator.cpp 
+  Generator.cpp
+  GeneratorMicroTurbine.hpp
+  GeneratorMicroTurbine_Impl.hpp
+  GeneratorMicroTurbine.cpp
+  GeneratorMicroTurbineHeatRecovery.hpp
+  GeneratorMicroTurbineHeatRecovery_Impl.hpp
+  GeneratorMicroTurbineHeatRecovery.cpp
   GeneratorPhotovoltaic.hpp
   GeneratorPhotovoltaic_Impl.hpp
-  GeneratorPhotovoltaic.cpp  
+  GeneratorPhotovoltaic.cpp
   GlareSensor.hpp
   GlareSensor_Impl.hpp
   GlareSensor.cpp
@@ -606,7 +618,7 @@ set(${target_name}_src
   InteriorPartitionSurfaceGroup.cpp
   Inverter.hpp
   Inverter_Impl.hpp
-  Inverter.cpp  
+  Inverter.cpp
   LayeredConstruction.hpp
   LayeredConstruction_Impl.hpp
   LayeredConstruction.cpp
@@ -652,9 +664,15 @@ set(${target_name}_src
   Material.hpp
   Material_Impl.hpp
   Material.cpp
-  Meter.hpp
-  Meter_Impl.hpp
-  Meter.cpp
+  MaterialPropertyGlazingSpectralData.hpp
+  MaterialPropertyGlazingSpectralData_Impl.hpp
+  MaterialPropertyGlazingSpectralData.cpp
+  MeterCustom.hpp
+  MeterCustom_Impl.hpp
+  MeterCustom.cpp
+  MeterCustomDecrement.hpp
+  MeterCustomDecrement_Impl.hpp
+  MeterCustomDecrement.cpp
   Mixer.hpp
   Mixer_Impl.hpp
   Mixer.cpp
@@ -676,6 +694,9 @@ set(${target_name}_src
   OutputControlReportingTolerances.hpp
   OutputControlReportingTolerances_Impl.hpp
   OutputControlReportingTolerances.cpp
+  OutputMeter.hpp
+  OutputMeter_Impl.hpp
+  OutputMeter.cpp
   OutputVariable.hpp
   OutputVariable_Impl.hpp
   OutputVariable.cpp
@@ -982,6 +1003,15 @@ set(${target_name}_src
   SiteGroundTemperatureBuildingSurface.hpp
   SiteGroundTemperatureBuildingSurface_Impl.hpp
   SiteGroundTemperatureBuildingSurface.cpp
+  SiteGroundTemperatureDeep.hpp
+  SiteGroundTemperatureDeep_Impl.hpp
+  SiteGroundTemperatureDeep.cpp
+  SiteGroundTemperatureShallow.hpp
+  SiteGroundTemperatureShallow_Impl.hpp
+  SiteGroundTemperatureShallow.cpp
+  SiteGroundTemperatureFCfactorMethod.hpp
+  SiteGroundTemperatureFCfactorMethod_Impl.hpp
+  SiteGroundTemperatureFCfactorMethod.cpp
   SiteWaterMainsTemperature.hpp
   SiteWaterMainsTemperature_Impl.hpp
   SiteWaterMainsTemperature.cpp
@@ -1005,7 +1035,7 @@ set(${target_name}_src
   SkyTemperature.cpp
   SolarCollectorFlatPlatePhotovoltaicThermal.hpp
   SolarCollectorFlatPlatePhotovoltaicThermal_Impl.hpp
-  SolarCollectorFlatPlatePhotovoltaicThermal.cpp  
+  SolarCollectorFlatPlatePhotovoltaicThermal.cpp
   SolarCollectorFlatPlateWater.hpp
   SolarCollectorFlatPlateWater_Impl.hpp
   SolarCollectorFlatPlateWater.cpp
@@ -1017,10 +1047,10 @@ set(${target_name}_src
   SolarCollectorPerformanceFlatPlate.cpp
   SolarCollectorPerformanceIntegralCollectorStorage.hpp
   SolarCollectorPerformanceIntegralCollectorStorage_Impl.hpp
-  SolarCollectorPerformanceIntegralCollectorStorage.cpp  
+  SolarCollectorPerformanceIntegralCollectorStorage.cpp
   SolarCollectorPerformancePhotovoltaicThermalSimple.hpp
   SolarCollectorPerformancePhotovoltaicThermalSimple_Impl.hpp
-  SolarCollectorPerformancePhotovoltaicThermalSimple.cpp  
+  SolarCollectorPerformancePhotovoltaicThermalSimple.cpp
   Space.hpp
   Space_Impl.hpp
   Space.cpp
@@ -1263,7 +1293,7 @@ set(${target_name}_src
   ZoneHVACWaterToAirHeatPump.cpp
   ZoneMixing.hpp
   ZoneMixing_Impl.hpp
-  ZoneMixing.cpp  
+  ZoneMixing.cpp
   ZoneVentilationDesignFlowRate.hpp
   ZoneVentilationDesignFlowRate_Impl.hpp
   ZoneVentilationDesignFlowRate.cpp
@@ -1382,11 +1412,11 @@ set(${target_name}_moc
   LuminaireDefinition_Impl.hpp
   MasslessOpaqueMaterial_Impl.hpp
   Material_Impl.hpp
-  Meter_Impl.hpp
   OpaqueMaterial_Impl.hpp
   OtherEquipment_Impl.hpp
   OtherEquipmentDefinition_Impl.hpp
   OutputControlReportingTolerances_Impl.hpp
+  OutputMeter_Impl.hpp
   OutputVariable_Impl.hpp
   OutsideSurfaceConvectionAlgorithm_Impl.hpp
   ParentObject_Impl.hpp
@@ -1420,7 +1450,6 @@ set(${target_name}_moc
   SimulationControl_Impl.hpp
   Site_Impl.hpp
   SiteGroundReflectance_Impl.hpp
-  SiteGroundTemperatureBuildingSurface_Impl.hpp
   SiteWaterMainsTemperature_Impl.hpp
   SizingParameters_Impl.hpp
   SizingPlant_Impl.hpp
@@ -1591,6 +1620,7 @@ set(${target_name}_test_src
   test/ElectricLoadCenterDistribution_GTest.cpp
   test/ElectricLoadCenterInverterSimple_GTest.cpp
   test/ElectricLoadCenterInverterLookUpTable_GTest.cpp
+  test/ElectricLoadCenterStorageSimple_GTest.cpp
   test/EvaporativeCoolerDirectResearchSpecial_GTest.cpp
   test/EvaporativeCoolerIndirectResearchSpecial_GTest.cpp
   test/EvaporativeFluidCoolerSingleSpeed_GTest.cpp
@@ -1607,6 +1637,7 @@ set(${target_name}_test_src
   test/GasMixture_GTest.cpp
   test/Gas_GTest.cpp
   test/GeneratorPhotovoltaic_GTest.cpp
+  test/GeneratorMicroTurbine_GTest.cpp
   test/GlareSensor_GTest.cpp
   test/GroundHeatExchangerHorizontalTrench_GTest.cpp
   test/GroundHeatExchangerVertical_GTest.cpp
@@ -1631,7 +1662,9 @@ set(${target_name}_test_src
   test/Luminaire_GTest.cpp
   test/MasslessOpaqueMaterial_GTest.cpp
   test/Material_GTest.cpp
-  test/Meter_GTest.cpp
+  test/MaterialPropertyGlazingSpectralData_GTest.cpp
+  test/MeterCustom_GTest.cpp
+  test/MeterCustomDecrement_GTest.cpp
   test/ModelFixture.cpp
   test/ModelFixture.hpp
   test/ModelObject_GTest.cpp
@@ -1642,6 +1675,7 @@ set(${target_name}_test_src
   test/OpaqueMaterial_GTest.cpp
   test/OtherEquipment_GTest.cpp
   test/OutputControlReportingTolerances_GTest.cpp
+  test/OutputMeter_GTest.cpp
   test/OutputVariable_GTest.cpp
   test/ParentObject_GTest.cpp
   test/People_GTest.cpp
@@ -1721,6 +1755,10 @@ set(${target_name}_test_src
   test/SimpleGlazing_GTest.cpp
   test/SimulationControl_GTest.cpp
   test/Site_GTest.cpp
+  test/SiteGroundTemperatureDeep_GTest.cpp
+  test/SiteGroundTemperatureFCfactorMethod_GTest.cpp
+  test/SiteGroundTemperatureShallow_GTest.cpp
+  test/SiteGroundTemperatureBuildingSurface_GTest.cpp
   test/SizingPlant_GTest.cpp
   test/SizingSystem_GTest.cpp
   test/SizingZone_GTest.cpp
