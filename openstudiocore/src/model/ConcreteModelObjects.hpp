@@ -409,7 +409,7 @@
 #include "AirflowNetworkMultiZoneComponentDetailedOpening_Impl.hpp"
 #include "AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp"
 #include "AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp"
-#include "AirflowNetworkMultiZoneSurfaceCrack.hpp"
+#include "AirflowNetworkMultiZoneSurface_Impl.hpp"
 #include "AirflowNetworkMultiZoneSurfaceCrack_Impl.hpp"
 #include "AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea_Impl.hpp"
 #include "AirflowNetworkSimulationControl_Impl.hpp"

@@ -27,18 +27,17 @@ namespace openstudio {
 namespace model {
 
 // TODO: Check the following class names against object getters and setters.
-class SurfAndSubSurf;
-class SurfaceAirflowLeakage;
-class ExternalNode;
+class PlanarSurface;
+//class SurfaceAirflowLeakage;
+//class ExternalNode;
+//class Schedule;
 class Schedule;
-class Schedule;
-class AirflowNetworkOccupantVentilationControl;
+//class AirflowNetworkOccupantVentilationControl;
 
 namespace detail {
 
   /** AirflowNetworkMultiZoneSurface_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurface.*/
   class MODEL_API AirflowNetworkMultiZoneSurface_Impl : public ModelObject_Impl {
-    Q_OBJECT;
    public:
     /** @name Constructors and Destructors */
     //@{
@@ -72,13 +71,13 @@ namespace detail {
     //@{
 
     // TODO: Check return type. From object lists, some candidates are: SurfAndSubSurf.
-    SurfAndSubSurf surface() const;
+    PlanarSurface surface() const;
 
     // TODO: Check return type. From object lists, some candidates are: SurfaceAirflowLeakage.
-    SurfaceAirflowLeakage leakageComponent() const;
+    //SurfaceAirflowLeakage leakageComponent() const;
 
     // TODO: Check return type. From object lists, some candidates are: ExternalNode.
-    boost::optional<ExternalNode> externalNode() const;
+    //boost::optional<ExternalNode> externalNode() const;
 
     double windowDoorOpeningFactorOrCrackFactor() const;
 
@@ -115,22 +114,22 @@ namespace detail {
     boost::optional<Schedule> ventingAvailabilitySchedule() const;
 
     // TODO: Check return type. From object lists, some candidates are: AirflowNetworkOccupantVentilationControl.
-    boost::optional<AirflowNetworkOccupantVentilationControl> occupantVentilationControl() const;
+    //boost::optional<AirflowNetworkOccupantVentilationControl> occupantVentilationControl() const;
 
     //@}
     /** @name Setters */
     //@{
 
     // TODO: Check argument type. From object lists, some candidates are: SurfAndSubSurf.
-    bool setSurface(const SurfAndSubSurf& surfAndSubSurf);
+    bool setSurface(const PlanarSurface& surfAndSubSurf);
 
     // TODO: Check argument type. From object lists, some candidates are: SurfaceAirflowLeakage.
-    bool setLeakageComponent(const SurfaceAirflowLeakage& surfaceAirflowLeakage);
+    //bool setLeakageComponent(const SurfaceAirflowLeakage& surfaceAirflowLeakage);
 
     // TODO: Check argument type. From object lists, some candidates are: ExternalNode.
-    bool setExternalNode(const boost::optional<ExternalNode>& externalNode);
+    //bool setExternalNode(const boost::optional<ExternalNode>& externalNode);
 
-    void resetExternalNode();
+    //void resetExternalNode();
 
     bool setWindowDoorOpeningFactorOrCrackFactor(double windowDoorOpeningFactorOrCrackFactor);
 
@@ -171,9 +170,9 @@ namespace detail {
     void resetVentingAvailabilitySchedule();
 
     // TODO: Check argument type. From object lists, some candidates are: AirflowNetworkOccupantVentilationControl.
-    bool setOccupantVentilationControl(const boost::optional<AirflowNetworkOccupantVentilationControl>& airflowNetworkOccupantVentilationControl);
+    //bool setOccupantVentilationControl(const boost::optional<AirflowNetworkOccupantVentilationControl>& airflowNetworkOccupantVentilationControl);
 
-    void resetOccupantVentilationControl();
+    //void resetOccupantVentilationControl();
 
     //@}
     /** @name Other */
@@ -188,8 +187,8 @@ namespace detail {
     // Optional getters for use by methods like children() so can remove() if the constructor fails.
     // There are other ways for the public versions of these getters to fail--perhaps all required
     // objects should be returned as boost::optionals
-    boost::optional<SurfAndSubSurf> optionalSurface() const;
-    boost::optional<SurfaceAirflowLeakage> optionalLeakageComponent() const;
+    boost::optional<PlanarSurface> optionalSurface() const;
+    //boost::optional<SurfaceAirflowLeakage> optionalLeakageComponent() const;
   };
 
 } // detail

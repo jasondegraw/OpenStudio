@@ -140,6 +140,7 @@ SWIG_UNIQUEMODELOBJECT(Building);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentDetailedOpening, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentHorizontalOpening, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentSimpleOpening, 1);
+SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurface, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceCrack, 1);
 SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea, 1);
 SWIG_MODELOBJECT(BuildingStory, 1);

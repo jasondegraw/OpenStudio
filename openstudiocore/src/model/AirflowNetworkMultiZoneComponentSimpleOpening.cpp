@@ -21,7 +21,7 @@
 #include <model/AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp>
 
 #include <utilities/idd/IddEnums.hxx>
-#include <utilities/idd/OS_AirflowNetworkMultiZoneComponentSimpleOpening_FieldEnums.hxx>
+#include <utilities/idd/OS_AirflowNetwork_MultiZoneComponentSimpleOpening_FieldEnums.hxx>
 
 #include <utilities/units/Unit.hpp>
 
@@ -67,55 +67,55 @@ namespace detail {
   }
 
   double AirflowNetworkMultiZoneComponentSimpleOpening_Impl::airMassFlowCoefficientWhenOpeningisClosed() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   double AirflowNetworkMultiZoneComponentSimpleOpening_Impl::airMassFlowExponentWhenOpeningisClosed() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   bool AirflowNetworkMultiZoneComponentSimpleOpening_Impl::isAirMassFlowExponentWhenOpeningisClosedDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed);
+    return isEmpty(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed);
   }
 
   double AirflowNetworkMultiZoneComponentSimpleOpening_Impl::minimumDensityDifferenceforTwoWayFlow() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::MinimumDensityDifferenceforTwoWayFlow,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::MinimumDensityDifferenceforTwoWayFlow,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   double AirflowNetworkMultiZoneComponentSimpleOpening_Impl::dischargeCoefficient() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::DischargeCoefficient,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::DischargeCoefficient,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   bool AirflowNetworkMultiZoneComponentSimpleOpening_Impl::setAirMassFlowCoefficientWhenOpeningisClosed(double airMassFlowCoefficientWhenOpeningisClosed) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed, airMassFlowCoefficientWhenOpeningisClosed);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed, airMassFlowCoefficientWhenOpeningisClosed);
     return result;
   }
 
   bool AirflowNetworkMultiZoneComponentSimpleOpening_Impl::setAirMassFlowExponentWhenOpeningisClosed(double airMassFlowExponentWhenOpeningisClosed) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed, airMassFlowExponentWhenOpeningisClosed);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed, airMassFlowExponentWhenOpeningisClosed);
     return result;
   }
 
   void AirflowNetworkMultiZoneComponentSimpleOpening_Impl::resetAirMassFlowExponentWhenOpeningisClosed() {
-    bool result = setString(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed, "");
+    bool result = setString(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::AirMassFlowExponentWhenOpeningisClosed, "");
     OS_ASSERT(result);
   }
 
   bool AirflowNetworkMultiZoneComponentSimpleOpening_Impl::setMinimumDensityDifferenceforTwoWayFlow(double minimumDensityDifferenceforTwoWayFlow) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::MinimumDensityDifferenceforTwoWayFlow, minimumDensityDifferenceforTwoWayFlow);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::MinimumDensityDifferenceforTwoWayFlow, minimumDensityDifferenceforTwoWayFlow);
     return result;
   }
 
   bool AirflowNetworkMultiZoneComponentSimpleOpening_Impl::setDischargeCoefficient(double dischargeCoefficient) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentSimpleOpeningFields::DischargeCoefficient, dischargeCoefficient);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentSimpleOpeningFields::DischargeCoefficient, dischargeCoefficient);
     return result;
   }
 

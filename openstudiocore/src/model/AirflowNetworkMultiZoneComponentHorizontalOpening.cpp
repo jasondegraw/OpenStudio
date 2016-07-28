@@ -21,7 +21,7 @@
 #include <model/AirflowNetworkMultiZoneComponentHorizontalOpening_Impl.hpp>
 
 #include <utilities/idd/IddEnums.hxx>
-#include <utilities/idd/OS_AirflowNetworkMultiZoneComponentHorizontalOpening_FieldEnums.hxx>
+#include <utilities/idd/OS_AirflowNetwork_MultiZoneComponentHorizontalOpening_FieldEnums.hxx>
 
 #include <utilities/units/Unit.hpp>
 
@@ -67,64 +67,64 @@ namespace detail {
   }
 
   double AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::airMassFlowCoefficientWhenOpeningisClosed() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   double AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::airMassFlowExponentWhenOpeningisClosed() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   bool AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::isAirMassFlowExponentWhenOpeningisClosedDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed);
+    return isEmpty(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed);
   }
 
   double AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::slopingPlaneAngle() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   bool AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::isSlopingPlaneAngleDefaulted() const {
-    return isEmpty(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle);
+    return isEmpty(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle);
   }
 
   double AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::dischargeCoefficient() const {
-    boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::DischargeCoefficient,true);
+    boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::DischargeCoefficient,true);
     OS_ASSERT(value);
     return value.get();
   }
 
   bool AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::setAirMassFlowCoefficientWhenOpeningisClosed(double airMassFlowCoefficientWhenOpeningisClosed) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed, airMassFlowCoefficientWhenOpeningisClosed);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::AirMassFlowCoefficientWhenOpeningisClosed, airMassFlowCoefficientWhenOpeningisClosed);
     return result;
   }
 
   bool AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::setAirMassFlowExponentWhenOpeningisClosed(double airMassFlowExponentWhenOpeningisClosed) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed, airMassFlowExponentWhenOpeningisClosed);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed, airMassFlowExponentWhenOpeningisClosed);
     return result;
   }
 
   void AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::resetAirMassFlowExponentWhenOpeningisClosed() {
-    bool result = setString(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed, "");
+    bool result = setString(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::AirMassFlowExponentWhenOpeningisClosed, "");
     OS_ASSERT(result);
   }
 
   bool AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::setSlopingPlaneAngle(double slopingPlaneAngle) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle, slopingPlaneAngle);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle, slopingPlaneAngle);
     return result;
   }
 
   void AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::resetSlopingPlaneAngle() {
-    bool result = setString(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle, "");
+    bool result = setString(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::SlopingPlaneAngle, "");
     OS_ASSERT(result);
   }
 
   bool AirflowNetworkMultiZoneComponentHorizontalOpening_Impl::setDischargeCoefficient(double dischargeCoefficient) {
-    bool result = setDouble(OS_AirflowNetworkMultiZoneComponentHorizontalOpeningFields::DischargeCoefficient, dischargeCoefficient);
+    bool result = setDouble(OS_AirflowNetwork_MultiZoneComponentHorizontalOpeningFields::DischargeCoefficient, dischargeCoefficient);
     return result;
   }
 

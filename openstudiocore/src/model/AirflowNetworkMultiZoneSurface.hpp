@@ -29,16 +29,16 @@ namespace model {
 
 // TODO: Check the following class names against object getters and setters.
 //class SurfAndSubSurf;
-class Surface;
-class SurfaceAirflowLeakage;
-class ExternalNode;
+class PlanarSurface;
+//class SurfaceAirflowLeakage;
+//class ExternalNode;
 class Schedule;
 //class Schedule;
-class AirflowNetworkOccupantVentilationControl;
+//class AirflowNetworkOccupantVentilationControl;
 
 namespace detail {
 
-  class AirflowNetworkMultiZoneSurface_Impl;
+class AirflowNetworkMultiZoneSurface_Impl;
 
 } // detail
 
@@ -48,7 +48,7 @@ public:
   /** @name Constructors and Destructors */
   //@{
 
-  AirflowNetworkMultiZoneSurface(const Model& model, const Surface &surface);
+  AirflowNetworkMultiZoneSurface(const Model& model); // , const PlanarSurface &surface);
 
   virtual ~AirflowNetworkMultiZoneSurface() {}
 
@@ -62,10 +62,10 @@ public:
   //@{
 
   // TODO: Check return type. From object lists, some candidates are: SurfAndSubSurf.
-  Surface surface() const;
+  PlanarSurface surface() const;
 
   // TODO: Check return type. From object lists, some candidates are: SurfaceAirflowLeakage.
-  SurfaceAirflowLeakage leakageComponent() const;
+  //SurfaceAirflowLeakage leakageComponent() const;
 
   // TODO: Check return type. From object lists, some candidates are: ExternalNode.
   //boost::optional<ExternalNode> externalNode() const;
@@ -105,17 +105,17 @@ public:
   boost::optional<Schedule> ventingAvailabilitySchedule() const;
 
   // TODO: Check return type. From object lists, some candidates are: AirflowNetworkOccupantVentilationControl.
-  boost::optional<AirflowNetworkOccupantVentilationControl> occupantVentilationControl() const;
+  //boost::optional<AirflowNetworkOccupantVentilationControl> occupantVentilationControl() const;
 
   //@}
   /** @name Setters */
   //@{
 
   // TODO: Check argument type. From object lists, some candidates are: SurfAndSubSurf.
-  bool setSurface(const Surface& surface);
+  bool setSurface(const PlanarSurface& surface);
 
   // TODO: Check argument type. From object lists, some candidates are: SurfaceAirflowLeakage.
-  bool setLeakageComponent(const SurfaceAirflowLeakage& surfaceAirflowLeakage);
+  //bool setLeakageComponent(const SurfaceAirflowLeakage& surfaceAirflowLeakage);
 
   // TODO: Check argument type. From object lists, some candidates are: ExternalNode.
   //bool setExternalNode(const ExternalNode& externalNode);
@@ -161,9 +161,9 @@ public:
   void resetVentingAvailabilitySchedule();
 
   // TODO: Check argument type. From object lists, some candidates are: AirflowNetworkOccupantVentilationControl.
-  bool setOccupantVentilationControl(const AirflowNetworkOccupantVentilationControl& airflowNetworkOccupantVentilationControl);
+  //bool setOccupantVentilationControl(const AirflowNetworkOccupantVentilationControl& airflowNetworkOccupantVentilationControl);
 
-  void resetOccupantVentilationControl();
+  //void resetOccupantVentilationControl();
 
   //@}
   /** @name Other */

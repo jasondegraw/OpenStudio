@@ -22,7 +22,7 @@
 #include <model/Model.hpp>
 
 #include <utilities/idd/IddEnums.hxx>
-#include <utilities/idd/OS_AirflowNetworkMultiZoneSurfaceCrack_FieldEnums.hxx>
+#include <utilities/idd/OS_AirflowNetwork_MultiZoneSurfaceCrack_FieldEnums.hxx>
 
 #include <utilities/units/Unit.hpp>
 
@@ -70,110 +70,110 @@ IddObjectType AirflowNetworkMultiZoneSurfaceCrack_Impl::iddObjectType() const
 
 double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowCoefficient() const
 {
-  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, true);
+  boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, true);
   OS_ASSERT(value);
   return value.get();
 }
 
 double AirflowNetworkMultiZoneSurfaceCrack_Impl::airMassFlowExponent() const
 {
-  boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, true);
+  boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::AirMassFlowExponent, true);
   OS_ASSERT(value);
   return value.get();
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isAirMassFlowExponentDefaulted() const
 {
-  return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent);
+  return isEmpty(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::AirMassFlowExponent);
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowCoefficient(double airMassFlowCoefficientatReferenceConditions)
 {
-  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, airMassFlowCoefficientatReferenceConditions);
+  bool result = setDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::AirMassFlowCoefficientatReferenceConditions, airMassFlowCoefficientatReferenceConditions);
   return result;
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setAirMassFlowExponent(double airMassFlowExponent)
 {
-  bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, airMassFlowExponent);
+  bool result = setDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::AirMassFlowExponent, airMassFlowExponent);
   return result;
 }
 
 void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetAirMassFlowExponent()
 {
-  bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::AirMassFlowExponent, "");
+  bool result = setString(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::AirMassFlowExponent, "");
   OS_ASSERT(result);
 }
 
 double AirflowNetworkMultiZoneSurfaceCrack_Impl::referenceTemperature() const
 {
-	boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceTemperature, true);
+	boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceTemperature, true);
 	OS_ASSERT(value);
 	return value.get();
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isReferenceTemperatureDefaulted() const
 {
-	return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceTemperature);
+	return isEmpty(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceTemperature);
 }
 
 double AirflowNetworkMultiZoneSurfaceCrack_Impl::referenceBarometricPressure() const
 {
-	boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceBarometricPressure, true);
+	boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceBarometricPressure, true);
 	OS_ASSERT(value);
 	return value.get();
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isReferenceBarometricPressureDefaulted() const
 {
-	return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceBarometricPressure);
+	return isEmpty(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceBarometricPressure);
 }
 
 double AirflowNetworkMultiZoneSurfaceCrack_Impl::referenceHumidityRatio() const
 {
-	boost::optional<double> value = getDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceHumidityRatio, true);
+	boost::optional<double> value = getDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceHumidityRatio, true);
 	OS_ASSERT(value);
 	return value.get();
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::isReferenceHumidityRatioDefaulted() const
 {
-	return isEmpty(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceHumidityRatio);
+	return isEmpty(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceHumidityRatio);
 }
 
 void AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceTemperature(double referenceTemperature)
 {
-	bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceTemperature, referenceTemperature);
+	bool result = setDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceTemperature, referenceTemperature);
 	OS_ASSERT(result);
 }
 
 void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetReferenceTemperature()
 {
-	bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceTemperature, "");
+	bool result = setString(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceTemperature, "");
 	OS_ASSERT(result);
 }
 
 bool AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceBarometricPressure(double referenceBarometricPressure)
 {
-	bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceBarometricPressure, referenceBarometricPressure);
+	bool result = setDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceBarometricPressure, referenceBarometricPressure);
 	return result;
 }
 
 void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetReferenceBarometricPressure()
 {
-	bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceBarometricPressure, "");
+	bool result = setString(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceBarometricPressure, "");
 	OS_ASSERT(result);
 }
 
 void AirflowNetworkMultiZoneSurfaceCrack_Impl::setReferenceHumidityRatio(double referenceHumidityRatio)
 {
-	bool result = setDouble(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceHumidityRatio, referenceHumidityRatio);
+	bool result = setDouble(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceHumidityRatio, referenceHumidityRatio);
 	OS_ASSERT(result);
 }
 
 void AirflowNetworkMultiZoneSurfaceCrack_Impl::resetReferenceHumidityRatio()
 {
-	bool result = setString(OS_AirflowNetworkMultiZoneSurfaceCrackFields::ReferenceHumidityRatio, "");
+	bool result = setString(OS_AirflowNetwork_MultiZoneSurfaceCrackFields::ReferenceHumidityRatio, "");
 	OS_ASSERT(result);
 }
 
