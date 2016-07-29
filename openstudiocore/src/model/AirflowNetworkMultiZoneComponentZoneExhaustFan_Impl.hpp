@@ -17,37 +17,39 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  **********************************************************************/
 
-#ifndef MODEL_AIRFLOWNETWORKMULTIZONESURFACECRACK_IMPL_HPP
-#define MODEL_AIRFLOWNETWORKMULTIZONESURFACECRACK_IMPL_HPP
+#ifndef MODEL_AIRFLOWNETWORKMULTIZONECOMPONENTZONEEXHAUSTFAN_IMPL_HPP
+#define MODEL_AIRFLOWNETWORKMULTIZONECOMPONENTZONEEXHAUSTFAN_IMPL_HPP
 
 #include <model/ModelAPI.hpp>
-#include <model/ModelObject_Impl.hpp>
+#include "ModelObject_Impl.hpp"
 
 namespace openstudio {
 namespace model {
 
+class FanZoneExhaust;
+class AirflowNetworkMultiZoneReferenceCrackConditions;
+
 namespace detail {
 
-/** AirflowNetworkMultiZoneSurfaceCrack_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneSurfaceCrack.*/
-class MODEL_API AirflowNetworkMultiZoneSurfaceCrack_Impl : public ModelObject_Impl
-{
+/** AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl is a ModelObject_Impl that is the implementation class for AirflowNetworkMultiZoneComponentZoneExhaustFan.*/
+class MODEL_API AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl : public ModelObject_Impl {
 public:
   /** @name Constructors and Destructors */
   //@{
 
-  AirflowNetworkMultiZoneSurfaceCrack_Impl(const IdfObject& idfObject,
+  AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl(const IdfObject& idfObject,
     Model_Impl* model,
     bool keepHandle);
 
-  AirflowNetworkMultiZoneSurfaceCrack_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
+  AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
     Model_Impl* model,
     bool keepHandle);
 
-  AirflowNetworkMultiZoneSurfaceCrack_Impl(const AirflowNetworkMultiZoneSurfaceCrack_Impl& other,
+  AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl(const AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl& other,
     Model_Impl* model,
     bool keepHandle);
 
-  virtual ~AirflowNetworkMultiZoneSurfaceCrack_Impl() {}
+  virtual ~AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl() {}
 
   //@}
   /** @name Virtual Methods */
@@ -61,11 +63,13 @@ public:
   /** @name Getters */
   //@{
 
-  double airMassFlowCoefficient() const;
+  FanZoneExhaust fanZoneExhaust() const;
 
-  double airMassFlowExponent() const;
+  double airMassFlowCoefficientWhentheZoneExhaustFanisOffatReferenceConditions() const;
 
-  bool isAirMassFlowExponentDefaulted() const;
+  double airMassFlowExponentWhentheZoneExhaustFanisOff() const;
+
+  bool isAirMassFlowExponentWhentheZoneExhaustFanisOffDefaulted() const;
 
   boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
 
@@ -73,20 +77,27 @@ public:
   /** @name Setters */
   //@{
 
-  bool setAirMassFlowCoefficient(double airMassFlowCoefficientatReferenceConditions);
+  bool setFanZoneExhaust(const FanZoneExhaust& fansZoneExhaust);
 
-  bool setAirMassFlowExponent(double airMassFlowExponent);
+  bool setAirMassFlowCoefficientWhentheZoneExhaustFanisOffatReferenceConditions(double airMassFlowCoefficientWhentheZoneExhaustFanisOffatReferenceConditions);
 
-  void resetAirMassFlowExponent();
+  bool setAirMassFlowExponentWhentheZoneExhaustFanisOff(double airMassFlowExponentWhentheZoneExhaustFanisOff);
+
+  void resetAirMassFlowExponentWhentheZoneExhaustFanisOff();
 
   bool setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions& referenceCrackConditions);
 
   void resetReferenceCrackConditions();
 
   //@}
+  /** @name Other */
+  //@{
+
+  //@}
 protected:
 private:
-  REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneSurfaceCrack");
+  REGISTER_LOGGER("openstudio.model.AirflowNetworkMultiZoneComponentZoneExhaustFan");
+
 };
 
 } // detail
@@ -94,5 +105,5 @@ private:
 } // model
 } // openstudio
 
-#endif // MODEL_AIRFLOWNETWORKMULTIZONESURFACECRACK_IMPL_HPP
+#endif // MODEL_AIRFLOWNETWORKMULTIZONECOMPONENTZONEEXHAUSTFAN_IMPL_HPP
 

@@ -30,7 +30,6 @@ namespace model {
 class PlanarSurface;
 //class SurfaceAirflowLeakage;
 //class ExternalNode;
-//class Schedule;
 class Schedule;
 //class AirflowNetworkOccupantVentilationControl;
 

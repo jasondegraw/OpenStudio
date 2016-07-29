@@ -87,18 +87,13 @@ class DesignSpecificationOutdoorAir;
 class SpaceLoadInstance;
 class SpaceLoadDefinition;
 class GeneratorPhotovoltaic;
+class FanZoneExhaust;
 }
 }
 
 UNIQUEMODELOBJECT_TEMPLATES(Site);
 UNIQUEMODELOBJECT_TEMPLATES(Facility);
 UNIQUEMODELOBJECT_TEMPLATES(Building);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentDetailedOpening);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentHorizontalOpening);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneComponentSimpleOpening);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurface);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceCrack);
-MODELOBJECT_TEMPLATES(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
 MODELOBJECT_TEMPLATES(BuildingStory);
 MODELOBJECT_TEMPLATES(PlanarSurfaceGroup);
 MODELOBJECT_TEMPLATES(Space); 
@@ -137,12 +132,6 @@ MODELOBJECT_TEMPLATES(LightingSimulationZone);
 SWIG_UNIQUEMODELOBJECT(Site);
 SWIG_UNIQUEMODELOBJECT(Facility);
 SWIG_UNIQUEMODELOBJECT(Building);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentDetailedOpening, 1);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentHorizontalOpening, 1);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneComponentSimpleOpening, 1);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurface, 1);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceCrack, 1);
-SWIG_MODELOBJECT(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea, 1);
 SWIG_MODELOBJECT(BuildingStory, 1);
 SWIG_MODELOBJECT(PlanarSurfaceGroup, 0);
 SWIG_MODELOBJECT(Space, 1); 

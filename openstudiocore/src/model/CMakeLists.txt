@@ -44,6 +44,12 @@ set(${target_name}_src
   AirflowNetworkMultiZoneComponentSimpleOpening.hpp
   AirflowNetworkMultiZoneComponentSimpleOpening_Impl.hpp
   AirflowNetworkMultiZoneComponentSimpleOpening.cpp
+  AirflowNetworkMultiZoneComponentZoneExhaustFan.hpp
+  AirflowNetworkMultiZoneComponentZoneExhaustFan_Impl.hpp
+  AirflowNetworkMultiZoneComponentZoneExhaustFan.cpp
+  AirflowNetworkMultiZoneReferenceCrackConditions.hpp
+  AirflowNetworkMultiZoneReferenceCrackConditions_Impl.hpp
+  AirflowNetworkMultiZoneReferenceCrackConditions.cpp
   AirflowNetworkMultiZoneSurface.hpp
   AirflowNetworkMultiZoneSurface_Impl.hpp
   AirflowNetworkMultiZoneSurface.cpp
@@ -1307,6 +1313,7 @@ set(${target_name}_swig_src
   ModelResources.i
   ModelGeometry.i
   ModelHVAC.i
+  ModelAirflow.i
   ModelRefrigeration.i
   ModelGenerators.i
 )
@@ -1843,7 +1850,9 @@ MAKE_SWIG_TARGET(OpenStudioModelGeometry model "${CMAKE_CURRENT_SOURCE_DIR}/Mode
 
 MAKE_SWIG_TARGET(OpenStudioModelHVAC model "${CMAKE_CURRENT_SOURCE_DIR}/ModelHVAC.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModelGeometry)
 
-MAKE_SWIG_TARGET(OpenStudioModelRefrigeration model "${CMAKE_CURRENT_SOURCE_DIR}/ModelRefrigeration.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModelHVAC)
+MAKE_SWIG_TARGET(OpenStudioModelAirflow model "${CMAKE_CURRENT_SOURCE_DIR}/ModelAirflow.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModelHVAC)
+
+MAKE_SWIG_TARGET(OpenStudioModelRefrigeration model "${CMAKE_CURRENT_SOURCE_DIR}/ModelRefrigeration.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModelAirflow)
 
 MAKE_SWIG_TARGET(OpenStudioModelGenerators model "${CMAKE_CURRENT_SOURCE_DIR}/ModelGenerators.i" "${${target_name}_swig_src}" ${target_name} OpenStudioModelRefrigeration)
 

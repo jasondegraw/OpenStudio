@@ -48,7 +48,7 @@ public:
   /** @name Constructors and Destructors */
   //@{
 
-  AirflowNetworkMultiZoneSurface(const Model& model); // , const PlanarSurface &surface);
+  AirflowNetworkMultiZoneSurface(const Model& model, const PlanarSurface &surface);
 
   virtual ~AirflowNetworkMultiZoneSurface() {}
 
@@ -61,7 +61,7 @@ public:
   /** @name Getters */
   //@{
 
-  // TODO: Check return type. From object lists, some candidates are: SurfAndSubSurf.
+  /** Returns the planar surface associated with this object. */
   PlanarSurface surface() const;
 
   // TODO: Check return type. From object lists, some candidates are: SurfaceAirflowLeakage.
@@ -69,20 +69,20 @@ public:
 
   // TODO: Check return type. From object lists, some candidates are: ExternalNode.
   //boost::optional<ExternalNode> externalNode() const;
-
+  /** Returns the window opening, door opening, or crack factor for this object. */
   double windowDoorOpeningFactorOrCrackFactor() const;
-
+  /** Returns true if the window opening, door opening, or crack factor for this object is defaulted. */
   bool isWindowDoorOpeningFactorOrCrackFactorDefaulted() const;
-
+  /** Returns the ventilation control mode for this object. */
   std::string ventilationControlMode() const;
-
+  /** Returns true if the ventilation control mode for this object is defaulted. */
   bool isVentilationControlModeDefaulted() const;
 
-  // TODO: Check return type. From object lists, some candidates are: Schedule.
+  /** Returns the ventilation control schedule if this object has one. */
   boost::optional<Schedule> ventilationControlZoneTemperatureSetpointSchedule() const;
-
+  /** Returns the minimum venting open factor for this object. */
   double minimumVentingOpenFactor() const;
-
+  /** Returns true if the minimum venting open factor for this object is defaulted. */
   bool isMinimumVentingOpenFactorDefaulted() const;
 
   double indoorandOutdoorTemperatureDifferenceLowerLimitForMaximumVentingOpenFactor() const;

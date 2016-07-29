@@ -193,6 +193,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentDetailedOpening);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentHorizontalOpening);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentSimpleOpening);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneComponentZoneExhaustFan);
+    REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneReferenceCrackConditions);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurface);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurfaceCrack);
     REGISTER_CONSTRUCTOR(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);
@@ -610,6 +612,8 @@ if (_className::iddObjectType() == typeToCreate) { \
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentDetailedOpening);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentHorizontalOpening);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentSimpleOpening);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneComponentZoneExhaustFan);
+    REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneReferenceCrackConditions);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurface);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurfaceCrack);
     REGISTER_COPYCONSTRUCTORS(AirflowNetworkMultiZoneSurfaceEffectiveLeakageArea);

@@ -26508,265 +26508,320 @@ OS:AirflowNetwork:MultiZoneSurface,
       \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required
 
-OS:AirflowNetwork:MultiZoneSurfaceCrack,
-       \min-fields 3
-       \memo This object specifies the properties of airflow through a crack.
+OS:AirflowNetwork:MultiZoneReferenceCrackConditions,
+      \min-fields 5
+      \memo This object specifies the conditions under which the air mass flow coefficient was measured.
   A1, \field Handle
-       \type handle
-       \required-field
+      \type handle
+      \required-field
   A2, \field Name
-       \required-field
-       \type alpha
-       \reference SurfaceAirflowLeakageNames
-       \note A unique name for this object.
+      \required-field
+      \type alpha
+      \reference ReferenceCrackConditions
+      \note A unique name for this object.
+  N1, \field Reference Temperature
+      \type real
+      \units C
+      \default 20
+      \note The reference temperature under which the surface crack data were obtained.
+  N2, \field Reference Barometric Pressure
+      \type real
+      \units Pa
+      \default 101325
+      \minimum 31000
+      \maximum 120000
+      \ip-units inHg
+      \note The reference barometric pressure under which the surface crack data were obtained.
+  N3; \field Reference Humidity Ratio
+      \type real
+      \units kgWater/kgDryAir
+      \default 0
+      \note The reference humidity ratio under which the surface crack data were obtained.
+
+OS:AirflowNetwork:MultiZoneSurfaceCrack,
+      \min-fields 3
+      \memo This object specifies the properties of airflow through a crack.
+  A1, \field Handle
+      \type handle
+      \required-field
+  A2, \field Name
+      \required-field
+      \type alpha
+      \reference SurfaceAirflowLeakageNames
+      \note A unique name for this object.
   N1, \field Air Mass Flow Coefficient at Reference Conditions
-       \type real
-       \required-field
-       \units kg/s
-       \minimum> 0
-       \note The air mass flow coefficient at the conditions defined
-       \note in the Reference Crack Conditions object.
-       \note Defined at 1 Pa pressure difference across this crack.
+      \type real
+      \required-field
+      \units kg/s
+      \minimum> 0
+      \note The air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference across this crack.
   N2, \field Air Mass Flow Exponent
-       \type real
-       \units dimensionless
-       \minimum 0.5
-       \maximum 1.0
-       \default 0.65
-       \note The air mass flow exponent for the surface crack.
-  N3, \field Reference Temperature
-       \type real
-       \units C
-       \default 20
-       \note The reference temperature under which the surface crack data were obtained.
-  N4, \field Reference Barometric Pressure
-       \type real
-       \units Pa
-       \default 101325
-       \minimum 31000
-       \maximum 120000
-       \ip-units inHg
-       \note The reference barometric pressure under which the surface crack data were obtained.
-  N5; \field Reference Humidity Ratio
-       \type real
-       \units kgWater/kgDryAir
-       \default 0
-       \note The reference humidity ratio under which the surface crack data were obtained.
+      \type real
+      \units dimensionless
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note The air mass flow exponent for the surface crack.
+  A3; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note The AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered.
 
 OS:AirflowNetwork:MultiZoneSurfaceEffectiveLeakageArea,
-       \min-fields 6
-       \memo This object is used to define surface air leakage.
+      \min-fields 6
+      \memo This object is used to define surface air leakage.
   A1, \field Handle
-       \type handle
-       \required-field
+      \type handle
+      \required-field
   A2, \field Name
-       \required-field
-       \type alpha
-       \reference SurfaceAirflowLeakageNames
-       \note A unique name for this object.
+      \required-field
+      \type alpha
+      \reference SurfaceAirflowLeakageNames
+      \note A unique name for this object.
   N1, \field Effective Leakage Area
-       \required-field
-       \type real
-       \units m2
-       \minimum> 0
-       \note The effective leakage area.
+      \required-field
+      \type real
+      \units m2
+      \minimum> 0
+      \note The effective leakage area.
   N2, \field Discharge Coefficient
-       \type real
-       \units dimensionless
-       \minimum> 0
-       \default 1.0
-       \note The coefficient used in the air mass flow equation.
+      \type real
+      \units dimensionless
+      \minimum> 0
+      \default 1.0
+      \note The coefficient used in the air mass flow equation.
   N3, \field Reference Pressure Difference
-       \type real
-       \units Pa
-       \minimum> 0
-       \default 4.0
-       \note The pressure difference used to define the air mass flow coefficient and exponent.
+      \type real
+      \units Pa
+      \minimum> 0
+      \default 4.0
+      \note The pressure difference used to define the air mass flow coefficient and exponent.
   N4; \field Air Mass Flow Exponent
-       \units dimensionless
-       \type real
-       \default .65
-       \minimum 0.5
-       \maximum 1.0
-       \note The exponent used in the air mass flow equation.
+      \units dimensionless
+      \type real
+      \default .65
+      \minimum 0.5
+      \maximum 1.0
+      \note The exponent used in the air mass flow equation.
 
 OS:AirflowNetwork:MultiZoneComponentSimpleOpening,
-       \min-fields 6
-       \memo This object specifies the properties of air flow through windows and doors (window, door and
-       \memo glass door heat transfer subsurfaces) when they are closed or open.
+      \min-fields 6
+      \memo This object specifies the properties of air flow through windows and doors (window, door and
+      \memo glass door heat transfer subsurfaces) when they are closed or open.
   A1, \field Handle
-       \type handle
-       \required-field
+      \type handle
+      \required-field
   A2, \field Name
-       \required-field
-       \type alpha
-       \reference SurfaceAirflowLeakageNames
-       \note Enter a unique name for this object.
+      \required-field
+      \type alpha
+      \reference SurfaceAirflowLeakageNames
+      \note Enter a unique name for this object.
   N1, \field Air Mass Flow Coefficient When Opening is Closed
-       \required-field
-       \type real
-       \minimum> 0
-       \units kg/s-m
-       \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following equation:
-       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-       \note Used only when opening (window or door) is closed.
+      \required-field
+      \type real
+      \minimum> 0
+      \units kg/s-m
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when opening (window or door) is closed.
   N2, \field Air Mass Flow Exponent When Opening is Closed
-       \units dimensionless
-       \type real
-       \default .65
-       \minimum 0.5
-       \maximum 1.0
-       \note Enter the exponent used in the following equation:
-       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-       \note Used only when opening (window or door) is closed.
+      \units dimensionless
+      \type real
+      \default .65
+      \minimum 0.5
+      \maximum 1.0
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when opening (window or door) is closed.
   N3, \field Minimum Density Difference for Two-Way Flow
-       \required-field
-       \units kg/m3
-       \type real
-       \minimum> 0
-       \note Enter the minimum density difference above which two-way flow may occur due to stack effect.
+      \required-field
+      \units kg/m3
+      \type real
+      \minimum> 0
+      \note Enter the minimum density difference above which two-way flow may occur due to stack effect.
   N4; \field Discharge Coefficient
-       \required-field
-       \units dimensionless
-       \type real
-       \minimum> 0
-       \note The Discharge Coefficient indicates the fractional effectiveness
-       \note for air flow through a window or door at that Opening Factor
+      \required-field
+      \units dimensionless
+      \type real
+      \minimum> 0
+      \note The Discharge Coefficient indicates the fractional effectiveness
+      \note for air flow through a window or door at that Opening Factor
 
 OS:AirflowNetwork:MultiZoneComponentDetailedOpening,
-       \min-fields 17
-       \extensible:5
-       \memo This object specifies the properties of airflow through windows and doors (window, door and
-       \memo glass door heat transfer subsurfaces) when they are closed or open.
+      \min-fields 17
+      \extensible:5
+      \memo This object specifies the properties of airflow through windows and doors (window, door and
+      \memo glass door heat transfer subsurfaces) when they are closed or open.
   A1, \field Handle
-       \type handle
-       \required-field
+      \type handle
+      \required-field
   A2, \field Name
-       \required-field
-       \type alpha
-       \reference SurfaceAirflowLeakageNames
-       \note Enter a unique name for this object.
+      \required-field
+      \type alpha
+      \reference SurfaceAirflowLeakageNames
+      \note Enter a unique name for this object.
   N1, \field Air Mass Flow Coefficient When Opening is Closed
-       \required-field
-       \type real
-       \units kg/s-m
-       \minimum> 0
-       \note Defined at 1 Pa per meter of crack length. Enter the coefficient used in the following
-       \note equation:
-       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-       \note Used only when opening (window or door) is closed.
+      \required-field
+      \type real
+      \units kg/s-m
+      \minimum> 0
+      \note Defined at 1 Pa per meter of crack length. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when opening (window or door) is closed.
   N2, \field Air Mass Flow Exponent When Opening is Closed
-       \units dimensionless
-       \type real
-       \minimum 0.5
-       \maximum 1.0
-       \default 0.65
-       \note Enter the exponent used in the following equation:
-       \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-       \note Used only when opening (window or door) is closed.
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when opening (window or door) is closed.
   A3, \field Type of Rectangular Large Vertical Opening
-       \type choice
-       \key NonPivoted
-       \key HorizontallyPivoted
-       \note Select the type of vertical opening: Non-pivoted opening or Horizontally pivoted opening.
-       \default NonPivoted
+      \type choice
+      \key NonPivoted
+      \key HorizontallyPivoted
+      \note Select the type of vertical opening: Non-pivoted opening or Horizontally pivoted opening.
+      \default NonPivoted
   N3, \field Extra Crack Length or Height of Pivoting Axis
-       \type real
-       \units m
-       \minimum 0
-       \default 0
-       \note Extra crack length is used for LVO Non-pivoted type with multiple openable parts.
-       \note Height of pivoting axis is used for LVO Horizontally pivoted type.
-       \note Specifies window or door characteristics that depend on the LVO type.
-       \note For Non-pivoted Type (rectangular windows and doors), this field is the extra crack length
-       \note in meters due to multiple openable parts, if present.  Extra here means in addition
-       \note to the length of the cracks on the top, bottom and sides of the window/door.
-       \note For Horizontally pivoted Type, this field gives the height of the
-       \note pivoting axis measured from the bottom of the glazed part of the window (m).
+      \type real
+      \units m
+      \minimum 0
+      \default 0
+      \note Extra crack length is used for LVO Non-pivoted type with multiple openable parts.
+      \note Height of pivoting axis is used for LVO Horizontally pivoted type.
+      \note Specifies window or door characteristics that depend on the LVO type.
+      \note For Non-pivoted Type (rectangular windows and doors), this field is the extra crack length
+      \note in meters due to multiple openable parts, if present.  Extra here means in addition
+      \note to the length of the cracks on the top, bottom and sides of the window/door.
+      \note For Horizontally pivoted Type, this field gives the height of the
+      \note pivoting axis measured from the bottom of the glazed part of the window (m).
   N4, \field Opening Factor 1
-       \type real
-       \units dimensionless
-       \minimum 0
-       \maximum 0
-       \default 0
-       \begin-extensible
-       \note This value must be specified as 0.
+      \type real
+      \units dimensionless
+      \minimum 0
+      \maximum 0
+      \default 0
+      \begin-extensible
+      \note This value must be specified as 0.
   N5, \field Discharge Coefficient for Opening Factor 1
-       \type real
-       \units dimensionless
-       \minimum> 0
-       \maximum 1
-       \default 0.001
-       \note The Discharge Coefficient indicates the fractional effectiveness
-       \note for air flow through a window or door at that Opening Factor.
+      \type real
+      \units dimensionless
+      \minimum> 0
+      \maximum 1
+      \default 0.001
+      \note The Discharge Coefficient indicates the fractional effectiveness
+      \note for air flow through a window or door at that Opening Factor.
   N6, \field Width Factor for Opening Factor 1
-       \type real
-       \units dimensionless
-       \minimum 0
-       \maximum 1
-       \default 0
-       \note The Width Factor is the opening width divided by the window or door width.
+      \type real
+      \units dimensionless
+      \minimum 0
+      \maximum 1
+      \default 0
+      \note The Width Factor is the opening width divided by the window or door width.
   N7, \field Height Factor for Opening Factor 1
-       \type real
-       \units dimensionless
-       \minimum 0
-       \maximum 1
-       \default 0
-       \note The Height Factor is the opening height divided by the window or door height.
+      \type real
+      \units dimensionless
+      \minimum 0
+      \maximum 1
+      \default 0
+      \note The Height Factor is the opening height divided by the window or door height.
   N9, \field Start Height Factor for Opening Factor 1
-       \type real
-       \units dimensionless
-       \minimum 0
-       \maximum 1
-       \default 0
-       \note The Start Height Factor is the Start Height divided by the window or door height.
-       \note Start Height is the distance between the bottom of the window or door and the
-       \note bottom of the window or door opening. The sum of the Height Factor and the Start Height
-       \note Factor must be less than 1.0 in order to have the opening within the window or door
-       \note dimensions.
+      \type real
+      \units dimensionless
+      \minimum 0
+      \maximum 1
+      \default 0
+      \note The Start Height Factor is the Start Height divided by the window or door height.
+      \note Start Height is the distance between the bottom of the window or door and the
+      \note bottom of the window or door opening. The sum of the Height Factor and the Start Height
+      \note Factor must be less than 1.0 in order to have the opening within the window or door
+      \note dimensions.
 
 OS:AirflowNetwork:MultiZoneComponentHorizontalOpening,
       \min-fields 6
       \memo This object specifies the properties of air flow through a horizontal opening
   A1, \field Handle
-       \type handle
-       \required-field
+      \type handle
+      \required-field
   A2, \field Name
-       \required-field
-       \type alpha
-       \reference SurfaceAirflowLeakageNames
-       \note Enter a unique name for this object.
+      \required-field
+      \type alpha
+      \reference SurfaceAirflowLeakageNames
+      \note Enter a unique name for this object.
   N1, \field Air Mass Flow Coefficient When Opening is Closed
-       \required-field
-       \type real
-       \minimum> 0
-       \units kg/s-m
-       \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following equation:
-       \note Mass flow rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-       \note Used only when opening is closed.
+      \required-field
+      \type real
+      \minimum> 0
+      \units kg/s-m
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following equation:
+      \note Mass flow rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when opening is closed.
   N2, \field Air Mass Flow Exponent When Opening is Closed
-       \units dimensionless
-       \type real
-       \default .65
-       \minimum 0.5
-       \maximum 1.0
-       \note Enter the exponent used in the following equation:
-       \note Mass flow rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
-       \note Used only when opening is closed.
+      \units dimensionless
+      \type real
+      \default .65
+      \minimum 0.5
+      \maximum 1.0
+      \note Enter the exponent used in the following equation:
+      \note Mass flow rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when opening is closed.
   N3, \field Sloping Plane Angle
-       \units deg
-       \type real
-       \minimum> 0
-       \maximum 90
-       \default 90
-       \note Sloping plane angle = 90 is equivalent to fully open.
+      \units deg
+      \type real
+      \minimum> 0
+      \maximum 90
+      \default 90
+      \note Sloping plane angle = 90 is equivalent to fully open.
   N4; \field Discharge Coefficient
-       \required-field
-       \units dimensionless
-       \type real
-       \minimum> 0
-       \note The Discharge Coefficient indicates the fractional effectiveness
-       \note for air flow through the opening at that Opening Factor.
+      \required-field
+      \units dimensionless
+      \type real
+      \minimum> 0
+      \note The Discharge Coefficient indicates the fractional effectiveness
+      \note for air flow through the opening at that Opening Factor.
+
+OS:AirflowNetwork:MultiZoneComponentZoneExhaustFan,
+      \min-fields 4
+      \memo This object specifies the additional properties for a zone exhaust fan
+      \memo to perform multizone airflow calculations.
+  A1, \field Handle
+      \type handle
+      \required-field
+  A2, \field Name
+      \required-field
+      \type object-list
+      \object-list FansZoneExhaust
+      \note Enter the name of a Fan:ZoneExhaust object.
+  N1, \field Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions
+      \required-field
+      \type real
+      \units kg/s
+      \minimum> 0
+      \note Enter the air mass flow coefficient at the conditions defined
+      \note in the Reference Crack Conditions object.
+      \note Defined at 1 Pa pressure difference. Enter the coefficient used in the following
+      \note equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when the fan is off.
+  N2, \field Air Mass Flow Exponent When the Zone Exhaust Fan is Off
+      \units dimensionless
+      \type real
+      \minimum 0.5
+      \maximum 1.0
+      \default 0.65
+      \note Enter the exponent used in the following equation:
+      \note Mass Flow Rate = Air Mass Flow Coefficient * (dP)^Air Mass Flow Exponent.
+      \note Used only when the fan is off.
+  A3; \field Reference Crack Conditions
+      \type object-list
+      \object-list ReferenceCrackConditions
+      \note Select a AirflowNetwork:MultiZone:ReferenceCrackConditions name associated with
+      \note the air mass flow coefficient entered above.
 
 \group OpenStudio Output Requests
 

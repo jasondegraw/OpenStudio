@@ -27,6 +27,8 @@ namespace openstudio {
 
 namespace model {
 
+class AirflowNetworkMultiZoneReferenceCrackConditions;
+
 namespace detail {
 
 class AirflowNetworkMultiZoneSurfaceCrack_Impl;
@@ -46,7 +48,7 @@ public:
     double massFlowExponent);
   /** Construct a surface crack object. */
   AirflowNetworkMultiZoneSurfaceCrack(const Model& model, double massFlowCoefficient, double massFlowExponent,
-    double referenceTemperature, double referenceBarometricPressure, double referenceHumidityRatio);
+    const AirflowNetworkMultiZoneReferenceCrackConditions &referenceCrackConditions);
 
   virtual ~AirflowNetworkMultiZoneSurfaceCrack() {}
 
@@ -62,18 +64,8 @@ public:
   double airMassFlowExponent() const;
   /** Returns true if the mass flow exponent is defaulted. */
   bool isAirMassFlowExponentDefaulted() const;
-  /** Returns the reference temperature in degrees C. */
-  double referenceTemperature() const;
-  /** Returns true if the reference temperature is defaulted. */
-  bool isReferenceTemperatureDefaulted() const;
-  /** Returns the reference barometric pressure in Pa. */
-  double referenceBarometricPressure() const;
-  /** Returns true if the reference barometric pressure is defaulted. */
-  bool isReferenceBarometricPressureDefaulted() const;
-  /** Returns the reference humidity ratio in kgWater/kgDryAir. */
-  double referenceHumidityRatio() const;
-  /** Returns true if the reference humidity ratio is defaulted. */
-  bool isReferenceHumidityRatioDefaulted() const;
+  /** Returns a reference crack conditions object if available. */
+  boost::optional<AirflowNetworkMultiZoneReferenceCrackConditions> referenceCrackConditions() const;
 
   //@}
   /** @name Setters */
@@ -84,18 +76,10 @@ public:
   bool setAirMassFlowExponent(double airMassFlowExponent);
   /** Returns the mass flow exponent to the default value. */
   void resetAirMassFlowExponent();
-  /** Sets the reference temperature in degrees C. */
-  void setReferenceTemperature(double referenceTemperature);
-  /** Resets the reference temperature to the default. */
-  void resetReferenceTemperature();
-  /** Sets the the reference barometric pressure in Pa. */
-  bool setReferenceBarometricPressure(double referenceBarometricPressure);
-  /** Resets the reference barometric pressure to the default. */
-  void resetReferenceBarometricPressure();
-  /** Sets the reference humidity ratio in kgWater/kgDryAir. */
-  void setReferenceHumidityRatio(double referenceHumidityRatio);
-  /** Resets the reference humidity ratio to the default. */
-  void resetReferenceHumidityRatio();
+  /** Sets the the reference crack conditions. */
+  bool setReferenceCrackConditions(const AirflowNetworkMultiZoneReferenceCrackConditions& referenceCrackConditions);
+  /** Resets the the reference crack conditions. */
+  void resetReferenceCrackConditions();
 
   //@}
 protected:
